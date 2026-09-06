@@ -1,0 +1,68 @@
+name: Validar ATLAS en Windows
+
+# La candidata se valida al publicar expresamente su etiqueta rc.
+# Comprobar la cuota/bloqueo de gasto antes de publicar cada etiqueta.
+# No necesita secretos ni llama a proveedores de IA o datos de mercado.
+on:
+  workflow_dispatch:
+    inputs:
+      candidate:
+        description: 'Etiqueta de candidata revisada que se debe validar'
+        required: true
+        type: choice
+        default: v0.2.0-rc.1
+        options:
+          - v0.2.0-rc.1
+  push:
+    tags:
+      - 'v*-rc.*'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: atlas-validation-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    env:
+      PYTHONUTF8: '1'
+      ATLAS_DATA_DIR: var/test-data
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+          ref: ${{ inputs.candidate || github.ref }}
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
+        with:
+          python-version: '3.14.4'
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: '24.15.0'
+          package-manager-cache: false
+      - name: Registrar commit realmente validado
+        run: git rev-parse HEAD
+      - name: Instalar pnpm fijado
+        run: npm.cmd install --global pnpm@11.19.0
+      - name: Instalar dependencias y compilar
+        run: ./Install-Atlas.ps1
+      - name: Pruebas Python con datos aislados
+        run: ./.venv/Scripts/python.exe -m pytest -q --basetemp var/pytest-ci
+      - name: TypeScript
+        run: node frontend/node_modules/typescript/bin/tsc --noEmit --project frontend/tsconfig.json
+      - name: Contratos generados coherentes con el motor
+        run: ./.venv/Scripts/python.exe tools/export_contracts.py --check
+      - name: Lint de la aplicación mantenida
+        working-directory: frontend
+        run: node node_modules/oxlint/bin/oxlint app lib next.config.ts local-server.mjs
+      - name: Arranque y recorrido sintético mediante el proxy
+        run: |
+          ./Start-Atlas.ps1
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          ./.venv/Scripts/python.exe tools/smoke_local.py
+      - name: Parada
+        if: always()
+        run: ./Stop-Atlas.ps1
