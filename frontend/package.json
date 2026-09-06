@@ -1,6 +1,6 @@
 {
   "name": "sites-project",
-  "version": "0.1.0",
+  "version": "0.2.0-rc.1",
   "private": true,
   "engines": {
     "node": ">=22.13.0"
@@ -8,8 +8,9 @@
   "scripts": {
     "dev": "vinext dev",
     "build": "vinext build",
-    "start": "wrangler dev --config dist/server/wrangler.json",
-    "lint": "oxlint",
+    "start": "node local-server.mjs",
+    "lint": "oxlint app lib next.config.ts local-server.mjs",
+    "lint:all": "oxlint",
     "format": "oxfmt"
   },
   "dependencies": {

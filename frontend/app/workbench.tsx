@@ -1,5 +1,7 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
+import { api } from '@/lib/api';
+import type { DatasetResponse, StateResponse, LedgerResponse, ResearchResponse, ResearchResult as StoredResearch, ExperimentResponse, PortfolioPoint, BacktestPoint } from '@/lib/api-types';
 import {
   Play,
   Download,
@@ -33,29 +35,6 @@ import {
   TableRow,
 } from '@/components/ui/table';
 
-export async function api(path: string, body?: unknown): Promise<any> {
-  const r = await fetch(
-    '/api' + path,
-    body === undefined
-      ? { cache: 'no-store' }
-      : {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-Atlas-Client': 'local-v1',
-          },
-          body: JSON.stringify(body),
-        },
-  );
-  const data: any = await r.json();
-  if (!r.ok)
-    throw new Error(
-      typeof data.detail === 'string'
-        ? data.detail
-        : JSON.stringify(data.detail),
-    );
-  return data;
-}
 export const money = (n: number) =>
   new Intl.NumberFormat('es-ES', {
     style: 'currency',
@@ -143,10 +122,11 @@ export function DataTable({
     </Table>
   );
 }
-export function Curve({ data }: { data: any[] }) {
-  const values = data.map((p) => p.nav ?? p.equity),
-    bench = data.every((p) => p.benchmark != null)
-      ? data.map((p) => p.benchmark)
+/* oxlint-disable jsx-a11y/prefer-tag-over-role -- Inline SVG requires image semantics and cannot be replaced by an img containing paths. */
+export function Curve({ data }: { data: (PortfolioPoint | BacktestPoint)[] }) {
+  const values = data.map((p) => 'nav' in p ? p.nav : p.equity),
+    bench = data.every((p) => 'benchmark' in p && p.benchmark != null)
+      ? data.map((p) => 'benchmark' in p ? p.benchmark : 0)
       : null,
     all = bench ? [...values, ...bench] : values,
     min = Math.min(...all) * 0.96,
@@ -218,6 +198,8 @@ export function Curve({ data }: { data: any[] }) {
   );
 }
 
+/* oxlint-enable jsx-a11y/prefer-tag-over-role */
+
 const DEFAULT_COSTS = {
   initial_cash: 10000,
   commission_bps: 5,
@@ -273,22 +255,26 @@ function useAction(onError: (s: string) => void) {
   return { busy, run };
 }
 
+function useDatasetSymbol(dataset: DatasetResponse | undefined) {
+  const [selection, setSelection] = useState<{ datasetId?: string; symbol: string } | null>(null);
+  const symbols = dataset?.manifest.symbols ?? [];
+  const symbol = selection?.datasetId === dataset?.id ? selection?.symbol ?? symbols[0] ?? '' : symbols[0] ?? '';
+  const setSymbol = (value: string) => setSelection({ datasetId: dataset?.id, symbol: value });
+  return { symbols, symbol, setSymbol };
+}
+
 export function Lab({
   dataset,
   onError,
 }: {
-  dataset: any;
+  dataset: DatasetResponse | undefined;
   onError: (s: string) => void;
 }) {
-  const [symbol, setSymbol] = useState(''),
-    [costs, setCosts] = useState(DEFAULT_COSTS),
-    [result, setResult] = useState<any>(null);
+  const { symbols, symbol, setSymbol } = useDatasetSymbol(dataset);
+  const [costs, setCosts] = useState(DEFAULT_COSTS),
+    [savedResult, setResult] = useState<{ datasetId?: string; result: ResearchResponse } | null>(null);
+  const result = savedResult?.datasetId === dataset?.id ? savedResult?.result : null;
   const { busy, run } = useAction(onError);
-  const symbols = dataset?.manifest?.symbols || [];
-  useEffect(() => {
-    setSymbol(symbols[0] || '');
-    setResult(null);
-  }, [dataset?.id]);
   return (
     <>
       <section className="panel">
@@ -316,13 +302,14 @@ export function Lab({
           disabled={!symbol || busy}
           onClick={() =>
             run(async () =>
-              setResult(
-                await api('/research', {
-                  dataset_id: dataset.id,
+              setResult({
+                datasetId: dataset?.id,
+                result: await api<ResearchResponse>('/research', {
+                  dataset_id: dataset?.id,
                   symbol,
                   costs,
                 }),
-              ),
+              }),
             )
           }
         >
@@ -334,7 +321,9 @@ export function Lab({
     </>
   );
 }
-export function ResearchResult({ result }: { result: any }) {
+export function ResearchResult({ result }: { result: StoredResearch }) {
+  if (!result.out_of_sample || !result.candidate_results || !result.sensitivity)
+    return <p className="muted">La investigación aún no tiene resultados completos.</p>;
   const m = result.out_of_sample.metrics;
   return (
     <>
@@ -355,13 +344,13 @@ export function ResearchResult({ result }: { result: any }) {
           <h2>Resultado fuera de muestra</h2>
           <span className="tag">{result.selected_strategy.kind}</span>
         </div>
-        <Curve data={result.out_of_sample.curve} />
+        <Curve data={result.out_of_sample.curve ?? []} />
         <div className="split-periods">
-          {['train_period', 'validation_period', 'test_period'].map((k, i) => (
+          {(['train_period', 'validation_period', 'test_period'] as const).map((k, i) => (
             <div key={k}>
               <span>{['Preparación', 'Selección', 'Prueba reservada'][i]}</span>
               <strong>
-                {typeof result[k] === 'object'
+                {result[k] != null
                   ? result[k].start + ' → ' + result[k].end
                   : String(result[k])}
               </strong>
@@ -383,7 +372,7 @@ export function ResearchResult({ result }: { result: any }) {
             'Exceso sobre mantener',
             'Caída máxima',
           ]}
-          rows={result.candidate_results.map((c: any) => [
+          rows={result.candidate_results.map((c) => [
             c.strategy.kind +
               (c.strategy.kind === 'sma_cross'
                 ? ` ${c.strategy.fast_window}/${c.strategy.slow_window}`
@@ -396,7 +385,7 @@ export function ResearchResult({ result }: { result: any }) {
         <h3>Sensibilidad a los costes</h3>
         <DataTable
           heads={['Multiplicador', 'Retorno', 'Exceso', 'Caída']}
-          rows={result.sensitivity.map((s: any) => [
+          rows={result.sensitivity.map((s) => [
             s.cost_multiplier + '×',
             pct(s.metrics.total_return),
             pct(s.metrics.excess_return),
@@ -406,7 +395,7 @@ export function ResearchResult({ result }: { result: any }) {
         <details className="details">
           <summary>Supuestos y límites del cálculo</summary>
           <ul>
-            {result.warnings.map((w: string, i: number) => (
+            {(result.warnings ?? []).map((w: string, i: number) => (
               <li key={i}>{w}</li>
             ))}
           </ul>
@@ -422,7 +411,7 @@ export function DataPanel({
   selectDataset,
   onError,
 }: {
-  dataset: any;
+  dataset: DatasetResponse | undefined;
   refresh: () => Promise<void>;
   selectDataset: (id: string) => void;
   onError: (s: string) => void;
@@ -433,7 +422,7 @@ export function DataPanel({
     [source, setSource] = useState(''),
     [update, setUpdate] = useState(false),
     [synthetic, setSynthetic] = useState(false),
-    [preview, setPreview] = useState<any>(null),
+    [preview, setPreview] = useState<LedgerResponse | null>(null),
     [ticker, setTicker] = useState(''),
     [start, setStart] = useState('2022-01-01'),
     [end, setEnd] = useState(''),
@@ -448,7 +437,7 @@ export function DataPanel({
   }
   async function submit(commit = false) {
     if (kind === 'prices') {
-      const d = await api('/datasets', {
+      const d = await api<DatasetResponse>('/datasets', {
         csv,
         name,
         source,
@@ -459,7 +448,7 @@ export function DataPanel({
       setMessage('Precios importados y versión guardada.');
       await refresh();
     } else {
-      const p = await api('/datasets/' + dataset.id + '/ledger', {
+      const p = await api<LedgerResponse>('/datasets/' + dataset?.id + '/ledger', {
         csv,
         commit,
       });
@@ -512,13 +501,13 @@ export function DataPanel({
                 placeholder="Ej.: exportación de mi proveedor, OHLC sin ajustar"
               />
             </Field>
-            <label className="switch-row">
-              <Switch checked={synthetic} onCheckedChange={setSynthetic} />
+            <label className="switch-row" htmlFor="synthetic-data">
+              <Switch id="synthetic-data" checked={synthetic} onCheckedChange={setSynthetic} />
               Son datos sintéticos
             </label>
             {dataset && (
-              <label className="switch-row">
-                <Switch checked={update} onCheckedChange={setUpdate} />
+              <label className="switch-row" htmlFor="update-data">
+                <Switch id="update-data" checked={update} onCheckedChange={setUpdate} />
                 Actualizar {dataset.name} conservando su historial
               </label>
             )}
@@ -574,9 +563,9 @@ export function DataPanel({
           </div>
         )}
         {message && (
-          <p className="success" role="status">
+          <output className="success">
             {message}
-          </p>
+          </output>
         )}
       </section>
       <div>
@@ -620,7 +609,7 @@ export function DataPanel({
             disabled={busy || !ticker}
             onClick={() =>
               run(async () => {
-                const d = await api('/feeds', {
+                const d = await api<DatasetResponse>('/feeds', {
                   symbol: ticker,
                   start,
                   end: end || null,
@@ -701,13 +690,13 @@ export function AgentPanel({
   refresh,
   onError,
 }: {
-  dataset: any;
-  state: any;
+  dataset: DatasetResponse | undefined;
+  state: StateResponse;
   refresh: () => Promise<void>;
   onError: (s: string) => void;
 }) {
-  const [symbol, setSymbol] = useState(''),
-    [provider, setProvider] = useState('none'),
+  const { symbols, symbol, setSymbol } = useDatasetSymbol(dataset);
+  const [provider, setProvider] = useState('none'),
     [prompt, setPrompt] = useState(
       'Compara mantener este activo con filtros de tendencia. Busca una reducción de caídas y evalúa el resultado neto de costes frente al benchmark.',
     ),
@@ -716,39 +705,40 @@ export function AgentPanel({
     [autoPaper, setAutoPaper] = useState(false),
     [costs, setCosts] = useState(DEFAULT_COSTS),
     [selected, setSelected] = useState(''),
-    [detail, setDetail] = useState<any>(null),
+    [detail, setDetail] = useState<ExperimentResponse | null>(null),
     [minOos, setMinOos] = useState(126),
     [minSharpe, setMinSharpe] = useState(0.5),
     [maxDrawdown, setMaxDrawdown] = useState(0.15),
     [minForward, setMinForward] = useState(20);
   const { busy, run } = useAction(onError);
-  const symbols = dataset?.manifest?.symbols || [];
-  useEffect(() => setSymbol(symbols[0] || ''), [dataset?.id]);
+  const detailRevision = useRef(0);
   useEffect(() => {
     if (!selected) return;
     let active = true;
-    const read = () =>
-      api('/experiments/' + selected)
+    const read = () => {
+      const revision = ++detailRevision.current;
+      return api<ExperimentResponse>('/experiments/' + selected)
         .then((d) => {
-          if (active) setDetail(d);
+          if (active && revision === detailRevision.current) setDetail(d);
         })
         .catch((e) => {
           if (active) onError(String(e));
         });
+    };
     void read();
     const t = setInterval(read, 5000);
     return () => {
       active = false;
       clearInterval(t);
     };
-  }, [selected]);
+  }, [selected, onError]);
   const providerConfig = state.providers.find(
-    (p: any) => p.provider === provider,
+    (p) => p.provider === provider,
   );
   const missing = provider !== 'none' && !providerConfig?.configured;
   async function create() {
-    const j = await api('/experiments', {
-      dataset_id: dataset.id,
+    const j = await api<ExperimentResponse>('/experiments', {
+      dataset_id: dataset?.id,
       symbol,
       prompt,
       provider,
@@ -768,8 +758,11 @@ export function AgentPanel({
     setSelected(j.id);
     await refresh();
   }
-  async function control(action: string) {
-    setDetail(await api('/experiments/' + selected + '/control', { action }));
+  async function control(action: 'pause' | 'resume' | 'cancel') {
+    ++detailRevision.current;
+    const result = await api<ExperimentResponse>('/experiments/' + selected + '/control', { action });
+    ++detailRevision.current;
+    setDetail(result);
     await refresh();
   }
   return (
@@ -891,8 +884,8 @@ export function AgentPanel({
               crear el experimento.
             </p>
           </details>
-          <label className="switch-row">
-            <Switch checked={autoPaper} onCheckedChange={setAutoPaper} />
+          <label className="switch-row" htmlFor="automatic-paper">
+            <Switch id="automatic-paper" checked={autoPaper} onCheckedChange={setAutoPaper} />
             Activar simulación automáticamente si supera los criterios
           </label>
           <Button
@@ -926,7 +919,7 @@ export function AgentPanel({
             </div>
           ) : (
             <div className="jobs">
-              {state.experiments.map((j: any) => (
+              {state.experiments.map((j) => (
                 <button
                   key={j.id}
                   onClick={() => setSelected(j.id)}
@@ -984,6 +977,12 @@ export function AgentPanel({
               value={(detail.observation?.elapsed_hours || 0).toFixed(1) + ' h'}
             />
           </div>
+          {detail.execution_active && detail.control_requested && (
+            <output className="muted">
+              {detail.control_requested === 'pause' ? 'Pausa solicitada.' : 'Cancelación solicitada.'}{' '}
+              Cerrando la operación en curso. No se iniciarán nuevas fases ni llamadas de IA.
+            </output>
+          )}
           {detail.error && <p className="error">{detail.error}</p>}
           {detail.summary && (
             <div className="report-copy">
@@ -1012,7 +1011,7 @@ export function AgentPanel({
                   : 'No se autoriza ejecución'}
               </h3>
               <div className="checks">
-                {detail.gate.checks.map((c: any, i: number) => (
+                {detail.gate.checks.map((c, i: number) => (
                   <div key={i} className="check">
                     {c.passed ? (
                       <Check className="positive" size={18} />
@@ -1039,14 +1038,14 @@ export function AgentPanel({
                 {detail.paper_account.fills.length} ejecuciones ·{' '}
                 {
                   detail.paper_account.orders.filter(
-                    (o: any) => o.status === 'pending',
+                    (o) => o.status === 'pending',
                   ).length
                 }{' '}
                 pendientes
               </p>
               <DataTable
                 heads={['Fecha', 'Activo', 'Lado', 'Cantidad', 'Precio']}
-                rows={detail.paper_account.fills.map((f: any) => [
+                rows={detail.paper_account.fills.map((f) => [
                   f.date,
                   f.symbol,
                   f.side,
@@ -1057,7 +1056,7 @@ export function AgentPanel({
             </>
           )}
           <div className="actions">
-            {['queued', 'observing', 'eligible_paper'].includes(
+            {['queued', 'running', 'observing', 'eligible_paper'].includes(
               detail.status,
             ) && (
               <Button
@@ -1071,13 +1070,13 @@ export function AgentPanel({
             )}
             {detail.status === 'paused' && (
               <Button
-                disabled={busy}
+                disabled={busy || detail.execution_active || detail.reserved_usd > 0}
                 onClick={() => run(() => control('resume'))}
               >
                 Reanudar
               </Button>
             )}
-            {['queued', 'observing', 'eligible_paper', 'paused'].includes(
+            {['queued', 'running', 'observing', 'eligible_paper', 'paused', 'interrupted'].includes(
               detail.status,
             ) && (
               <Button
@@ -1106,7 +1105,7 @@ export function SettingsPanel({
   refresh,
   onError,
 }: {
-  state: any;
+  state: StateResponse;
   refresh: () => Promise<void>;
   onError: (s: string) => void;
 }) {
@@ -1127,6 +1126,7 @@ export function SettingsPanel({
           <div className="switch-row">
             <Switch
               aria-label="Parada de ejecución"
+              disabled={busy}
               checked={state.settings.kill_switch}
               onCheckedChange={(checked) =>
                 run(async () => {
@@ -1176,7 +1176,7 @@ export function SettingsPanel({
         </section>
         <section className="panel">
           <h2>Conectar la IA</h2>
-          {state.providers.map((p: any) => (
+          {state.providers.map((p) => (
             <div key={p.provider} className="provider">
               <div>
                 <strong>
@@ -1210,7 +1210,7 @@ export function SettingsPanel({
           <FileText size={20} />
         </div>
         <div className="audit">
-          {state.audit.map((a: any) => (
+          {state.audit.map((a) => (
             <div key={a.seq}>
               <span className="audit-node" />
               <div>

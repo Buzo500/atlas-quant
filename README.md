@@ -1,4 +1,6 @@
-# ATLAS Quant · v0.1
+# ATLAS Quant
+
+Motor e interfaz **v0.2.0-rc.1**, candidata pendiente de cierre; no es todavía v0.2 estable. El [registro de candidata](docs/candidata_v0_2.md) identifica sus comprobaciones y el ensayo sostenido. La [hoja de ruta](docs/hoja_de_ruta.md) recoge las versiones previstas y el [plan de v0.2](docs/plan_v0_2.md) sus criterios de cierre. El historial de cambios está en [CHANGELOG.md](CHANGELOG.md).
 
 Aplicación local para analizar una cartera en EUR, comparar estrategias de acciones/ETF y ejecutar experimentos acotados con OpenAI o Anthropic. Incluye simulación de órdenes; no está conectada a ningún bróker.
 
@@ -10,7 +12,7 @@ Para trabajar en otro equipo: [traslado al sobremesa y conversación nueva en Co
 
 ## Abrir la aplicación
 
-Después de instalar las dependencias en cada equipo, ejecuta `Start-Atlas.ps1 -OpenBrowser`, o desde PowerShell en la raíz del proyecto:
+Después de instalar las dependencias en cada equipo, haz doble clic en **Abrir-ATLAS.cmd**. Para detener motor e interfaz, usa **Detener-ATLAS.cmd**. También puedes ejecutar `Start-Atlas.ps1 -OpenBrowser`, o iniciar en primer plano desde PowerShell en la raíz del proyecto:
 
 ```powershell
 .\.venv\Scripts\python.exe tools\run_atlas.py --open
@@ -18,7 +20,11 @@ Después de instalar las dependencias en cada equipo, ejecuta `Start-Atlas.ps1 -
 
 La interfaz está en **http://127.0.0.1:3000/**. El motor usa el puerto 8000. Ambos escuchan exclusivamente en el ordenador local. Para detenerlos, ejecuta `Stop-Atlas.ps1`; si arrancaste el lanzador en primer plano, también puedes usar Ctrl+C. No cierres ni suspendas el ordenador durante un experimento que quieras mantener activo.
 
-Para instalar: Python 3.12+, Node.js 22.13+ y pnpm; después `Install-Atlas.ps1`. Los paquetes Python están fijados en `requirements.txt` y los de la interfaz en `frontend/pnpm-lock.yaml`. El sobremesa se ha instalado el 06/09/2026 con Python 3.14.4, Node 24.15.0 y pnpm 11.19.0; las versiones, ruta y comprobaciones de cada equipo están en [CONTINUIDAD.md](docs/CONTINUIDAD.md).
+Para instalar: Python 3.12+, Node.js 22.13+ y **pnpm 11.19.0**; después `Install-Atlas.ps1`. El instalador comprueba las versiones, crea una copia previa si existe una base e instala las dependencias fijadas en `requirements.txt` y `frontend/pnpm-lock.yaml`. La interfaz se compila para el arranque habitual. No se arrancará un artefacto ausente o desactualizado.
+
+`Status-Atlas.ps1` consulta la salud de la instancia. `Backup-Atlas.ps1` crea una copia coherente; además, se guardan copias automáticas al iniciar y cada 24 horas de funcionamiento, conservando siete. Para restaurar y actualizar, consulta la [guía de operación en Windows](docs/operacion_windows.md). Incluye los comandos completos, diagnóstico y comportamiento de recuperación.
+
+El sobremesa se ha probado el 06/09/2026 con Python 3.14.4, Node 24.15.0 y pnpm 11.19.0; las versiones, ruta y comprobaciones de cada equipo están en [CONTINUIDAD.md](docs/CONTINUIDAD.md).
 
 ## Primer recorrido
 
@@ -50,6 +56,9 @@ Si se cumplen los criterios, activaste la simulación automática y la parada gl
 
 ## Estado y validación
 
+- Candidata **0.2.0-rc.1**: **368 pruebas y 91 subtests superados** en Windows, dos avisos anteriores; TypeScript, contratos, lint de aplicación, dependencias y build verificado correctos. El [registro de candidata](docs/candidata_v0_2.md) distingue estas pruebas locales de la CI y del ensayo de 48 horas.
+
+- Consolidación previa del núcleo de v0.2 en el sobremesa: **328 pruebas y 91 subtests superados**. Corregidas las escrituras concurrentes, pausa/cancelación durante cálculo, aplicación atómica de límites y recuperación de ejecuciones. Contratos OpenAPI/TypeScript comprobados, lint de aplicación y compilación correctos. La demo conserva datos y resultados con presupuesto cero. Garantías y deuda pendiente en [consolidación del núcleo](docs/consolidacion_core.md); validación operativa previa en la [auditoría de v0.2](docs/auditoria_v0_2.md). GitHub Actions está preparado con activación manual; todavía no se ha ejecutado.
 - Portátil: 167 pruebas automatizadas y 91 subtests superados en la revisión original de v0.1, con dos avisos de deprecación de TestClient; compilación, TypeScript y recuperación tras reinicio comprobados.
 - Sobremesa, 06/09/2026: 167 pruebas y 91 subtests superados de nuevo, con los mismos dos avisos; compilación y TypeScript comprobados. Motor y proxy local responden correctamente. Se han probado en navegador la cartera de demostración, la comparación del Laboratorio y el informe de un experimento sin IA, con presupuesto, gasto y reserva cero. Parada, reinicio, persistencia e integridad SQLite comprobados; detalles en [CONTINUIDAD.md](docs/CONTINUIDAD.md).
 - La descarga real de SXR8.DE se verificó en el portátil, con corte explícito anterior al 04/09/2026: 932 barras EUR. La consulta incluyendo el 04/09 falló correctamente porque Yahoo devolvió un cierre ausente con volumen; no se inventó el dato. Ese símbolo fue una prueba técnica, no una recomendación de inversión. La instalación del sobremesa se ha probado con datos sintéticos.
@@ -61,8 +70,10 @@ Detalles, limitaciones y próximos hitos: [guía de v0.1](docs/version_0_1.md).
 ```powershell
 .\.venv\Scripts\python.exe -m pytest -q
 pnpm --dir frontend exec tsc --noEmit
-pnpm --dir frontend build
+.\.venv\Scripts\python.exe tools\build_frontend.py
 ```
+
+Detén ATLAS antes de reconstruir. `pnpm --dir frontend dev` queda disponible para desarrollo; el uso diario emplea la compilación verificada por el lanzador.
 
 ## Diseño del proyecto completo
 

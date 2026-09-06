@@ -41,7 +41,7 @@ def normalize_strategy(strategy: dict) -> dict:
         lookback = _integer(strategy.get("lookback", 63), "lookback")
         top_k = _integer(strategy.get("top_k", 1), "top_k")
         if top_k != 1:
-            raise ValueError("Momentum v0.1 es temporal sobre un símbolo; top_k debe ser 1.")
+            raise ValueError("Momentum es temporal sobre un símbolo; top_k debe ser 1.")
         normalized.update(lookback=lookback, top_k=1)
     return normalized
 
@@ -92,7 +92,7 @@ def _max_quantity(cash: Decimal, price: Decimal, commission: Decimal, minimum: D
     return min(proportional, fixed, weighted_proportional, weighted_fixed).to_integral_value(rounding=ROUND_FLOOR)
 
 
-def _simulate(market: list[dict], strategy: dict, start: int, stop: int, parameters: tuple) -> dict:
+def _simulate(market: list[dict], strategy: dict, start: int, stop: int, parameters: tuple, checkpoint=None) -> dict:
     initial, commission, slippage, minimum, weight = parameters
     closes = [bar["close"] for bar in market]
     cash, quantity = initial, ZERO
@@ -101,6 +101,8 @@ def _simulate(market: list[dict], strategy: dict, start: int, stop: int, paramet
     prevented_sales = 0
     no_volume = 0
     for index in range(start, stop):
+        if checkpoint and (index - start) % 64 == 0:
+            checkpoint()
         bar = market[index]
         wants = _want_position(closes, index - 1, strategy)
         if bar["volume"] == ZERO:
@@ -157,11 +159,11 @@ def _metrics(curve: list[dict], benchmark: list[dict], initial: Decimal, trades:
             "excess_return": float(total - benchmark_return), "observations": observations}
 
 
-def _run(market: list[dict], strategy: dict, start: int, stop: int, parameters: tuple) -> dict:
+def _run(market: list[dict], strategy: dict, start: int, stop: int, parameters: tuple, checkpoint=None) -> dict:
     if stop - start < 2:
         raise ValueError("Se necesitan al menos dos barras en el periodo de evaluación.")
-    simulation = _simulate(market, strategy, start, stop, parameters)
-    benchmark = _simulate(market, {"kind": "buy_hold", "symbol": strategy["symbol"]}, start, stop, parameters)
+    simulation = _simulate(market, strategy, start, stop, parameters, checkpoint)
+    benchmark = _simulate(market, {"kind": "buy_hold", "symbol": strategy["symbol"]}, start, stop, parameters, checkpoint)
     for point, reference in zip(simulation["curve"], benchmark["curve"], strict=True):
         point["benchmark"] = reference["equity"]
     warnings = [
@@ -190,7 +192,7 @@ def _run(market: list[dict], strategy: dict, start: int, stop: int, parameters: 
 
 def backtest(bars: list[dict], strategy: dict, initial_cash=10000, commission_bps=5,
              slippage_bps=5, minimum_fee=1.25, *, evaluation_start: str | None = None,
-             max_position_weight=1.0) -> dict:
+             max_position_weight=1.0, checkpoint=None) -> dict:
     """Evaluate from the first observed session on/after evaluation_start.
 
     Earlier bars provide indicator history only. Every evaluation starts with
@@ -198,6 +200,8 @@ def backtest(bars: list[dict], strategy: dict, initial_cash=10000, commission_bp
     A weekend/holiday start advances to the next observed bar, with a warning.
     Strategy and benchmark share the same maximum entry weight after fees.
     """
+    if checkpoint:
+        checkpoint()
     rule = normalize_strategy(strategy)
     market = [bar for bar in normalize_bars(bars) if bar["symbol"] == rule["symbol"]]
     parameters = _parameters(initial_cash, commission_bps, slippage_bps, minimum_fee, max_position_weight)
@@ -205,7 +209,7 @@ def backtest(bars: list[dict], strategy: dict, initial_cash=10000, commission_bp
     if evaluation_start is not None:
         requested = iso_date(evaluation_start)
         start = next((index for index, bar in enumerate(market) if bar["date"] >= requested), len(market))
-    result = _run(market, rule, start, len(market), parameters)
+    result = _run(market, rule, start, len(market), parameters, checkpoint)
     if evaluation_start is not None and market[start]["date"] != evaluation_start:
         result["warnings"].append(f"Inicio solicitado {evaluation_start}: evaluación desde la primera barra disponible, {market[start]['date']}.")
     return result
@@ -216,7 +220,9 @@ def _period(market: list[dict], start: int, stop: int) -> dict:
 
 
 def run_research(bars: list[dict], candidates: list[dict], initial_cash=10000, commission_bps=5,
-                 slippage_bps=5, minimum_fee=1.25, max_position_weight=1.0) -> dict:
+                 slippage_bps=5, minimum_fee=1.25, max_position_weight=1.0, checkpoint=None) -> dict:
+    if checkpoint:
+        checkpoint()
     if not isinstance(candidates, list) or not 1 <= len(candidates) <= 30:
         raise ValueError("La investigación requiere entre 1 y 30 candidatos definidos antes de evaluar el holdout.")
     rules = [normalize_strategy(candidate) for candidate in candidates]
@@ -236,19 +242,19 @@ def run_research(bars: list[dict], candidates: list[dict], initial_cash=10000, c
     validation_end = int(count * 0.8)
     results = []
     for rule in rules:
-        validation = _run(aligned[rule["symbol"]], rule, train_end, validation_end, parameters)
+        validation = _run(aligned[rule["symbol"]], rule, train_end, validation_end, parameters, checkpoint)
         results.append({"strategy": rule, "validation_metrics": validation["metrics"]})
     # Stable input-order ties; the holdout is not consulted to select a rule.
     winner = max(results, key=lambda result: (result["validation_metrics"]["excess_return"],
                                               result["validation_metrics"]["total_return"]))["strategy"]
     selected_market = aligned[winner["symbol"]]
-    holdout = _run(selected_market, winner, validation_end, count, parameters)
-    full = _run(selected_market, winner, 0, count, parameters)
+    holdout = _run(selected_market, winner, validation_end, count, parameters, checkpoint)
+    full = _run(selected_market, winner, 0, count, parameters, checkpoint)
     sensitivity = []
     for multiplier in (0.5, 1.0, 2.0):
         varied = (parameters[0], parameters[1] * Decimal(str(multiplier)),
                   parameters[2] * Decimal(str(multiplier)), parameters[3] * Decimal(str(multiplier)), parameters[4])
-        variant = _run(selected_market, winner, validation_end, count, varied)
+        variant = _run(selected_market, winner, validation_end, count, varied, checkpoint)
         sensitivity.append({"cost_multiplier": multiplier, "period": "test", "metrics": variant["metrics"]})
     serializable = [{key: str(value) if isinstance(value, Decimal) else value for key, value in bar.items()}
                     for bar in market]

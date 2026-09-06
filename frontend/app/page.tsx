@@ -1,5 +1,9 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
+import Link from 'next/link';
+import { version } from '../package.json';
+import { api } from '@/lib/api';
+import type { StateResponse, PortfolioResponse, DatasetResponse } from '@/lib/api-types';
 import {
   Activity,
   Database,
@@ -13,7 +17,6 @@ import {
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import {
-  api,
   money,
   pct,
   Metric,
@@ -27,14 +30,18 @@ import {
 } from './workbench';
 
 export default function Home() {
-  const [state, setState] = useState<any>(null),
+  const [state, setState] = useState<StateResponse | null>(null),
     [datasetId, setDatasetId] = useState(''),
-    [portfolio, setPortfolio] = useState<any>(null),
+    [savedPortfolio, setPortfolio] = useState<{ datasetId: string; value: PortfolioResponse } | null>(null),
     [error, setError] = useState(''),
     [busy, setBusy] = useState(false),
     [tab, setTab] = useState('portfolio');
+  const stateRevision = useRef(0);
+  const portfolio = savedPortfolio?.datasetId === datasetId ? savedPortfolio.value : null;
   async function refresh() {
-    const s = await api('/state');
+    const revision = ++stateRevision.current;
+    const s = await api<StateResponse>('/state');
+    if (revision !== stateRevision.current) return;
     setState(s);
     setDatasetId((previous) => previous || s.datasets[0]?.id || '');
   }
@@ -46,24 +53,27 @@ export default function Home() {
     );
     return () => clearInterval(timer);
   }, []);
-  const dataset = state?.datasets.find((d: any) => d.id === datasetId);
+  const dataset = state?.datasets.find((d) => d.id === datasetId);
+  const auditSequence = state?.audit[0]?.seq;
   useEffect(() => {
     let active = true;
     if (datasetId)
-      api('/datasets/' + datasetId + '/portfolio')
+      api<PortfolioResponse>('/datasets/' + datasetId + '/portfolio')
         .then((p) => {
-          if (active) setPortfolio(p);
+          if (active) setPortfolio({ datasetId, value: p });
         })
         .catch((e) => {
           if (active) setError(String(e));
         });
-    else setPortfolio(null);
     return () => {
       active = false;
     };
-  }, [datasetId, dataset?.version, state?.audit?.[0]?.seq]);
+  }, [datasetId, dataset?.version, auditSequence]);
   useEffect(() => {
-    const context = (document as any).modelContext;
+    const context = (document as Document & { modelContext?: { registerTool: (
+      tool: { name: string; title: string; description: string; inputSchema: object;
+        annotations: object; execute: (input: unknown) => Promise<unknown> },
+      options: { signal: AbortSignal }) => unknown } }).modelContext;
     if (!context?.registerTool) return;
     const controller = new AbortController();
     Promise.resolve(
@@ -87,15 +97,15 @@ export default function Home() {
               Object.keys(input).length
             )
               throw new Error('Se requiere un objeto vacío.');
-            const s = await api('/state');
+            const s = await api<StateResponse>('/state');
             setState(s);
             return {
-              datasets: s.datasets.map((d: any) => ({
+              datasets: s.datasets.map((d) => ({
                 id: d.id,
                 name: d.name,
                 source_kind: d.source_kind,
               })),
-              experiments: s.experiments.map((j: any) => ({
+              experiments: s.experiments.map((j) => ({
                 id: j.id,
                 status: j.status,
                 symbol: j.symbol,
@@ -113,7 +123,7 @@ export default function Home() {
     setBusy(true);
     setError('');
     try {
-      const d = await api('/datasets/demo', {});
+      const d = await api<DatasetResponse>('/datasets/demo', {});
       setDatasetId(d.id);
       await refresh();
     } catch (e) {
@@ -125,17 +135,17 @@ export default function Home() {
   return (
     <div className="atlas-shell">
       <header className="topbar">
-        <a href="/" className="brand">
+        <Link href="/" className="brand">
           <Activity size={26} />
           <span>
             ATLAS <small>QUANT</small>
           </span>
-        </a>
+        </Link>
         <div className="topbar-right">
           <span className="status-dot">
             {state ? 'Motor conectado' : 'Conectando al motor'}
           </span>
-          <span className="version">v0.1</span>
+          <span className="version">v{version}</span>
         </div>
       </header>
       <main className="workspace">
@@ -209,7 +219,7 @@ export default function Home() {
               label="Conjunto de datos"
               value={datasetId}
               onChange={setDatasetId}
-              options={(state?.datasets || []).map((d: any) => ({
+              options={(state?.datasets || []).map((d) => ({
                 value: d.id,
                 label: d.name,
               }))}
@@ -282,7 +292,7 @@ export default function Home() {
                 </div>
               )}
             </section>
-            {portfolio?.positions?.length > 0 && (
+            {portfolio && portfolio.positions.length > 0 && (
               <section className="panel">
                 <div className="panel-heading">
                   <h2>Posiciones</h2>
@@ -299,13 +309,14 @@ export default function Home() {
                     'Peso',
                     'P&L no realizado',
                   ]}
-                  rows={portfolio.positions.map((p: any) => [
-                    <strong>{p.symbol}</strong>,
+                  rows={portfolio.positions.map((p) => [
+                    <strong key="symbol">{p.symbol}</strong>,
                     p.quantity,
                     money(p.price),
                     money(p.market_value),
                     pct(p.weight),
                     <span
+                      key="pnl"
                       className={
                         p.unrealized_pnl >= 0 ? 'positive' : 'negative'
                       }
@@ -316,7 +327,7 @@ export default function Home() {
                 />
               </section>
             )}
-            {portfolio?.warnings?.length > 0 && (
+            {portfolio && portfolio.warnings.length > 0 && (
               <details className="details">
                 <summary>Convenciones de valoración</summary>
                 <ul>
@@ -359,7 +370,7 @@ export default function Home() {
           </TabsContent>
         </Tabs>
         <p className="footnote">
-          ATLAS v0.1 · Datos y experimentos guardados en este ordenador. Los
+          ATLAS v{version} · Datos y experimentos guardados en este ordenador. Los
           resultados de la demo son sintéticos. Ninguna conclusión de IA
           autoriza por sí sola una operación.
         </p>

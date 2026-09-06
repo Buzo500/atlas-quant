@@ -103,7 +103,7 @@ def _currency(value: str, line: int) -> str:
     value = (value or "EUR").upper()
     if value != "EUR":
         raise DataValidationError(
-            f"Fila {line}: moneda {value!r} no soportada. v0.1 admite EUR; hace falta conversión FX explícita."
+            f"Fila {line}: moneda {value!r} no soportada. ATLAS admite EUR; hace falta conversión FX explícita."
         )
     return value
 

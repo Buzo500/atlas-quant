@@ -3,12 +3,15 @@ from __future__ import annotations
 
 import asyncio
 import hashlib
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
+from threading import Event
+from uuid import uuid4
 
 from . import ai
-from .analytics import portfolio_snapshot
+from .controls import ACTIVE_STATUSES, DEFAULT_SETTINGS, WorkStopped, control_experiment, update_settings
+from .datasets import DatasetService
+from .worker_lock import WorkerLock
 from .backtest import backtest, run_research
-from .data import build_provenance_manifest, demo_dataset
 from .gates import DEFAULT_POLICY, evaluate_evidence
 from .store import Store, encode, now
 
@@ -16,90 +19,89 @@ from .store import Store, encode, now
 class Service:
     def __init__(self, store: Store):
         self.store = store
-        self.lock = asyncio.Lock()
         self.wake = asyncio.Event()
+        self.research_lock = asyncio.Lock()
+        self.feed_lock = asyncio.Lock()
+        self._stops = {}
+        self.datasets = DatasetService(store, self.wake.set,
+            lambda: datetime.now(timezone.utc), lambda: now())
 
     def settings(self):
-        return self.store.get("settings", "main", {"id":"main","kill_switch":True,
-            "max_position_weight":0.25,"mode":"paper","live_available":False})
+        return self.store.get("settings", "main", dict(DEFAULT_SETTINGS))
 
-    def dataset(self, ident):
-        value = self.store.get("dataset", ident)
-        if not value:
-            raise ValueError("Conjunto de datos no encontrado.")
-        return value
-
-    def save_dataset(self, bars, name, source_kind, source, ident=None, extras=None):
-        if any(b["date"] > datetime.now(timezone.utc).date().isoformat() for b in bars):
-            raise ValueError("No se admiten precios con fechas futuras.")
-        old = self.dataset(ident) if ident else None
-        if old:
-            # No historical revisions while forward observation refers to a frozen cutoff.
-            lookup = {(b["date"],b["symbol"]):b for b in bars}
-            if any(lookup.get((b["date"],b["symbol"])) != b for b in old["bars"]):
-                raise ValueError("La actualización debe conservar todas las barras anteriores sin cambios. Importe las revisiones como un conjunto nuevo.")
-            prior_keys = {(b["date"],b["symbol"]) for b in old["bars"]}
-            last_dates = {symbol:max(b["date"] for b in old["bars"] if b["symbol"]==symbol) for symbol in {b["symbol"] for b in old["bars"]}}
-            if any((b["date"],b["symbol"]) not in prior_keys and b["date"] <= last_dates.get(b["symbol"],"") for b in bars):
-                raise ValueError("Solo se pueden añadir barras posteriores al último día de cada activo; no insertar historia pasada.")
-            source_kind, source = old["source_kind"], old["source"]
-        value = {**(old or {}),**(extras or {}),"name":name,"bars":bars,"source_kind":source_kind,"source":source,
-                 "manifest":build_provenance_manifest(bars,name,source_kind,source)}
-        if ident:
-            value["id"] = ident
-        result = self.store.save_dataset(value)
+    def update_settings(self, values):
+        result = update_settings(self.store, values)
         self.wake.set()
         return result
 
-    async def connect_feed(self, symbol, start, end=None):
-        from .feed import fetch_daily
-        snapshot = await asyncio.to_thread(fetch_daily,symbol,start,end)
-        dataset = self.save_dataset(snapshot["bars"],symbol+" · Yahoo diario","observed",snapshot["source"],
-            extras={"corporate_actions":snapshot["corporate_actions"],"source_metadata":snapshot["source_metadata"],
-                    "warnings":snapshot["warnings"],"feed":{"symbol":symbol.upper(),"start":start,
-                    "last_attempt":now(),"error":None,"interval_hours":6}})
-        self.store.audit("feed.connected",dataset["id"])
-        return dataset
+    def control(self, ident, action):
+        result = control_experiment(self.store, ident, action)
+        if action in ("pause", "cancel") and ident in self._stops:
+            self._stops[ident].set()
+        self.wake.set()
+        return result
+
+    def dataset(self, ident):
+        return self.datasets.dataset(ident)
+
+    def save_dataset(self, *args, **kwargs):
+        return self.datasets.save_dataset(*args, **kwargs)
+
+    async def connect_feed(self, *args, **kwargs):
+        return await self.datasets.connect_feed(*args, **kwargs)
 
     async def refresh_feed(self, ident):
-        from .feed import fetch_daily
-        dataset = self.dataset(ident)
-        feed = dataset.get("feed")
-        if not feed:
-            raise ValueError("Este conjunto no tiene una fuente automática.")
-        feed["last_attempt"] = now()
-        self.store.put("dataset",dataset)
-        try:
-            snapshot = await asyncio.to_thread(fetch_daily,feed["symbol"],feed["start"])
-            # Historical revisions fail closed in save_dataset; don't splice them silently.
-            dataset = self.save_dataset(snapshot["bars"],dataset["name"],"observed",snapshot["source"],ident,
-                extras={"corporate_actions":snapshot["corporate_actions"],"source_metadata":snapshot["source_metadata"],
-                        "warnings":snapshot["warnings"],"feed":{**feed,"error":None}})
-            self.store.audit("feed.refreshed",dataset["id"])
-        except Exception as exc:
-            dataset["feed"]["error"] = str(exc) if isinstance(exc,ValueError) else "Error al consultar la fuente; se conserva la última versión."
-            self.store.put("dataset",dataset,"feed.failed")
-        return dataset
+        return await self.datasets.refresh_feed(ident)
 
     def load_demo(self):
-        existing = next((d for d in self.store.list("dataset") if d.get("demo")),None)
-        if existing:
-            return existing
-        demo = demo_dataset()
-        dataset = self.save_dataset(demo["bars"],demo["name"],"synthetic",demo["source"])
-        dataset["demo"] = True
-        self.store.put("dataset",dataset)
-        self.store.put("ledger",{"id":dataset["id"],"events":demo["events"]},"ledger.demo_loaded")
-        return dataset
+        return self.datasets.load_demo()
 
     def portfolio(self, ident):
-        dataset = self.dataset(ident)
-        events = self.store.get("ledger",ident,{"events":[]})["events"]
-        if not events:
-            return {"nav":0,"cash":0,"net_contributions":0,"pnl":0,"twr":0,"positions":[],"curve":[],"warnings":["Importa movimientos para valorar tu cartera."]}
-        return portfolio_snapshot(events,dataset["bars"])
+        return self.datasets.portfolio(ident)
+
+    def import_ledger(self, ident, csv, commit=False):
+        return self.datasets.import_ledger(ident, csv, commit)
+
+    @staticmethod
+    def _check_current(current, job):
+        if (not current or current["status"] not in ACTIVE_STATUSES
+                or current.get("execution_token") != job.get("execution_token")):
+            raise WorkStopped()
+
+    def _checkpoint(self, job):
+        self._check_current(self.store.get("experiment", job["id"]), job)
+
+    def _save_progress(self, job, fields, event):
+        # Only work fields are merged. A concurrent control owns status and orders.
+        def apply(current):
+            if current.get("execution_token") != job.get("execution_token"):
+                raise WorkStopped()
+            if current["status"] != "cancelled":
+                current.update({key: job[key] for key in fields})
+            return current
+        current = self.store.update("experiment", job["id"], apply, event)
+        self._check_current(current, job)
+        job.update(current)
+
+    async def _compute(self, job, fn, *args, **kwargs):
+        stop = self._stops.get(job["id"], Event())
+        def checkpoint():
+            if stop.is_set():
+                raise WorkStopped()
+        task = asyncio.create_task(asyncio.to_thread(fn, *args, checkpoint=checkpoint, **kwargs))
+        try:
+            return await asyncio.shield(task)
+        except asyncio.CancelledError:
+            # Cancelling to_thread alone does not stop its thread. Drain it safely.
+            stop.set()
+            try:
+                await task
+            except Exception:
+                pass
+            raise
 
     def create_experiment(self, request):
+        request = dict(request)
         dataset = self.dataset(request["dataset_id"])
         if request["symbol"] not in {b["symbol"] for b in dataset["bars"]}:
             raise ValueError("El activo no pertenece al conjunto de datos.")
@@ -120,80 +122,102 @@ class Service:
                "frozen_hash":hashlib.sha256(encode(dataset["bars"]).encode()).hexdigest(),
                "spent_usd":0.0,"reserved_usd":0.0,"research":None,"summary":None,
                "error":None,"observation":{},"gate":None,"paper_account":None}
-        saved = self.store.put("experiment",job,"experiment.created")
+        def create(tx):
+            if sum(j["status"] in ACTIVE_STATUSES | {"paused"} for j in tx.list("experiment")) >= 10:
+                raise ValueError("Máximo 10 experimentos activos o pausados.")
+            return tx.put("experiment", job, "experiment.created")
+        saved = self.store.atomic(create)
         self.wake.set()
         return saved
 
     async def _call_ai(self, job, fn, **kwargs):
-        remaining = max(0,job["budget_usd"]-job["spent_usd"])
-        # Durable conservative reservation BEFORE network I/O. Crash never gives free retry.
-        job["reserved_usd"] = remaining
-        self.store.put("experiment",job,"ai.reserved")
+        def reserve(current):
+            self._check_current(current, job)
+            if current.get("reserved_usd", 0):
+                raise ValueError("Existe una reserva de API sin resolver; no se repite la llamada.")
+            remaining = max(0, current["budget_usd"] - current["spent_usd"])
+            current["reserved_usd"] = remaining
+            return current
+        current = self.store.update("experiment", job["id"], reserve, "ai.reserved")
+        remaining = current["reserved_usd"]
+        job.update(current)
+
+        def settle(charged, event):
+            def apply(current):
+                if current.get("execution_token") != job.get("execution_token"):
+                    raise WorkStopped()
+                current["spent_usd"] += charged
+                current["reserved_usd"] = 0
+                return current
+            current = self.store.update("experiment", job["id"], apply, event)
+            job["spent_usd"], job["reserved_usd"] = current["spent_usd"], current["reserved_usd"]
         try:
-            result = await fn(provider=job["provider"],model=job["model"],budget_usd=remaining,**kwargs)
-            charged = result["usage"]["estimated_cost_usd"]
+            result = await fn(provider=job["provider"], model=job["model"], budget_usd=remaining, **kwargs)
         except ai.AIError as exc:
-            usage = getattr(exc,"usage",None)
-            charged = (usage or {}).get("estimated_cost_usd",0) if isinstance(usage,dict) else 0
-            if getattr(exc,"may_be_charged",False):
-                charged = max(charged,getattr(exc,"reserved_cost_usd",remaining) or remaining)
-            job["spent_usd"] += charged
-            job["reserved_usd"] = 0
-            self.store.put("experiment",job,"ai.failed")
+            usage = getattr(exc, "usage", None)
+            charged = usage.get("estimated_cost_usd", 0) if isinstance(usage, dict) else 0
+            if getattr(exc, "may_be_charged", False):
+                charged = max(charged, getattr(exc, "reserved_cost_usd", remaining) or remaining)
+            settle(charged, "ai.failed")
             raise
-        job["spent_usd"] += charged
-        job["reserved_usd"] = 0
-        self.store.put("experiment",job,"ai.completed")
+        # Unknown transport errors/cancellation leave the reservation durable.
+        settle(result["usage"]["estimated_cost_usd"], "ai.completed")
         return result
 
     async def start_research(self, job):
-        job.update(status="running",phase="planning",started_at=now())
-        self.store.put("experiment",job,"experiment.started")
-        # Read the original version, never allow a later import to change the selected hypothesis.
-        with self.store.transaction() as db:
-            import json
-            dataset = json.loads(db.execute("SELECT body FROM versions WHERE dataset_id=? AND version=?",
-                (job["dataset_id"],job["dataset_version"])).fetchone()[0])
-        if job["provider"] == "none":
-            candidates = [{"kind":"buy_hold","symbol":job["symbol"]},
-                          {"kind":"sma_cross","symbol":job["symbol"],"fast_window":20,"slow_window":100},
-                          {"kind":"sma_cross","symbol":job["symbol"],"fast_window":50,"slow_window":200}]
-            job["plan"] = {"hypothesis":job["prompt"],"candidates":candidates,
-                           "risks":["Catálogo fijo sin IA. Tres candidatos consumen evidencia de validación."]}
-        else:
-            plan = await self._call_ai(job,ai.propose_strategies,prompt=job["prompt"],
-                dataset_summary={"symbols":[job["symbol"]],"manifest":dataset["manifest"],
-                                 "hours":job["hours"],"costs":job["costs"]})
-            job["plan"] = plan["plan"]
-            candidates = plan["plan"]["candidates"]
-        job["phase"] = "backtesting"
-        self.store.put("experiment",job,"research.started")
-        research = await asyncio.to_thread(run_research,dataset["bars"],candidates,**job["costs"])
-        research["warnings"].extend(dataset.get("warnings",[]))
-        job["research"] = research
-        job["phase"] = "reporting"
-        self.store.put("experiment",job,"research.completed")
-        metrics = research["out_of_sample"]["metrics"]
-        selected = research["selected_strategy"]
-        engine_summary = (f"La regla seleccionada fue {selected['kind']} sobre {selected['symbol']}. "
-            f"En {metrics['observations']} sesiones reservadas obtuvo {metrics['total_return']:.2%} neto de costes, "
-            f"frente a {metrics['benchmark_return']:.2%} del benchmark con el mismo peso. "
-            f"La caída máxima fue {abs(metrics['max_drawdown']):.2%}, con {metrics['trade_count']} ejecuciones. "
-            "La regla queda congelada. Estos resultados históricos no autorizan órdenes reales.")
-        job["summary"] = {"summary":engine_summary,
-            "limitations":research.get("warnings",[]),"recommendation":"continue_observation","provider":"none"}
-        if job["provider"] != "none":
-            try:
-                compact = {k:v for k,v in research.items() if k not in ("full_result",)}
-                compact["out_of_sample"] = {"metrics":research["out_of_sample"]["metrics"]}
-                job["summary"] = await self._call_ai(job,ai.summarize_research,research=compact)
-            except ai.AIError as exc:
-                job["summary"]["limitations"].append("No se obtuvo resumen de IA: " + str(exc))
-        job.update(status="observing",phase="forward_observation",observation_started_at=now())
-        self.store.put("experiment",job,"experiment.observing")
+        self._checkpoint(job)
+        dataset = self.store.get_dataset_version(job["dataset_id"], job["dataset_version"])
+        if dataset is None:
+            raise ValueError("No se encuentra la versión congelada del conjunto.")
+        if not job.get("plan"):
+            if job["provider"] == "none":
+                job["plan"] = {"hypothesis": job["prompt"], "candidates": [
+                    {"kind": "buy_hold", "symbol": job["symbol"]},
+                    {"kind": "sma_cross", "symbol": job["symbol"], "fast_window": 20, "slow_window": 100},
+                    {"kind": "sma_cross", "symbol": job["symbol"], "fast_window": 50, "slow_window": 200}],
+                    "risks": ["Catálogo fijo sin IA. Tres candidatos consumen evidencia de validación."]}
+            else:
+                plan = await self._call_ai(job, ai.propose_strategies, prompt=job["prompt"],
+                    dataset_summary={"symbols": [job["symbol"]], "manifest": dataset["manifest"],
+                                     "hours": job["hours"], "costs": job["costs"]})
+                job["plan"] = plan["plan"]
+            self._save_progress(job, ("plan",), "research.planned")
+        if not job.get("research"):
+            job["phase"] = "backtesting"
+            self._save_progress(job, ("phase",), "research.started")
+            async with self.research_lock:
+                self._checkpoint(job)
+                research = await self._compute(job, run_research, dataset["bars"], job["plan"]["candidates"], **job["costs"])
+            research["warnings"].extend(dataset.get("warnings", []))
+            job.update(research=research, phase="reporting")
+            self._save_progress(job, ("research", "phase"), "research.completed")
+        if not job.get("summary"):
+            research = job["research"]
+            metrics, selected = research["out_of_sample"]["metrics"], research["selected_strategy"]
+            engine_summary = (f"La regla seleccionada fue {selected['kind']} sobre {selected['symbol']}. "
+                f"En {metrics['observations']} sesiones reservadas obtuvo {metrics['total_return']:.2%} neto de costes, "
+                f"frente a {metrics['benchmark_return']:.2%} del benchmark con el mismo peso. "
+                f"La caída máxima fue {abs(metrics['max_drawdown']):.2%}, con {metrics['trade_count']} ejecuciones. "
+                "La regla queda congelada. Estos resultados históricos no autorizan órdenes reales.")
+            job["summary"] = {"summary": engine_summary, "limitations": list(research.get("warnings", [])),
+                              "recommendation": "continue_observation", "provider": "none"}
+            if job["provider"] != "none":
+                try:
+                    compact = {k: v for k, v in research.items() if k != "full_result"}
+                    compact["out_of_sample"] = {"metrics": research["out_of_sample"]["metrics"]}
+                    job["summary"] = await self._call_ai(job, ai.summarize_research, research=compact)
+                except ai.AIError as exc:
+                    job["summary"]["limitations"].append("No se obtuvo resumen de IA: " + str(exc))
+            self._save_progress(job, ("summary",), "research.reported")
+        def observing(current):
+            self._check_current(current, job)
+            current.update(status="observing", phase="forward_observation", observation_started_at=now())
+            return current
+        job.update(self.store.update("experiment", job["id"], observing, "experiment.observing"))
         await self.observe(job)
 
     async def observe(self, job):
+        self._checkpoint(job)
         dataset = self.dataset(job["dataset_id"])
         elapsed = (datetime.now(timezone.utc)-datetime.fromisoformat(job["observation_started_at"])).total_seconds()/3600
         # Only bars dated AFTER experiment start count; old late-uploaded data are not prospective evidence.
@@ -204,7 +228,7 @@ class Service:
             "source_kind":dataset["source_kind"],"reconciled":not dataset.get("corporate_actions") and not dataset.get("feed",{}).get("error") and fresh,
             "forward_metrics":None,"last_date":new_dates[-1] if new_dates else None}
         if len(new_dates)>=2:
-            forward = await asyncio.to_thread(backtest,dataset["bars"],job["research"]["selected_strategy"],
+            forward = await self._compute(job,backtest,dataset["bars"],job["research"]["selected_strategy"],
                 evaluation_start=new_dates[0],**job["costs"])
             observation["forward_metrics"] = forward["metrics"]
             job["forward_result"] = forward
@@ -218,42 +242,89 @@ class Service:
             job["phase"] = "finished"
             job["finished_at"] = now()
             job["completion_note"] = "Plazo finalizado. " + ("Criterios no superados; no se activa ejecución." if not job["gate"]["passed"] else "Criterios superados para simulación.")
-        settings = self.settings()
-        paper_enabled = job["status"] == "eligible_paper" and job["auto_paper"] and not settings["kill_switch"]
-        if paper_enabled or job.get("paper_account"):
-            from .paper import new_account, advance_paper
-            if not job["paper_account"]:
-                job["paper_account"] = new_account(initial_cash=job["costs"]["initial_cash"],started_at_date=max(b["date"] for b in dataset["bars"]))
-                self.store.audit("paper.activated",job["id"],{"strategy":job["research"]["selected_strategy"]})
-            job["paper_account"] = advance_paper(job["paper_account"],dataset["bars"],job["research"]["selected_strategy"],
-                enabled=paper_enabled and job["costs"].get("max_position_weight",1)<=settings["max_position_weight"],
-                **{k:v for k,v in job["costs"].items() if k!="initial_cash"})
-        self.store.put("experiment",job,"experiment."+job["status"] if before!=job["status"] else None)
+        def commit_observation(tx):
+            current = tx.get("experiment", job["id"])
+            self._check_current(current, job)
+            latest = tx.get("dataset", job["dataset_id"])
+            if latest["version"] != dataset["version"] or latest.get("feed") != dataset.get("feed"):
+                self.wake.set()
+                return  # New data/quality metadata require a fresh evaluation.
+            settings = tx.get("settings", "main", DEFAULT_SETTINGS)
+            fields = ("status", "phase", "finished_at", "completion_note", "observation", "gate", "forward_result")
+            current.update({key: job[key] for key in fields if key in job})
+            paper_enabled = current["status"] == "eligible_paper" and current["auto_paper"] and not settings["kill_switch"]
+            if paper_enabled or current.get("paper_account"):
+                from .paper import new_account, advance_paper
+                if not current.get("paper_account"):
+                    current["paper_account"] = new_account(initial_cash=current["costs"]["initial_cash"],
+                        started_at_date=max(b["date"] for b in dataset["bars"]))
+                    tx.audit("paper.activated", job["id"], {"strategy": current["research"]["selected_strategy"]})
+                current["paper_account"] = advance_paper(current["paper_account"], dataset["bars"],
+                    current["research"]["selected_strategy"], enabled=paper_enabled and
+                    current["costs"].get("max_position_weight", 1) <= settings["max_position_weight"],
+                    **{k: v for k, v in current["costs"].items() if k != "initial_cash"})
+            tx.put("experiment", current, "experiment." + current["status"] if before != current["status"] else None)
+        self.store.atomic(commit_observation)
 
     async def tick(self):
-        async with self.lock:
-            for job in self.store.list("experiment"):
+        # Locks all ticks for this local database, including independent Service objects.
+        lock = WorkerLock(str(self.store.path) + ".tick.lock")
+        if not lock.acquire():
+            return
+        try:
+            for candidate in self.store.list("experiment"):
+                token = uuid4().hex
+                def claim(current):
+                    if current["status"] not in {"queued", "observing", "eligible_paper"} or current.get("execution_active"):
+                        return None
+                    current.update(execution_token=token, execution_active=True, control_requested=None)
+                    if current["status"] == "queued":
+                        current.update(status="running", started_at=current.get("started_at") or now(),
+                                       phase=current.get("phase") if current.get("plan") else "planning")
+                    return current
+                job = self.store.update("experiment", candidate["id"], claim)
+                if job.get("execution_token") != token:
+                    continue
+                self._stops[job["id"]] = Event()
+                error = None
+                interrupted = False
                 try:
-                    if job["status"]=="queued":
+                    if job["status"] == "running":
                         await self.start_research(job)
-                    elif job["status"] in ("observing","eligible_paper"):
+                    else:
                         await self.observe(job)
+                except WorkStopped:
+                    pass
+                except asyncio.CancelledError:
+                    interrupted = True
+                    raise
                 except Exception as exc:
-                    # ValueError and our AIError are safe messages. No credentials/raw provider output.
-                    public = str(exc) if isinstance(exc,(ValueError,ai.AIError)) else "Error interno. Revisa el registro local y los datos; el experimento no se repetirá automáticamente."
-                    job.update(status="failed",error=public,finished_at=now())
-                    self.store.put("experiment",job,"experiment.failed")
+                    error = str(exc) if isinstance(exc, (ValueError, ai.AIError)) else "Error interno. Revisa el registro local y los datos; el experimento no se repetirá automáticamente."
+                finally:
+                    def finish(current):
+                        if current.get("execution_token") != token:
+                            return None
+                        current.update(execution_active=False, control_requested=None)
+                        current.pop("execution_token", None)
+                        if current["status"] != "cancelled" and (interrupted or current.get("reserved_usd", 0)):
+                            current.update(status="interrupted", error="Proceso interrumpido. Se conserva la reserva de API; no se repite la llamada.")
+                        elif error and current["status"] != "cancelled":
+                            current.update(status="failed", error=error, finished_at=now())
+                        return current
+                    self.store.update("experiment", job["id"], finish, "experiment.execution_finished")
+                    self._stops.pop(job["id"], None)
+        finally:
+            lock.release()
 
     async def worker(self):
         while True:
-            async with self.lock:
-                for dataset in self.store.list("dataset"):
-                    feed = dataset.get("feed")
-                    if feed and (datetime.now(timezone.utc)-datetime.fromisoformat(feed["last_attempt"])).total_seconds()>=6*3600:
-                        await self.refresh_feed(dataset["id"])
-            await self.tick()
             self.wake.clear()
+            for dataset in self.store.list("dataset"):
+                feed = dataset.get("feed")
+                if feed and (datetime.now(timezone.utc)-datetime.fromisoformat(feed["last_attempt"])).total_seconds() >= 6*3600:
+                    await self.refresh_feed(dataset["id"])
+            await self.tick()
             try:
-                await asyncio.wait_for(self.wake.wait(),timeout=30)
+                await asyncio.wait_for(self.wake.wait(), timeout=30)
             except asyncio.TimeoutError:
                 pass

@@ -10,7 +10,7 @@ from datetime import datetime, timedelta, timezone
 import pytest
 from fastapi.testclient import TestClient
 
-from atlas_quant.app import create_app
+from atlas_quant.app import ExperimentInput, create_app
 from atlas_quant.paper import advance_paper, new_account
 
 
@@ -329,9 +329,13 @@ def test_frozen_dataset_cannot_be_rewritten_or_marked_observed(client):
 
 def test_process_recovery_preserves_reservation_and_does_not_retry(app):
     service = app.state.service
-    service.store.put("experiment", {"id": "interrupted-job", "status": "running", "reserved_usd": 0.75, "spent_usd": 0.10})
+    dataset = service.load_demo()
+    request = ExperimentInput(dataset_id=dataset["id"], symbol="DEMO_BOND", provider="none", budget_usd=1)
+    interrupted = service.create_experiment(request.model_dump())
+    interrupted.update(status="running", reserved_usd=0.75, spent_usd=0.10)
+    service.store.put("experiment", interrupted)
     with TestClient(app, raise_server_exceptions=False) as client:
-        response = client.get("/api/experiments/interrupted-job")
+        response = client.get(f"/api/experiments/{interrupted['id']}")
         assert response.status_code == 200
         job = response.json()
         assert job["status"] == "interrupted"
