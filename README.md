@@ -1,0 +1,76 @@
+# ATLAS Quant · v0.1
+
+Aplicación local para analizar una cartera en EUR, comparar estrategias de acciones/ETF y ejecutar experimentos acotados con OpenAI o Anthropic. Incluye simulación de órdenes; no está conectada a ningún bróker.
+
+Preferencias confirmadas: OpenAI y Anthropic seleccionables desde la app, integración preparada sin consumo hasta decidir un presupuesto y primera etapa en el PC. El presupuesto inicial sigue en cero. La entrega se ha probado en Windows; Ubuntu no se ha validado todavía.
+
+Cambios solicitados el 06/09/2026, todavía en planificación: [inspección de gráficos, velas y aprendizaje acumulativo de IA](docs/backlog_planificacion.md).
+
+Para trabajar en otro equipo: [traslado al sobremesa y conversación nueva en Codex](docs/traslado_sobremesa.md). El contexto para retomar el proyecto está en [CONTINUIDAD.md](docs/CONTINUIDAD.md); Git no traslada automáticamente el chat original ni los experimentos locales.
+
+## Abrir la aplicación
+
+En este ordenador las dependencias ya están instaladas. Ejecuta `Start-Atlas.ps1 -OpenBrowser`, o desde PowerShell en esta carpeta:
+
+```powershell
+.\.venv\Scripts\python.exe tools\run_atlas.py --open
+```
+
+La interfaz está en **http://127.0.0.1:3000/**. El motor usa el puerto 8000. Ambos escuchan exclusivamente en el ordenador local. Para detenerlos, ejecuta `Stop-Atlas.ps1`; si arrancaste el lanzador en primer plano, también puedes usar Ctrl+C. No cierres ni suspendas el ordenador durante un experimento que quieras mantener activo.
+
+Para otra instalación: Python 3.12+, Node.js 22.13+ y pnpm; después `Install-Atlas.ps1`. Los paquetes Python están fijados en `requirements.txt` y los de la interfaz en `frontend/pnpm-lock.yaml`.
+
+## Primer recorrido
+
+1. **Cargar demostración** añade tres activos ficticios y movimientos sintéticos. No descarga una cartera real.
+2. **Cartera** muestra efectivo, posiciones, aportaciones, P&L y TWR diario.
+3. **Laboratorio** compara mantener y dos cruces de medias con selección cronológica 60/20/20, comisiones, deslizamiento y un mismo límite de posición para estrategia y benchmark.
+4. **Agente IA** crea un experimento de duración y presupuesto limitados. Sin clave, usa «Catálogo fijo · sin IA». Se genera un informe y se observa la regla congelada sobre nuevas sesiones.
+5. **Datos** importa CSV y permite conectar Yahoo diario en EUR. Las importaciones de movimientos se previsualizan antes de confirmar y omiten IDs ya importados.
+6. **Ajustes** controla la parada de ejecución simulada y el límite de peso. La parada está activada por defecto.
+
+## Conectar OpenAI o Anthropic
+
+Copia `.env.example` a `.env` y escribe allí **solo la clave del proveedor que quieras usar**. El lanzador carga ese archivo en el motor Python; no pasa las claves al proceso de la interfaz. No pegues claves en prompts ni las subas al repositorio.
+
+```dotenv
+OPENAI_API_KEY=tu_clave_local
+ANTHROPIC_API_KEY=
+```
+
+Reinicia ATLAS. En Agente IA selecciona proveedor, presupuesto en USD y duración. Crear ese experimento autoriza sus llamadas hasta el presupuesto indicado. La aplicación no hace llamadas de IA al arrancar. Una suscripción a ChatGPT o Claude no configura por sí sola una clave de API.
+
+Modelos incluidos: `gpt-5.4-mini` y `claude-haiku-4-5-20251001`. El coste se estima con precios registrados el 05/09/2026; consulta la factura del proveedor para el importe real. No se ha realizado una llamada pagada durante la validación de esta entrega.
+
+## Qué significa «dejarlo dos días»
+
+El motor propone un máximo de ocho candidatos, ejecuta pruebas, congela el ganador, produce un informe y espera sesiones nuevas. Puede consultar las fuentes diarias cada seis horas y trabajar sin la pestaña abierta. El plazo de 48 horas acaba con una revisión; **no equivale a validar rentabilidad**. Por defecto, la promoción necesita como mínimo 20 sesiones nuevas, 126 observaciones fuera de muestra, 10 ejecuciones, Sharpe ≥0,5, caída ≤15% y resultados comparables bajo costes duplicados. Para observar 20 sesiones debes elegir una duración que realmente las permita, por ejemplo 720–1.080 horas, según calendario.
+
+Si se cumplen los criterios, activaste la simulación automática y la parada global está desactivada, abre una cuenta paper independiente. Una señal al cierre solo puede ejecutarse en una apertura posterior recibida. Los datos sintéticos nunca habilitan esa promoción. No hay endpoint de órdenes reales.
+
+## Estado y validación
+
+- 167 pruebas automatizadas y 91 subtests superados en la revisión de v0.1; dos avisos de deprecación de las dependencias de TestClient.
+- Compilación de interfaz y TypeScript comprobados. El soporte WebMCP es opcional y no se ha validado en un navegador compatible.
+- Descarga real de SXR8.DE verificada con corte explícito anterior al 04/09/2026: 932 barras EUR. La consulta incluyendo el 04/09 falló correctamente porque Yahoo devolvió un cierre ausente con volumen; no se inventó el dato. Ese símbolo fue una prueba técnica, no una recomendación de inversión.
+- No se ha realizado una prueba sostenida de 48 horas, una llamada real a los modelos ni una conexión con IBKR.
+
+Detalles, limitaciones y próximos hitos: [guía de v0.1](docs/version_0_1.md).
+
+```powershell
+.\.venv\Scripts\python.exe -m pytest -q
+pnpm --dir frontend exec tsc --noEmit
+pnpm --dir frontend build
+```
+
+## Diseño del proyecto completo
+
+- [Diseño completo editable](docs/atlas_quant_diseno.md)
+- [Diseño en PDF](output/pdf/atlas_quant_diseno.pdf)
+- [PDF en el móvil, con acceso privado](https://atlas-quant-lectura.patosverdes098.chatgpt.site/atlas_quant_diseno.pdf)
+
+El diseño contiene 20 secciones, una matriz de los 16 requisitos solicitados, costes contrastados y seis fases de implementación. Sigue siendo el alcance objetivo; la v0.1 implementa un subconjunto descrito en su guía. El PDF publicado es la especificación original, no un certificado de funcionalidad implementada.
+
+Los archivos `docs/insumos_*` y `docs/base_diseno_quant.md` son material de preparación; el documento definitivo es `docs/atlas_quant_diseno.md`.
+
+`tools/render_design_pdf.py` genera el PDF a partir de la especificación. Utiliza ReportLab, pypdf y las fuentes Calibri de Windows. El resumen de verificación entregado está en `output/pdf/validacion_diseno.json`; el renderizador puede recrear temporales en `tmp/pdfs/`.

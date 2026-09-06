@@ -1,0 +1,39 @@
+{
+  "pages": 22,
+  "words_source": 8051,
+  "chapters": 20,
+  "missing_chapters": [],
+  "annotations": 70,
+  "chars_per_page": [
+    633,
+    1016,
+    2620,
+    1636,
+    3032,
+    3292,
+    2920,
+    3915,
+    1547,
+    1869,
+    2007,
+    3771,
+    3009,
+    2832,
+    1974,
+    2589,
+    3185,
+    3175,
+    2857,
+    2982,
+    3022,
+    2699
+  ],
+  "pdf_bytes": 166271,
+  "pages_with_text_outside_margins": [],
+  "visual_review": "Todas las paginas revisadas en imagen; detalle de portada, comparativa, arquitectura, costes y pagina actualizada. Sin defectos visuales detectados.",
+  "phase_hours": {
+    "minimum": 380,
+    "maximum": 650
+  },
+  "status": "Diseno revisado; aplicacion no implementada y pruebas del software propuestas, no ejecutadas."
+}

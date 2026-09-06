@@ -1,0 +1,13 @@
+# ATLAS Quant
+
+Antes de continuar una tarea sobre este proyecto, lee `docs/CONTINUIDAD.md` y `README.md`. Para instalarlo en otro equipo, consulta `docs/traslado_sobremesa.md`.
+
+- Responde en español, de forma directa y realista. El usuario estudia el doble grado de Ingeniería del Software y Matemática Computacional en U-TAD; quiere precisión y discrepancias argumentadas cuando correspondan.
+- El alcance implementado está en `docs/version_0_1.md`. `docs/atlas_quant_diseno.md` describe el objetivo completo, no funciones ya disponibles.
+- Las mejoras de gráficos y aprendizaje acumulativo siguen en planificación en `docs/backlog_planificacion.md`. Trasladar o instalar la aplicación no implica empezar a implementarlas. Sigue la solicitud actual del usuario para determinar el alcance.
+- Presupuesto inicial de API: cero hasta que el usuario decida uno. No introducir llamadas pagadas en instalaciones, pruebas o arranque. OpenAI y Anthropic son opciones previstas y ya tienen adaptadores.
+- La v0.1 solo ejecuta órdenes simuladas. No tiene integración con un bróker ni órdenes reales. La automatización real es una intención futura bajo reglas y límites configurados.
+- `.env`, `var/`, instalaciones locales y copias de seguridad no van a Git. No pedir claves en el chat ni mostrarlas en salidas.
+- `frontend/.openai/hosting.json` es necesario para importar la configuración local; conservarlo. `pdf-mobile/` es una publicación y repositorio independientes, excluidos del repositorio principal.
+- Distinguir pruebas históricas en el portátil de validaciones realizadas en el equipo actual. No declarar una migración validada solo porque la instalación original funcionó.
+- Al cambiar de equipo, actualizar la documentación de continuidad con el estado relevante del proyecto; no asumir que otra conversación tiene este historial.

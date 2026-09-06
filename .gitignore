@@ -1,0 +1,19 @@
+.venv/
+__pycache__/
+.pytest_cache/
+*.pyc
+.env
+.env.*
+!.env.example
+var/
+tmp/
+node_modules/
+*.log
+
+# Publicacion independiente del PDF; no incluir el repositorio Git anidado.
+/pdf-mobile/
+/output/pdf/atlas_pdf_mobile_site.tar.gz
+
+# Resultados de ejecuciones y copias locales; no son codigo compartido.
+/output/validation/
+/backups/
