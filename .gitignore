@@ -8,6 +8,7 @@ __pycache__/
 var/
 tmp/
 node_modules/
+.pnpm-store/
 *.log
 
 # Publicacion independiente del PDF; no incluir el repositorio Git anidado.

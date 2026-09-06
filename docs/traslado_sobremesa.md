@@ -2,6 +2,8 @@
 
 Guía preparada el 6 de septiembre de 2026 para Windows. No es necesario usar WSL2 para esta versión.
 
+La instalación nativa del sobremesa se completó y verificó ese mismo día en `C:\Users\lulae\Documents\Personal\Proyectos\atlas-quant`, con base nueva y demo sin claves ni gasto. Las versiones comprobadas, resultados y comandos de este PC están en [CONTINUIDAD.md](CONTINUIDAD.md). Los pasos de publicación y clonación siguientes se conservan como referencia para otros traslados.
+
 La ruta sencilla es publicar el código en un repositorio privado, clonarlo en el sobremesa y abrir allí una conversación de Codex asociada a esa carpeta. `AGENTS.md` y `docs/CONTINUIDAD.md` llevan el contexto del proyecto. Git no lleva automáticamente la conversación original ni la base de datos de ATLAS.
 
 ## 1. Publicar desde el portátil

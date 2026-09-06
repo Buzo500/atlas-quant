@@ -10,7 +10,7 @@ Para trabajar en otro equipo: [traslado al sobremesa y conversación nueva en Co
 
 ## Abrir la aplicación
 
-En este ordenador las dependencias ya están instaladas. Ejecuta `Start-Atlas.ps1 -OpenBrowser`, o desde PowerShell en esta carpeta:
+Después de instalar las dependencias en cada equipo, ejecuta `Start-Atlas.ps1 -OpenBrowser`, o desde PowerShell en la raíz del proyecto:
 
 ```powershell
 .\.venv\Scripts\python.exe tools\run_atlas.py --open
@@ -18,7 +18,7 @@ En este ordenador las dependencias ya están instaladas. Ejecuta `Start-Atlas.ps
 
 La interfaz está en **http://127.0.0.1:3000/**. El motor usa el puerto 8000. Ambos escuchan exclusivamente en el ordenador local. Para detenerlos, ejecuta `Stop-Atlas.ps1`; si arrancaste el lanzador en primer plano, también puedes usar Ctrl+C. No cierres ni suspendas el ordenador durante un experimento que quieras mantener activo.
 
-Para otra instalación: Python 3.12+, Node.js 22.13+ y pnpm; después `Install-Atlas.ps1`. Los paquetes Python están fijados en `requirements.txt` y los de la interfaz en `frontend/pnpm-lock.yaml`.
+Para instalar: Python 3.12+, Node.js 22.13+ y pnpm; después `Install-Atlas.ps1`. Los paquetes Python están fijados en `requirements.txt` y los de la interfaz en `frontend/pnpm-lock.yaml`. El sobremesa se ha instalado el 06/09/2026 con Python 3.14.4, Node 24.15.0 y pnpm 11.19.0; las versiones, ruta y comprobaciones de cada equipo están en [CONTINUIDAD.md](docs/CONTINUIDAD.md).
 
 ## Primer recorrido
 
@@ -50,9 +50,10 @@ Si se cumplen los criterios, activaste la simulación automática y la parada gl
 
 ## Estado y validación
 
-- 167 pruebas automatizadas y 91 subtests superados en la revisión de v0.1; dos avisos de deprecación de las dependencias de TestClient.
-- Compilación de interfaz y TypeScript comprobados. El soporte WebMCP es opcional y no se ha validado en un navegador compatible.
-- Descarga real de SXR8.DE verificada con corte explícito anterior al 04/09/2026: 932 barras EUR. La consulta incluyendo el 04/09 falló correctamente porque Yahoo devolvió un cierre ausente con volumen; no se inventó el dato. Ese símbolo fue una prueba técnica, no una recomendación de inversión.
+- Portátil: 167 pruebas automatizadas y 91 subtests superados en la revisión original de v0.1, con dos avisos de deprecación de TestClient; compilación, TypeScript y recuperación tras reinicio comprobados.
+- Sobremesa, 06/09/2026: 167 pruebas y 91 subtests superados de nuevo, con los mismos dos avisos; compilación y TypeScript comprobados. Motor y proxy local responden correctamente. Se han probado en navegador la cartera de demostración, la comparación del Laboratorio y el informe de un experimento sin IA, con presupuesto, gasto y reserva cero. Parada, reinicio, persistencia e integridad SQLite comprobados; detalles en [CONTINUIDAD.md](docs/CONTINUIDAD.md).
+- La descarga real de SXR8.DE se verificó en el portátil, con corte explícito anterior al 04/09/2026: 932 barras EUR. La consulta incluyendo el 04/09 falló correctamente porque Yahoo devolvió un cierre ausente con volumen; no se inventó el dato. Ese símbolo fue una prueba técnica, no una recomendación de inversión. La instalación del sobremesa se ha probado con datos sintéticos.
+- El soporte WebMCP es opcional y no se ha validado en un navegador compatible.
 - No se ha realizado una prueba sostenida de 48 horas, una llamada real a los modelos ni una conexión con IBKR.
 
 Detalles, limitaciones y próximos hitos: [guía de v0.1](docs/version_0_1.md).
