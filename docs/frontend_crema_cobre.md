@@ -1,5 +1,7 @@
 # Frontend crema y cobre
 
+**Actualización posterior · rc.2, 08/09/2026:** [escalado físico 125 %/150 % comprobado](validacion_escalado_windows.md) en el monitor 3440 × 1440 de este sobremesa; restaurado el 100 % inicial. El resto de este documento conserva la implementación y las pruebas de la entrega anterior. El ensayo de 48 horas sigue aplazado.
+
 Implementado el 8 de septiembre de 2026, tras autorización expresa del usuario. Se entrega en la aplicación local de Windows y mantiene la versión **0.2.0-rc.1**. El cierre de la candidata sigue pendiente; esta entrega no inicia un ensayo de 48 horas ni publica una versión estable.
 
 ## Diseño y alcance
@@ -34,7 +36,7 @@ No se modifican endpoints, contratos, esquema SQLite ni lógica financiera. Se c
 | 1366 × 768 | Portátil/ventana reducida |
 | 390 × 844 | Ventana estrecha, paneles apilados y tablas con desplazamiento propio |
 
-No se observa desbordamiento horizontal de la página en esos recorridos. El viewport temporal del navegador se restaura al terminar. Los tamaños equivalentes al escalado no prueban el comportamiento físico del monitor ni del sistema operativo: **queda pendiente probar Windows al 125 % y 150 %** en el equipo del usuario.
+No se observa desbordamiento horizontal de la página en esos recorridos. El viewport temporal del navegador se restaura al terminar. Los tamaños equivalentes al escalado no prueban el comportamiento físico del monitor ni del sistema operativo: **en aquella entrega quedó pendiente Windows al 125 % y 150 %**. La comprobación posterior de rc.2 se enlaza al inicio de este documento.
 
 Recorridos realizados: estado inicial sin datos, carga de demo y comparación histórica en base aislada; cartera y expediente existentes en base habitual; apertura/cierre del formulario de experimento; selección de proveedor sin clave y comprobación del botón de inicio deshabilitado; mensajes de importación incompleta; navegación por teclado con flechas y Enter. Se verificó la respuesta JSON del informe existente y la salud directa del motor y a través del proxy. El formulario abierto en 3440 mantiene Pausar/Cancelar en la primera pantalla del expediente.
 

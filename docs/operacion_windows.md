@@ -4,7 +4,7 @@ Guía actualizada el 8 de septiembre de 2026. **v0.2.0-rc.2 es una candidata con
 
 ATLAS normal está arrancado; los entornos E2E están cerrados y la base habitual conserva su contenido. El recorrido usa Windows nativo, motor Python e interfaz compilada; no requiere WSL, CUDA, claves ni presupuesto de pago. La ejecución es exclusivamente simulada.
 
-El escalado físico 125 %/150 % sigue pendiente: el control de Windows bloqueó el cambio y se mantuvo el 100 % inicial. Los 35 viewports CSS anteriores no lo sustituyen. Ensayo de 48 horas y seguimiento aplazados. Evidencia, arranques e incidencias históricas en [CONTINUIDAD](CONTINUIDAD.md) y [candidata_v0_2.md](candidata_v0_2.md).
+**[Escalado físico 125 %/150 % comprobado](validacion_escalado_windows.md)** en el monitor 3440 × 1440 de este PC, mediante Configuración de Windows y Chrome al 100 %, sin emulación; restaurado el 100 % inicial. El intento anterior bloqueado y los 35 viewports CSS se conservan como antecedentes distintos. Ensayo de 48 horas y seguimiento aplazados. Evidencia, arranques e incidencias históricas en [CONTINUIDAD](CONTINUIDAD.md) y [candidata_v0_2.md](candidata_v0_2.md).
 
 ## Iniciar, consultar el estado y detener
 

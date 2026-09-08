@@ -1,5 +1,7 @@
 # Consolidación del frontend
 
+**Actualización posterior · rc.2, 08/09/2026:** [escalado físico 125 %/150 % comprobado](validacion_escalado_windows.md) en el monitor 3440 × 1440 de este sobremesa; restaurado el 100 % inicial. Los apartados siguientes conservan el trabajo y las pruebas de la revisión anterior. El ensayo de 48 horas sigue aplazado.
+
 Trabajo del 8 de septiembre de 2026 sobre la interfaz crema y cobre. Mantiene las cinco secciones existentes y la versión **0.2.0-rc.1**. Refuerza los recorridos, la trazabilidad, los contratos y las pruebas; no inicia el ensayo de 48 horas ni declara v0.2 estable.
 
 Este documento complementa [frontend_crema_cobre.md](frontend_crema_cobre.md). Las afirmaciones de aquella entrega sobre contratos y dependencias describen su alcance anterior: esta consolidación sí añade infraestructura de pruebas de frontend y amplía los contratos indicados a continuación.
@@ -137,4 +139,4 @@ Tras esa corrección se volvió a generar el manifiesto y arrancar ATLAS: ejecuc
 
 Detener ATLAS antes de modificar código o reconstruir. Usar `tools/build_frontend.py` para generar el manifiesto requerido por el arranque diario; un build directo no lo sustituye. Las pruebas que escriban datos deben utilizar una base aislada. Comprobar la preservación de datos habituales antes de dar por terminada la actualización.
 
-La validación de viewports CSS no equivale a probar el escalado físico de Windows: siguen pendientes comprobaciones al 125 % y 150 % en el equipo del usuario. El ensayo sostenido permanece aplazado. Presupuesto de API cero, sin claves nuevas, llamadas pagadas, bróker real, aprendizaje, móvil o acceso remoto.
+La validación de viewports CSS no equivale a probar el escalado físico de Windows: al cerrar esta revisión anterior quedaron pendientes las comprobaciones al 125 % y 150 %. La comprobación posterior de rc.2 se enlaza al inicio de este documento. El ensayo sostenido permanece aplazado. Presupuesto de API cero, sin claves nuevas, llamadas pagadas, bróker real, aprendizaje, móvil o acceso remoto.
