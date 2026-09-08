@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRead } from '@/shared/use-read';
 import { QueryStatus } from '@/shared/query-status';
 import { useNavigation, type Section } from '@/shared/navigation';
@@ -28,6 +28,7 @@ import { PortfolioPanel } from '@/features/portfolio/portfolio-panel';
 import { date } from '@/shared/format';
 
 export default function Home() {
+  const dataTab = useRef<HTMLButtonElement | null>(null);
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
   const { navigation, navigate } = useNavigation();
@@ -179,7 +180,7 @@ export default function Home() {
             <Bot />
             Agente IA
           </TabsTrigger>
-          <TabsTrigger value="data">
+          <TabsTrigger ref={dataTab} value="data">
             <FolderInput />
             Datos
           </TabsTrigger>
@@ -292,7 +293,10 @@ export default function Home() {
             connected={connected}
             stateLoaded={!!state}
             busy={busy}
-            onImport={() => setTab('data')}
+            onImport={() => {
+              setTab('data');
+              dataTab.current?.focus();
+            }}
             onDemo={demo}
           />
         </TabsContent>

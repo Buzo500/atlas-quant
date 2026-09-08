@@ -23,6 +23,7 @@ jobs:
     env:
       PYTHONUTF8: '1'
       ATLAS_DATA_DIR: var/test-data
+      PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/var/playwright-browsers
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
@@ -52,7 +53,11 @@ jobs:
         run: ./.venv/Scripts/python.exe tools/export_contracts.py --check
       - name: Lint de la aplicación mantenida
         working-directory: frontend
-        run: node node_modules/oxlint/bin/oxlint app lib components/atlas features shared test next.config.ts local-server.mjs vitest.config.ts
+        run: node node_modules/oxlint/bin/oxlint app lib components/atlas features shared test e2e next.config.ts local-server.mjs vitest.config.ts playwright.config.ts
+      - name: Instalar Chromium fijado para los recorridos E2E
+        run: node frontend/node_modules/@playwright/test/cli.js install chromium
+      - name: Recorridos de navegador con interfaz compilada y base aislada
+        run: ./.venv/Scripts/python.exe tools/run_e2e.py
       - name: Arranque y recorrido sintético mediante el proxy
         id: runtime
         run: |
