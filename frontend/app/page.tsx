@@ -322,6 +322,7 @@ export default function Home() {
         </TabsContent>
         <TabsContent keepMounted value="data">
           <DataPanel
+            active={tab === 'data'}
             dataset={dataset}
             refresh={refresh}
             selectDataset={setDatasetId}

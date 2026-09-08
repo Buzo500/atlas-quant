@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import Literal
 from uuid import uuid4
 
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.responses import JSONResponse, PlainTextResponse
 from pydantic import BaseModel, ConfigDict, Field
 from starlette.middleware.trustedhost import TrustedHostMiddleware
@@ -16,9 +16,10 @@ from . import __version__
 from .ai import provider_status
 from .backtest import run_research
 from .contracts import (HealthResponse, StateResponse, DatasetResponse, PortfolioResponse,
-                        LedgerResponse, ResearchResponse, ExperimentResponse, SettingsResponse)
+                        DatasetPricesResponse, LedgerResponse, ResearchResponse, ExperimentResponse, SettingsResponse)
 from .data import parse_prices_csv, price_csv_template, ledger_csv_template
 from .datasets import LedgerPreviewConflict
+from .prices import PricesNotFound
 from .service import Service
 from .store import Store, now
 from .worker_lock import WorkerLock
@@ -198,6 +199,16 @@ def create_app(data_dir=None, run_worker=True):
     @app.get("/api/datasets/{ident}/portfolio", response_model=PortfolioResponse, response_model_exclude_unset=True)
     def portfolio(ident: str):
         return service.portfolio(ident)
+
+    @app.get("/api/datasets/{ident}/prices", response_model=DatasetPricesResponse)
+    def prices(ident: str, version: int = Query(ge=1, le=2_147_483_647),
+               symbol: str = Query(min_length=1, max_length=50),
+               start: str | None = Query(default=None, max_length=10),
+               end: str | None = Query(default=None, max_length=10)):
+        try:
+            return service.datasets.prices(ident, version, symbol, start, end)
+        except PricesNotFound as exc:
+            raise HTTPException(404, str(exc)) from exc
 
     @app.post("/api/datasets/{ident}/ledger", response_model=LedgerResponse, response_model_exclude_unset=True)
     async def ledger(ident: str, body: LedgerInput):

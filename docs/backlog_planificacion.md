@@ -1,6 +1,6 @@
 # ATLAS · Funcionalidades pendientes y planificación
 
-Actualizado: 8 de septiembre de 2026. Estado: planificación, con UI-001 implementado tras autorización expresa; registrar el resto de requisitos no autoriza su implementación.
+Actualizado: 8 de septiembre de 2026. UI-001 implementado; GRAPH-001/002 en desarrollo autorizado como `0.3.0-dev.1`, con alcance en el [plan de v0.3](plan_v0_3.md). El resto sigue como planificación; registrarlo no autoriza su implementación.
 
 El usuario solicita guardar tres mejoras para futuras versiones: información al pasar el ratón por los gráficos, velas y otros tipos de gráfico, y una IA que acumule experiencia y aprenda de sus investigaciones. Pide estudiar si conviene entrenarla en local. La elección de arquitectura que aparece aquí es una recomendación del asistente, todavía no una decisión adoptada por el usuario.
 
@@ -75,7 +75,7 @@ Orden recomendado:
 
 Cambiar el aspecto del gráfico no cambia los precios usados para fills ni la contabilidad. Heikin-Ashi/Renko y otras transformaciones pueden contener precios sintéticos; las pruebas de ejecución deben seguir usando precios de mercado observados con resolución suficiente. No se promete reconstruir la secuencia intradía de una vela diaria. [Advertencia técnica de TradingView sobre gráficos no estándar](https://in.tradingview.com/support/solutions/43000481029-strategy-produces-unrealistic-results-on-non-standard-chart-types-heikin-ashi-renko-etc/).
 
-No se elige todavía biblioteca de gráficos. Se evaluarán cobertura, rendimiento, accesibilidad, licencia y coste de mantenimiento al implementar; no hace falta construir muchos estilos antes de resolver bien velas e inspección.
+Decisión de v0.3: ampliar el SVG propio, con interacción separada de la agregación, reducción de curvas y un límite explícito de velas visibles. Las medidas locales cumplen los objetivos iniciales sin una biblioteca nueva. [Implementación y límites](graficos_v0_3.md). Los gráficos transformados del punto 3 siguen como opciones posteriores.
 
 ## STRAT-001 · Amplitud de mercado: McClellan Oscillator y Summation Index
 

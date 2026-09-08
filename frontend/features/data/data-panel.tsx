@@ -11,17 +11,20 @@ import { Choice, Field } from '@/shared/ui';
 import { useAction } from '@/shared/use-action';
 import { LedgerImport } from './ledger-import';
 import { date, dateTime, number } from '@/shared/format';
+import { PricesPanel } from '@/features/prices/prices-panel';
 
 export function DataPanel({
   dataset,
   refresh,
   selectDataset,
   onError,
+  active = true,
 }: {
   dataset: DatasetResponse | undefined;
   refresh: () => Promise<void>;
   selectDataset: (id: string) => void;
   onError: (s: string) => void;
+  active?: boolean;
 }) {
   const [kind, setKind] = useState('prices'),
     [csv, setCsv] = useState(''),
@@ -95,6 +98,7 @@ export function DataPanel({
   }
   return (
     <div className="data-layout">
+      <PricesPanel dataset={dataset} active={active} />
       <section className="panel data-import">
         <div className="panel-heading">
           <h2>Importar CSV</h2>

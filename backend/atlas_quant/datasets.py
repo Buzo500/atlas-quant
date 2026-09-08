@@ -10,6 +10,7 @@ from datetime import datetime, timezone
 
 from .analytics import portfolio_snapshot
 from .data import demo_dataset, parse_ledger_csv
+from .prices import PricesNotFound, project_prices, validate_price_range
 from .store import now
 
 
@@ -39,6 +40,13 @@ class DatasetService:
         if value is None:
             raise ValueError("Conjunto de datos no encontrado.")
         return value
+
+    def prices(self, ident, version, symbol, start=None, end=None):
+        validate_price_range(start, end)
+        snapshot = self.store.get_dataset_version(ident, version)
+        if snapshot is None:
+            raise PricesNotFound("Conjunto o versión de datos no encontrado.")
+        return project_prices(snapshot, symbol, start, end)
 
     def _prepare(self, current, incoming):
         value = {**(current or {}), **incoming}

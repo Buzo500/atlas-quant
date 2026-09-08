@@ -1,12 +1,12 @@
 # ATLAS Quant
 
-Versión vigente: **0.2.0-rc.2, candidata con CI verificada**. No es todavía v0.2 estable. El [registro de candidata](docs/candidata_v0_2.md) identifica las fuentes y comprobaciones de cada revisión, incluida la candidata histórica rc.1. La [hoja de ruta](docs/hoja_de_ruta.md) recoge las versiones previstas y el [plan de v0.2](docs/plan_v0_2.md) sus criterios de cierre. El historial de cambios está en [CHANGELOG.md](CHANGELOG.md).
+Versión de desarrollo: **0.3.0-dev.1 · gráficos interactivos**. Conserva como antecedente `0.2.0-rc.2`, candidata publicada con CI verificada; el ensayo de 48 horas sigue aplazado y v0.2 no se declara estable. El [plan de v0.3](docs/plan_v0_3.md) fija el alcance, y la [guía de gráficos](docs/graficos_v0_3.md) explica su uso y validación. La [hoja de ruta](docs/hoja_de_ruta.md) recoge las entregas previstas y [CHANGELOG.md](CHANGELOG.md) sus cambios.
 
 Aplicación local para analizar una cartera en EUR, comparar estrategias de acciones/ETF y ejecutar experimentos acotados con OpenAI o Anthropic. Incluye simulación de órdenes; no está conectada a ningún bróker.
 
 Preferencias confirmadas: OpenAI y Anthropic seleccionables desde la app, integración preparada sin consumo hasta decidir un presupuesto y primera etapa en el PC. El presupuesto inicial sigue en cero. La entrega se ha probado en Windows; Ubuntu no se ha validado todavía.
 
-Cambios solicitados el 06/09/2026, todavía en planificación: [inspección de gráficos, velas y aprendizaje acumulativo de IA](docs/backlog_planificacion.md).
+Los gráficos de v0.3 se desarrollan por autorización expresa del usuario. Aprendizaje acumulativo, indicadores nuevos, móvil, ejecución remota e informes LaTeX mantienen su alcance futuro en el [backlog](docs/backlog_planificacion.md).
 
 Para trabajar en otro equipo: [traslado al sobremesa y conversación nueva en Codex](docs/traslado_sobremesa.md). El contexto para retomar el proyecto está en [CONTINUIDAD.md](docs/CONTINUIDAD.md); Git no traslada automáticamente el chat original ni los experimentos locales.
 
@@ -33,10 +33,10 @@ El sobremesa se ha probado el 06/09/2026 con Python 3.14.4, Node 24.15.0 y pnpm 
 ## Primer recorrido
 
 1. **Cargar demostración** añade tres activos ficticios y movimientos sintéticos. No descarga una cartera real.
-2. **Cartera** muestra efectivo, posiciones, aportaciones, P&L y TWR diario.
+2. **Cartera** muestra efectivo, posiciones, aportaciones, P&L y TWR diario. Su curva permite inspeccionar observaciones, elegir línea/área o TWR desde el origen, filtrar fechas y ampliar/desplazar la vista.
 3. **Laboratorio** compara mantener y dos cruces de medias con selección cronológica 60/20/20, comisiones, deslizamiento y un mismo límite de posición para estrategia y benchmark.
 4. **Agente IA** crea un experimento de duración y presupuesto limitados. Sin clave, usa «Catálogo fijo · sin IA». Se genera un informe y se observa la regla congelada sobre nuevas sesiones.
-5. **Datos** importa CSV y permite conectar Yahoo diario en EUR. Las importaciones de movimientos se previsualizan antes de confirmar y omiten IDs ya importados.
+5. **Datos** permite explorar precios de cada activo: velas, línea, área o barras OHLC, volumen y agregación diaria/semanal/mensual. También importa CSV y permite conectar Yahoo diario en EUR. Las importaciones de movimientos se previsualizan antes de confirmar y omiten IDs ya importados.
 6. **Ajustes** controla la parada de ejecución simulada y el límite de peso. La parada está activada por defecto.
 
 ## Conectar OpenAI o Anthropic
@@ -59,6 +59,8 @@ El motor propone un máximo de ocho candidatos, ejecuta pruebas, congela el gana
 Si se cumplen los criterios, activaste la simulación automática y la parada global está desactivada, abre una cuenta paper independiente. Una señal al cierre solo puede ejecutarse en una apertura posterior recibida. Los datos sintéticos nunca habilitan esa promoción. No hay endpoint de órdenes reales.
 
 ## Estado y validación
+
+- **0.3.0-dev.1, validación local:** 477 pruebas Python y 91 subtests, 201 de frontend y 7/7 E2E con API real. Contratos, TypeScript, lint y build con manifiesto correctos. Precios/curvas comprobados hasta 100.000 observaciones y 1.000 velas visibles; Windows físico 125 %/150 % revisado y 100 % restaurado. [Evidencia y límites](docs/graficos_v0_3.md). CI de v0.3 pendiente; ensayo sostenido aplazado.
 
 - **0.2.0-rc.2 con CI verificada:** 446 pruebas Python y 91 subtests (22,13 s), 140 Vitest en 15 archivos (43,86 s) y 5/5 E2E (18,7 s) en Windows CI. Validación local separada: 446+91 (38,34 s, dos avisos previos), 140 Vitest (13,34 s) y 5/5 E2E (9,6 s). El [registro de candidata](docs/candidata_v0_2.md) conserva también el primer intento remoto fallido y sus correcciones.
 

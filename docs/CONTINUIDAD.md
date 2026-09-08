@@ -2,7 +2,21 @@
 
 Actualizado: 8 de septiembre de 2026. Este documento resume decisiones y estado para una conversación nueva de Codex; no contiene la transcripción completa del chat original.
 
-## Estado actual: rc.2 con CI verificada
+## Estado actual: desarrollo de v0.3 autorizado
+
+El usuario aplaza el ensayo de 48 horas y su seguimiento, y autoriza expresamente **empezar a implementar v0.3**. La rama es `codex/v0.3-graficos`, basada en `v0.2.0-rc.2` (`9aee422`). Motor e interfaz se identifican como **0.3.0-dev.1**. No se declara estable v0.2, no se reactiva el monitor y no se publican etiquetas estables nuevas.
+
+Implementados: lectura de precios por versión inmutable; panel OHLCV en Datos con velas/línea/área/OHLC, volumen, intervalos diarios/semanales/mensuales, fechas, zoom, desplazamiento y originales paginados; inspección por ratón y teclado en precios, cartera y backtests; línea/área y TWR de cartera desde el origen. El SVG conserva observaciones originales para la lectura y limita explícitamente la ventana de velas a 1.000. [Uso y evidencia](graficos_v0_3.md); [alcance y criterios](plan_v0_3.md).
+
+Se detuvo ATLAS antes de editar y se creó `backups/atlas-20260908T172729906683Z-0db1c3ca`. La comprobación anterior a la validación conserva el contenido persistente y la auditoría de esa copia. Las pruebas con escritura se ejecutan exclusivamente en directorios `var/validation/e2e-*`, con datos sintéticos, sin claves y presupuesto cero. Los benchmarks generan fechas civiles artificiales desde 1750; no representan un histórico bursátil acreditado. Las funciones contables, ejecución simulada y controles no cambian por explorar un gráfico.
+
+**Escalado físico de los gráficos nuevos comprobado** el 08/09/2026: monitor 2 de 3440 × 1440, Chrome visible y zoom 100 %, Windows 125 % y 150 %, sin emulación. Revisados precios, cartera y resultado real del Laboratorio en la base aislada; sin desbordamiento global, controles/teclado legibles, SVG sin escalado de tipografía. **100 % inicial restaurado y verificado**. Evidencia local `output/validation/v03-windows-scale/results.json` y siete capturas de la aplicación; las capturas nativas de Configuración están en la conversación. El ajuste posterior solo acota los decimales residuales del cambio calculado, conservando geometría y valores originales.
+
+Rendimiento local con Chromium y API real: 100.000 observaciones, primera representación de precios **2,10 s**, curva **2,44 s**, p95 de inspección/zoom alrededor de **34 ms**, heap tras GC **31,4 MiB**; ocho cambios de pestaña sin aumento de nodos/listeners después del calentamiento. Prueba adicional de 1.000 velas: puntero p95 **33,8 ms**, zoom p95 **50,7 ms**, 4.025 nodos SVG y heap **25,2 MiB**. Son mediciones cortas, no el ensayo sostenido. Scripts reproducibles en `tools/benchmarks/`.
+
+Los apartados siguientes son historia. Sus referencias a rc.2 o rc.1 y a instancias arrancadas describen aquellas entregas; para retomar prevalecen este bloque y el registro de v0.3. CI de v0.3 pendiente; no atribuirle los resultados de CI de rc.2. Aprendizaje, indicadores nuevos, LaTeX, remoto, móvil y bróker siguen fuera del desarrollo actual.
+
+## Histórico: rc.2 con CI verificada
 
 **CI de rc.2 superada:** [ejecución 34249730107](https://github.com/Buzo500/atlas-quant/actions/runs/34249730107), sobre `412918b5e9067e44f293b0633068ca932a472d64`. En Windows: **446 pruebas Python y 91 subtests** (22,13 s), **140 Vitest en 15 archivos** (43,86 s) y **5/5 E2E** (18,7 s); instalación limpia, build con manifiesto, contratos, TypeScript, lint, `pip check`, smoke, arranque y parada correctos. E2E remoto `e2e-ea578aac47f341ffac48cd6330edbb5a`: resultado 0, conservación de la base comprobada, integridad `ok` y puertos libres. Este SHA identifica fuentes, pruebas y workflow; el cierre posterior solo modifica documentación.
 

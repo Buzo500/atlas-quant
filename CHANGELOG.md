@@ -1,5 +1,15 @@
 # Cambios de ATLAS Quant
 
+## v0.3.0-dev.1 · Gráficos interactivos · 2026-09-08
+
+Entrega de desarrollo basada en `v0.2.0-rc.2`. El ensayo sostenido y su seguimiento siguen aplazados; no se publica una versión estable por omitirlos.
+
+- Consulta de precios por conjunto, versión inmutable, activo y fechas inclusivas, con procedencia, advertencias y cierre anterior. Lectura local sin descargas ni mutaciones de dominio.
+- Panel de precios en Datos con velas, línea, área, OHLC y volumen; intervalos diarios, semanales y mensuales calculados sobre las sesiones elegidas, con cobertura parcial explícita.
+- Cursor y teclado, fechas, zoom, desplazamiento y tabla diaria original. Ventana explícita de hasta 1.000 barras dibujadas, sin eliminar datos de origen.
+- Curvas de cartera y backtest con inspección de observaciones originales, línea/área y navegación temporal. TWR de cartera calculado desde su origen, sin convertir métricas globales en métricas del tramo visible.
+- Contratos regenerados, pruebas de lectura inmutable y agregación, y recorridos de navegador con la API real. [Uso, evidencia y límites](docs/graficos_v0_3.md).
+
 ## v0.2.0-rc.2 · Candidata con CI verificada · 2026-09-08
 
 Candidata desarrollada en `codex/v0.2.0-rc.2`, sobre la [PR #1](https://github.com/Buzo500/atlas-quant/pull/1) fusionada en `master` (`e1f6e020a1d75a81bff97eefcbebe726d47bcdb3`). La [CI 34249730107](https://github.com/Buzo500/atlas-quant/actions/runs/34249730107) verifica las fuentes, pruebas y workflow de `412918b5e9067e44f293b0633068ca932a472d64`; el cierre posterior solo modifica documentación. La integración por la [PR #2](https://github.com/Buzo500/atlas-quant/pull/2) y la etiqueta `v0.2.0-rc.2` siguen el procedimiento autorizado. No es estable: escalado físico pendiente, ensayo de 48 horas y seguimiento aplazados. [Evidencia de candidata](docs/candidata_v0_2.md).

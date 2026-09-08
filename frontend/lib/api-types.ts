@@ -63,6 +63,36 @@ export type CostsResponse = {
   "max_position_weight": number;
 };
 
+export type DatasetPriceBar = {
+  "date": string;
+  "open": number;
+  "high": number;
+  "low": number;
+  "close": number;
+  "volume": number;
+};
+
+export type DatasetPricesResponse = {
+  "dataset_id": string;
+  "dataset_version": number;
+  "manifest_hash": string;
+  "symbol": string;
+  "currency": "EUR";
+  "source_kind": "observed" | "synthetic";
+  "source": string;
+  "source_metadata": (SourceMetadata) | (null);
+  "price_basis": string;
+  "calendar": string;
+  "warnings": Array<string>;
+  "available_start": string;
+  "available_end": string;
+  "first_date": (string) | (null);
+  "last_date": (string) | (null);
+  "preceding_close": (number) | (null);
+  "preceding_date": (string) | (null);
+  "bars": Array<DatasetPriceBar>;
+};
+
 export type DatasetResponse = {
   "id": string;
   "name": string;

@@ -1,3 +1,20 @@
+/** Immutable daily-price read: the dataset version is always explicit. */
+export function datasetPricesPath(
+  id: string,
+  version: number,
+  symbol: string,
+  range: { start?: string; end?: string } = {},
+): string {
+  if (!id || !symbol || !Number.isInteger(version) || version < 1)
+    throw new Error(
+      'Selecciona un conjunto, una versión positiva y un activo.',
+    );
+  const query = new URLSearchParams({ version: String(version), symbol });
+  if (range.start) query.set('start', range.start);
+  if (range.end) query.set('end', range.end);
+  return `/datasets/${encodeURIComponent(id)}/prices?${query}`;
+}
+
 export class ApiError extends Error {
   constructor(
     message: string,

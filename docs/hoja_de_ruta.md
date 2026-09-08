@@ -2,11 +2,13 @@
 
 Actualizado: 8 de septiembre de 2026. La v0.1 es la última entrega cerrada; **0.2.0-rc.2 es una candidata con CI verificada, todavía no v0.2 estable**. La [CI 34249730107](https://github.com/Buzo500/atlas-quant/actions/runs/34249730107) valida `412918b5e9067e44f293b0633068ca932a472d64`: 446 Python y 91 subtests, 140 Vitest y cinco E2E, además del recorrido de instalación y operación. El cierre posterior solo modifica documentación; la integración por la [PR #2](https://github.com/Buzo500/atlas-quant/pull/2) y la etiqueta `v0.2.0-rc.2` siguen el procedimiento autorizado.
 
-La candidata incorpora correcciones de foco, anuncios accesibles, aislamiento de pytest y control de procesos E2E. **[Escalado físico 125 %/150 % comprobado](validacion_escalado_windows.md)** en el monitor 3440 × 1440 de este PC, con el 100 % inicial restaurado; los 35 viewports CSS históricos son evidencia distinta. H6 sigue abierto: ensayo de 48 horas y seguimiento aplazados. Las demás versiones continúan como planificación sin fechas comprometidas. La candidata rc.1 y el intento fallido de CI de rc.2 se conservan en [candidata_v0_2.md](candidata_v0_2.md).
+La candidata incorpora correcciones de foco, anuncios accesibles, aislamiento de pytest y control de procesos E2E. **[Escalado físico 125 %/150 % comprobado](validacion_escalado_windows.md)** en el monitor 3440 × 1440 de este PC, con el 100 % inicial restaurado; los 35 viewports CSS históricos son evidencia distinta. H6 sigue abierto: ensayo de 48 horas y seguimiento aplazados. v0.3 tiene implementación autorizada; las versiones posteriores continúan como planificación sin fechas comprometidas. La candidata rc.1 y el intento fallido de CI de rc.2 se conservan en [candidata_v0_2.md](candidata_v0_2.md).
 
 El alcance disponible se describe en [v0.1](version_0_1.md) y las comprobaciones de cada equipo en [CONTINUIDAD](CONTINUIDAD.md). El [diseño completo](atlas_quant_diseno.md) describe el objetivo del producto. Esta hoja de ruta establece el orden de trabajo actual y sustituye la prioridad histórica de conectar IBKR inmediatamente después de v0.1.
 
 ## Versiones y condiciones de cierre
+
+**En desarrollo autorizado: `0.3.0-dev.1`.** Se implementan GRAPH-001/002 mediante el [plan de v0.3](plan_v0_3.md), preservando la candidata rc.2 y el ensayo aplazado. [Uso y validación de los gráficos](graficos_v0_3.md). Las versiones posteriores siguen como planificación.
 
 | Versión | Entrega prevista | Condición principal para cerrarla |
 |---|---|---|

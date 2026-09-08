@@ -1,4 +1,5 @@
 import type {
+  DatasetPricesResponse,
   ExperimentResponse,
   LedgerResponse,
   PortfolioResponse,
@@ -174,6 +175,50 @@ test('laboratorio real: identidad inmutable, costes y borrador entre pestañas',
     costs: { commission_bps: 5 },
   });
   expect(result.out_of_sample.metrics.observations).toBeGreaterThan(0);
+  const backtestCurve = page
+    .locator('figure.chart')
+    .filter({
+      has: page.getByRole('slider', {
+        name: 'Observación de la curva',
+        exact: true,
+      }),
+    })
+    .last();
+  const backtestSlider = backtestCurve.getByRole('slider', {
+    name: 'Observación de la curva',
+    exact: true,
+  });
+  await backtestSlider.focus();
+  await page.keyboard.press('End');
+  const finalBacktest = result.out_of_sample.curve.at(-1)!;
+  const backtestDetail = backtestCurve.getByLabel('Detalle de la observación', {
+    exact: true,
+  });
+  await expect(backtestDetail.locator('time')).toHaveAttribute(
+    'datetime',
+    finalBacktest.date,
+  );
+  await expect(backtestDetail.locator('data').nth(0)).toHaveAttribute(
+    'value',
+    String(finalBacktest.equity),
+  );
+  await expect(backtestDetail.locator('data').nth(1)).toHaveAttribute(
+    'value',
+    String(finalBacktest.benchmark),
+  );
+  await backtestCurve
+    .getByRole('button', { name: 'Acercar curva', exact: true })
+    .click();
+  await backtestCurve
+    .getByRole('combobox', { name: 'Representación de la curva', exact: true })
+    .selectOption('area');
+  await expect(backtestDetail.locator('data').nth(0)).toHaveAttribute(
+    'value',
+    String(finalBacktest.equity),
+  );
+  await backtestCurve
+    .getByRole('button', { name: 'Restablecer curva', exact: true })
+    .click();
   const context = page.getByRole('region', {
     name: 'Contexto de la ejecución',
   });
@@ -241,9 +286,7 @@ test('experimento breve sin IA: crear, pausar, reanudar, cancelar y recuperar se
   await page
     .getByRole('textbox', { name: 'Hipótesis de investigación', exact: true })
     .fill('Recorrido E2E sintético sin IA ni órdenes reales.');
-  await page
-    .getByRole('spinbutton', { name: /^Duración \(horas\)/ })
-    .fill('1');
+  await page.getByRole('spinbutton', { name: /^Duración \(horas\)/ }).fill('1');
   await expect(
     page.getByRole('combobox', { name: 'Proveedor de IA', exact: true }),
   ).toContainText('Catálogo fijo · sin IA');
@@ -412,4 +455,230 @@ test('interrupción de conexión y reintento contra la misma cartera real', asyn
   await expect(
     page.getByRole('button', { name: 'Reintentar cartera', exact: true }),
   ).toHaveCount(0);
+});
+
+test('curva real: valores originales, TWR, rango inclusivo y controles adaptables', async ({
+  page,
+}, testInfo) => {
+  const dataset = await ensureDemo(page);
+  const portfolio = await readApi<PortfolioResponse>(
+    page,
+    `/api/datasets/${dataset.id}/portfolio`,
+  );
+  const curve = page.locator('figure.chart').first();
+  const slider = curve.getByRole('slider', {
+    name: 'Observación de la curva',
+    exact: true,
+  });
+  const detail = curve.getByLabel('Detalle de la observación', { exact: true });
+  const stats = await page.locator('.stats').first().innerText();
+  const first = portfolio.curve[0],
+    last = portfolio.curve.at(-1)!;
+  await slider.focus();
+  await page.keyboard.press('Home');
+  await expect(detail.locator('time')).toHaveAttribute('datetime', first.date);
+  await expect(detail.locator('data').first()).toHaveAttribute(
+    'value',
+    String(first.nav),
+  );
+  await page.keyboard.press('End');
+  await expect(detail.locator('time')).toHaveAttribute('datetime', last.date);
+  await expect(detail.locator('data').first()).toHaveAttribute(
+    'value',
+    String(last.nav),
+  );
+  await curve
+    .getByRole('combobox', { name: 'Serie de la curva', exact: true })
+    .selectOption('twr');
+  await expect(detail.locator('data').nth(1)).toHaveText(
+    new Intl.NumberFormat('es-ES', {
+      style: 'percent',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(last.twr_index - 1),
+  );
+  await curve
+    .getByRole('combobox', { name: 'Representación de la curva', exact: true })
+    .selectOption('area');
+  const from = portfolio.curve.at(-12)!,
+    to = portfolio.curve.at(-3)!;
+  await curve.getByLabel('Inicio de la curva', { exact: true }).fill(from.date);
+  await curve.getByLabel('Fin de la curva', { exact: true }).fill(to.date);
+  await curve
+    .getByRole('button', { name: 'Aplicar rango', exact: true })
+    .click();
+  await slider.focus();
+  await page.keyboard.press('Home');
+  await expect(detail.locator('time')).toHaveAttribute('datetime', from.date);
+  await expect(detail.locator('data').nth(1)).toHaveAttribute(
+    'value',
+    String(from.twr_index),
+  );
+  await page.keyboard.press('End');
+  await expect(detail.locator('time')).toHaveAttribute('datetime', to.date);
+  await curve
+    .getByRole('button', { name: 'Acercar curva', exact: true })
+    .click();
+  await expect(slider).toBeEnabled();
+  await curve
+    .getByRole('button', { name: 'Restablecer curva', exact: true })
+    .click();
+  await slider.focus();
+  await page.keyboard.press('Home');
+  await expect(detail.locator('time')).toHaveAttribute('datetime', first.date);
+  expect(await page.locator('.stats').first().innerText()).toBe(stats);
+  for (const [width, height] of [
+    [3440, 1440],
+    [1920, 1080],
+    [1366, 768],
+    [390, 844],
+  ]) {
+    await page.setViewportSize({ width, height });
+    await expect
+      .poll(() =>
+        page.evaluate(
+          () => document.documentElement.scrollWidth <= window.innerWidth + 1,
+        ),
+      )
+      .toBe(true);
+    await curve.scrollIntoViewIfNeeded();
+    await expect(
+      curve.getByRole('button', { name: 'Restablecer curva', exact: true }),
+    ).toBeVisible();
+    await slider.focus();
+    await page.keyboard.press('End');
+    await expect(detail.locator('time')).toHaveAttribute('datetime', last.date);
+    await page.screenshot({
+      path: testInfo.outputPath(`curva-${width}.png`),
+      fullPage: true,
+    });
+  }
+  expect(
+    await readApi<PortfolioResponse>(
+      page,
+      `/api/datasets/${dataset.id}/portfolio`,
+    ),
+  ).toEqual(portfolio);
+});
+
+test('precios reales: OHLCV, agregación del rango, estilos, teclado y pantallas', async ({
+  page,
+}, testInfo) => {
+  const dataset = await ensureDemo(page);
+  const symbol = 'DEMO_WORLD';
+  const path = `/api/datasets/${dataset.id}/prices?version=${dataset.version}&symbol=${symbol}`;
+  const source = await readApi<DatasetPricesResponse>(page, path);
+  expect(source.manifest_hash).toBe(dataset.manifest.sha256);
+  await tab(page, 'Datos');
+  await expect(
+    page.getByRole('heading', { name: 'Precios del activo', exact: true }),
+  ).toBeVisible();
+  await select(page, 'Activo del gráfico', symbol);
+  const slider = page.getByRole('slider', {
+    name: 'Inspeccionar barra',
+    exact: true,
+  });
+  const detail = page.getByRole('region', {
+    name: 'Lectura de precios',
+    exact: true,
+  });
+  const numeric = (value: number) =>
+    new Intl.NumberFormat('es-ES', { maximumFractionDigits: 20 }).format(value);
+  const field = (name: string) =>
+    detail.locator(`[data-price-field="${name}"]`);
+  await slider.focus();
+  await page.keyboard.press('End');
+  const last = source.bars.at(-1)!;
+  for (const name of ['open', 'high', 'low', 'close'] as const)
+    await expect(field(name)).toHaveText(`${numeric(last[name])} EUR`);
+  await expect(field('volume')).toHaveText(numeric(last.volume));
+  for (const label of ['Línea', 'Área', 'Barras OHLC', 'Velas']) {
+    await select(page, 'Representación de precios', label);
+    await expect(field('close')).toHaveText(`${numeric(last.close)} EUR`);
+  }
+  // Choose two actual daily observations inside one civil month. Compute the
+  // expected aggregate independently from the backend response, not UI helpers.
+  const pairIndex = source.bars.findIndex(
+    (bar, index) =>
+      index > 0 &&
+      bar.date.slice(0, 7) === source.bars[index - 1].date.slice(0, 7),
+  );
+  expect(pairIndex).toBeGreaterThan(0);
+  const pair = source.bars.slice(pairIndex - 1, pairIndex + 1);
+  await page.getByLabel('Precios desde', { exact: true }).fill(pair[0].date);
+  await page.getByLabel('Precios hasta', { exact: true }).fill(pair[1].date);
+  await page
+    .getByRole('button', { name: 'Aplicar fechas', exact: true })
+    .click();
+  await select(page, 'Intervalo del gráfico', 'Mensual');
+  await expect(field('open')).toHaveText(`${numeric(pair[0].open)} EUR`);
+  await expect(field('high')).toHaveText(
+    `${numeric(Math.max(...pair.map((bar) => bar.high)))} EUR`,
+  );
+  await expect(field('low')).toHaveText(
+    `${numeric(Math.min(...pair.map((bar) => bar.low)))} EUR`,
+  );
+  await expect(field('close')).toHaveText(`${numeric(pair[1].close)} EUR`);
+  await expect(field('volume')).toHaveText(
+    numeric(pair[0].volume + pair[1].volume),
+  );
+  await expect(detail.getByText(/Periodo civil recortado/)).toBeVisible();
+  await page.getByText('Datos diarios originales', { exact: true }).click();
+  const original = page.getByRole('table', {
+    name: `Precios diarios originales · ${symbol}`,
+    exact: true,
+  });
+  await expect(original.getByRole('row')).toHaveCount(3);
+  await expect(original.getByRole('cell').nth(0)).toHaveText(
+    numeric(pair[0].open),
+  );
+  await page
+    .getByRole('button', { name: 'Restablecer vista', exact: true })
+    .click();
+  await select(page, 'Intervalo del gráfico', 'Diario');
+  await page
+    .getByRole('button', { name: 'Primera ventana', exact: true })
+    .click();
+  await slider.focus();
+  await page.keyboard.press('Home');
+  await expect(field('close')).toHaveText(
+    `${numeric(source.bars[0].close)} EUR`,
+  );
+  await expect(field('change')).toHaveText('—');
+  for (const [width, height] of [
+    [3440, 1440],
+    [1920, 1080],
+    [1366, 768],
+    [390, 844],
+  ]) {
+    await page.setViewportSize({ width, height });
+    await expect
+      .poll(() =>
+        page.evaluate(
+          () => document.documentElement.scrollWidth <= window.innerWidth + 1,
+        ),
+      )
+      .toBe(true);
+    await page.locator('.price-chart-svg').scrollIntoViewIfNeeded();
+    await slider.focus();
+    await page.keyboard.press('Home');
+    await expect(field('close')).toHaveText(
+      `${numeric(source.bars[0].close)} EUR`,
+    );
+    await page.screenshot({
+      path: testInfo.outputPath(`precios-${width}.png`),
+      fullPage: true,
+    });
+  }
+  await select(page, 'Activo del gráfico', 'DEMO_BOND');
+  const bond = await readApi<DatasetPricesResponse>(
+    page,
+    `/api/datasets/${dataset.id}/prices?version=${dataset.version}&symbol=DEMO_BOND`,
+  );
+  await slider.focus();
+  await page.keyboard.press('End');
+  await expect(field('close')).toHaveText(
+    `${numeric(bond.bars.at(-1)!.close)} EUR`,
+  );
+  expect(await readApi<DatasetPricesResponse>(page, path)).toEqual(source);
 });

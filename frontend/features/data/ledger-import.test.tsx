@@ -15,7 +15,10 @@ import {
   portfolioResponse,
 } from '@/test/fixtures';
 
-vi.mock('@/lib/api', () => ({ api: vi.fn() }));
+vi.mock('@/lib/api', async (original) => ({
+  ...(await original<typeof import('@/lib/api')>()),
+  api: vi.fn(),
+}));
 const request = vi.mocked(api);
 const reply = () => ({
   added: 1,
@@ -26,6 +29,9 @@ const reply = () => ({
   preview_token: 'a'.repeat(64),
 });
 const props = () => ({
+  // These tests isolate ledger requests; price reads have their own component
+  // coverage and are exercised together with imports by the real E2E suite.
+  active: false,
   dataset: datasetResponse(),
   refresh: vi.fn(async () => {}),
   selectDataset: vi.fn(),
