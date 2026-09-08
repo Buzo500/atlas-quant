@@ -2,12 +2,29 @@
 from __future__ import annotations
 
 import asyncio
+import hashlib
+import hmac
+import json
 import uuid
 from datetime import datetime, timezone
 
 from .analytics import portfolio_snapshot
 from .data import demo_dataset, parse_ledger_csv
 from .store import now
+
+
+class LedgerPreviewConflict(ValueError):
+    """The reviewed import no longer matches its data and ledger snapshot."""
+
+
+def _ledger_preview_token(dataset, events, csv):
+    # This is a consistency precondition, not an authentication credential.
+    # Hash the actual bars rather than trusting a separately stored manifest.
+    context = {"purpose": "atlas-ledger-preview-v1", "dataset_id": dataset["id"],
+               "dataset_version": dataset["version"], "bars": dataset["bars"],
+               "ledger": events, "csv": csv}
+    encoded = json.dumps(context, ensure_ascii=False, allow_nan=False, sort_keys=True, separators=(",", ":"))
+    return hashlib.sha256(encoded.encode("utf-8")).hexdigest()
 
 
 class DatasetService:
@@ -157,7 +174,14 @@ class DatasetService:
                     "positions": [], "curve": [], "warnings": ["Importa movimientos para valorar tu cartera."]}
         return portfolio_snapshot(events, dataset["bars"])
 
-    def import_ledger(self, ident, csv, commit=False):
+    def import_ledger(self, ident, csv, commit=False, *, preview_token=None, require_preview=True):
+        """Review or confirm an import against one atomic snapshot.
+
+        Trusted in-process imports may explicitly disable the preview requirement;
+        the HTTP route always requires it for commits.
+        """
+        if commit and require_preview and not preview_token:
+            raise ValueError("Previsualiza los movimientos antes de confirmar la importación.")
         imported = parse_ledger_csv(csv)
         today = self.clock().date().isoformat()
         if any(event["date"] > today for event in imported):
@@ -168,6 +192,10 @@ class DatasetService:
             if dataset is None:
                 raise ValueError("Conjunto de datos no encontrado.")
             old = work.get("ledger", ident, {"events": []})["events"]
+            token = _ledger_preview_token(dataset, old, csv)
+            if commit and preview_token is not None and not hmac.compare_digest(preview_token, token):
+                raise LedgerPreviewConflict(
+                    "La previsualización ha cambiado. Vuelve a previsualizar los movimientos antes de confirmar.")
             indexed = {event["id"]: event for event in old}
             added = 0
             for event in imported:
@@ -181,6 +209,6 @@ class DatasetService:
             if commit:
                 work.put("ledger", {"id": ident, "events": events}, "ledger.imported")
             return {"added": added, "duplicates": len(imported) - added, "total": len(events),
-                    "committed": commit, "portfolio": snapshot}
+                    "committed": commit, "portfolio": snapshot, "preview_token": token}
 
         return self.store.atomic(import_events)

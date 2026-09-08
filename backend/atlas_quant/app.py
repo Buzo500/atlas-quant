@@ -5,6 +5,7 @@ import os
 from contextlib import asynccontextmanager, suppress
 from pathlib import Path
 from typing import Literal
+from uuid import uuid4
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse, PlainTextResponse
@@ -17,6 +18,7 @@ from .backtest import run_research
 from .contracts import (HealthResponse, StateResponse, DatasetResponse, PortfolioResponse,
                         LedgerResponse, ResearchResponse, ExperimentResponse, SettingsResponse)
 from .data import parse_prices_csv, price_csv_template, ledger_csv_template
+from .datasets import LedgerPreviewConflict
 from .service import Service
 from .store import Store, now
 from .worker_lock import WorkerLock
@@ -37,6 +39,7 @@ class PricesInput(StrictModel):
 class LedgerInput(StrictModel):
     csv: str = Field(min_length=1,max_length=2_000_000)
     commit: bool = False
+    preview_token: str | None = Field(default=None, pattern=r"^[0-9a-f]{64}$")
 
 
 class Costs(StrictModel):
@@ -76,8 +79,15 @@ class ResearchInput(StrictModel):
 
 
 class SettingsInput(StrictModel):
-    kill_switch: bool
-    max_position_weight: float = Field(default=0.25,gt=0,le=1)
+    """Partial update: omitted fields retain their current stored value.
+
+    Defaults describe initial settings only; the route excludes every unset field.
+    Explicit null values and fields outside this model are rejected.
+    """
+    kill_switch: bool = Field(default=True, strict=True,
+                             description="Cambia solo la parada; si se omite, conserva el valor vigente.")
+    max_position_weight: float = Field(default=0.25,gt=0,le=1,
+                                       description="Cambia solo el límite; si se omite, conserva el valor vigente.")
 
 
 class ControlInput(StrictModel):
@@ -140,6 +150,10 @@ def create_app(data_dir=None, run_worker=True):
     async def invalid(request, exc):
         return JSONResponse({"detail":str(exc)},status_code=422)
 
+    @app.exception_handler(LedgerPreviewConflict)
+    async def stale_ledger_preview(request, exc):
+        return JSONResponse({"detail":str(exc)},status_code=409)
+
     @app.get("/api/health", response_model=HealthResponse, response_model_exclude_unset=True)
     def health():
         worker = getattr(app.state,"worker",None)
@@ -187,7 +201,8 @@ def create_app(data_dir=None, run_worker=True):
 
     @app.post("/api/datasets/{ident}/ledger", response_model=LedgerResponse, response_model_exclude_unset=True)
     async def ledger(ident: str, body: LedgerInput):
-        return service.import_ledger(ident, body.csv, body.commit)
+        return service.import_ledger(ident, body.csv, body.commit,
+                                     preview_token=body.preview_token, require_preview=True)
 
     @app.get("/api/templates/{kind}",response_class=PlainTextResponse)
     def template(kind: str):
@@ -199,12 +214,24 @@ def create_app(data_dir=None, run_worker=True):
     @app.post("/api/research", response_model=ResearchResponse, response_model_exclude_unset=True)
     async def research(body: ResearchInput):
         dataset = service.dataset(body.dataset_id)
+        costs = body.costs.model_dump()
+        execution_id = uuid4().hex
         candidates = [{"kind":"buy_hold","symbol":body.symbol},
                       {"kind":"sma_cross","symbol":body.symbol,"fast_window":20,"slow_window":100},
                       {"kind":"sma_cross","symbol":body.symbol,"fast_window":50,"slow_window":200}]
         async with service.research_lock:
-            result = await asyncio.to_thread(run_research,dataset["bars"],candidates,**body.costs.model_dump())
-        store.audit("research.manual",body.dataset_id,{"data_hash":result["data_hash"],"strategy":result["selected_strategy"]})
+            started_at = now()
+            result = await asyncio.to_thread(run_research,dataset["bars"],candidates,**costs)
+        execution = {"id": execution_id, "dataset_id": dataset["id"], "dataset_name": dataset["name"],
+                     "dataset_version": dataset["version"], "dataset_manifest_hash": dataset["manifest"]["sha256"],
+                     "symbol": result["selected_strategy"]["symbol"], "costs": costs,
+                     "started_at": started_at, "completed_at": now(),
+                     "period": {"start": result["train_period"]["start"], "end": result["test_period"]["end"],
+                                "observations": sum(result[key]["observations"]
+                                                    for key in ("train_period", "validation_period", "test_period"))}}
+        result = {**result, "execution": execution}
+        store.audit("research.manual",body.dataset_id,{"data_hash":result["data_hash"],
+                    "strategy":result["selected_strategy"], "execution": execution})
         return result
 
     @app.post("/api/experiments", response_model=ExperimentResponse, response_model_exclude_unset=True,status_code=201)
@@ -225,7 +252,8 @@ def create_app(data_dir=None, run_worker=True):
 
     @app.post("/api/settings", response_model=SettingsResponse, response_model_exclude_unset=True)
     async def settings(body: SettingsInput):
-        return service.update_settings(body.model_dump())
+        """Apply only supplied settings; changing a limit never implies changing the stop."""
+        return service.update_settings(body.model_dump(exclude_unset=True))
 
     @app.get("/api/experiments/{ident}/report",response_class=PlainTextResponse)
     def report(ident: str):

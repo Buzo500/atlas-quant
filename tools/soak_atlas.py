@@ -16,10 +16,10 @@ import sqlite3
 import subprocess
 import sys
 import time
-import urllib.request
 import uuid
 
 from atlas_runtime import InstanceLock, atomic_json, locked, read_json
+from local_http import open_local_http
 
 ROOT = Path(__file__).resolve().parents[1]
 TERMINAL_SUCCESS = "completion_requires_restart_check"
@@ -181,9 +181,8 @@ def database_snapshot(path, *, full_integrity=False, audit_prefix_count=None):
 
 
 def http_read(url, *, json_response=False):
-    opener = urllib.request.build_opener(urllib.request.ProxyHandler({}))
     started = time.perf_counter()
-    with opener.open(url, timeout=5) as response:
+    with open_local_http(url, timeout=5) as response:
         payload = response.read(8 * 1024**2 + 1)
         if response.status != 200 or len(payload) > 8 * 1024**2:
             raise RuntimeError("Respuesta HTTP no válida o excesiva.")

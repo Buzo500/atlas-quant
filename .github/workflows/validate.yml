@@ -36,6 +36,12 @@ jobs:
           package-manager-cache: false
       - name: Instalar pnpm fijado
         run: npm.cmd install --global pnpm@11.19.0
+      - name: Instalar dependencias de frontend fijadas
+        working-directory: frontend
+        run: pnpm.cmd install --frozen-lockfile --prod=false
+      - name: Pruebas de comportamiento del frontend
+        working-directory: frontend
+        run: pnpm.cmd run test:run
       - name: Instalar dependencias y compilar
         run: ./Install-Atlas.ps1
       - name: Pruebas Python con datos aislados
@@ -46,7 +52,7 @@ jobs:
         run: ./.venv/Scripts/python.exe tools/export_contracts.py --check
       - name: Lint de la aplicación mantenida
         working-directory: frontend
-        run: node node_modules/oxlint/bin/oxlint app lib next.config.ts local-server.mjs
+        run: node node_modules/oxlint/bin/oxlint app lib components/atlas features shared test next.config.ts local-server.mjs vitest.config.ts
       - name: Arranque y recorrido sintético mediante el proxy
         run: |
           ./Start-Atlas.ps1

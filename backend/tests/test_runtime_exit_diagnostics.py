@@ -61,7 +61,7 @@ def test_failure_identifies_original_child_and_preserves_sibling_exit_codes(supe
         frontend.code = code
         return response
 
-    monkeypatch.setattr(run_atlas.urllib.request, "build_opener", lambda *args: Mock(open=page_open))
+    monkeypatch.setattr(run_atlas, "open_local_http", page_open)
     with pytest.raises(RuntimeError, match=f"frontend: código {code}"):
         run_atlas.supervise(5, False, "e" * 32)
     state = read_json(run_atlas.STATE)

@@ -88,6 +88,9 @@ def compiled_frontend(tmp_path):
     files = {
         "app/page.tsx": "export default function Page() { return null; }",
         "hooks/use-mobile.ts": "export const useMobile = () => false;",
+        "features/data/data-panel.tsx": "export const DataPanel = () => null;",
+        "shared/use-read.ts": "export const useRead = () => null;",
+        "test/setup.ts": "export {};",
         "package.json": '{"name":"test-build"}',
         "pnpm-lock.yaml": "lockfileVersion: '9.0'",
         ".openai/hosting.json": '{"project_id":null}',
@@ -120,7 +123,8 @@ def test_missing_build_is_rejected(compiled_frontend, missing):
         build_frontend.verify_build(compiled_frontend)
 
 
-@pytest.mark.parametrize("source", ["app/page.tsx", "hooks/use-mobile.ts", "pnpm-lock.yaml", ".openai/hosting.json"])
+@pytest.mark.parametrize("source", ["app/page.tsx", "hooks/use-mobile.ts", "features/data/data-panel.tsx",
+                                    "shared/use-read.ts", "test/setup.ts", "pnpm-lock.yaml", ".openai/hosting.json"])
 def test_changed_sources_including_hooks_make_build_stale(compiled_frontend, source):
     with (compiled_frontend / source).open("a", encoding="utf-8") as stream:
         stream.write("\nchanged test input\n")
@@ -130,6 +134,13 @@ def test_changed_sources_including_hooks_make_build_stale(compiled_frontend, sou
 
 def test_new_hook_is_part_of_the_build_fingerprint(compiled_frontend):
     (compiled_frontend / "hooks/new-hook.ts").write_text("export const value = 1;", encoding="utf-8")
+    with pytest.raises(RuntimeError, match="desactualizada"):
+        build_frontend.verify_build(compiled_frontend)
+
+
+@pytest.mark.parametrize("folder", ["features", "shared"])
+def test_new_feature_or_shared_module_invalidates_build(compiled_frontend, folder):
+    (compiled_frontend / folder / "new-module.ts").write_text("export const value = 1;", encoding="utf-8")
     with pytest.raises(RuntimeError, match="desactualizada"):
         build_frontend.verify_build(compiled_frontend)
 

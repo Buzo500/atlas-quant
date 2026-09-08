@@ -181,6 +181,7 @@ class LedgerResponse(ResponseModel):
     total: int
     committed: bool
     portfolio: PortfolioResponse
+    preview_token: str = Field(pattern=r"^[0-9a-f]{64}$")
 
 
 class Strategy(ResponseModel):
@@ -267,6 +268,20 @@ class SensitivityResult(ResponseModel):
     metrics: Metrics
 
 
+class ResearchExecution(ResponseModel):
+    """Immutable identity of the snapshot and inputs used by a manual run."""
+    id: str
+    dataset_id: str
+    dataset_name: str
+    dataset_version: int
+    dataset_manifest_hash: str
+    symbol: str
+    costs: CostsResponse
+    started_at: str
+    completed_at: str
+    period: Period
+
+
 class ResearchResult(ResponseModel):
     """A persisted research checkpoint can contain only its frozen strategy."""
     selected_strategy: Strategy
@@ -280,6 +295,7 @@ class ResearchResult(ResponseModel):
     data_hash: str | None = None
     warnings: list[str] | None = None
     max_position_weight: float | None = None
+    execution: ResearchExecution | None = None
 
 
 class ResearchResponse(ResearchResult):
@@ -294,6 +310,7 @@ class ResearchResponse(ResearchResult):
     data_hash: str
     warnings: list[str]
     max_position_weight: float
+    execution: ResearchExecution
 
 
 class Plan(ResponseModel):

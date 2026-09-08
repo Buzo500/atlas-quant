@@ -1,8 +1,56 @@
 # ATLAS Quant: continuidad entre equipos
 
-Actualizado: 6 de septiembre de 2026. Este documento resume decisiones y estado para una conversación nueva de Codex; no contiene la transcripción completa del chat original.
+Actualizado: 8 de septiembre de 2026. Este documento resume decisiones y estado para una conversación nueva de Codex; no contiene la transcripción completa del chat original.
 
-## Solicitud actual: cierre de v0.2
+## Solicitud actual: consolidación del frontend
+
+El usuario autorizó resolver, uno a uno, los nueve puntos de la revisión del frontend. **Implementados y validados el 08/09/2026**, manteniendo crema/marfil/cobre y el monolito modular. Detalles y límites en [frontend_consolidacion.md](frontend_consolidacion.md).
+
+1. Confirmación de movimientos ligada a CSV, conjunto, versión, precios y ledger mediante token verificado dentro de la transacción.
+2. Resultados del Laboratorio con contexto real e inmutable de ejecución y aviso cuando el borrador cambia.
+3. Vitest/Testing Library y CI con pruebas de interfaz; lint incluye funcionalidades, componentes propios, compartidos y tests.
+4. Consultas con descarte de respuestas y errores obsoletos, cancelación, última consulta y reintento. Ajustes envía solo el campo modificado: guardar peso desde un estado antiguo no desactiva una parada concurrente.
+5. Borradores conservados al cambiar de pestaña; URL para sección/conjunto/experimento. Recargar conserva selecciones, no CSV, hipótesis ni autorización automática.
+6. Pantallas separadas en `frontend/features/` y utilidades en `frontend/shared/`; el manifiesto de compilación incorpora estas carpetas y sus pruebas.
+7. Formatos comunes EUR/USD/porcentajes/fechas con ausencia y valor inválido diferenciados; precio con fecha de sesión. Instantes en Europe/Madrid explícita.
+8. Benchmark más contrastado, ejes explicados y tabla accesible de datos originales.
+9. Medición de 100.000 observaciones y 1.000 registros; reducción solo visual por extremos y tablas de 50 filas, conservando todos los datos.
+
+Pruebas finales de este sobremesa: **421 del motor + 91 subtests** (32,87 s, dos avisos previos de TestClient), **126 de interfaz** (12,49 s), TypeScript, contratos, lint y compilación con manifiesto correctos. **35 comprobaciones de tamaño** (cinco secciones por siete viewports, incluido 3440 × 1440), sin desbordamiento global ni paneles ocultos ocupando espacio. Consola sin errores. El escalado físico de Windows al 125 % y 150 % sigue pendiente: los anchos equivalentes no lo sustituyen.
+
+ATLAS se detuvo antes de editar. Copia: `backups/atlas-20260908T131709657852Z-125c578f`. Pruebas con escritura en `var/validation/frontend-hardening-20260908/data`, con claves eliminadas del entorno y `run_worker=False`: demo, Laboratorio, revisión/edición/confirmación CSV y expediente desechable de una hora, pausado/reanudado/cancelado inmediatamente. No se ejecutó ese experimento ni se inició el ensayo de 48 horas. Ambos servidores de prueba terminaron con código 0.
+
+**ATLAS queda arrancado para uso normal en http://127.0.0.1:3000/**, ejecución `b17661795e9c416c8a6ff0bb995b3e59`, con la base habitual. Integridad SQLite, huella persistente y prefijo de auditoría coinciden con la copia; se conservan NAV 25.118,66876 EUR, tres posiciones e IDs originales. Parada global activada, sin claves, presupuesto/gasto/reserva cero. Abrir con `Abrir-ATLAS.cmd`; detener con `Detener-ATLAS.cmd`.
+
+Evidencia ignorada por Git: `output/validation/frontend-hardening.json`, `frontend-hardening-backend.xml`, `frontend-hardening-ui-tests.json`, `frontend-hardening-viewports.json`, `frontend-hardening-preservation.json` y `frontend_bench_final.json`. Los cambios son locales: sin commit/push ni CI remota de estas fuentes. Sigue **0.2.0-rc.1**, con ensayo y seguimiento aplazados. Sites, gráficos avanzados, aprendizaje, móvil, remoto e informes LaTeX no cambian.
+
+## Implementación visual previa: frontend crema y cobre
+
+El 08/09/2026 el usuario autorizó implementar la dirección visual de la maqueta en el programa local, con adaptación a pantallas ultrapanorámicas como **3440 × 1440**. Se aplica a las cinco secciones existentes: Cartera, Laboratorio, Agente IA, Datos y Ajustes. Fondo crema, superficies marfil, cobre, texto oscuro y cifras tabulares; tablas y formularios compactos y curva azul pizarra medida mediante `ResizeObserver`. Se conservan los endpoints, contratos y controles del motor. Detalle de implementación y validación en [frontend_crema_cobre.md](frontend_crema_cobre.md).
+
+Se detuvo ATLAS antes de editar y se creó la copia `backups/atlas-20260908T124552339287Z-c00f74f9`. La base habitual conserva conjunto, versiones, ledger, investigación e IDs: su huella persistente y el prefijo de auditoría coinciden con la copia, con integridad SQLite correcta. Se validaron demo y Laboratorio en una base aislada y el expediente existente mediante consultas. Ninguna llamada pagada, clave añadida ni orden real. El arranque diario mantiene el manifiesto generado por `tools/build_frontend.py`. **ATLAS queda arrancado para uso normal en http://127.0.0.1:3000/**; abrir con `Abrir-ATLAS.cmd` y detener con `Detener-ATLAS.cmd`.
+
+**394 pruebas y 91 subtests superados en este sobremesa**, con los dos avisos previos de TestClient; TypeScript, contratos y lint de aplicación y del componente de curva correctos. Se corrigió una prueba dependiente de la fecha real: ahora el generador de demo y su servicio comparten el reloj fijo del test de concurrencia, sin cambiar el código del motor. Evidencia local en `output/validation/frontend_crema_cobre_tests.xml` y `frontend_data_preservation.json`.
+
+Los tamaños se comprueban como viewports CSS de navegador, no como medición física del monitor. Las tablas pueden desplazarse horizontalmente dentro de su panel. Queda pendiente una comprobación manual del escalado real de Windows al 125 % y 150 %. La creación de un nuevo experimento de 48 horas fue bloqueada por la revisión automática de aprobación; no se reintentó ni se inició el ensayo. Se verifican el informe existente y las condiciones de los controles mediante lectura y pruebas automatizadas del núcleo.
+
+La [maqueta publicada en Sites](https://atlas-quant-interfaz.patosverdes098.chatgpt.site) permanece independiente, privada y sin cambios, con iframe aislado y CSP. Los informes LaTeX por fechas siguen en planificación como **REPORT-001**, propuestos para v0.6. No se implementan gráficos avanzados, aprendizaje, móvil ni acceso remoto. El ensayo sostenido sigue aplazado y su seguimiento pausado. La versión sigue siendo **0.2.0-rc.1**: estos cambios locales necesitan una candidata identificada, CI y el ensayo correspondiente antes de declarar estabilidad.
+
+## Corrección anterior: fallo del ensayo y arranque habitual
+
+El usuario pidió únicamente corregir el fallo del ensayo; su repetición queda aplazada. Se trabaja en `codex/fix-local-health-resources`, basada en la candidata `ef75b7be7afc2072142ace73bf0df166da245a55`. Al retomar, la carpeta estaba en `master` (`97520b8`) sin cambios locales; esa rama y la etiqueta `v0.2.0-rc.1` se conservan.
+
+El ensayo del 6 de septiembre falló tras 3.900 segundos válidos: el supervisor agotó archivos abiertos al construir un cliente HTTP, y ambos servidores terminaron ordenadamente. Los datos y la auditoría se verificaron intactos. La evidencia original está en `output/validation/incident-rc1-20260906T185725Z/`; no se altera ni se convierte en un ensayo superado.
+
+Las comprobaciones del supervisor y del monitor usan ahora `tools/local_http.py`: HTTP directo a `127.0.0.1`, sin crear contextos TLS ni consultar proxies, y cierre de respuesta y conexión incluso ante errores. Antes, cada `urllib.build_opener` creaba también un contexto TLS en Python 3.14 y abría el destino heredado de `SSLKEYLOGFILE`, aunque la petición fuese HTTP local. Los errores de construcción, protocolo y lectura de salud pasan por el control de fallos existente. No se modifica la configuración del antivirus ni las variables de entorno.
+
+Validación de la corrección en este sobremesa: **85 pruebas focalizadas superadas en 16,51 segundos**, con datos aislados y conexiones simuladas. Incluyen 200 consultas repetidas sin TLS, cierre ante errores, agotamiento de descriptores, respuestas inválidas y regresiones del supervisor/monitor. No se han arrancado servidores de ATLAS. Evidencia local: `output/validation/local_http_fix_tests.xml` y `output/validation/local_http_fix.json`.
+
+Al entregar la corrección, ATLAS quedó detenido y el seguimiento horario pausado. Esta corrección no publica otra candidata, no ejecuta CI ni reinicia la prueba de 48 horas. La CI superada corresponde al commit anterior; el ensayo largo de la corrección sigue pendiente.
+
+Después, el usuario intentó abrir la aplicación y comunicó «La compilación está desactualizada». El cambio de rama había dejado las fuentes y el manifiesto de compilación con hashes distintos; Git comprueba texto normalizado, pero el manifiesto compara bytes, incluidos los finales de línea. Se regeneró la interfaz con `tools/build_frontend.py`, sin cambios de código ni dependencias, y se realizó el arranque habitual con `Start-Atlas.ps1 -OpenBrowser`. **ATLAS queda funcionando**, con motor, proxy, HTML y recursos compilados verificados, integridad SQLite correcta y contenido persistente/auditoría anterior conservados. Evidencia: `output/validation/startup_after_rebuild.json`. El ensayo de 48 horas sigue aplazado y el seguimiento permanece pausado. Los apartados siguientes conservan la evidencia histórica.
+
+## Preparación anterior: cierre de v0.2
 
 El usuario autorizó preparar y validar la candidata, ejecutar CI con coste cero y comenzar el ensayo sostenido. La versión de candidata es **0.2.0-rc.1**, aún sin calificar como estable. La suite previa al commit pasa con **368 pruebas y 91 subtests**, además de contratos, TypeScript, lint, dependencias y build. La evidencia viva del cierre se conserva en `output/validation/candidate_release.json`; leerla para saber el commit, CI y monitor realmente iniciados, no inferir su resultado de este plan. Ver [candidata_v0_2.md](candidata_v0_2.md) para el estado del cierre; los apartados siguientes conservan la evidencia histórica previa. La salida inesperada anterior sigue sin causa confirmada: ahora se archiva el diagnóstico por ejecución. No modificar código ni reconstruir mientras corre el ensayo. Los resultados del monitor se guardan en `output/validation/` y no van a Git.
 
@@ -132,6 +180,8 @@ Fuente detallada: `docs/backlog_planificacion.md`.
 5. Comparar un LLM por API con uno local; ajustar adaptadores solo si una tarea concreta lo justifica. La recomendación de memoria y modelos numéricos locales con LLM intercambiable es una propuesta, no una arquitectura ya aprobada o construida.
 6. REMOTE-001: crear experimentos desde el portátil y mantenerlos en el sobremesa, con datos/versiones, acceso autenticado, recuperación y prevención de duplicados. La RTX 3080 no acelera los backtests actuales de CPU.
 7. MOBILE-001: panel móvil para estrategias, controles y métricas actualizadas; PWA como propuesta inicial. No existe esa app en la versión actual; `pdf-mobile/` solo publica el diseño.
+8. UI-001: implementar el futuro frontend crema/marfil y cobre con distribución adaptable, incluyendo 3440 × 1440 y escalado de Windows/navegador. Requisito pendiente de implementación y validación; la maqueta no sustituye a la aplicación.
+9. REPORT-001: informes LaTeX editables con plantilla propia, recursos y fechas seleccionables para cartera y backtests; métricas del período y datos/versiones identificados. Encaje propuesto en v0.6, sin generar documentos ni instalar herramientas ahora.
 
 El usuario pidió expresamente mantener estas mejoras en planificación. No retomarlas automáticamente al instalar la aplicación en otro ordenador.
 

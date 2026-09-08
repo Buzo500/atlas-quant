@@ -209,7 +209,7 @@ def test_concurrent_ledger_import_preserves_events_and_idempotency(tmp_path, sam
     def import_event(instance, ident):
         barrier.wait(5)
         csv = f"id,date,kind,amount,currency\n{ident},2026-01-01,deposit,1000,EUR\n"
-        return instance.import_ledger(original["id"], csv, commit=True)
+        return instance.import_ledger(original["id"], csv, commit=True, require_preview=False)
 
     with ThreadPoolExecutor(max_workers=2) as pool:
         one = pool.submit(import_event, first, "deposit-1")
@@ -225,11 +225,11 @@ def test_ledger_rejection_rolls_back_ledger_and_audit(tmp_path):
     instance = service(tmp_path / "ledger-reject.sqlite3")
     original = dataset(instance)
     csv = "id,date,kind,amount,currency\ndeposit-1,2026-01-01,deposit,1000,EUR\n"
-    instance.import_ledger(original["id"], csv, commit=True)
+    instance.import_ledger(original["id"], csv, commit=True, require_preview=False)
     before = instance.store.get("ledger", original["id"])
     audit = instance.store.audit_list()
     with pytest.raises(ValueError, match="contenido diferente"):
-        instance.import_ledger(original["id"], csv.replace("1000", "2000"), commit=True)
+        instance.import_ledger(original["id"], csv.replace("1000", "2000"), commit=True, require_preview=False)
     assert instance.store.get("ledger", original["id"]) == before
     assert instance.store.audit_list() == audit
 
@@ -281,15 +281,32 @@ def test_skipped_mutator_does_not_change_record_or_audit(tmp_path):
     assert store.audit_list() == []
 
 
-def test_concurrent_demo_load_is_single_complete_dataset_and_ledger(tmp_path):
+def test_concurrent_demo_load_is_single_complete_dataset_and_ledger(tmp_path, monkeypatch):
+    class DemoClock(datetime):
+        @classmethod
+        def now(cls, tz=None):
+            return NOW.astimezone(tz) if tz is not None else NOW.replace(tzinfo=None)
+
+    # The real generator and the services must use the same fixed day; wall-clock
+    # demo dates otherwise become "future" dates after this fixture's NOW.
+    monkeypatch.setattr("atlas_quant.data.datetime", DemoClock)
     one = service(tmp_path / "demo.sqlite3")
     two = service(one.store.path)
+    barrier = threading.Barrier(2)
+
+    def load(instance):
+        barrier.wait(5)
+        return instance.load_demo()
+
     with ThreadPoolExecutor(max_workers=2) as pool:
-        a, b = pool.submit(one.load_demo), pool.submit(two.load_demo)
+        a, b = pool.submit(load, one), pool.submit(load, two)
         assert a.result(15)["id"] == b.result(15)["id"]
     datasets = one.store.list("dataset")
     assert len(datasets) == 1
     assert len(one.store.list("ledger")) == 1
+    assert len(datasets[0]["bars"]) == 3300
+    assert datasets[0]["bars"][-1]["date"] == "2026-09-04"
+    assert len(one.store.get("ledger", datasets[0]["id"])["events"]) == 6
     assert one.portfolio(datasets[0]["id"])["nav"] > 0
 
 

@@ -2,7 +2,13 @@
 
 Preparación autorizada el 6 de septiembre de 2026. **No es una entrega estable.** El código de motor, OpenAPI, salud e interfaz usa `0.2.0-rc.1`; la etiqueta de candidata identifica el commit que se valida. No confundir esta etiqueta con `v0.2.0`, que requiere cerrar H5/H6.
 
+**Actualización del 8 de septiembre:** la CI de `ef75b7b` pasó, pero el ensayo falló tras 3.900 segundos válidos por agotamiento de archivos abiertos en el supervisor. Se corrigen las conexiones de comprobación HTTP en `codex/fix-local-health-resources`; la etiqueta original permanece intacta. El usuario ha aplazado expresamente el siguiente ensayo y el seguimiento sigue pausado. Posteriormente se recompiló la interfaz y arrancó ATLAS para uso normal. Detalle vigente en [CONTINUIDAD.md](CONTINUIDAD.md).
+
+**Frontend del 08/09/2026:** aplicado el rediseño crema y cobre con autorización del usuario. Las comprobaciones locales de [frontend_crema_cobre.md](frontend_crema_cobre.md) corresponden al árbol modificado, no al SHA de la CI anterior. Identificar y validar de nuevo la candidata que incluya estos cambios antes de repetir el ensayo. No se ha iniciado otro seguimiento ni publicado una versión estable.
+
 ## Recorrido de cierre
+
+La consolidación posterior del frontend añade pruebas y modifica los contratos de movimientos, investigación manual y ajustes. Su [validación local](frontend_consolidacion.md) pasa 421 pruebas del motor, 91 subtests y 126 pruebas de interfaz, más revisión de navegador. Incorporar estas fuentes a la candidata que se identifique y valide; no atribuirles la CI del SHA anterior. El ensayo continúa aplazado.
 
 1. Guardar y revisar las fuentes en la rama `codex/v0.2.0-rc.1`, conservando `master` y el punto anterior `97520b8`.
 2. Ejecutar pruebas, contratos, TypeScript, lint de aplicación y compilación verificada. La suite incluye las regresiones de concurrencia y recuperación, y comprueba que las versiones publicadas por backend e interfaz coinciden.

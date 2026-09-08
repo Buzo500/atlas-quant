@@ -14,7 +14,7 @@ from pydantic import ValidationError
 from atlas_quant.app import create_app
 from atlas_quant import __version__
 from atlas_quant.contracts import (
-    ExperimentResponse, PaperAccount, PortfolioResponse, ResearchResponse,
+    ExperimentResponse, PaperAccount, PortfolioResponse, ResearchResponse, ResearchResult,
     StateResponse,
 )
 from atlas_quant.paper import advance_paper, new_account
@@ -90,7 +90,7 @@ def test_real_offline_lifecycle_preserves_typed_results(offline_app):
         assert job["spent_usd"] == job["reserved_usd"] == job["budget_usd"] == 0
         assert job["paper_account"] is None
         assert ExperimentResponse.model_validate(job).model_dump(exclude_unset=True) == job
-        assert ResearchResponse.model_validate(job["research"]).model_dump(exclude_unset=True) == job["research"]
+        assert ResearchResult.model_validate(job["research"]).model_dump(exclude_unset=True) == job["research"]
 
         state_response = client.get("/api/state")
         assert state_response.status_code == 200, state_response.text

@@ -10,6 +10,10 @@ Cambios solicitados el 06/09/2026, todavía en planificación: [inspección de g
 
 Para trabajar en otro equipo: [traslado al sobremesa y conversación nueva en Codex](docs/traslado_sobremesa.md). El contexto para retomar el proyecto está en [CONTINUIDAD.md](docs/CONTINUIDAD.md); Git no traslada automáticamente el chat original ni los experimentos locales.
 
+Interfaz local actual: [diseño crema y cobre, adaptación ultrapanorámica y validación](docs/frontend_crema_cobre.md). Incluye las cinco secciones existentes; los informes LaTeX siguen en planificación.
+
+Consolidación posterior: [nueve mejoras de fiabilidad, trazabilidad y pruebas del frontend](docs/frontend_consolidacion.md). Incluye confirmaciones vinculadas al CSV revisado, resultados identificados, consultas con recuperación, borradores entre pestañas, formatos comunes y tablas paginadas. Validación local: **421 pruebas del motor, 91 subtests y 126 pruebas de interfaz**, además de 35 comprobaciones de tamaño en navegador. La CI de estas fuentes y el ensayo sostenido siguen pendientes.
+
 ## Abrir la aplicación
 
 Después de instalar las dependencias en cada equipo, haz doble clic en **Abrir-ATLAS.cmd**. Para detener motor e interfaz, usa **Detener-ATLAS.cmd**. También puedes ejecutar `Start-Atlas.ps1 -OpenBrowser`, o iniciar en primer plano desde PowerShell en la raíz del proyecto:

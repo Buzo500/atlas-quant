@@ -182,6 +182,7 @@ export type LastPrice = {
 export type LedgerInput = {
   "csv": string;
   "commit"?: boolean;
+  "preview_token"?: (string) | (null);
 };
 
 export type LedgerResponse = {
@@ -190,6 +191,7 @@ export type LedgerResponse = {
   "total": number;
   "committed": boolean;
   "portfolio": PortfolioResponse;
+  "preview_token": string;
 };
 
 export type Manifest = {
@@ -398,6 +400,19 @@ export type ProviderResponse = {
   "models": Array<ProviderModel>;
 };
 
+export type ResearchExecution = {
+  "id": string;
+  "dataset_id": string;
+  "dataset_name": string;
+  "dataset_version": number;
+  "dataset_manifest_hash": string;
+  "symbol": string;
+  "costs": CostsResponse;
+  "started_at": string;
+  "completed_at": string;
+  "period": Period;
+};
+
 export type ResearchInput = {
   "dataset_id": string;
   "symbol": string;
@@ -416,6 +431,7 @@ export type ResearchResponse = {
   "data_hash": string;
   "warnings": Array<string>;
   "max_position_weight": number;
+  "execution": ResearchExecution;
 };
 
 export type ResearchResult = {
@@ -430,6 +446,7 @@ export type ResearchResult = {
   "data_hash"?: (string) | (null);
   "warnings"?: (Array<string>) | (null);
   "max_position_weight"?: (number) | (null);
+  "execution"?: (ResearchExecution) | (null);
 };
 
 export type RiskLimits = {
@@ -446,7 +463,7 @@ export type SensitivityResult = {
 };
 
 export type SettingsInput = {
-  "kill_switch": boolean;
+  "kill_switch"?: boolean;
   "max_position_weight"?: number;
 };
 

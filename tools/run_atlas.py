@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import argparse
 from datetime import datetime, timezone
+from http.client import HTTPException
 import json
 import os
 from pathlib import Path
@@ -10,12 +11,12 @@ import shutil
 import subprocess
 import sys
 import time
-import urllib.request
 import uuid
 import webbrowser
 
 from atlas_runtime import InstanceLock, atomic_json, frontend_env, locked, port_open, read_json
 from build_frontend import verify_build
+from local_http import open_local_http
 from process_group import ProcessGroup
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -56,12 +57,13 @@ def load_env(path, env):
 
 
 def health(port):
-    opener = urllib.request.build_opener(urllib.request.ProxyHandler({}))
     try:
-        with opener.open(f"http://127.0.0.1:{port}/api/health", timeout=2) as response:
+        with open_local_http(f"http://127.0.0.1:{port}/api/health", timeout=2) as response:
+            if response.status != 200:
+                return False
             value = json.load(response)
-        return value.get("status") == "ok" and value.get("live_available") is False
-    except (OSError, ValueError):
+        return isinstance(value, dict) and value.get("status") == "ok" and value.get("live_available") is False
+    except (OSError, HTTPException, ValueError):
         return False
 
 
@@ -207,7 +209,7 @@ def supervise(timeout, open_browser, run_id):
             if stop_signal.exists():
                 break
             if all(health(p) for p in (8000, 3000)):
-                with urllib.request.build_opener(urllib.request.ProxyHandler({})).open(URL, timeout=10) as response:
+                with open_local_http(URL, timeout=10) as response:
                     if response.status != 200:
                         raise RuntimeError("La interfaz no responde correctamente.")
                 record(status="running")

@@ -59,8 +59,9 @@ class Service:
     def portfolio(self, ident):
         return self.datasets.portfolio(ident)
 
-    def import_ledger(self, ident, csv, commit=False):
-        return self.datasets.import_ledger(ident, csv, commit)
+    def import_ledger(self, ident, csv, commit=False, *, preview_token=None, require_preview=True):
+        return self.datasets.import_ledger(ident, csv, commit, preview_token=preview_token,
+                                           require_preview=require_preview)
 
     @staticmethod
     def _check_current(current, job):

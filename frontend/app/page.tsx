@@ -1,9 +1,12 @@
 'use client';
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
+import { useRead } from '@/shared/use-read';
+import { QueryStatus } from '@/shared/query-status';
+import { useNavigation, type Section } from '@/shared/navigation';
 import Link from 'next/link';
 import { version } from '../package.json';
 import { api } from '@/lib/api';
-import type { StateResponse, PortfolioResponse, DatasetResponse } from '@/lib/api-types';
+import type { StateResponse, DatasetResponse } from '@/lib/api-types';
 import {
   Activity,
   Database,
@@ -16,64 +19,48 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import {
-  money,
-  pct,
-  Metric,
-  Curve,
-  Choice,
-  DataTable,
-  Lab,
-  AgentPanel,
-  DataPanel,
-  SettingsPanel,
-} from './workbench';
+import { Choice } from '@/shared/ui';
+import { Lab } from '@/features/research/lab';
+import { AgentPanel } from '@/features/experiments/agent-panel';
+import { DataPanel } from '@/features/data/data-panel';
+import { SettingsPanel } from '@/features/settings/settings-panel';
+import { PortfolioPanel } from '@/features/portfolio/portfolio-panel';
+import { date } from '@/shared/format';
 
 export default function Home() {
-  const [state, setState] = useState<StateResponse | null>(null),
-    [datasetId, setDatasetId] = useState(''),
-    [savedPortfolio, setPortfolio] = useState<{ datasetId: string; value: PortfolioResponse } | null>(null),
-    [error, setError] = useState(''),
-    [busy, setBusy] = useState(false),
-    [tab, setTab] = useState('portfolio');
-  const stateRevision = useRef(0);
-  const portfolio = savedPortfolio?.datasetId === datasetId ? savedPortfolio.value : null;
-  async function refresh() {
-    const revision = ++stateRevision.current;
-    const s = await api<StateResponse>('/state');
-    if (revision !== stateRevision.current) return;
-    setState(s);
-    setDatasetId((previous) => previous || s.datasets[0]?.id || '');
-  }
-  useEffect(() => {
-    void refresh().catch((e) => setError(String(e)));
-    const timer = setInterval(
-      () => void refresh().catch((e) => setError(String(e))),
-      5000,
-    );
-    return () => clearInterval(timer);
-  }, []);
+  const [error, setError] = useState('');
+  const [busy, setBusy] = useState(false);
+  const { navigation, navigate } = useNavigation();
+  const tab = navigation.tab;
+  const setTab = (tab: Section) => navigate({ tab });
+  const setDatasetId = (dataset: string) => navigate({ dataset });
+  const stateQuery = useRead<StateResponse>({
+    path: '/state',
+    intervalMs: 5000,
+  });
+  const state = stateQuery.data;
+  const refresh = stateQuery.refresh;
+  const connected = !!state && !stateQuery.error;
+  const datasetId = navigation.dataset || state?.datasets[0]?.id || '';
   const dataset = state?.datasets.find((d) => d.id === datasetId);
-  const auditSequence = state?.audit[0]?.seq;
   useEffect(() => {
-    let active = true;
-    if (datasetId)
-      api<PortfolioResponse>('/datasets/' + datasetId + '/portfolio')
-        .then((p) => {
-          if (active) setPortfolio({ datasetId, value: p });
-        })
-        .catch((e) => {
-          if (active) setError(String(e));
-        });
-    return () => {
-      active = false;
-    };
-  }, [datasetId, dataset?.version, auditSequence]);
-  useEffect(() => {
-    const context = (document as Document & { modelContext?: { registerTool: (
-      tool: { name: string; title: string; description: string; inputSchema: object;
-        annotations: object; execute: (input: unknown) => Promise<unknown> },
-      options: { signal: AbortSignal }) => unknown } }).modelContext;
+    const context = (
+      document as Document & {
+        modelContext?: {
+          registerTool: (
+            tool: {
+              name: string;
+              title: string;
+              description: string;
+              inputSchema: object;
+              annotations: object;
+              execute: (input: unknown) => Promise<unknown>;
+            },
+            options: { signal: AbortSignal },
+          ) => unknown;
+        };
+      }
+    ).modelContext;
     if (!context?.registerTool) return;
     const controller = new AbortController();
     Promise.resolve(
@@ -98,7 +85,6 @@ export default function Home() {
             )
               throw new Error('Se requiere un objeto vacío.');
             const s = await api<StateResponse>('/state');
-            setState(s);
             return {
               datasets: s.datasets.map((d) => ({
                 id: d.id,
@@ -132,89 +118,95 @@ export default function Home() {
       setBusy(false);
     }
   }
+  const titles: Record<string, { title: string; description: string }> = {
+    portfolio: {
+      title: 'Cartera',
+      description:
+        'Posiciones, patrimonio y rentabilidad del conjunto seleccionado.',
+    },
+    lab: {
+      title: 'Laboratorio',
+      description:
+        'Compara estrategias con datos históricos y costes de ejecución.',
+    },
+    agent: {
+      title: 'Agente IA',
+      description: 'Experimentos, evidencia y seguimiento de estrategias.',
+    },
+    data: {
+      title: 'Datos',
+      description:
+        'Importa precios y movimientos. Consulta su origen y trazabilidad.',
+    },
+    settings: {
+      title: 'Ajustes',
+      description:
+        'Límites de simulación, proveedores y registro de actividad.',
+    },
+  };
   return (
-    <div className="atlas-shell">
+    <Tabs
+      className="atlas-shell"
+      value={tab}
+      onValueChange={(v) => setTab(v as Section)}
+    >
+      <a className="skip-link" href="#main-content">
+        Ir al contenido
+      </a>
       <header className="topbar">
-        <Link href="/" className="brand">
-          <Activity size={26} />
+        <Link href="/" className="brand" aria-label="ATLAS Quant, inicio">
+          <span className="brand-mark">
+            <Activity size={22} strokeWidth={1.7} />
+          </span>
           <span>
             ATLAS <small>QUANT</small>
           </span>
         </Link>
+        <TabsList
+          className="main-tabs"
+          variant="line"
+          aria-label="Secciones de ATLAS"
+        >
+          <TabsTrigger value="portfolio">
+            <Wallet />
+            Cartera
+          </TabsTrigger>
+          <TabsTrigger value="lab">
+            <FlaskConical />
+            Laboratorio
+          </TabsTrigger>
+          <TabsTrigger value="agent">
+            <Bot />
+            Agente IA
+          </TabsTrigger>
+          <TabsTrigger value="data">
+            <FolderInput />
+            Datos
+          </TabsTrigger>
+          <TabsTrigger value="settings">
+            <Settings />
+            Ajustes
+          </TabsTrigger>
+        </TabsList>
         <div className="topbar-right">
-          <span className="status-dot">
-            {state ? 'Motor conectado' : 'Conectando al motor'}
-          </span>
+          <output
+            className={
+              'status-dot ' + (connected ? 'connected' : 'disconnected')
+            }
+          >
+            {connected
+              ? 'Motor conectado'
+              : state || stateQuery.error
+                ? 'Motor sin conexión'
+                : 'Conectando…'}
+          </output>
           <span className="version">v{version}</span>
         </div>
       </header>
-      <main className="workspace">
-        <div className="title-row">
-          <div>
-            <p className="eyebrow">TU ESPACIO DE INVERSIÓN</p>
-            <h1>
-              {tab === 'portfolio'
-                ? 'La cartera, con perspectiva.'
-                : tab === 'lab'
-                  ? 'Poner las ideas a prueba.'
-                  : tab === 'agent'
-                    ? 'Investigar. Observar. Decidir.'
-                    : tab === 'data'
-                      ? 'El origen de cada resultado.'
-                      : 'El control sigue en tus manos.'}
-            </h1>
-          </div>
-          <Button variant="secondary" disabled={busy} onClick={demo}>
-            <Database />
-            {busy ? 'Cargando…' : 'Cargar demostración'}
-          </Button>
-        </div>
-        <div className="notice">
-          <ShieldCheck size={19} />
-          <span>
-            Modo análisis y simulación ·{' '}
-            {state?.settings.kill_switch
-              ? 'Parada de ejecución activada'
-              : 'Simulación bajo reglas habilitada'}{' '}
-            · Dinero real pendiente de integración con bróker
-          </span>
-        </div>
-        {error && (
-          <div role="alert" className="error">
-            {error}
-            <button
-              className="dismiss"
-              aria-label="Cerrar aviso"
-              onClick={() => setError('')}
-            >
-              ×
-            </button>
-          </div>
-        )}
-        <Tabs value={tab} onValueChange={(v) => setTab(String(v))}>
-          <TabsList className="main-tabs" variant="line">
-            <TabsTrigger value="portfolio">
-              <Wallet />
-              Cartera
-            </TabsTrigger>
-            <TabsTrigger value="lab">
-              <FlaskConical />
-              Laboratorio
-            </TabsTrigger>
-            <TabsTrigger value="agent">
-              <Bot />
-              Agente IA
-            </TabsTrigger>
-            <TabsTrigger value="data">
-              <FolderInput />
-              Datos
-            </TabsTrigger>
-            <TabsTrigger value="settings">
-              <Settings />
-              Ajustes
-            </TabsTrigger>
-          </TabsList>
-          <div className="toolbar">
+      <main className="workspace" id="main-content" tabIndex={-1}>
+        <div className="toolbar">
+          <div className="dataset-picker">
+            <span className="toolbar-label">Conjunto de datos</span>
             <Choice
               label="Conjunto de datos"
               value={datasetId}
@@ -224,157 +216,129 @@ export default function Home() {
                 label: d.name,
               }))}
             />
-            {dataset && (
-              <>
-                <span
-                  className={
-                    'tag ' +
-                    (dataset.source_kind === 'synthetic' ? 'amber' : '')
-                  }
-                >
-                  {dataset.source_kind === 'synthetic'
-                    ? 'DATOS SINTÉTICOS'
-                    : 'DATOS IMPORTADOS'}
-                </span>
-                <span className="muted">
-                  EUR · hasta {dataset.manifest.date_max}
-                </span>
-              </>
-            )}
           </div>
-          <TabsContent value="portfolio">
-            <div className="stats">
-              <Metric
-                title="Valor de la cartera"
-                value={portfolio ? money(portfolio.nav) : '—'}
-              />
-              <Metric
-                title="Efectivo disponible"
-                value={portfolio ? money(portfolio.cash) : '—'}
-              />
-              <Metric
-                title="Resultado acumulado"
-                value={portfolio ? money(portfolio.pnl) : '—'}
-              />
-              <Metric
-                title="Rentabilidad TWR"
-                value={portfolio ? pct(portfolio.twr) : '—'}
-              />
+          {dataset && (
+            <div className="dataset-context">
+              <span
+                className={
+                  'tag ' + (dataset.source_kind === 'synthetic' ? 'amber' : '')
+                }
+              >
+                {dataset.source_kind === 'synthetic'
+                  ? 'Datos sintéticos'
+                  : 'Datos importados'}
+              </span>
+              <span className="muted">
+                EUR · hasta {date(dataset.manifest.date_max)}
+              </span>
             </div>
-            <section className="panel">
-              <div className="panel-heading">
-                <h2>Evolución del patrimonio</h2>
-                <span className="muted">Valoración diaria · EUR</span>
-              </div>
-              {portfolio?.curve?.length ? (
-                <Curve data={portfolio.curve} />
-              ) : (
-                <div className="empty">
-                  <Wallet size={36} />
-                  <h3>
-                    {dataset
-                      ? 'Importa tus movimientos'
-                      : 'Empieza con un conjunto de datos'}
-                  </h3>
-                  <p>
-                    {dataset
-                      ? 'Los precios ya están disponibles. Añade depósitos, compras y otros movimientos desde Datos para construir tu cartera.'
-                      : 'Explora la demostración con tres activos ficticios o importa tu historial de precios y operaciones.'}
-                  </p>
-                  <div className="actions centered">
-                    <Button onClick={() => setTab('data')}>
-                      Importar datos
-                    </Button>
-                    <Button variant="secondary" disabled={busy} onClick={demo}>
-                      Explorar demo
-                    </Button>
-                  </div>
-                </div>
-              )}
-            </section>
-            {portfolio && portfolio.positions.length > 0 && (
-              <section className="panel">
-                <div className="panel-heading">
-                  <h2>Posiciones</h2>
-                  <span className="muted">
-                    Aportaciones netas: {money(portfolio.net_contributions)}
-                  </span>
-                </div>
-                <DataTable
-                  heads={[
-                    'Activo',
-                    'Cantidad',
-                    'Último precio',
-                    'Valor',
-                    'Peso',
-                    'P&L no realizado',
-                  ]}
-                  rows={portfolio.positions.map((p) => [
-                    <strong key="symbol">{p.symbol}</strong>,
-                    p.quantity,
-                    money(p.price),
-                    money(p.market_value),
-                    pct(p.weight),
-                    <span
-                      key="pnl"
-                      className={
-                        p.unrealized_pnl >= 0 ? 'positive' : 'negative'
-                      }
-                    >
-                      {money(p.unrealized_pnl)}
-                    </span>,
-                  ])}
-                />
-              </section>
-            )}
-            {portfolio && portfolio.warnings.length > 0 && (
-              <details className="details">
-                <summary>Convenciones de valoración</summary>
-                <ul>
-                  {portfolio.warnings.map((w: string, i: number) => (
-                    <li key={i}>{w}</li>
-                  ))}
-                </ul>
-              </details>
-            )}
-          </TabsContent>
-          <TabsContent value="lab">
-            <Lab dataset={dataset} onError={setError} />
-          </TabsContent>
-          <TabsContent value="agent">
-            {state && (
-              <AgentPanel
-                dataset={dataset}
-                state={state}
-                refresh={refresh}
-                onError={setError}
-              />
-            )}
-          </TabsContent>
-          <TabsContent value="data">
-            <DataPanel
+          )}
+          <span className="local-label">Espacio local</span>
+        </div>
+        <div className="title-row">
+          <div>
+            <h1>{titles[tab].title}</h1>
+            <p className="page-description">{titles[tab].description}</p>
+          </div>
+          <Button
+            variant="outline"
+            disabled={busy || !connected}
+            onClick={demo}
+          >
+            <Database />
+            {busy ? 'Cargando…' : 'Cargar demostración'}
+          </Button>
+        </div>
+        <div className="notice">
+          <ShieldCheck size={17} />
+          <span>
+            <strong>Análisis y simulación</strong>
+            <span className="notice-separator">·</span>
+            {!connected
+              ? 'Estado de ejecución pendiente de conexión'
+              : state?.settings.kill_switch
+                ? 'Parada de ejecución activada'
+                : 'Simulación bajo reglas habilitada'}
+            <span className="notice-secondary">
+              {' '}
+              · Sin conexión a un bróker
+            </span>
+          </span>
+        </div>
+        <QueryStatus label="Estado del motor" query={stateQuery} />
+        {navigation.dataset && state && !dataset && (
+          <p role="alert" className="error">
+            El conjunto de este enlace no está disponible. Selecciona otro
+            conjunto.
+          </p>
+        )}
+        {error && (
+          <div role="alert" className="error">
+            <span>{error}</span>
+            <button
+              className="dismiss"
+              aria-label="Cerrar aviso"
+              onClick={() => setError('')}
+            >
+              ×
+            </button>
+          </div>
+        )}
+        <TabsContent keepMounted value="portfolio">
+          <PortfolioPanel
+            dataset={dataset}
+            auditSequence={state?.audit[0]?.seq}
+            active={tab === 'portfolio'}
+            connected={connected}
+            stateLoaded={!!state}
+            busy={busy}
+            onImport={() => setTab('data')}
+            onDemo={demo}
+          />
+        </TabsContent>
+        <TabsContent keepMounted value="lab">
+          <Lab dataset={dataset} onError={setError} />
+        </TabsContent>
+        <TabsContent keepMounted value="agent">
+          {state ? (
+            <AgentPanel
               dataset={dataset}
+              state={state}
+              selectedId={navigation.experiment}
+              onSelect={(experiment) => navigate({ experiment })}
+              active={tab === 'agent'}
               refresh={refresh}
-              selectDataset={setDatasetId}
               onError={setError}
             />
-          </TabsContent>
-          <TabsContent value="settings">
-            {state && (
-              <SettingsPanel
-                state={state}
-                refresh={refresh}
-                onError={setError}
-              />
-            )}
-          </TabsContent>
-        </Tabs>
-        <p className="footnote">
-          ATLAS v{version} · Datos y experimentos guardados en este ordenador. Los
-          resultados de la demo son sintéticos. Ninguna conclusión de IA
-          autoriza por sí sola una operación.
-        </p>
+          ) : (
+            <output className="empty">
+              Esperando el estado de los experimentos…
+            </output>
+          )}
+        </TabsContent>
+        <TabsContent keepMounted value="data">
+          <DataPanel
+            dataset={dataset}
+            refresh={refresh}
+            selectDataset={setDatasetId}
+            onError={setError}
+          />
+        </TabsContent>
+        <TabsContent keepMounted value="settings">
+          {state ? (
+            <SettingsPanel state={state} refresh={refresh} onError={setError} />
+          ) : (
+            <output className="empty">Esperando los ajustes del motor…</output>
+          )}
+        </TabsContent>
+        <footer className="footnote">
+          <span>ATLAS Quant · v{version} · Guardado en este ordenador</span>
+          <span>
+            La demo utiliza datos sintéticos. Las conclusiones de IA no
+            autorizan operaciones.
+          </span>
+        </footer>
       </main>
-    </div>
+    </Tabs>
   );
 }

@@ -52,6 +52,9 @@ def control_experiment(store, ident, action):
 
 
 def update_settings(store, values):
+    """Merge requested fields with current settings in the same transaction as paper controls."""
+    if not values:
+        raise ValueError("Indica al menos un ajuste que quieras cambiar.")
     def apply(tx):
         previous = tx.get("settings", "main", DEFAULT_SETTINGS)
         config = {**previous, **values}
