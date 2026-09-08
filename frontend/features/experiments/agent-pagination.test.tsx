@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react';
+import { render, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import {
@@ -34,9 +34,10 @@ describe('Paginación y expediente seleccionado', () => {
       onError: vi.fn(),
       onSelect: vi.fn(),
     };
-    const { rerender } = render(
+    const { container, rerender } = render(
       <AgentPanel {...input} selectedId="job-1000" />,
     );
+    const screen = within(container);
     const report = await screen.findByRole('link', {
       name: 'Exportar informe JSON',
     });
@@ -79,7 +80,8 @@ describe('Paginación y expediente seleccionado', () => {
     ).not.toBeNull();
     rerender(<AgentPanel {...input} selectedId="job-0005" />);
     expect(screen.getByText('1–50 de 1000 · Página 1 de 20')).not.toBeNull();
-  });
+    // 1,000 records, repeated table renders and real user-event navigation.
+  }, 15_000);
 
   it('limita la página cuando una actualización reduce el número de experimentos', () => {
     const records = experiments(120);
@@ -90,9 +92,10 @@ describe('Paginación y expediente seleccionado', () => {
       active: false,
       selectedId: 'job-0110',
     };
-    const { rerender } = render(
+    const { container, rerender } = render(
       <AgentPanel {...input} state={stateResponse({ experiments: records })} />,
     );
+    const screen = within(container);
     expect(screen.getByText('101–120 de 120 · Página 3 de 3')).not.toBeNull();
     rerender(
       <AgentPanel

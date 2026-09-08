@@ -1,7 +1,7 @@
 name: Validar ATLAS en Windows
 
-# La candidata se valida al publicar expresamente su etiqueta rc.
-# Comprobar la cuota/bloqueo de gasto antes de publicar cada etiqueta.
+# Validación manual de una rama o al publicar expresamente una etiqueta rc.
+# Comprobar la cuota/bloqueo de gasto antes de cada ejecución.
 # No necesita secretos ni llama a proveedores de IA o datos de mercado.
 on:
   workflow_dispatch:
@@ -54,10 +54,11 @@ jobs:
         working-directory: frontend
         run: node node_modules/oxlint/bin/oxlint app lib components/atlas features shared test next.config.ts local-server.mjs vitest.config.ts
       - name: Arranque y recorrido sintético mediante el proxy
+        id: runtime
         run: |
           ./Start-Atlas.ps1
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           ./.venv/Scripts/python.exe tools/smoke_local.py
       - name: Parada
-        if: always()
+        if: ${{ always() && (steps.runtime.outcome == 'success' || steps.runtime.outcome == 'failure' || steps.runtime.outcome == 'cancelled') }}
         run: ./Stop-Atlas.ps1

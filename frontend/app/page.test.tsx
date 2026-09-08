@@ -2,8 +2,8 @@ import {
   act,
   fireEvent,
   render,
-  screen,
   waitFor,
+  within,
 } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it } from 'vitest';
@@ -40,25 +40,29 @@ function responses() {
 describe('Navegación y borradores', () => {
   it('mantiene CSV, hipótesis y costes al cambiar de pestaña', async () => {
     responses();
-    render(<Home />);
+    // A timed-out async test must never query the next test's document.
+    const screen = within(render(<Home />).container);
     const user = userEvent.setup();
     await screen.findByText('Motor conectado');
-    await user.click(screen.getByRole('tab', { name: 'Datos' }));
+    const tabs = within(
+      screen.getByRole('tablist', { name: 'Secciones de ATLAS' }),
+    );
+    await user.click(tabs.getByRole('tab', { name: 'Datos' }));
     fireEvent.change(screen.getByRole('textbox', { name: 'Contenido CSV' }), {
       target: { value: 'borrador-csv' },
     });
-    await user.click(screen.getByRole('tab', { name: 'Laboratorio' }));
+    await user.click(tabs.getByRole('tab', { name: 'Laboratorio' }));
     fireEvent.change(
       screen.getByRole('spinbutton', { name: 'Comisión (pb)' }),
       { target: { value: '9' } },
     );
-    await user.click(screen.getByRole('tab', { name: 'Agente IA' }));
+    await user.click(tabs.getByRole('tab', { name: 'Agente IA' }));
     await user.click(screen.getByRole('button', { name: 'Nuevo experimento' }));
     fireEvent.change(
       screen.getByRole('textbox', { name: 'Hipótesis de investigación' }),
       { target: { value: 'hipótesis sin enviar' } },
     );
-    await user.click(screen.getByRole('tab', { name: 'Datos' }));
+    await user.click(tabs.getByRole('tab', { name: 'Datos' }));
     expect(
       (
         screen.getByRole('textbox', {
@@ -66,7 +70,7 @@ describe('Navegación y borradores', () => {
         }) as HTMLTextAreaElement
       ).value,
     ).toBe('borrador-csv');
-    await user.click(screen.getByRole('tab', { name: 'Laboratorio' }));
+    await user.click(tabs.getByRole('tab', { name: 'Laboratorio' }));
     expect(
       (
         screen.getByRole('spinbutton', {
@@ -74,7 +78,7 @@ describe('Navegación y borradores', () => {
         }) as HTMLInputElement
       ).value,
     ).toBe('9');
-    await user.click(screen.getByRole('tab', { name: 'Agente IA' }));
+    await user.click(tabs.getByRole('tab', { name: 'Agente IA' }));
     expect(
       (
         screen.getByRole('textbox', {
@@ -84,9 +88,12 @@ describe('Navegación y borradores', () => {
     ).toBe('hipótesis sin enviar');
     expect(window.location.search).toBe('?tab=agent');
     expect(localStorage.length + sessionStorage.length).toBe(0);
-  });
+    // This covers seven user clicks and three full mounted panels in jsdom.
+  }, 15_000);
 
-  it('recupera selección desde el enlace y después de recargar sin autorizar simulación', async () => {
+  it('recupera selección desde el enlace y después de recargar sin autorizar simulación', async ({
+    signal,
+  }) => {
     window.history.replaceState(
       null,
       '',
@@ -94,7 +101,12 @@ describe('Navegación y borradores', () => {
     );
     const requests = responses();
     let view = render(<Home />);
-    await screen.findByRole('heading', { name: 'B · Observando' });
+    let screen = within(view.container);
+    await screen.findByRole(
+      'heading',
+      { name: 'B · Observando' },
+      { timeout: 3000 },
+    );
     expect(
       screen.getByRole('combobox', { name: 'Conjunto de datos' }).textContent,
     ).toContain('Datos b');
@@ -105,9 +117,15 @@ describe('Navegación y borradores', () => {
     });
     await user.click(toggle);
     expect(toggle.getAttribute('aria-checked')).toBe('true');
+    signal.throwIfAborted();
     view.unmount();
     view = render(<Home />);
-    await screen.findByRole('heading', { name: 'B · Observando' });
+    screen = within(view.container);
+    await screen.findByRole(
+      'heading',
+      { name: 'B · Observando' },
+      { timeout: 3000 },
+    );
     await user.click(screen.getByRole('button', { name: 'Nuevo experimento' }));
     expect(
       screen
@@ -121,7 +139,7 @@ describe('Navegación y borradores', () => {
 
   it('respeta navegación atrás sin perder el borrador de datos', async () => {
     responses();
-    render(<Home />);
+    const screen = within(render(<Home />).container);
     await screen.findByText('Motor conectado');
     const user = userEvent.setup();
     await user.click(screen.getByRole('tab', { name: 'Datos' }));
@@ -154,7 +172,7 @@ describe('Navegación y borradores', () => {
         return ++attempts === 1 ? pending.promise : portfolioResponse();
       throw new Error('unexpected');
     });
-    render(<Home />);
+    const screen = within(render(<Home />).container);
     await screen.findByRole('heading', { name: 'Cargando cartera…' });
     expect(
       screen.queryByRole('heading', { name: 'Importa tus movimientos' }),

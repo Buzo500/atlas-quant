@@ -1,3 +1,4 @@
+import { availableParallelism } from 'node:os';
 import { fileURLToPath } from 'node:url';
 import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vitest/config';
@@ -22,6 +23,11 @@ export default defineConfig({
     restoreMocks: true,
     unstubGlobals: true,
     unstubEnvs: true,
-    maxWorkers: 4,
+    // jsdom is CPU-heavy: leave capacity for Vite and React on small runners.
+    // Preserve per-file isolation and the default timeout for shorter tests.
+    maxWorkers: Math.max(
+      1,
+      Math.min(4, Math.floor(availableParallelism() / 2)),
+    ),
   },
 });

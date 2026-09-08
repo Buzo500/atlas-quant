@@ -21,7 +21,13 @@ La copia principal no se sustituye ni restaura para validar. Mientras el monitor
 
 ## CI y presupuesto cero
 
-Comprobado en la cuenta del propietario antes de la primera ejecución: repositorio privado, GitHub Free, **0 de 2.000 minutos** de Actions consumidos, **0 de 0,5 GB** de almacenamiento utilizado y sin método de pago configurado. No se han cambiado datos de facturación, presupuestos ni suscripciones. Según la [documentación de GitHub](https://docs.github.com/en/billing/concepts/product-billing/github-actions), sin método de pago válido el uso se bloquea al agotar la cuota. Esta comprobación no debe asumirse vigente para futuras ejecuciones si cambia la cuenta.
+**Revisión del frontend, 08/09/2026:** el usuario autorizó subir y validar `codex/fix-local-health-resources`, conservando `master` y la etiqueta original. La primera [ejecución de esta revisión](https://github.com/Buzo500/atlas-quant/actions/runs/34240011639), sobre `839f2d3e84b82891bbd062412d7eb69620957491`, falló en tres pruebas de interfaz: dos recorridos excedieron cinco segundos y otro no encontró su selección. Pasaron las otras 123. La parada añadió un error al no existir todavía la instalación. Se conserva este resultado como fallo, pendiente de validar la corrección; no se ha ejecutado el ensayo sostenido.
+
+La corrección acota las consultas de las pruebas a su propio contenedor y limita workers según CPU disponible. Solo los dos recorridos que caducaron disponen de 15 segundos; no se eliminan aserciones, pruebas ni aislamiento, ni se añaden reintentos. La limpieza de CI se ejecuta cuando se intentó arrancar ATLAS, incluso si ese paso falla o se cancela. No intenta detener una instalación que nunca llegó a arrancar.
+
+Antes de ese run, la página de consumo de Actions mostraba **6,7 de 2.000 minutos usados**, **0 de 0,5 GB de almacenamiento** y **0 USD facturables**. Cuota suficiente para el runner estándar acotado a 20 minutos, sin publicar artefactos ni añadir llamadas pagadas. No se han modificado las opciones de facturación.
+
+Comprobado en la cuenta del propietario antes de la ejecución original del 6 de septiembre: repositorio privado, GitHub Free, **0 de 2.000 minutos** de Actions consumidos, **0 de 0,5 GB** de almacenamiento utilizado y sin método de pago configurado. No se han cambiado datos de facturación, presupuestos ni suscripciones. Según la [documentación de GitHub](https://docs.github.com/en/billing/concepts/product-billing/github-actions), sin método de pago válido el uso se bloquea al agotar la cuota. Esta comprobación no debe asumirse vigente para futuras ejecuciones si cambia la cuenta.
 
 La CI usa un runner estándar `windows-latest` con límite de 20 minutos. Sus resultados deben asociarse a la etiqueta y SHA concretos, sin sustituirlos por los resultados de este PC.
 
