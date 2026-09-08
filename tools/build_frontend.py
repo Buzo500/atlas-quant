@@ -19,7 +19,7 @@ def file_hash(path):
 
 def source_files(frontend):
     paths = []
-    for name in ("app", "components", "features", "shared", "test", "hooks", "lib", "public", "src", ".openai"):
+    for name in ("app", "components", "features", "shared", "test", "e2e", "hooks", "lib", "public", "src", ".openai"):
         folder = frontend / name
         if folder.exists():
             paths.extend(p for p in folder.rglob("*") if p.is_file())

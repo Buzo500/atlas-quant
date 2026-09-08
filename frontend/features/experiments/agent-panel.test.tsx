@@ -25,7 +25,8 @@ const props = (experiments: ExperimentResponse[] = []) => ({
 });
 
 function jsonBody(init?: RequestInit): Record<string, unknown> {
-  if (typeof init?.body !== 'string') throw new Error('Se esperaba un cuerpo JSON textual');
+  if (typeof init?.body !== 'string')
+    throw new Error('Se esperaba un cuerpo JSON textual');
   return JSON.parse(init.body) as Record<string, unknown>;
 }
 
@@ -70,9 +71,7 @@ describe('Controles del expediente de experimento', () => {
       const input = props([detail]);
       render(<AgentPanel {...input} />);
       const user = userEvent.setup();
-      await user.click(
-        await screen.findByRole('button', { name: button }),
-      );
+      await user.click(await screen.findByRole('button', { name: button }));
       await screen.findByRole('heading', { name: heading });
       expect(input.refresh).toHaveBeenCalledOnce();
       expect(
@@ -146,6 +145,52 @@ describe('Controles del expediente de experimento', () => {
 });
 
 describe('Creación acotada sin llamadas reales', () => {
+  it.each(['submit', 'other-field', 'hidden-panel'] as const)(
+    'gestiona el foco al completar una creación asíncrona: %s',
+    async (focus) => {
+      const creation = deferred<ExperimentResponse>();
+      mockFetch((path, init) => {
+        if (path === '/api/experiments' && init?.method === 'POST') {
+          expect(jsonBody(init)).toMatchObject({
+            provider: 'none',
+            budget_usd: 0,
+            auto_paper: false,
+          });
+          return creation.promise;
+        }
+        if (path === '/api/experiments/experiment-a')
+          return experimentResponse();
+        throw new Error(`Petición inesperada: ${path}`);
+      });
+      const input = props();
+      const view = (active: boolean) => (
+        <>
+          <div hidden={!active}>
+            <AgentPanel {...input} active={active} />
+          </div>
+          <input aria-label="Otro campo" />
+        </>
+      );
+      const { rerender } = render(view(true));
+      const user = userEvent.setup();
+      screen.getByRole('button', { name: 'Iniciar experimento' }).focus();
+      await user.keyboard('{Enter}');
+      const other = screen.getByRole('textbox', { name: 'Otro campo' });
+      if (focus !== 'submit') other.focus();
+      if (focus === 'hidden-panel') rerender(view(false));
+      await act(async () => creation.resolve(experimentResponse()));
+      await waitFor(() => expect(input.refresh).toHaveBeenCalledOnce());
+      expect(
+        screen.queryByRole('button', { name: 'Iniciar experimento' }),
+      ).toBeNull();
+      expect(document.activeElement).toBe(
+        focus === 'submit'
+          ? screen.getByRole('button', { name: 'Nuevo experimento' })
+          : other,
+      );
+    },
+  );
+
   it('bloquea un proveedor sin clave y también un proveedor configurado con presupuesto cero', async () => {
     const fetchMock = mockFetch(() => {
       throw new Error('No debe solicitar el motor');
@@ -181,7 +226,7 @@ describe('Creación acotada sin llamadas reales', () => {
     let posted: Record<string, unknown> | undefined;
     const fetchMock = mockFetch((path, init) => {
       if (path === '/api/experiments' && init?.method === 'POST') {
-          posted = jsonBody(init);
+        posted = jsonBody(init);
         return creation.promise;
       }
       if (path === '/api/experiments/experiment-a')

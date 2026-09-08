@@ -1,8 +1,18 @@
 # ATLAS Quant · Auditoría y avance de v0.2
 
-**Cierre posterior:** preparada la candidata `0.2.0-rc.1`; seguimiento y evidencia del commit en [candidata_v0_2.md](candidata_v0_2.md). H5 dispone de [CI superada para `3f1d990`](https://github.com/Buzo500/atlas-quant/actions/runs/34241300060), del 08/09/2026; H6 sigue pendiente y el ensayo de 48 horas está aplazado. Las cifras, versión del motor y límites citados en la auditoría inferior corresponden al bloque anterior. La condición estable sigue pendiente de sus comprobaciones de cierre.
+**Estado vigente:** `0.2.0-rc.2`, candidata con CI verificada, no estable. La [CI 34249730107](https://github.com/Buzo500/atlas-quant/actions/runs/34249730107) valida `412918b5e9067e44f293b0633068ca932a472d64`; el cierre posterior solo cambia documentación. Integración mediante la [PR #2](https://github.com/Buzo500/atlas-quant/pull/2) y etiqueta `v0.2.0-rc.2` según el procedimiento autorizado.
 
-Fecha: 6 de septiembre de 2026. Base de trabajo: commit `97520b8` (`traslado al sobremesa`), árbol limpio al comenzar. Los cambios descritos se han probado como árbol de trabajo local sobre esa base; no se ha publicado ni etiquetado una versión nueva.
+## Revisión de rc.2 · 8 de septiembre de 2026
+
+En CI Windows: **446 Python + 91 subtests** (22,13 s), **140 Vitest en 15 archivos** (43,86 s), **5/5 E2E** (18,7 s); instalación limpia, build, contratos, tipos, lint, `pip check`, smoke, arranque y parada correctos. E2E remoto `e2e-ea578aac47f341ffac48cd6330edbb5a`: resultado 0, conservación verificada, integridad `ok` y puertos libres. Comprobaciones locales separadas: 446+91 (38,34 s, dos avisos previos), 140 Vitest (13,34 s) y 5/5 E2E (9,6 s).
+
+Se corrigieron foco, anuncios por sondeo, mensaje de importación, identificación del intérprete mediante su grupo de procesos y aislamiento antes de recoger módulos de pytest. La primera [CI 34248790750](https://github.com/Buzo500/atlas-quant/actions/runs/34248790750) se conserva fallida: 444 Python superadas, dos fallidas y 91 subtests (21,99 s), 140 Vitest superadas, sin E2E remoto acreditado en ese intento. Los dos fallos por alias Windows 8.3 se corrigieron con `samefile`: dos fallos antes y dos casos correctos después con ruta corta, y dos correctos con ruta larga.
+
+La base habitual coincide con `atlas-20260908T151716582043Z-af195afe`, incluidos contenido completo, esquema, secuencias y 539 eventos de auditoría. La creación y retirada de WAL/SHM sin cambios de datos se reprodujo en copias y es compatible con la diferencia de hash del primer intento E2E local; no demuestra su causa original. Se conservan logs y resultados fallidos. El entorno manual `e2e-0de1cebd856c4115984403a8086dc09e` cerró con resultado 0, sin interacciones de UI manual.
+
+ATLAS normal está arrancado, ejecución `7fa354c2b8d5425fa4818dab68acd8a0`, con salud rc.2, cartera y controles conservados, sin claves y con consumo cero. **Escalado físico 125 %/150 % pendiente:** el control de Windows bloqueó la operación al no identificar una URL de confianza; no se cambió el 100 % inicial. Los 35 viewports CSS históricos son evidencia distinta. Ensayo de 48 horas y seguimiento aplazados. [Registro completo de candidata](candidata_v0_2.md).
+
+## Registro histórico de la auditoría inicial
 
 **Actualización posterior:** CORE-001 y los controles concurrentes se han corregido tras la revisión inicial. La [consolidación del núcleo](consolidacion_core.md) registra los cambios, 328 pruebas y 91 subtests superados, contratos, lint de aplicación y validación de la demo. Las 254 pruebas descritas más abajo corresponden al bloque operativo previo; no son la última ejecución de la suite. La escala horizontal sigue fuera del alcance.
 
@@ -38,19 +48,19 @@ Entorno: Windows 11 Home x64, Python 3.14.4, Node 24.15.0 y pnpm 11.19.0. RTX 30
 
 Una segunda actualización de la copia aislada, con el helper de salida corregido, volvió a pasar: mensajes de pip/build visibles, hash de base intacto durante instalar y estado conservado tras reiniciar. El ciclo de actualización y comprobación duró 21,177 segundos. La copia terminó detenida sin parada forzada y liberó ambos puertos.
 
-La instalación principal volvió a arrancar invocando `Start-Atlas.ps1` desde otra carpeta. API, proxy, controles y cartera se verificaron de nuevo, incluida su carga final en navegador. Queda funcionando con la demo original y el experimento sin IA en observación.
+La instalación principal volvió a arrancar invocando `Start-Atlas.ps1` desde otra carpeta. API, proxy, controles y cartera se verificaron de nuevo, incluida su carga final en navegador. Al terminar aquel bloque quedó funcionando con la demo original y el experimento sin IA en observación; no describe el estado de la instancia actual.
 
 La evidencia local está en `output/validation/clean_v02.json`, `output/validation/migration_v02_desktop.json` y `output/validation/runtime_v02_desktop.json`, excluidos de Git. El primer punto de recuperación previo al desarrollo es `backups/before-v0.2-20260906T151721Z/`: copia manual mediante SQLite, anterior al formato nuevo con manifiesto. Las copias nuevas publicadas por las herramientas sí incluyen manifiesto.
 
-## Límites y cierre pendiente
+## Límites actuales y cierre pendiente
 
-- La v0.2 sigue **en desarrollo**. El identificador del motor permanece en 0.1.0 para no presentar esta consolidación como una entrega estable ya cerrada.
-- Falta una prueba operativa sostenida de **48 horas**, con salud, recursos, errores, copia automática y persistencia registrados. Los recorridos cortos y las pruebas unitarias no la sustituyen. No se ha iniciado una tarea programada ni un servicio Windows.
-- `.github/workflows/validate.yml` prepara instalación, pruebas Python, TypeScript, build y recorrido sintético en Windows. Solo responde a `workflow_dispatch`; no se ha subido ni ejecutado desde esta sesión. Antes de activarlo, comprobar disponibilidad y límites de Actions de la cuenta. No contiene claves ni llamadas pagadas.
-- Falta identificar la candidata mediante commit y, tras resolver los pendientes, cerrar los criterios H5/H6 y publicar una etiqueta. La captura de fuentes local de las pruebas no sustituye comprobar el artefacto del commit finalmente publicado.
+- La versión vigente es **0.2.0-rc.2 en preparación**, todavía no estable. El identificador 0.1.0 citado en la evidencia anterior corresponde al bloque original.
+- Falta completar satisfactoriamente una prueba operativa sostenida de **48 horas**, con salud, recursos, errores, copia automática y persistencia registrados. El ensayo de rc.1 se interrumpió; su repetición y el seguimiento están aplazados. Los recorridos cortos y las pruebas unitarias no lo sustituyen. No se ha instalado un servicio Windows.
+- `.github/workflows/validate.yml` incluye instalación, pruebas de interfaz y Python, TypeScript, contratos, lint, build y recorrido sintético en Windows. Permite activación manual y por etiqueta candidata. La ejecución superada de `3f1d990` está identificada arriba; la validación de rc.2 debe asociarse a sus propias fuentes. Antes de activarlo, comprobar disponibilidad y límites de Actions de la cuenta. No contiene claves ni llamadas pagadas.
+- Falta registrar el commit final, la integración y los resultados de rc.2 y cerrar los criterios H5/H6 antes de una etiqueta estable. La captura de fuentes local de las pruebas no sustituye comprobar el artefacto del commit finalmente publicado.
 - Copias y logs están en el mismo equipo; no hay cifrado, copia externa automática, rotación de logs, autoinicio ni recuperación automática de servidores. Las copias manuales/previas a actualizar no tienen retención automática.
 - No se han incorporado gráficos del backlog, aprendizaje acumulativo, modelos locales, conexión a IBKR ni órdenes reales. Presupuesto, gasto y reserva de API permanecen en cero en la demo usada.
 
 ## Próximo paso concreto
 
-La consolidación prioritaria ya está implementada y validada; consultar su documento para las deudas que siguen abiertas. La revisión `3f1d990` ha superado CI. El siguiente cierre pendiente es H6; su ensayo de 48 horas permanece aplazado y no se inicia en esta revisión. Si aparecen fallos, corregirlos dentro de v0.2 y repetir solo la validación afectada. No adelantar gráficos, móvil o aprendizaje durante esta consolidación.
+Preparar rc.2 integrando el trabajo previamente validado, automatizando recorridos de navegador y revisando el uso, con sus resultados ligados a las fuentes finales. La revisión `3f1d990` ya superó CI, pero esa evidencia no se transfiere a cambios posteriores. H6 y el ensayo de 48 horas permanecen aplazados y no se inician en este bloque. Si aparecen fallos, corregirlos dentro de v0.2 y repetir la validación afectada. No adelantar gráficos avanzados, móvil o aprendizaje durante esta consolidación.

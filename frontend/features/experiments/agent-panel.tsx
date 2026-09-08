@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import {
   Play,
   Download,
@@ -75,6 +75,8 @@ export function AgentPanel({
   active?: boolean;
 }) {
   const { symbols, symbol, setSymbol } = useDatasetSymbol(dataset);
+  const createButton = useRef<HTMLButtonElement | null>(null);
+  const createToggle = useRef<HTMLButtonElement | null>(null);
   const [provider, setProvider] = useState('none'),
     [prompt, setPrompt] = useState(
       'Compara mantener este activo con filtros de tendencia. Busca una reducción de caídas y evalúa el resultado neto de costes frente al benchmark.',
@@ -129,6 +131,15 @@ export function AgentPanel({
       },
     });
     setSelected(j.id);
+    // Move focus only if the disappearing submit still owns it. A user may
+    // have moved to another field or section while the request was running.
+    const submit = createButton.current;
+    if (
+      submit === document.activeElement &&
+      submit &&
+      !submit.closest('[hidden], [inert]')
+    )
+      createToggle.current?.focus();
     setShowCreate(false);
     await refresh();
   }
@@ -154,6 +165,7 @@ export function AgentPanel({
             </h2>
           </div>
           <Button
+            ref={createToggle}
             variant="secondary"
             onClick={() => setShowCreate((value) => !value)}
             aria-expanded={showCreate}
@@ -369,9 +381,11 @@ export function AgentPanel({
             Activar simulación automáticamente si supera los criterios
           </label>
           <Button
+            ref={createButton}
             disabled={
               busy || !symbol || missing || (provider !== 'none' && budget <= 0)
             }
+            focusableWhenDisabled={busy}
             onClick={() => run(create)}
           >
             <Play />

@@ -13,15 +13,19 @@ export function LedgerImport({
   csv,
   refresh,
   onError,
+  onMessage,
+  onConfirmationRemoved,
 }: {
   dataset: DatasetResponse | undefined;
   csv: string;
   refresh: () => Promise<void>;
   onError: (message: string) => void;
+  onMessage: (message: string) => void;
+  onConfirmationRemoved: (button: HTMLButtonElement | null) => void;
 }) {
   const [preview, setPreview] = useState<LedgerResponse | null>(null);
   const [busy, setBusy] = useState(false);
-  const [message, setMessage] = useState('');
+  const confirmButton = useRef<HTMLButtonElement | null>(null);
   const active = useRef(true);
   const inFlight = useRef(false);
   useEffect(() => {
@@ -35,7 +39,7 @@ export function LedgerImport({
     if (!dataset || !csv || inFlight.current || (commit && !preview)) return;
     inFlight.current = true;
     setBusy(true);
-    setMessage('');
+    onMessage('');
     onError('');
     try {
       const result = await api<LedgerResponse>(
@@ -48,8 +52,9 @@ export function LedgerImport({
       );
       if (!active.current) return;
       if (commit) {
+        onConfirmationRemoved(confirmButton.current);
         setPreview(null);
-        setMessage(
+        onMessage(
           `${result.added} movimientos añadidos; ${result.duplicates} duplicados omitidos.`,
         );
         await refresh();
@@ -59,6 +64,7 @@ export function LedgerImport({
     } catch (error) {
       if (active.current) {
         // A failed or uncertain commit always requires a fresh review.
+        if (commit) onConfirmationRemoved(confirmButton.current);
         setPreview(null);
         onError(error instanceof Error ? error.message : String(error));
       }
@@ -93,12 +99,16 @@ export function LedgerImport({
             {dataset?.name} · versión {dataset?.version}
           </span>
           <span>Valor resultante: {moneyEUR(preview.portfolio.nav)}</span>
-          <Button disabled={busy} onClick={() => void submit(true)}>
+          <Button
+            ref={confirmButton}
+            disabled={busy}
+            focusableWhenDisabled={busy}
+            onClick={() => void submit(true)}
+          >
             Confirmar importación
           </Button>
         </div>
       )}
-      {message && <output className="success">{message}</output>}
     </>
   );
 }

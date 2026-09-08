@@ -1,8 +1,10 @@
 # ATLAS Quant · Operación en Windows
 
-Guía del 6 de septiembre de 2026 para esta instalación local. Recoge los cambios operativos de la candidata **v0.2.0-rc.1**; motor, API e interfaz comparten ese identificador. No constituye el cierre de v0.2 ni certifica una prueba sostenida o una ejecución de CI. El estado de validación está en [CONTINUIDAD](CONTINUIDAD.md) y los criterios pendientes, en el [plan de v0.2](plan_v0_2.md).
+Guía actualizada el 8 de septiembre de 2026. **v0.2.0-rc.2 es una candidata con CI verificada, no estable.** La [CI 34249730107](https://github.com/Buzo500/atlas-quant/actions/runs/34249730107) valida `412918b5e9067e44f293b0633068ca932a472d64`: 446 Python y 91 subtests, 140 Vitest, cinco E2E, instalación limpia, compilación, contratos, tipos, lint, dependencias, smoke, arranque y parada correctos. El cierre posterior solo modifica documentación; integración mediante la [PR #2](https://github.com/Buzo500/atlas-quant/pull/2) y etiqueta `v0.2.0-rc.2` según el procedimiento autorizado.
 
-El recorrido habitual usa Windows nativo, el motor Python y la interfaz compilada. No necesita WSL, CUDA, claves de API ni presupuesto de pago. El modo de ejecución sigue siendo exclusivamente simulado.
+ATLAS normal está arrancado; los entornos E2E están cerrados y la base habitual conserva su contenido. El recorrido usa Windows nativo, motor Python e interfaz compilada; no requiere WSL, CUDA, claves ni presupuesto de pago. La ejecución es exclusivamente simulada.
+
+El escalado físico 125 %/150 % sigue pendiente: el control de Windows bloqueó el cambio y se mantuvo el 100 % inicial. Los 35 viewports CSS anteriores no lo sustituyen. Ensayo de 48 horas y seguimiento aplazados. Evidencia, arranques e incidencias históricas en [CONTINUIDAD](CONTINUIDAD.md) y [candidata_v0_2.md](candidata_v0_2.md).
 
 ## Iniciar, consultar el estado y detener
 
@@ -81,6 +83,36 @@ Para comprobar la compilación sin reconstruirla:
 ```
 
 El lanzador compara los archivos fuente y los artefactos con el manifiesto de compilación. Una compilación ausente, modificada o desactualizada bloquea el arranque e indica cómo reconstruirla.
+
+## Validación E2E aislada
+
+Este recorrido abre Chromium contra la interfaz compilada y la API real. Requiere las dependencias fijadas de frontend ya instaladas y **ATLAS detenido**. Ejecuta los comandos desde la raíz del proyecto. El recorrido usa los puertos locales 3000 y 8000 y rechaza una instancia existente; no la reutiliza ni la detiene para hacer pruebas.
+
+Detén ATLAS y, cuando termine correctamente, genera la compilación y su manifiesto:
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\Stop-Atlas.ps1
+.\.venv\Scripts\python.exe tools\build_frontend.py
+```
+
+Prepara Chromium la primera vez, o cuando cambie la versión fijada de Playwright. La descarga se guarda dentro del proyecto, en `var/playwright-browsers`, y necesita conexión a Internet. No configura proveedores ni consume API de pago:
+
+```powershell
+$env:PLAYWRIGHT_BROWSERS_PATH = Join-Path $PWD 'var\playwright-browsers'
+node frontend/node_modules/@playwright/test/cli.js install chromium
+```
+
+Después de una compilación e instalación correctas, ejecuta:
+
+```powershell
+.\.venv\Scripts\python.exe tools/run_e2e.py
+```
+
+El ejecutor crea una carpeta nueva `var/validation/e2e-UUID` y una base vacía en su subcarpeta `data`. No carga `.env`, no hereda claves de proveedores y no reutiliza `var/atlas` ni una base de otra prueba. Comprueba datos sintéticos, proveedor `none`, presupuesto, gasto y reserva **0 USD**, sin fuentes externas ni simulación automática. Los experimentos de prueba tienen una duración configurada de una hora y se cancelan al terminar el recorrido; no se espera esa hora ni se inicia el ensayo de 48 horas.
+
+La salida identifica la carpeta de evidencia, con `run.json`, registros de los servidores y de Playwright. El ejecutor cierra sus procesos, comprueba la liberación de los puertos y contrasta que los archivos de la base habitual no han cambiado. Un código de salida 0 indica que el recorrido terminó correctamente; revisar el resultado y los registros si falla. Las carpetas de evidencia y los binarios de Chromium quedan fuera de Git.
+
+Estas pruebas no certifican por sí solas el escalado físico de Windows. La revisión al 125 % y 150 % se registra por separado; cambiar únicamente el viewport o la escala simulada de un navegador no sustituye esa comprobación. El recorrido E2E tampoco reactiva el seguimiento ni reemplaza la prueba sostenida aplazada.
 
 ## Actualizar el código conservando los datos
 

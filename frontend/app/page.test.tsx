@@ -38,6 +38,25 @@ function responses() {
   });
 }
 describe('Navegación y borradores', () => {
+  it('continúa en la pestaña Datos al activar Importar datos con teclado', async () => {
+    mockFetch((path) => {
+      if (path === '/api/state')
+        return stateResponse({ datasets: [], experiments: [] });
+      throw new Error('Solicitud inesperada: ' + path);
+    });
+    const screen = within(render(<Home />).container);
+    await screen.findByText('Motor conectado');
+    const user = userEvent.setup();
+    screen.getByRole('button', { name: 'Importar datos' }).focus();
+    await user.keyboard('{Enter}');
+    const dataTab = screen.getByRole('tab', { name: 'Datos' });
+    expect(dataTab.getAttribute('aria-selected')).toBe('true');
+    expect(document.activeElement).toBe(dataTab);
+    expect(
+      screen.getByRole('textbox', { name: 'Contenido CSV' }),
+    ).not.toBeNull();
+  });
+
   it('mantiene CSV, hipótesis y costes al cambiar de pestaña', async () => {
     responses();
     // A timed-out async test must never query the next test's document.

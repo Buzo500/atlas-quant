@@ -60,6 +60,12 @@ def _windows_api():
     api.SetInformationJobObject.restype = wintypes.BOOL
     api.AssignProcessToJobObject.argtypes = [wintypes.HANDLE, wintypes.HANDLE]
     api.AssignProcessToJobObject.restype = wintypes.BOOL
+    api.OpenProcess.argtypes = [wintypes.DWORD, wintypes.BOOL, wintypes.DWORD]
+    api.OpenProcess.restype = wintypes.HANDLE
+    api.IsProcessInJob.argtypes = [wintypes.HANDLE, wintypes.HANDLE, ctypes.POINTER(wintypes.BOOL)]
+    api.IsProcessInJob.restype = wintypes.BOOL
+    api.GetExitCodeProcess.argtypes = [wintypes.HANDLE, ctypes.POINTER(wintypes.DWORD)]
+    api.GetExitCodeProcess.restype = wintypes.BOOL
     api.CloseHandle.argtypes = [wintypes.HANDLE]
     api.CloseHandle.restype = wintypes.BOOL
     return api
@@ -101,6 +107,25 @@ class _WindowsJob:
                 raise _windows_error("No se pudo cerrar la protección de procesos de ATLAS")
             self._handle = None
 
+    def contains_pid(self, pid: int) -> bool:
+        """Query only: a recycled or foreign PID never grants process ownership."""
+        if self._handle is None or type(pid) is not int or pid <= 0:
+            return False
+        process = self._api.OpenProcess(0x1000, False, pid)  # QUERY_LIMITED_INFORMATION
+        if not process:
+            if ctypes.get_last_error() in {5, 87}:  # inaccessible or no longer exists
+                return False
+            raise _windows_error("No se pudo consultar la identidad de un proceso")
+        try:
+            member, exit_code = wintypes.BOOL(), wintypes.DWORD()
+            if not self._api.IsProcessInJob(process, self._handle, ctypes.byref(member)):
+                raise _windows_error("No se pudo comprobar la pertenencia al grupo")
+            if not self._api.GetExitCodeProcess(process, ctypes.byref(exit_code)):
+                raise _windows_error("No se pudo comprobar el estado del proceso")
+            return bool(member.value) and exit_code.value == 259  # STILL_ACTIVE
+        finally:
+            self._api.CloseHandle(process)
+
 
 class ProcessGroup:
     """Context manager owning a job and the successfully assigned Popen handles.
@@ -128,6 +153,18 @@ class ProcessGroup:
             self._job.add(process)
         self._processes.append(process)
         return process
+
+    def contains_pid(self, pid: int) -> bool:
+        """Windows proves membership of this exact job, including descendants.
+
+        This read-only check does not adopt a process or authorize terminating
+        it by PID. Other platforms can prove only retained direct Popen handles.
+        """
+        if self._closed:
+            return False
+        if self._job is not None:
+            return self._job.contains_pid(pid)
+        return any(process.pid == pid and process.poll() is None for process in self._processes)
 
     def close(self):
         if self._closed:

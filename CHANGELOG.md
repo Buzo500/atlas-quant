@@ -1,8 +1,32 @@
 # Cambios de ATLAS Quant
 
+## v0.2.0-rc.2 · Candidata con CI verificada · 2026-09-08
+
+Candidata desarrollada en `codex/v0.2.0-rc.2`, sobre la [PR #1](https://github.com/Buzo500/atlas-quant/pull/1) fusionada en `master` (`e1f6e020a1d75a81bff97eefcbebe726d47bcdb3`). La [CI 34249730107](https://github.com/Buzo500/atlas-quant/actions/runs/34249730107) verifica las fuentes, pruebas y workflow de `412918b5e9067e44f293b0633068ca932a472d64`; el cierre posterior solo modifica documentación. La integración por la [PR #2](https://github.com/Buzo500/atlas-quant/pull/2) y la etiqueta `v0.2.0-rc.2` siguen el procedimiento autorizado. No es estable: escalado físico pendiente, ensayo de 48 horas y seguimiento aplazados. [Evidencia de candidata](docs/candidata_v0_2.md).
+
+- Conserva el monolito modular, las transacciones, los controles de simulación y la operación Windows incorporados en rc.1.
+- Corrige el agotamiento de archivos del supervisor: comprobaciones HTTP locales sin crear contextos TLS ni consultar proxies, con cierre explícito de respuesta y conexión. La corrección no convierte el ensayo fallido de rc.1 en uno superado.
+- Interfaz crema, marfil y cobre para las cinco secciones, adaptada a escritorio y pantallas ultrapanorámicas.
+- Confirmación de movimientos vinculada al CSV, conjunto, versión, barras y ledger revisados, con comprobación del token dentro de la transacción.
+- Comparaciones del Laboratorio con identidad de ejecución, datos y costes utilizados; aviso cuando el borrador deja de coincidir con el resultado.
+- Consultas que descartan respuestas obsoletas, distinguen carga/error/datos conservados y permiten reintentar lecturas; ajustes parciales que no sobrescriben una parada concurrente al guardar un peso.
+- Borradores conservados entre pestañas y selecciones recuperables desde la URL; la recarga no conserva una autorización de simulación automática.
+- Paneles separados por funcionalidad, formatos comunes EUR/USD/fechas, tabla accesible de las curvas y paginación de 50 filas. La reducción del SVG conserva los datos completos.
+- Pruebas de comportamiento con Vitest/Testing Library y CI ampliada. **Antecedente validado:** `3f1d990ac15c391e638302828d1a720d99d78003` superó [CI de Windows](https://github.com/Buzo500/atlas-quant/actions/runs/34241300060) con 421 pruebas Python, 91 subtests y 126 pruebas de interfaz; esa ejecución no valida cambios posteriores de rc.2.
+- Recorridos E2E con interfaz compilada, API real y Chromium sobre una base nueva por ejecución; presupuesto cero y cierre comprobado de los procesos propios. El PID del intérprete se verifica mediante su pertenencia al grupo del servidor; una integridad o cierre incorrectos impiden dar la prueba por superada.
+- Foco persistente al importar datos, crear un experimento y confirmar CSV, respetando cambios de campo o sección durante la espera. El mensaje de importación permanece tras actualizar la versión del conjunto.
+- Hora de consulta visible fuera de los anuncios accesibles; carga inicial, errores, recuperación y reintentos anunciados sin repetir sondeos normales.
+- Aislamiento de pytest antes de recoger e importar módulos, evitando abrir la base habitual al construir la aplicación global.
+- Identidad de archivos del test de aislamiento mediante `samefile`, compatible con alias Windows 8.3 y rutas largas. Se conserva la primera CI fallida y la reproducción que confirmó la corrección.
+- CI de Windows superada: **446 pruebas Python + 91 subtests** (22,13 s), **140 Vitest en 15 archivos** (43,86 s), **5/5 E2E** (18,7 s), instalación limpia, build, contratos, tipos, lint, dependencias, smoke, arranque y parada correctos.
+- Validación local: **446 pruebas Python y 91 subtests** (38,34 s, dos avisos previos), **140 pruebas Vitest en 15 archivos** (13,34 s), **5/5 E2E** (9,6 s), TypeScript, contratos, lint, `pip check` y compilación correctos. Conservación del contenido de la base habitual verificada frente a su copia; resultados fallidos anteriores preservados.
+- Escalado físico de Windows al 125 % y 150 % pendiente: la herramienta de control bloqueó la operación y no se modificó la escala. Los tamaños CSS comprobados anteriormente no sustituyen esta validación.
+
+No incorpora gráficos avanzados del backlog, aprendizaje, acceso remoto, móvil, conexión a bróker ni órdenes reales. Se mantiene el recorrido sintético sin claves y con presupuesto cero.
+
 ## v0.2.0-rc.1 · Candidata · 2026-09-06
 
-Motor, OpenAPI, salud e interfaz identifican la candidata 0.2.0-rc.1. No es una etiqueta estable: CI, recorridos del commit y ensayo sostenido se registran en [cierre de candidata](docs/candidata_v0_2.md).
+Candidata histórica: motor, OpenAPI, salud e interfaz se identificaron como 0.2.0-rc.1. No es una etiqueta estable: su CI, recorridos del commit y ensayo interrumpido se conservan en [cierre de candidata](docs/candidata_v0_2.md).
 
 - Arranque con instancia única, verificación de dependencias, puertos, página y API; estado consultable y parada cooperativa. Los fallos de un servidor detienen ambos sin repetir trabajos.
 - Propiedad de procesos mediante Windows Job Objects, incluyendo descendientes. La parada no utiliza un PID guardado para terminar procesos ajenos.

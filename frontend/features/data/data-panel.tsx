@@ -35,6 +35,7 @@ export function DataPanel({
     [end, setEnd] = useState(''),
     [message, setMessage] = useState('');
   const { busy, run } = useAction(onError);
+  const csvEditor = useRef<HTMLTextAreaElement | null>(null);
   const [readingFile, setReadingFile] = useState(false);
   const fileRevision = useRef(0);
   const fileMounted = useRef(true);
@@ -162,6 +163,7 @@ export function DataPanel({
         {readingFile && <output className="muted">Leyendo archivo…</output>}
         <Field label="Contenido CSV">
           <Textarea
+            ref={csvEditor}
             rows={7}
             value={csv}
             onChange={(e) => {
@@ -182,6 +184,16 @@ export function DataPanel({
             csv={readingFile ? '' : csv}
             refresh={refresh}
             onError={onError}
+            onMessage={setMessage}
+            onConfirmationRemoved={(button) => {
+              // The editor survives a ledger remount after the dataset refresh.
+              if (
+                button &&
+                button === document.activeElement &&
+                !button.closest('[hidden], [inert]')
+              )
+                csvEditor.current?.focus();
+            }}
           />
         ) : (
           <div className="actions">
