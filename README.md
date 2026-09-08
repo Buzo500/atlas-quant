@@ -12,7 +12,7 @@ Para trabajar en otro equipo: [traslado al sobremesa y conversación nueva en Co
 
 Interfaz local actual: [diseño crema y cobre, adaptación ultrapanorámica y validación](docs/frontend_crema_cobre.md). Incluye las cinco secciones existentes; los informes LaTeX siguen en planificación.
 
-Consolidación posterior: [nueve mejoras de fiabilidad, trazabilidad y pruebas del frontend](docs/frontend_consolidacion.md). Incluye confirmaciones vinculadas al CSV revisado, resultados identificados, consultas con recuperación, borradores entre pestañas, formatos comunes y tablas paginadas. Validación local: **421 pruebas del motor, 91 subtests y 126 pruebas de interfaz**, además de 35 comprobaciones de tamaño en navegador. La CI de estas fuentes y el ensayo sostenido siguen pendientes.
+Consolidación posterior: [nueve mejoras de fiabilidad, trazabilidad y pruebas del frontend](docs/frontend_consolidacion.md). Incluye confirmaciones vinculadas al CSV revisado, resultados identificados, consultas con recuperación, borradores entre pestañas, formatos comunes y tablas paginadas. **CI de Windows superada el 08/09/2026 para `3f1d990`**: [ejecución y resultados](https://github.com/Buzo500/atlas-quant/actions/runs/34241300060), con **421 pruebas del motor, 91 subtests y 126 pruebas de interfaz**, instalación limpia, compilación, contratos, arranque y parada. La revisión local añade 35 comprobaciones de tamaño en navegador. El ensayo sostenido de 48 horas sigue aplazado; v0.2 aún no es estable.
 
 ## Abrir la aplicación
 

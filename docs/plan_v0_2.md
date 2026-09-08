@@ -4,7 +4,7 @@
 
 Fecha: 6 de septiembre de 2026. Estado: implementación inicial completada y probada localmente; cierre de v0.2 pendiente. Este documento define los criterios de aceptación; la evidencia ejecutada se recoge en la [auditoría](auditoria_v0_2.md).
 
-**Consolidación del núcleo implementada:** CORE-001, controles concurrentes, contratos prioritarios y transacciones han sido corregidos y comprobados con 328 pruebas y 91 subtests. Garantías y deuda restante en [consolidacion_core.md](consolidacion_core.md). Sigue pendiente cerrar candidata, CI remoto y ensayo sostenido; la [revisión inicial](revision_core_arquitectura.md) se conserva como diagnóstico histórico.
+**Consolidación del núcleo implementada:** CORE-001, controles concurrentes, contratos prioritarios y transacciones han sido corregidos y comprobados con 328 pruebas y 91 subtests. Garantías y deuda restante en [consolidacion_core.md](consolidacion_core.md). La revisión posterior `3f1d990` supera CI de Windows con 421 pruebas Python, 91 subtests y 126 pruebas de interfaz. H6 sigue pendiente, con el ensayo de 48 horas aplazado; la [revisión inicial](revision_core_arquitectura.md) se conserva como diagnóstico histórico.
 
 ## Objetivo y punto de partida
 
@@ -24,7 +24,7 @@ Se conservan demo y proveedor `none`, sin claves y con gasto cero. Quedan fuera 
 
 ## Hitos pequeños y verificables
 
-Los hitos describen unidades de aceptación. H0–H4 tienen implementación y evidencia local; H5 tiene instalación independiente probada y CI preparada, pendiente de ejecución remota sobre un commit. H6 continúa pendiente por el ensayo de 48 horas y cierre de candidata. Consultar la auditoría para los escenarios concretos comprobados y sus límites.
+Los hitos describen unidades de aceptación. H0–H4 tienen implementación y evidencia local; H5 cuenta con instalación independiente y [CI de Windows superada para `3f1d990`](https://github.com/Buzo500/atlas-quant/actions/runs/34241300060). H6 continúa pendiente: el ensayo de 48 horas está aplazado y v0.2 no se declara estable. Consultar la auditoría para los escenarios concretos comprobados y sus límites.
 
 | Hito | Cambio concreto | Criterios de aceptación |
 |---|---|---|

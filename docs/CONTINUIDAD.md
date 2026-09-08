@@ -2,7 +2,21 @@
 
 Actualizado: 8 de septiembre de 2026. Este documento resume decisiones y estado para una conversación nueva de Codex; no contiene la transcripción completa del chat original.
 
-## Solicitud actual: consolidación del frontend
+## Solicitud actual: CI de la revisión
+
+El usuario autorizó ejecutar la CI. **Completada el 08/09/2026** para `3f1d990ac15c391e638302828d1a720d99d78003`, en `codex/fix-local-health-resources`: [GitHub Actions, ejecución 34241300060](https://github.com/Buzo500/atlas-quant/actions/runs/34241300060). La rama está subida; se conservan `master` y la etiqueta original `v0.2.0-rc.1`. Los cambios posteriores que registran esta evidencia son exclusivamente documentales; el SHA citado identifica las fuentes, pruebas y workflow realmente ejecutados.
+
+En el runner Windows de GitHub: **421 pruebas Python y 91 subtests** (19,01 s; dos avisos previos), **126 pruebas de interfaz en 14 archivos** (37,77 s), instalación desde checkout limpio, compilación con manifiesto, TypeScript, contratos, lint, arranque, recorrido sintético por proxy y parada correctos. El smoke confirma proveedor sin IA, gasto cero, HTML 200 y proxy correcto; no ejecuta interacciones de navegador. Estas últimas corresponden a la validación local del bloque siguiente.
+
+El primer intento sobre `839f2d3` falló en tres tests de interfaz: dos recorridos excedieron 5 s y otro no encontró su selección. La corrección limita workers según CPU, acota consultas al contenedor de cada test y admite 15 s solo en los dos recorridos complejos; sin eliminar aserciones ni añadir reintentos. La contaminación del test siguiente por una continuación asíncrona era un riesgo compatible con el fallo, no una causa demostrada. También se evita ejecutar la parada de CI si no se intentó arrancar ATLAS. La suite completa corregida pasó localmente con afinidad de 2 CPU antes de repetir la CI. Detalle y primer run fallido en [candidata_v0_2.md](candidata_v0_2.md).
+
+Cuota comprobada antes de ejecutar: 6,7/2.000 minutos y 0/0,5 GB utilizados, 0 USD facturables. Ambos intentos acotados a 20 minutos permanecen dentro de la cuota gratuita; sin cambios de facturación, claves nuevas, servicios de pago ni artefactos remotos.
+
+ATLAS se detuvo antes de modificar pruebas/configuración y se reconstruyó con `tools/build_frontend.py`. **Vuelve a estar funcionando en http://127.0.0.1:3000/**, ejecución `a0e040c188c1410d93449bdf4367e97a`, con salud y manifiesto correctos. La base habitual mantiene integridad, huella persistente y prefijo de auditoría de la copia anterior; conjunto, experimento, controles y presupuesto/gasto/reserva cero conservados. No se sustituye ni restaura la base.
+
+Evidencia local ignorada: `output/validation/github-ci-34241300060.json`, `github-run-34241300060.json`, `github-job-102111855928.log`, `frontend-hardening-preservation.json` y `ci_frontend_revision.json`. **No se ha repetido el ensayo de 48 horas ni reactivado su seguimiento**. H6 sigue pendiente, la versión sigue en `0.2.0-rc.1` y no se declara estable. Abrir: `Abrir-ATLAS.cmd`; detener ambos servidores: `Detener-ATLAS.cmd`.
+
+## Consolidación del frontend previa a la CI
 
 El usuario autorizó resolver, uno a uno, los nueve puntos de la revisión del frontend. **Implementados y validados el 08/09/2026**, manteniendo crema/marfil/cobre y el monolito modular. Detalles y límites en [frontend_consolidacion.md](frontend_consolidacion.md).
 
@@ -22,7 +36,7 @@ ATLAS se detuvo antes de editar. Copia: `backups/atlas-20260908T131709657852Z-12
 
 **ATLAS queda arrancado para uso normal en http://127.0.0.1:3000/**, ejecución `b17661795e9c416c8a6ff0bb995b3e59`, con la base habitual. Integridad SQLite, huella persistente y prefijo de auditoría coinciden con la copia; se conservan NAV 25.118,66876 EUR, tres posiciones e IDs originales. Parada global activada, sin claves, presupuesto/gasto/reserva cero. Abrir con `Abrir-ATLAS.cmd`; detener con `Detener-ATLAS.cmd`.
 
-Evidencia ignorada por Git: `output/validation/frontend-hardening.json`, `frontend-hardening-backend.xml`, `frontend-hardening-ui-tests.json`, `frontend-hardening-viewports.json`, `frontend-hardening-preservation.json` y `frontend_bench_final.json`. Los cambios son locales: sin commit/push ni CI remota de estas fuentes. Sigue **0.2.0-rc.1**, con ensayo y seguimiento aplazados. Sites, gráficos avanzados, aprendizaje, móvil, remoto e informes LaTeX no cambian.
+Evidencia ignorada por Git: `output/validation/frontend-hardening.json`, `frontend-hardening-backend.xml`, `frontend-hardening-ui-tests.json`, `frontend-hardening-viewports.json`, `frontend-hardening-preservation.json` y `frontend_bench_final.json`. Este bloque recoge la entrega local anterior; su publicación y CI posterior están en el apartado vigente de arriba. Sigue **0.2.0-rc.1**, con ensayo y seguimiento aplazados. Sites, gráficos avanzados, aprendizaje, móvil, remoto e informes LaTeX no cambian.
 
 ## Implementación visual previa: frontend crema y cobre
 

@@ -1,6 +1,6 @@
 # ATLAS Quant · Auditoría y avance de v0.2
 
-**Cierre posterior:** preparada la candidata `0.2.0-rc.1`; seguimiento y evidencia del commit en [candidata_v0_2.md](candidata_v0_2.md). Las cifras y el estado del motor citados abajo corresponden al bloque anterior. La condición estable sigue pendiente de sus comprobaciones de cierre.
+**Cierre posterior:** preparada la candidata `0.2.0-rc.1`; seguimiento y evidencia del commit en [candidata_v0_2.md](candidata_v0_2.md). H5 dispone de [CI superada para `3f1d990`](https://github.com/Buzo500/atlas-quant/actions/runs/34241300060), del 08/09/2026; H6 sigue pendiente y el ensayo de 48 horas está aplazado. Las cifras, versión del motor y límites citados en la auditoría inferior corresponden al bloque anterior. La condición estable sigue pendiente de sus comprobaciones de cierre.
 
 Fecha: 6 de septiembre de 2026. Base de trabajo: commit `97520b8` (`traslado al sobremesa`), árbol limpio al comenzar. Los cambios descritos se han probado como árbol de trabajo local sobre esa base; no se ha publicado ni etiquetado una versión nueva.
 
@@ -53,4 +53,4 @@ La evidencia local está en `output/validation/clean_v02.json`, `output/validati
 
 ## Próximo paso concreto
 
-La consolidación prioritaria ya está implementada y validada; consultar su documento para las deudas que siguen abiertas. Revisar y guardar este conjunto como candidata, ejecutar su CI cuando estén comprobados los límites y completar el ensayo de 48 horas. Si aparecen fallos, corregirlos dentro de v0.2 y repetir solo la validación afectada. No adelantar gráficos, móvil o aprendizaje durante esta consolidación.
+La consolidación prioritaria ya está implementada y validada; consultar su documento para las deudas que siguen abiertas. La revisión `3f1d990` ha superado CI. El siguiente cierre pendiente es H6; su ensayo de 48 horas permanece aplazado y no se inicia en esta revisión. Si aparecen fallos, corregirlos dentro de v0.2 y repetir solo la validación afectada. No adelantar gráficos, móvil o aprendizaje durante esta consolidación.

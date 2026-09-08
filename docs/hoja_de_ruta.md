@@ -2,6 +2,8 @@
 
 Actualizado: 8 de septiembre de 2026. La v0.1 es la última entrega cerrada; v0.2 tiene una candidata 0.2.0-rc.1, todavía sin declarar estable. El usuario ha autorizado la consolidación de v0.2; las demás versiones son una planificación sin fechas comprometidas ni implementación iniciada por este documento. El estado de su cierre se recoge en [candidata_v0_2.md](candidata_v0_2.md).
 
+La [CI de la revisión `3f1d990`](https://github.com/Buzo500/atlas-quant/actions/runs/34241300060) está superada. H6 y su ensayo de 48 horas siguen pendientes; el usuario mantiene ese ensayo aplazado.
+
 El alcance disponible se describe en [v0.1](version_0_1.md) y las comprobaciones de cada equipo en [CONTINUIDAD](CONTINUIDAD.md). El [diseño completo](atlas_quant_diseno.md) describe el objetivo del producto. Esta hoja de ruta establece el orden de trabajo actual y sustituye la prioridad histórica de conectar IBKR inmediatamente después de v0.1.
 
 ## Versiones y condiciones de cierre

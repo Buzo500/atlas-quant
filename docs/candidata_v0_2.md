@@ -8,7 +8,9 @@ Preparación autorizada el 6 de septiembre de 2026. **No es una entrega estable.
 
 ## Recorrido de cierre
 
-La consolidación posterior del frontend añade pruebas y modifica los contratos de movimientos, investigación manual y ajustes. Su [validación local](frontend_consolidacion.md) pasa 421 pruebas del motor, 91 subtests y 126 pruebas de interfaz, más revisión de navegador. Incorporar estas fuentes a la candidata que se identifique y valide; no atribuirles la CI del SHA anterior. El ensayo continúa aplazado.
+**CI vigente superada:** `3f1d990ac15c391e638302828d1a720d99d78003`, rama `codex/fix-local-health-resources`, [ejecución 34241300060](https://github.com/Buzo500/atlas-quant/actions/runs/34241300060), del 08/09/2026. El checkout y el resultado del workflow corresponden a ese SHA: 421 pruebas Python y 91 subtests (19,01 s), 126 pruebas de interfaz (37,77 s), instalación limpia, build con manifiesto, TypeScript, contratos, lint, arranque, smoke sintético y parada correctos. No se cambia la etiqueta original. Los commits posteriores que solo registran esta evidencia no modifican las fuentes validadas.
+
+La consolidación posterior del frontend añade pruebas y modifica los contratos de movimientos, investigación manual y ajustes. Su [validación local](frontend_consolidacion.md) incluye revisión de navegador y conservación de la base del sobremesa; la CI comprueba el recorrido HTTP, sin automatizar navegador. H5 dispone de CI para la revisión actual; **H6 y el ensayo de 48 horas continúan aplazados**. El recorrido original de preparación se conserva a continuación como referencia; no autoriza iniciar ahora el ensayo.
 
 1. Guardar y revisar las fuentes en la rama `codex/v0.2.0-rc.1`, conservando `master` y el punto anterior `97520b8`.
 2. Ejecutar pruebas, contratos, TypeScript, lint de aplicación y compilación verificada. La suite incluye las regresiones de concurrencia y recuperación, y comprueba que las versiones publicadas por backend e interfaz coinciden.
@@ -21,7 +23,7 @@ La copia principal no se sustituye ni restaura para validar. Mientras el monitor
 
 ## CI y presupuesto cero
 
-**Revisión del frontend, 08/09/2026:** el usuario autorizó subir y validar `codex/fix-local-health-resources`, conservando `master` y la etiqueta original. La primera [ejecución de esta revisión](https://github.com/Buzo500/atlas-quant/actions/runs/34240011639), sobre `839f2d3e84b82891bbd062412d7eb69620957491`, falló en tres pruebas de interfaz: dos recorridos excedieron cinco segundos y otro no encontró su selección. Pasaron las otras 123. La parada añadió un error al no existir todavía la instalación. Se conserva este resultado como fallo, pendiente de validar la corrección; no se ha ejecutado el ensayo sostenido.
+**Revisión del frontend, 08/09/2026:** el usuario autorizó subir y validar `codex/fix-local-health-resources`, conservando `master` y la etiqueta original. La primera [ejecución de esta revisión](https://github.com/Buzo500/atlas-quant/actions/runs/34240011639), sobre `839f2d3e84b82891bbd062412d7eb69620957491`, falló en tres pruebas de interfaz: dos recorridos excedieron cinco segundos y otro no encontró su selección. Pasaron las otras 123. La parada añadió un error al no existir todavía la instalación. Se conserva este resultado como fallo; la segunda ejecución sobre `3f1d990` valida la corrección y pasa completa. No se ha ejecutado el ensayo sostenido.
 
 La corrección acota las consultas de las pruebas a su propio contenedor y limita workers según CPU disponible. Solo los dos recorridos que caducaron disponen de 15 segundos; no se eliminan aserciones, pruebas ni aislamiento, ni se añaden reintentos. La limpieza de CI se ejecuta cuando se intentó arrancar ATLAS, incluso si ese paso falla o se cancela. No intenta detener una instalación que nunca llegó a arrancar.
 
