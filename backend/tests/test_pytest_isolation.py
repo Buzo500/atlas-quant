@@ -30,7 +30,8 @@ def test_collection_isolates_global_app_and_cleans_up(tmp_path, inherited_direct
         f"assert data != Path({str(ROOT / 'var/atlas')!r}).resolve()\n"
         "assert data.name.startswith('atlas-pytest-data-') and data.is_dir()\n"
         "from atlas_quant.app import app\n"
-        "assert app.state.service.store.path == data / 'atlas.sqlite3'\n"
+        # Windows TEMP may use an 8.3 alias; compare the actual file identity.
+        "assert app.state.service.store.path.samefile(data / 'atlas.sqlite3')\n"
         "assert (data / 'atlas.sqlite3').is_file()\n"
         f"Path({str(report)!r}).write_text(json.dumps({{'data_dir': str(data)}}))\n"
         "def test_never_executed():\n"

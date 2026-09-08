@@ -2,7 +2,13 @@
 
 ## Estado actual · 0.2.0-rc.2 en preparación
 
-Estado previo al commit y la CI del 8 de septiembre de 2026. Motor e interfaz locales usan **`0.2.0-rc.2`**, en la rama `codex/v0.2.0-rc.2`; **no se declara v0.2 estable**. La [PR #1](https://github.com/Buzo500/atlas-quant/pull/1) está fusionada en `master`, commit `e1f6e020a1d75a81bff97eefcbebe726d47bcdb3`. Se conserva la candidata rc.1 y la trazabilidad de sus resultados. La CI histórica no se atribuye a las fuentes nuevas de rc.2; la nueva etiqueta queda condicionada a superar su CI.
+**Primera CI de rc.2 fallida; PR #2 abierta:** `dff5e24a0ebbce8a1cb0481fd64e47563794e433` está subido a `Buzo500/atlas-quant`. La [CI 34248790750](https://github.com/Buzo500/atlas-quant/actions/runs/34248790750) falló sobre ese SHA: 444 pruebas Python superadas, dos fallidas y 91 subtests en 21,99 s; 140 pruebas Vitest superadas. La [PR #2](https://github.com/Buzo500/atlas-quant/pull/2) sigue abierta. La fusión y la etiqueta `v0.2.0-rc.2` están autorizadas si pasa CI, pero no se han realizado. Código inicial: `e64351c0eb93ce2307be04ce31559c8aa9f3d24b`; documentación: `dff5e24`. El rechazo anterior de la revisión automática se conserva como antecedente, resuelto mediante autorización expresa.
+
+**ATLAS está detenido antes de corregir el test.** La ejecución anterior `0e3cebcbaa5344b0ade7a17071b986bd` había verificado versión rc.2, salud, compilación y conservación de la base habitual; ese resultado se conserva como evidencia del arranque, no como estado activo actual. El escalado físico sigue pendiente y aplazado.
+
+Los dos fallos remotos corresponden al test de aislamiento previo a colección, con y sin directorio heredado. Su comparación textual enfrentaba `store.path`, representado mediante el alias corto de Windows `RUNNER~1`, con la ruta resuelta bajo `runneradmin`: ambas identifican el mismo archivo. Se prepara una corrección exclusiva de la aserción de identidad del archivo, manteniendo la comprobación de aislamiento y sus dos variantes. Los logs y el fallo original no se eliminan. Este primer run no acredita E2E remoto; los cinco E2E superados de la tabla son locales. La repetición de CI se registrará con su nuevo SHA y resultado.
+
+Estado del 8 de septiembre de 2026. Motor e interfaz locales usan **`0.2.0-rc.2`**, en la rama `codex/v0.2.0-rc.2`; **no se declara v0.2 estable**. La [PR #1](https://github.com/Buzo500/atlas-quant/pull/1) está fusionada en `master`, commit `e1f6e020a1d75a81bff97eefcbebe726d47bcdb3`. Se conserva la candidata rc.1 y la trazabilidad de sus resultados. La CI histórica no se atribuye a las fuentes nuevas de rc.2; la nueva etiqueta queda condicionada a superar su CI.
 
 | Comprobación | Estado de este punto |
 |---|---|
@@ -13,10 +19,10 @@ Estado previo al commit y la CI del 8 de septiembre de 2026. Motor e interfaz lo
 | Conservación de la base habitual | Integridad y contenido completo, esquema, secuencias y 539 eventos de auditoría iguales a `backups/atlas-20260908T151716582043Z-af195afe`. El run E2E correcto registra igualdad de hashes antes/después. La diferencia de archivos WAL/SHM del primer intento tiene una reproducción compatible en copias, sin atribución concluyente de su causa original. |
 | Windows 125 % y 150 % | **No validado.** El control de Windows bloqueó la operación porque no pudo identificar una URL de confianza; no se cambió la escala inicial del 100 %. Monitor 1: 2560 × 1440; monitor 2: ultrapanorámico de 3440 píxeles de ancho. Las 35 comprobaciones históricas de viewports CSS no sustituyen el escalado físico. |
 | Entorno manual | `e2e-0de1cebd856c4115984403a8086dc09e` detenido con resultado 0, base habitual intacta y puertos libres. No se realizó ninguna interacción de UI manual. |
-| CI de rc.2 | Pendiente de ejecución sobre fuentes identificadas. |
+| CI de rc.2 | [Ejecución 34248790750](https://github.com/Buzo500/atlas-quant/actions/runs/34248790750), **fallida** sobre `dff5e24a0ebbce8a1cb0481fd64e47563794e433`: 444 Python superadas, 2 fallidas y 91 subtests (21,99 s); 140 Vitest superadas. Corrección del test y nueva CI pendientes; E2E remoto no acreditado por este run. |
 | H6 / ensayo sostenido | Ensayo de 48 horas y seguimiento aplazados; este bloque no los reinicia. |
 
-**ATLAS está detenido antes del commit y la CI.** La CI de rc.2 y la publicación de su etiqueta todavía no se presentan como completadas. Se mantiene presupuesto cero, sin claves ni llamadas de pago. Los registros E2E están en `var/validation/`; se conservan también los intentos fallidos. La apertura SQLite con `mode=ro` creó WAL/SHM en copias y una importación posterior de la aplicación los retiró sin cambiar el contenido. El primer intento no conservó hashes individuales: esta reproducción es compatible con aquella diferencia, pero no demuestra su causa. El cierre actual registra cada hash y falla ante integridad, salidas de servidores o liberación de puertos incorrectas.
+Se mantiene presupuesto cero, sin claves ni llamadas de pago. Los registros E2E están en `var/validation/`; se conservan también los intentos fallidos. La apertura SQLite con `mode=ro` creó WAL/SHM en copias y una importación posterior de la aplicación los retiró sin cambiar el contenido. El primer intento no conservó hashes individuales: esta reproducción es compatible con aquella diferencia, pero no demuestra su causa. El cierre actual registra cada hash y falla ante integridad, salidas de servidores o liberación de puertos incorrectas.
 
 ## Histórico · Candidata v0.2.0-rc.1
 
