@@ -10,7 +10,7 @@ from datetime import datetime, timedelta, timezone
 import pytest
 from fastapi.testclient import TestClient
 
-from atlas_quant.app import create_app
+from atlas_quant.app import ExperimentInput, create_app
 from atlas_quant.paper import advance_paper, new_account
 
 
@@ -117,13 +117,16 @@ def test_ledger_preview_does_not_mutate_then_commit_is_idempotent(app, client):
     assert app.state.service.store.audit_list() == before_audit
     assert client.get(f"/api/datasets/{ident}/portfolio").json()["nav"] == 0
 
-    first = client.post(f"/api/datasets/{ident}/ledger", headers=LOCAL, json={"csv": LEDGER, "commit": True})
+    first = client.post(f"/api/datasets/{ident}/ledger", headers=LOCAL,
+                        json={"csv": LEDGER, "commit": True, "preview_token": preview.json()["preview_token"]})
     assert first.status_code == 200, first.text
     assert first.json()["added"] == 2
     snapshot = client.get(f"/api/datasets/{ident}/portfolio").json()
     assert snapshot["cash"] == pytest.approx(795)
     assert snapshot["nav"] == pytest.approx(1003)
-    second = client.post(f"/api/datasets/{ident}/ledger", headers=LOCAL, json={"csv": LEDGER, "commit": True})
+    repeated = client.post(f"/api/datasets/{ident}/ledger", headers=LOCAL, json={"csv": LEDGER})
+    second = client.post(f"/api/datasets/{ident}/ledger", headers=LOCAL,
+                         json={"csv": LEDGER, "commit": True, "preview_token": repeated.json()["preview_token"]})
     assert second.status_code == 200
     assert second.json()["added"] == 0
     assert second.json()["duplicates"] == 2
@@ -134,16 +137,19 @@ def test_ledger_preview_does_not_mutate_then_commit_is_idempotent(app, client):
 def test_ledger_conflicting_id_returns_422_without_mutation(app, client):
     dataset = _dataset(client)
     path = f"/api/datasets/{dataset['id']}/ledger"
-    assert client.post(path, headers=LOCAL, json={"csv": LEDGER, "commit": True}).status_code == 200
+    preview = client.post(path, headers=LOCAL, json={"csv": LEDGER}).json()
+    assert client.post(path, headers=LOCAL,
+                       json={"csv": LEDGER, "commit": True, "preview_token": preview["preview_token"]}).status_code == 200
     before = app.state.service.store.get("ledger", dataset["id"])
-    response = client.post(path, headers=LOCAL, json={"csv": LEDGER.replace("1000,,EUR", "2000,,EUR"), "commit": True})
+    response = client.post(path, headers=LOCAL, json={"csv": LEDGER.replace("1000,,EUR", "2000,,EUR")})
     assert response.status_code == 422
     assert app.state.service.store.get("ledger", dataset["id"]) == before
 
 
 def test_invalid_ledger_insufficient_cash_returns_422(client):
     dataset = _dataset(client)
-    response = client.post(f"/api/datasets/{dataset['id']}/ledger", headers=LOCAL, json={"csv": LEDGER.replace("1000,,EUR", "100,,EUR"), "commit": True})
+    response = client.post(f"/api/datasets/{dataset['id']}/ledger", headers=LOCAL,
+                           json={"csv": LEDGER.replace("1000,,EUR", "100,,EUR")})
     assert response.status_code == 422
     assert "efectivo" in response.json()["detail"].lower()
 
@@ -152,9 +158,48 @@ def test_future_ledger_events_cannot_change_current_portfolio(app, client):
     dataset = _dataset(client)
     future = (datetime.now(timezone.utc) + timedelta(days=1)).date().isoformat()
     csv = f"id,date,kind,amount,currency\nfuture-deposit,{future},deposit,1000,EUR\n"
-    response = client.post(f"/api/datasets/{dataset['id']}/ledger", headers=LOCAL, json={"csv": csv, "commit": True})
+    response = client.post(f"/api/datasets/{dataset['id']}/ledger", headers=LOCAL, json={"csv": csv})
     assert response.status_code == 422
     assert app.state.service.store.get("ledger", dataset["id"]) is None
+
+
+def test_two_stale_settings_clients_change_only_the_requested_field(app, client):
+    # The second client uses the existing application's lifespan; it must not start another worker.
+    other = TestClient(app)
+    try:
+        assert client.post("/api/settings", headers=LOCAL, json={"kill_switch": False}).status_code == 200
+        stale_a = client.get("/api/state").json()["settings"]
+        stale_b = other.get("/api/state").json()["settings"]
+        assert stale_a["kill_switch"] is False
+        assert stale_b["max_position_weight"] == .25
+
+        # B stops simulation after A's last poll. A only intends to change its weight draft.
+        assert other.post("/api/settings", headers=LOCAL, json={"kill_switch": True}).status_code == 200
+        changed_weight = client.post("/api/settings", headers=LOCAL, json={"max_position_weight": .4})
+        assert changed_weight.status_code == 200, changed_weight.text
+        assert changed_weight.json()["kill_switch"] is True
+        assert changed_weight.json()["max_position_weight"] == .4
+
+        # B still knows .25, but its explicit stop toggle must preserve A's new .4 limit.
+        changed_stop = other.post("/api/settings", headers=LOCAL, json={"kill_switch": False})
+        assert changed_stop.status_code == 200, changed_stop.text
+        assert changed_stop.json()["kill_switch"] is False
+        assert changed_stop.json()["max_position_weight"] == .4
+    finally:
+        other.close()
+
+
+@pytest.mark.parametrize("payload", [
+    {}, {"kill_switch": None}, {"max_position_weight": None},
+    {"kill_switch": "false"}, {"kill_switch": False, "mode": "live"},
+    {"max_position_weight": 0}, {"max_position_weight": 1.1},
+])
+def test_invalid_partial_settings_leave_records_and_audit_unchanged(app, client, payload):
+    store = app.state.service.store
+    before = app.state.service.settings(), store.list("experiment"), store.audit_list()
+    response = client.post("/api/settings", headers=LOCAL, json=payload)
+    assert response.status_code == 422, response.text
+    assert (app.state.service.settings(), store.list("experiment"), store.audit_list()) == before
 
 
 @pytest.mark.parametrize("payload", [
@@ -329,9 +374,13 @@ def test_frozen_dataset_cannot_be_rewritten_or_marked_observed(client):
 
 def test_process_recovery_preserves_reservation_and_does_not_retry(app):
     service = app.state.service
-    service.store.put("experiment", {"id": "interrupted-job", "status": "running", "reserved_usd": 0.75, "spent_usd": 0.10})
+    dataset = service.load_demo()
+    request = ExperimentInput(dataset_id=dataset["id"], symbol="DEMO_BOND", provider="none", budget_usd=1)
+    interrupted = service.create_experiment(request.model_dump())
+    interrupted.update(status="running", reserved_usd=0.75, spent_usd=0.10)
+    service.store.put("experiment", interrupted)
     with TestClient(app, raise_server_exceptions=False) as client:
-        response = client.get("/api/experiments/interrupted-job")
+        response = client.get(f"/api/experiments/{interrupted['id']}")
         assert response.status_code == 200
         job = response.json()
         assert job["status"] == "interrupted"

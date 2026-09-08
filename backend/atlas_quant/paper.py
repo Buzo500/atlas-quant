@@ -93,7 +93,7 @@ def _validate_account(account: dict, rule: dict) -> tuple[Decimal, Decimal]:
     for symbol, raw in positions.items():
         size = decimal_value(raw, "paper.position")
         if size != _whole(size):
-            raise ValueError("Paper v0.1 admite acciones enteras.")
+            raise ValueError("La simulación paper admite acciones enteras.")
         if symbol != rule["symbol"] and size:
             raise ValueError("La cuenta paper solo puede contener el símbolo de su estrategia congelada.")
         if symbol == rule["symbol"]:

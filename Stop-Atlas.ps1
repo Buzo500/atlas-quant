@@ -1,5 +1,5 @@
 $ErrorActionPreference = 'Stop'
-$atlasStop = Join-Path $PSScriptRoot 'var/atlas.stop'
-New-Item -ItemType Directory -Path (Split-Path -Parent $atlasStop) -Force | Out-Null
-Set-Content -LiteralPath $atlasStop -Value 'stop' -Encoding ascii
-Write-Output 'Se ha solicitado detener el motor y la interfaz de ATLAS.'
+$atlasPython = Join-Path $PSScriptRoot '.venv/Scripts/python.exe'
+if (-not (Test-Path -LiteralPath $atlasPython)) { throw 'No hay una instalación de ATLAS en esta carpeta.' }
+& $atlasPython (Join-Path $PSScriptRoot 'tools/run_atlas.py') --stop
+exit $LASTEXITCODE

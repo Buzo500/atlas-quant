@@ -176,7 +176,7 @@ def fetch_daily(symbol: str, start: str, end: str | None = None) -> dict[str, An
         raise FeedError(f"La moneda confirmada por Yahoo es {currency!r}. Solo se admite EUR; no se infiere moneda ni se convierte FX.")
     kind = metadata.get("instrumentType")
     if kind not in {"EQUITY", "ETF"}:
-        raise FeedError(f"Tipo de instrumento {kind!r} no admitido o no verificado; v0.1 cubre acciones y ETF.")
+        raise FeedError(f"Tipo de instrumento {kind!r} no admitido o no verificado; ATLAS cubre acciones y ETF.")
     reported_symbol = metadata.get("symbol")
     if reported_symbol is not None and (not isinstance(reported_symbol, str) or reported_symbol.upper() != symbol):
         raise FeedError("El símbolo devuelto por Yahoo difiere del solicitado; revisa el identificador.")

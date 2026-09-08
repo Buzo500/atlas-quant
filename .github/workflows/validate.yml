@@ -1,18 +1,10 @@
 name: Validar ATLAS en Windows
 
-# La candidata se valida al publicar expresamente su etiqueta rc.
-# Comprobar la cuota/bloqueo de gasto antes de publicar cada etiqueta.
+# Validación manual de una rama o al publicar expresamente una etiqueta rc.
+# Comprobar la cuota/bloqueo de gasto antes de cada ejecución.
 # No necesita secretos ni llama a proveedores de IA o datos de mercado.
 on:
   workflow_dispatch:
-    inputs:
-      candidate:
-        description: 'Etiqueta de candidata revisada que se debe validar'
-        required: true
-        type: choice
-        default: v0.2.0-rc.1
-        options:
-          - v0.2.0-rc.1
   push:
     tags:
       - 'v*-rc.*'
@@ -35,7 +27,6 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           persist-credentials: false
-          ref: ${{ inputs.candidate || github.ref }}
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
         with:
           python-version: '3.14.4'
@@ -43,10 +34,14 @@ jobs:
         with:
           node-version: '24.15.0'
           package-manager-cache: false
-      - name: Registrar commit realmente validado
-        run: git rev-parse HEAD
       - name: Instalar pnpm fijado
         run: npm.cmd install --global pnpm@11.19.0
+      - name: Instalar dependencias de frontend fijadas
+        working-directory: frontend
+        run: pnpm.cmd install --frozen-lockfile --prod=false
+      - name: Pruebas de comportamiento del frontend
+        working-directory: frontend
+        run: pnpm.cmd run test:run
       - name: Instalar dependencias y compilar
         run: ./Install-Atlas.ps1
       - name: Pruebas Python con datos aislados
@@ -57,12 +52,13 @@ jobs:
         run: ./.venv/Scripts/python.exe tools/export_contracts.py --check
       - name: Lint de la aplicación mantenida
         working-directory: frontend
-        run: node node_modules/oxlint/bin/oxlint app lib next.config.ts local-server.mjs
+        run: node node_modules/oxlint/bin/oxlint app lib components/atlas features shared test next.config.ts local-server.mjs vitest.config.ts
       - name: Arranque y recorrido sintético mediante el proxy
+        id: runtime
         run: |
           ./Start-Atlas.ps1
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           ./.venv/Scripts/python.exe tools/smoke_local.py
       - name: Parada
-        if: always()
+        if: ${{ always() && (steps.runtime.outcome == 'success' || steps.runtime.outcome == 'failure' || steps.runtime.outcome == 'cancelled') }}
         run: ./Stop-Atlas.ps1

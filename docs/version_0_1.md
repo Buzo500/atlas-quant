@@ -95,6 +95,10 @@ HTTP solo en loopback; Host validado, origen autorizado y cabecera local obligat
 | Rendimiento | Trabajo acotado, un worker, límites de tamaño | Benchmarks de carga y grandes universos |
 | Utilidad/coste | Cartera, laboratorio, CSV y demo sin API de pago | Operativa real y fiscalidad |
 
-## Siguiente hito
+## Siguiente hito vigente
+
+La prioridad aprobada el 06/09/2026 es **v0.2: fiabilidad y distribución local**, seguida de gráficos, datos/contabilidad, análisis y laboratorio. Consultar la [hoja de ruta](hoja_de_ruta.md) y el [plan de v0.2](plan_v0_2.md). Sus mejoras de arranque, compilación y copias se documentan en la [guía operativa](operacion_windows.md); las descripciones anteriores de servidor de desarrollo y ausencia de copias automáticas corresponden a la entrega original v0.1.
+
+### Intención histórica de integración con bróker
 
 Conectar IBKR primero en lectura y cuenta paper, identificar contratos con IDs del bróker, importar posiciones/efectivo/ejecuciones y conciliar antes de enviar órdenes. Después: máquina de estados durable de órdenes, idempotencia, comprobación de sesión y saldo, límites agregados, recuperación de desconexiones y mandato explícito por cuenta. Solo tras esas comprobaciones tendrá sentido habilitar dinero real y automatización. Esta v0.1 no se debe promocionar a real cambiando un booleano.

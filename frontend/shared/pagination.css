@@ -1,0 +1,13 @@
+.table-pagination {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  padding-top: 14px;
+}
+.table-pagination output {
+  color: #62666a;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}

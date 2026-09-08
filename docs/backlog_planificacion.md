@@ -1,10 +1,50 @@
-# ATLAS · Cambios solicitados y plan de aprendizaje
+# ATLAS · Funcionalidades pendientes y planificación
 
-Fecha: 6 de septiembre de 2026. Estado: planificación, sin implementación autorizada en este turno.
+Actualizado: 8 de septiembre de 2026. Estado: planificación, con UI-001 implementado tras autorización expresa; registrar el resto de requisitos no autoriza su implementación.
 
 El usuario solicita guardar tres mejoras para futuras versiones: información al pasar el ratón por los gráficos, velas y otros tipos de gráfico, y una IA que acumule experiencia y aprenda de sus investigaciones. Pide estudiar si conviene entrenarla en local. La elección de arquitectura que aparece aquí es una recomendación del asistente, todavía no una decisión adoptada por el usuario.
 
+Ampliación del 06/09/2026: también solicita enviar estrategias desde el portátil al sobremesa para ejecutarlas durante ausencias y una app móvil para elegir/controlar estrategias y consultar resultados. Se registra exclusivamente como planificación y viabilidad en [ejecucion_remota_movil.md](ejecucion_remota_movil.md), sin cambios al programa. El orden de versiones vigente está en la [hoja de ruta](hoja_de_ruta.md).
+
+Nueva propuesta del 06/09/2026: guardar la regla de entrada del usuario con el oscilador de McClellan y considerar el McClellan Summation Index. Se registra como STRAT-001, candidata de investigación sin implementación ni rentabilidad validada. La prioridad sigue siendo consolidar el núcleo.
+
+Ampliación del 08/09/2026: registrar la dirección visual crema/marfil y cobre, exigir adaptación a pantallas ultrapanorámicas como 3440 × 1440 al implementar el frontend, y añadir informes LaTeX originales de cartera y backtests con fechas seleccionables. Se recogen como UI-001 y REPORT-001. La maqueta publicada es una referencia visual independiente, no la interfaz del programa ya implantada.
+
 Se mantienen las preferencias ya confirmadas: OpenAI y Anthropic seleccionables desde la app, presupuesto inicial cero y presupuesto decidido antes de cualquier consumo de IA; primero en el PC. No se han instalado modelos, lanzado entrenamientos, realizado llamadas pagadas ni modificado el motor o la base SQLite durante esta planificación.
+
+## UI-001 · Rediseño analítico y adaptación ultrapanorámica
+
+**Estado:** implementación autorizada y aplicada el 08/09/2026 en las cinco secciones del programa local. La curva mide su contenedor, las tablas conservan desplazamiento propio y las pantallas anchas distribuyen paneles en columnas. Validación y límites en [frontend_crema_cobre.md](frontend_crema_cobre.md). No equivale a cerrar v0.2 estable.
+
+Dirección visual solicitada: fondo crema, superficies marfil, acentos cobre y texto oscuro; sans serif limpia, cifras tabulares y monoespaciada solo para identificadores técnicos. Jerarquía compacta, tablas protagonistas, formularios claros y gráficos sobrios en azul pizarra. Excluir estética editorial clásica, efectos metálicos y apariencia de terminal de trading. Referencia: [maqueta crema y cobre, con acceso privado](https://atlas-quant-interfaz.patosverdes098.chatgpt.site). Sus cifras son ficticias y no tiene conexión con el motor.
+
+Requisitos de adaptación:
+
+- Diseñar una distribución fluida que aproveche pantallas anchas, con **3440 × 1440** como referencia explícita. Distribuir tablas, gráficos y parámetros en columnas cuando ayude al trabajo, manteniendo una jerarquía clara.
+- Acotar la longitud de textos y formularios; asignar el espacio adicional a contenido que lo aproveche. Mantener tamaños legibles de letra y controles, alineación de cifras y una densidad coherente.
+- Redimensionar los gráficos según el espacio disponible, conservando proporciones útiles, etiquetas y unidades legibles. No deformar las curvas ni escalar el conjunto de la interfaz como una imagen.
+- Adaptar también las cinco secciones actuales —Cartera, Laboratorio, Agente IA, Datos y Ajustes— a ventanas reducidas y pantallas convencionales. Evitar recortes, solapamientos y desplazamiento horizontal de toda la página; permitirlo dentro de tablas cuando sus columnas lo requieran.
+- Conservar los controles, estados y contratos actuales. Este requisito de distribución no implica implementar móvil/PWA, acceso remoto ni los gráficos avanzados del backlog.
+
+**Aceptación prevista:** comprobar las cinco secciones y sus estados vacíos, resultados, formularios desplegados y errores en 3440 × 1440, además de referencias de portátil y escritorio como 1366 × 768, 1920 × 1080 y 2560 × 1440. Probar redimensionado y escalado habitual de Windows/navegador —100 %, 125 % y 150 %— registrando el viewport efectivo en píxeles CSS; la resolución física del monitor no equivale necesariamente al espacio útil del navegador. Mantener navegación por teclado y acceso a todas las acciones. Se ha comprobado el programa en viewports CSS de escritorio y estrechos, incluido 3440 × 1440. El escalado físico de Windows sigue pendiente; ver la evidencia y los límites en [frontend_crema_cobre.md](frontend_crema_cobre.md).
+
+## REPORT-001 · Informes LaTeX de cartera y backtests por fechas
+
+**Estado:** funcionalidad solicitada para planificación, sin implementación autorizada. Encaje propuesto en la exportación reproducible de **v0.6**, reordenable al acotar esa entrega. No es necesaria para cerrar v0.2 ni para aplicar el rediseño visual.
+
+Solicitud del usuario: exportar un documento LaTeX con diseño original de ATLAS que resuma la evolución de la cartera, sus activos y resultados entre fechas elegidas en el momento de exportar; utilizar también este recorrido para resúmenes de backtests.
+
+Alcance y criterios propuestos:
+
+- Elegir el origen del informe —cartera o backtest/experimento— y las fechas de inicio y fin. Mostrar rango solicitado, sesiones realmente disponibles y convención de inclusión de extremos; tratar explícitamente intervalos vacíos, huecos y datos insuficientes.
+- Entregar **fuente `.tex` editable y los recursos locales necesarios** para compilarlo, con plantilla propia coherente con crema/marfil, cobre, sans serif, cifras tabulares y azul pizarra. Adaptar la estética a lectura e impresión. Un PDF compilado es una salida adicional propuesta, no un sustituto del fuente solicitado; concretar ese alcance al implementar.
+- Para cartera: patrimonio inicial/final y evolución, efectivo, aportaciones y retiradas, resultado y rentabilidad del período, posiciones, pesos y movimientos relevantes según los datos disponibles. Reconstruir el estado histórico necesario al inicio, incluidas posiciones abiertas antes de esa fecha; no usar las posiciones actuales para describir el pasado. Recalcular las métricas del intervalo con los flujos y convenciones del motor.
+- Para backtests: identificar estrategia y parámetros, capital, costes, benchmark, curvas, métricas y operaciones del tramo, conservando la distinción entre preparación, selección y prueba reservada. Resumir un tramo de una ejecución existente no reoptimiza ni vuelve a ejecutar la estrategia; debe conservar el estado inicial de ese tramo y diferenciarse de una nueva prueba con otras fechas. Comparar estrategia y benchmark en el mismo período y con supuestos compatibles.
+- Incluir trazabilidad: versión de ATLAS y de la plantilla, conjunto y versión/huella, ejecución o experimento, moneda, fechas, costes, parámetros, convenciones y fecha de generación. Obtener los datos desde una lectura coherente aunque el motor reciba nuevas sesiones. Identificar datos sintéticos y limitaciones del resultado.
+- Generación local con herramientas gratuitas, sin claves ni llamadas a IA o servicios de pago. Tratar nombres, textos e informes como contenido escapado para LaTeX. La plantilla y la compilación no deben ejecutar instrucciones aportadas por los datos.
+- Validar cifras contra el motor para el mismo corte temporal: flujos intermedios, posiciones previas al inicio, días sin sesión y series insuficientes. Comprobar compilación, caracteres españoles, tablas extensas y gráficos legibles. Recortar una curva no permite conservar como si fueran del tramo las métricas de toda la historia.
+
+La selección de motor LaTeX, paquetes, estructura del informe y distribución del paquete exportado se decidirá al acotar la implementación. Registrar esta funcionalidad no instala herramientas ni genera ahora un informe.
 
 ## Pendientes de gráficos
 
@@ -36,6 +76,36 @@ Orden recomendado:
 Cambiar el aspecto del gráfico no cambia los precios usados para fills ni la contabilidad. Heikin-Ashi/Renko y otras transformaciones pueden contener precios sintéticos; las pruebas de ejecución deben seguir usando precios de mercado observados con resolución suficiente. No se promete reconstruir la secuencia intradía de una vela diaria. [Advertencia técnica de TradingView sobre gráficos no estándar](https://in.tradingview.com/support/solutions/43000481029-strategy-produces-unrealistic-results-on-non-standard-chart-types-heikin-ashi-renko-etc/).
 
 No se elige todavía biblioteca de gráficos. Se evaluarán cobertura, rendimiento, accesibilidad, licencia y coste de mantenimiento al implementar; no hace falta construir muchos estilos antes de resolver bien velas e inspección.
+
+## STRAT-001 · Amplitud de mercado: McClellan Oscillator y Summation Index
+
+**Estado:** propuesta del usuario, solo planificación. Encaje propuesto en el catálogo del laboratorio de v0.6, condicionado a datos y especificación; no es un compromiso de entrega ni amplía el alcance actual de v0.2.
+
+### Regla de entrada aportada por el usuario
+
+El usuario indica que ha utilizado esta regla: el oscilador cierra por debajo de −100 y después registra dos cierres entre −100 y 0, generando señal de compra. Formalización de lo confirmado, con `MO` como valor del oscilador al cierre de la sesión:
+
+1. Un cierre con `MO < -100` establece la condición inicial.
+2. Después, dos cierres cumplen `-100 < MO < 0`.
+3. La señal de compra se conoce al cierre de la segunda confirmación. El activo que se compraría aún no está especificado.
+
+Los límites son estrictos: `MO = -100` y `MO = 0` no satisfacen ninguna de esas condiciones. No se presume todavía que las confirmaciones deban ser consecutivas ni inmediatamente posteriores al cierre inferior a −100. Antes de implementar, confirmar esa secuencia, qué invalida/reinicia el recuento, caducidad del estado inicial, rearme y tratamiento de señales repetidas con una posición abierta.
+
+Ejemplo ilustrativo compatible con la regla: `-130 → -80 → -40`, con señal tras la tercera lectura. No define el tratamiento de sesiones intermedias, huecos ni el precio de ejecución. En simulación solo se permitirá ejecutar después de que la señal y los datos necesarios estén disponibles, según los horarios reales de publicación y negociación.
+
+### Indicadores, datos y decisiones pendientes
+
+- El McClellan Oscillator usa amplitud diaria (número de valores que suben y bajan), suavizada mediante dos EMA con constantes 0,10 y 0,05, habitualmente denominadas EMA de 19 y 39 sesiones. No se obtiene aplicando esas medias al precio de un ETF. Identificar universo de amplitud y activo negociado por separado. [Definición de McClellan Financial](https://www.mcoscillator.com/learning_center/kb/mcclellan_oscillator/Calculating_the_McClellan_Oscillator/).
+- Confirmar plataforma/serie usada por el usuario, variante original o ajustada por proporción, escala e inicialización antes de trasladar el umbral −100. Fijar calendario, calentamiento, cobertura histórica, revisiones y disponibilidad temporal. Buscar una fuente gratuita adecuada o admitir importación CSV con procedencia; todavía no se ha verificado ninguna fuente histórica utilizable ni licencia. Los OHLCV actuales por activo no bastan para reconstruir esa amplitud. [Variantes y convenciones de McClellan](https://www.mcoscillator.com/learning_center/weekly_chart/start_point_for_summation_index_does_not_matter/).
+- Considerar el **McClellan Summation Index** como contexto, filtro o variante independiente, sin escoger todavía condición ni umbral. Acumula los valores del oscilador; deben documentarse variante, inicialización y nivel de referencia. [Descripción de ambos indicadores](https://www.mcoscillator.com/learning_center/kb/mcclellan_oscillator/the_mcclellan_oscillator_summation_index/).
+- Consecuencia matemática para diseñar el filtro: si `SI_t = SI_(t-1) + MO_t` sobre la misma serie, las dos confirmaciones con `MO_t < 0` implican descenso diario de `SI`. Exigir simultáneamente que ese mismo Summation Index suba ese día contradiría la entrada. No adoptar ese filtro por defecto; distinguir nivel, pendiente y cambios de pendiente cuando se concrete el diseño.
+- Completar reglas de salida, duración máxima, tamaño de posición, límites de riesgo, costes y siguiente oportunidad de ejecución. Lo aportado define una entrada candidata, no una estrategia completa. No inventar ni optimizar esos parámetros como si fueran parte de la regla original del usuario.
+
+### Validación prevista al desarrollar esta candidata
+
+Reproducir los indicadores frente a una referencia documentada; probar límites exactos, secuencias, reinicios y ausencia de señales duplicadas; impedir el uso de datos publicados después de la decisión. Evaluar la regla original y cualquier filtro del Summation Index como variantes identificadas, con costes, exposición comparable y periodos posteriores reservados. No interpretar la propuesta ni el uso previo del usuario como evidencia de rentabilidad.
+
+No se modifica código, interfaz, base, catálogo ejecutable ni configuración de proveedores al guardar esta idea. Presupuesto de API cero; no se necesita un LLM ni GPU para calcular estos indicadores.
 
 ## AI-001 · Aprendizaje acumulativo: precisar qué debe aprender
 
@@ -126,7 +196,7 @@ La documentación oficial de OpenAI consultada el 06/09/2026 indica que está re
 
 Los datos de la API de OpenAI no se usan por defecto para entrenar sus modelos salvo participación explícita; esto es distinto de la retención de datos y de nuestro propio aprendizaje local. No se presupone que las políticas de todos los proveedores sean idénticas. [Controles de datos](https://developers.openai.com/api/docs/guides/your-data).
 
-## Viabilidad en el PC actual
+## Viabilidad en el portátil original (referencia)
 
 Consulta local de hardware, sin ejecutar modelos: Intel Core Ultra 9 185H, 32 GiB de RAM instalada y NVIDIA RTX 2000 Ada Generation Laptop GPU. `nvidia-smi` informa 8.188 MiB de memoria gráfica total, aproximadamente 8 GiB. La comparación oficial de NVIDIA también especifica 8 GB para el modelo portátil; no confundirlo con tarjetas de escritorio de nombre parecido. [NVIDIA](https://www.nvidia.com/en-gb/products/workstations/professional-laptops/compare/).
 
@@ -150,3 +220,15 @@ No se recomienda comprar otra GPU ni migrar de sistema operativo para este paso.
 | E | Posible ajuste de adaptadores de lenguaje | Fallo concreto no resuelto por contexto/prompts y mejora demostrada en evaluación separada |
 
 Las etapas no tienen fecha de inicio aprobada. La planificación no inicia trabajos en segundo plano ni experimentos pagados. Las horas de desarrollo y costes se estimarán al acotar cada etapa; no se fija ahora un calendario de meses que presuponga que el mercado ofrecerá suficiente evidencia.
+
+## REMOTE-001 · Enviar experimentos al sobremesa
+
+Crear una ejecución desde el portátil, confirmar su aceptación y dejar que continúe en el sobremesa al cerrar o apagar el portátil. Consultar y controlar después el mismo trabajo mediante acceso privado autenticado; conservar datos, estrategia, parámetros y versiones, con prevención de duplicados, límites de recursos y recuperación de interrupciones. El servidor mantiene su propia base; no sincronizar dos SQLite activas. Los backtests actuales no utilizan la GPU.
+
+Estado: solicitado para el backlog, sin implementación autorizada. Ubicación propuesta: v0.8, reordenable. Criterio central: perder conexión o repetir una petición no duplica trabajo ni gasto y el estado se puede recuperar de forma verificable. Detalle en [ejecucion_remota_movil.md](ejecucion_remota_movil.md).
+
+## MOBILE-001 · Aplicación móvil de consulta y control
+
+Elegir estrategias, iniciar/pausar/reanudar/cancelar experimentos, consultar progreso y rendimiento con fecha de actualización, revisar simulación y recibir avisos opcionales. Propuesta inicial: web adaptada e instalable como PWA que comparte el motor del sobremesa. Las órdenes reales siguen dependiendo de integración con bróker, conciliación, autorización y límites de v1.2/v1.3.
+
+Estado: solicitado para el backlog, sin implementación autorizada; no existe hoy una app móvil de ATLAS. Ubicación propuesta: v0.9. Criterio central: comportamiento fiable al perder cobertura, acciones confirmadas por el servidor y validación en el móvil concreto; el teléfono no mantiene los cálculos en segundo plano. Detalle en [ejecucion_remota_movil.md](ejecucion_remota_movil.md).
