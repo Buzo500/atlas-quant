@@ -1,10 +1,10 @@
 # ATLAS Quant · Operación en Windows
 
-Guía actualizada el 8 de septiembre de 2026 para esta instalación local. La candidata **v0.2.0-rc.2 está en preparación**; rc.1 se conserva como referencia histórica. La [PR #1](https://github.com/Buzo500/atlas-quant/pull/1) está fusionada en `master`, commit `e1f6e020a1d75a81bff97eefcbebe726d47bcdb3`. La nueva CI y la comprobación del escalado físico de Windows al 125 % y 150 % siguen pendientes. El ensayo de 48 horas y su seguimiento continúan aplazados. Esta guía no constituye el cierre de v0.2; el estado de validación está en [CONTINUIDAD](CONTINUIDAD.md) y los criterios pendientes, en el [plan de v0.2](plan_v0_2.md).
+Guía actualizada el 8 de septiembre de 2026. **v0.2.0-rc.2 es una candidata con CI verificada, no estable.** La [CI 34249730107](https://github.com/Buzo500/atlas-quant/actions/runs/34249730107) valida `412918b5e9067e44f293b0633068ca932a472d64`: 446 Python y 91 subtests, 140 Vitest, cinco E2E, instalación limpia, compilación, contratos, tipos, lint, dependencias, smoke, arranque y parada correctos. El cierre posterior solo modifica documentación; integración mediante la [PR #2](https://github.com/Buzo500/atlas-quant/pull/2) y etiqueta `v0.2.0-rc.2` según el procedimiento autorizado.
 
-El recorrido habitual usa Windows nativo, el motor Python y la interfaz compilada. No necesita WSL, CUDA, claves de API ni presupuesto de pago. El modo de ejecución sigue siendo exclusivamente simulado.
+ATLAS normal está arrancado; los entornos E2E están cerrados y la base habitual conserva su contenido. El recorrido usa Windows nativo, motor Python e interfaz compilada; no requiere WSL, CUDA, claves ni presupuesto de pago. La ejecución es exclusivamente simulada.
 
-Validación local de rc.2 previa a CI: 446 pruebas Python y 91 subtests, 140 pruebas de interfaz y cinco E2E superados; comprobaciones de tipos, contratos, lint, dependencias y compilación correctas. La base habitual conserva el contenido de su copia de referencia. ATLAS normal y el entorno manual están detenidos en este punto; CI, etiqueta rc.2 y escalado físico siguen pendientes. El control de Windows bloqueó el intento de cambiar la escala al no identificar una URL de confianza; no se alteró el 100 % observado. Evidencia y límites en [candidata_v0_2.md](candidata_v0_2.md).
+El escalado físico 125 %/150 % sigue pendiente: el control de Windows bloqueó el cambio y se mantuvo el 100 % inicial. Los 35 viewports CSS anteriores no lo sustituyen. Ensayo de 48 horas y seguimiento aplazados. Evidencia, arranques e incidencias históricas en [CONTINUIDAD](CONTINUIDAD.md) y [candidata_v0_2.md](candidata_v0_2.md).
 
 ## Iniciar, consultar el estado y detener
 

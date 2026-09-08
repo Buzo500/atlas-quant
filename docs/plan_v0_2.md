@@ -1,10 +1,8 @@
 # ATLAS Quant · Plan de v0.2
 
-**Estado actual · 8 de septiembre de 2026:** candidata `0.2.0-rc.2` **en preparación**. La [PR #1](https://github.com/Buzo500/atlas-quant/pull/1) está fusionada en `master`, commit `e1f6e020a1d75a81bff97eefcbebe726d47bcdb3`. Este bloque añade recorridos de integración/E2E y correcciones de teclado, foco y anuncios accesibles. La nueva CI y la comprobación del escalado físico de Windows al 125 % y 150 % siguen pendientes. El ensayo de 48 horas y su seguimiento continúan aplazados; v0.2 no es estable.
+**Estado actual · 8 de septiembre de 2026:** candidata `0.2.0-rc.2` **con CI verificada**, no v0.2 estable. La [CI 34249730107](https://github.com/Buzo500/atlas-quant/actions/runs/34249730107) valida fuentes, pruebas y workflow de `412918b5e9067e44f293b0633068ca932a472d64`: 446 pruebas Python y 91 subtests, 140 Vitest y cinco E2E; instalación limpia, compilación, contratos, TypeScript, lint, dependencias, smoke, arranque y parada correctos. El cierre posterior solo modifica documentación. La integración por la [PR #2](https://github.com/Buzo500/atlas-quant/pull/2) y la etiqueta `v0.2.0-rc.2` siguen el procedimiento autorizado.
 
-La candidata `0.2.0-rc.1` y sus comprobaciones se conservan como evidencia histórica en [candidata_v0_2.md](candidata_v0_2.md). Las cifras de los bloques anteriores no certifican por sí solas las fuentes de rc.2.
-
-**Cierre local previo a CI:** 446 pruebas Python y 91 subtests, 140 Vitest y cinco E2E con API real y Chromium superados; TypeScript, contratos, lint, `pip check` y compilación correctos. Se han corregido el foco, los anuncios por sondeo, la identificación de procesos E2E y el aislamiento antes de la colección de pytest. La base habitual conserva el contenido completo de la copia de referencia. El control automatizado de Windows bloqueó el cambio de escala; 125 %/150 % continúan sin validar y no se sustituyen por los 35 viewports CSS históricos. ATLAS y el entorno manual están detenidos antes del commit; la etiqueta rc.2 queda condicionada a su CI. Detalles e incidencias preservadas en el registro de candidata.
+Se han corregido foco, anuncios por sondeo, identificación de procesos E2E y aislamiento previo a colección de pytest. ATLAS normal está arrancado; los entornos de prueba están cerrados y la base habitual conserva su contenido. El escalado físico de Windows al 125 % y 150 % sigue pendiente; los 35 viewports CSS históricos no lo sustituyen. El ensayo de 48 horas y su seguimiento permanecen aplazados. La candidata rc.1, la primera CI fallida de rc.2 y sus correcciones se conservan en [candidata_v0_2.md](candidata_v0_2.md).
 
 Fecha: 6 de septiembre de 2026. Estado: implementación inicial completada y probada localmente; cierre de v0.2 pendiente. Este documento define los criterios de aceptación; la evidencia ejecutada se recoge en la [auditoría](auditoria_v0_2.md).
 
@@ -28,7 +26,7 @@ Se conservan demo y proveedor `none`, sin claves y con gasto cero. Quedan fuera 
 
 ## Hitos pequeños y verificables
 
-Los hitos describen unidades de aceptación. H0–H4 tienen implementación y evidencia local; H5 cuenta con instalación independiente y [CI de Windows superada para la revisión anterior `3f1d990`](https://github.com/Buzo500/atlas-quant/actions/runs/34241300060). La CI de rc.2 todavía debe ejecutarse sobre sus fuentes identificadas. H6 continúa pendiente: el ensayo de 48 horas y su seguimiento están aplazados y v0.2 no se declara estable. Consultar la auditoría para los escenarios concretos comprobados y sus límites.
+Los hitos describen unidades de aceptación. H0–H4 tienen implementación y evidencia local; H5 cuenta con instalación independiente y [CI de Windows superada para la revisión anterior `3f1d990`](https://github.com/Buzo500/atlas-quant/actions/runs/34241300060). La CI de rc.2 está verificada para `412918b`, con instalación limpia y E2E remoto correctos. H6 continúa pendiente: el ensayo de 48 horas y su seguimiento están aplazados y v0.2 no se declara estable. Consultar la auditoría para los escenarios concretos comprobados y sus límites.
 
 | Hito | Cambio concreto | Criterios de aceptación |
 |---|---|---|
