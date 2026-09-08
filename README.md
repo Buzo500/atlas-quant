@@ -1,6 +1,6 @@
 # ATLAS Quant
 
-Motor e interfaz **v0.2.0-rc.1**, candidata pendiente de cierre; no es todavía v0.2 estable. El [registro de candidata](docs/candidata_v0_2.md) identifica sus comprobaciones y el ensayo sostenido. La [hoja de ruta](docs/hoja_de_ruta.md) recoge las versiones previstas y el [plan de v0.2](docs/plan_v0_2.md) sus criterios de cierre. El historial de cambios está en [CHANGELOG.md](CHANGELOG.md).
+Versión vigente en preparación: **0.2.0-rc.2**. No es todavía v0.2 estable. El [registro de candidata](docs/candidata_v0_2.md) identifica las fuentes y comprobaciones de cada revisión, incluida la candidata histórica rc.1. La [hoja de ruta](docs/hoja_de_ruta.md) recoge las versiones previstas y el [plan de v0.2](docs/plan_v0_2.md) sus criterios de cierre. El historial de cambios está en [CHANGELOG.md](CHANGELOG.md).
 
 Aplicación local para analizar una cartera en EUR, comparar estrategias de acciones/ETF y ejecutar experimentos acotados con OpenAI o Anthropic. Incluye simulación de órdenes; no está conectada a ningún bróker.
 
@@ -12,7 +12,7 @@ Para trabajar en otro equipo: [traslado al sobremesa y conversación nueva en Co
 
 Interfaz local actual: [diseño crema y cobre, adaptación ultrapanorámica y validación](docs/frontend_crema_cobre.md). Incluye las cinco secciones existentes; los informes LaTeX siguen en planificación.
 
-Consolidación posterior: [nueve mejoras de fiabilidad, trazabilidad y pruebas del frontend](docs/frontend_consolidacion.md). Incluye confirmaciones vinculadas al CSV revisado, resultados identificados, consultas con recuperación, borradores entre pestañas, formatos comunes y tablas paginadas. **CI de Windows superada el 08/09/2026 para `3f1d990`**: [ejecución y resultados](https://github.com/Buzo500/atlas-quant/actions/runs/34241300060), con **421 pruebas del motor, 91 subtests y 126 pruebas de interfaz**, instalación limpia, compilación, contratos, arranque y parada. La revisión local añade 35 comprobaciones de tamaño en navegador. El ensayo sostenido de 48 horas sigue aplazado; v0.2 aún no es estable.
+Consolidación posterior: [nueve mejoras de fiabilidad, trazabilidad y pruebas del frontend](docs/frontend_consolidacion.md), más correcciones de foco, anuncios de estado y aislamiento de pruebas. **Validación local de rc.2:** 446 pruebas del motor y 91 subtests, 140 pruebas de interfaz y cinco recorridos E2E con Chromium y API real; TypeScript, contratos, lint, dependencias y compilación correctos. La base habitual conserva el contenido de su copia de referencia. La nueva CI, la etiqueta rc.2 y el escalado físico de Windows al 125 % y 150 % siguen pendientes. Las 35 comprobaciones anteriores de viewports CSS no acreditan ese escalado; el ensayo de 48 horas y su seguimiento permanecen aplazados. [Evidencia, incidencias y límites](docs/candidata_v0_2.md).
 
 ## Abrir la aplicación
 
@@ -60,14 +60,16 @@ Si se cumplen los criterios, activaste la simulación automática y la parada gl
 
 ## Estado y validación
 
-- Candidata **0.2.0-rc.1**: **368 pruebas y 91 subtests superados** en Windows, dos avisos anteriores; TypeScript, contratos, lint de aplicación, dependencias y build verificado correctos. El [registro de candidata](docs/candidata_v0_2.md) distingue estas pruebas locales de la CI y del ensayo de 48 horas.
+- **0.2.0-rc.2 en preparación:** 446 pruebas Python y 91 subtests (38,34 s, dos avisos previos), 140 pruebas Vitest en 15 archivos (13,34 s) y 5/5 E2E (9,6 s), ejecutados localmente. CI y etiqueta pendientes, sin cierre estable. La [CI histórica de `3f1d990`](https://github.com/Buzo500/atlas-quant/actions/runs/34241300060) y rc.1 se conservan como antecedentes; consultar el [registro de candidata](docs/candidata_v0_2.md) para las fuentes y recorridos realmente comprobados.
 
-- Consolidación previa del núcleo de v0.2 en el sobremesa: **328 pruebas y 91 subtests superados**. Corregidas las escrituras concurrentes, pausa/cancelación durante cálculo, aplicación atómica de límites y recuperación de ejecuciones. Contratos OpenAPI/TypeScript comprobados, lint de aplicación y compilación correctos. La demo conserva datos y resultados con presupuesto cero. Garantías y deuda pendiente en [consolidación del núcleo](docs/consolidacion_core.md); validación operativa previa en la [auditoría de v0.2](docs/auditoria_v0_2.md). GitHub Actions está preparado con activación manual; todavía no se ha ejecutado.
+- Candidata histórica **0.2.0-rc.1**: **368 pruebas y 91 subtests superados** en Windows, dos avisos anteriores; TypeScript, contratos, lint de aplicación, dependencias y build verificado correctos. Su CI y el ensayo interrumpido se conservan en el registro de candidata.
+
+- Consolidación previa del núcleo de v0.2 en el sobremesa: **328 pruebas y 91 subtests superados**. Corregidas las escrituras concurrentes, pausa/cancelación durante cálculo, aplicación atómica de límites y recuperación de ejecuciones. Contratos OpenAPI/TypeScript comprobados, lint de aplicación y compilación correctos. La demo conservó datos y resultados con presupuesto cero. Garantías y deuda pendiente en [consolidación del núcleo](docs/consolidacion_core.md); validación operativa previa en la [auditoría de v0.2](docs/auditoria_v0_2.md). Estas cifras corresponden al bloque local anterior a las ejecuciones posteriores de GitHub Actions.
 - Portátil: 167 pruebas automatizadas y 91 subtests superados en la revisión original de v0.1, con dos avisos de deprecación de TestClient; compilación, TypeScript y recuperación tras reinicio comprobados.
 - Sobremesa, 06/09/2026: 167 pruebas y 91 subtests superados de nuevo, con los mismos dos avisos; compilación y TypeScript comprobados. Motor y proxy local responden correctamente. Se han probado en navegador la cartera de demostración, la comparación del Laboratorio y el informe de un experimento sin IA, con presupuesto, gasto y reserva cero. Parada, reinicio, persistencia e integridad SQLite comprobados; detalles en [CONTINUIDAD.md](docs/CONTINUIDAD.md).
 - La descarga real de SXR8.DE se verificó en el portátil, con corte explícito anterior al 04/09/2026: 932 barras EUR. La consulta incluyendo el 04/09 falló correctamente porque Yahoo devolvió un cierre ausente con volumen; no se inventó el dato. Ese símbolo fue una prueba técnica, no una recomendación de inversión. La instalación del sobremesa se ha probado con datos sintéticos.
 - El soporte WebMCP es opcional y no se ha validado en un navegador compatible.
-- No se ha realizado una prueba sostenida de 48 horas, una llamada real a los modelos ni una conexión con IBKR.
+- No se ha completado satisfactoriamente el ensayo sostenido de 48 horas; su repetición sigue aplazada. No se ha realizado una llamada real a los modelos ni una conexión con IBKR.
 
 Detalles, limitaciones y próximos hitos: [guía de v0.1](docs/version_0_1.md).
 

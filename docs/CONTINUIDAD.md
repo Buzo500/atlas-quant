@@ -2,7 +2,25 @@
 
 Actualizado: 8 de septiembre de 2026. Este documento resume decisiones y estado para una conversación nueva de Codex; no contiene la transcripción completa del chat original.
 
-## Solicitud actual: CI de la revisión
+## Estado actual: rc.2 en preparación
+
+El usuario ha retomado los pendientes de integración/E2E, teclado y escalado. **Motor e interfaz locales se identifican como `0.2.0-rc.2`; la candidata está en preparación y no es v0.2 estable.** Rama de trabajo: `codex/v0.2.0-rc.2`. La [PR #1](https://github.com/Buzo500/atlas-quant/pull/1) ya está fusionada en `master`, commit `e1f6e020a1d75a81bff97eefcbebe726d47bcdb3`. La etiqueta rc.1 y sus resultados se conservan como historia; su CI no valida los cambios actuales de rc.2.
+
+**Validación local final del bloque:** 446 pruebas Python y 91 subtests en 38,34 s, con dos avisos previos; 140 pruebas Vitest en 15 archivos, en 13,34 s; cinco recorridos E2E en 9,6 s. TypeScript, contratos, lint, `pip check` y compilación con manifiesto correctos. Son resultados del sobremesa, no de CI de rc.2. La suite Python utiliza `ATLAS_DATA_DIR` explícito y, además, un `conftest.py` que aísla el directorio antes de recoger e importar módulos de prueba.
+
+Están implementadas y comprobadas las correcciones de foco al importar datos, crear un experimento y confirmar movimientos; el mensaje de éxito del ledger sobrevive al refresco de versión. `QueryStatus` conserva la hora visible fuera de los anuncios accesibles y anuncia carga inicial, errores, recuperación y reintento sin repetir cada sondeo normal.
+
+**E2E automatizado superado:** `var/validation/e2e-7e176e2037584e4983d8e2b53428724e`, cinco recorridos con interfaz compilada, API real y Chromium, sin respuestas simuladas. Ambos servidores terminaron con código 0, puertos libres, integridad `ok` y hashes de la base habitual conservados. El primer intento falló antes del navegador al comparar el PID del lanzador de Python con el del intérprete; ahora se comprueba pertenencia al Job Object específico del servidor. Se mantienen el resultado y los logs fallidos.
+
+La base habitual tiene el mismo contenido completo, esquema, secuencias y 539 registros de auditoría que la copia `backups/atlas-20260908T151716582043Z-af195afe`, con integridad correcta. En copias aisladas se reprodujo que una apertura SQLite `mode=ro` puede crear WAL/SHM y una importación posterior de la aplicación puede retirarlos sin modificar los datos. Es una explicación compatible con la diferencia de hash del primer intento, **no una atribución concluyente**: aquel registro no conservaba los hashes individuales. El ejecutor registra ahora el inventario de hashes antes y después y rechaza cierres o comprobaciones de integridad incorrectos.
+
+**Escalado físico 125 %/150 % no validado.** La herramienta de control de Windows bloqueó la operación al no poder identificar una URL de confianza; no se cambió la escala. Se observó una escala inicial del 100 %, monitor 1 de 2560 × 1440 y monitor 2 ultrapanorámico de 3440 píxeles de ancho. Las 35 comprobaciones anteriores de viewports CSS no sustituyen esta revisión. El entorno manual `e2e-0de1cebd856c4115984403a8086dc09e` terminó con resultado 0, base habitual intacta y puertos libres; **no se realizó ninguna interacción de UI manual** en él.
+
+**Estado operativo previo al commit y la CI: ATLAS detenido.** La nueva CI de rc.2 está pendiente y su etiqueta queda condicionada al resultado; no se presenta como publicada ni estable. El ensayo sostenido de 48 horas y su seguimiento permanecen aplazados. Se mantiene presupuesto cero, sin claves ni llamadas pagadas. El arranque habitual y el resultado de CI se registrarán cuando se ejecuten.
+
+Los apartados siguientes conservan estados y validaciones históricos. Sus referencias a una aplicación arrancada o a rc.1 describen aquellas entregas; para el estado actual prevalece este apartado.
+
+## Histórico · CI de la revisión anterior a rc.2
 
 El usuario autorizó ejecutar la CI. **Completada el 08/09/2026** para `3f1d990ac15c391e638302828d1a720d99d78003`, en `codex/fix-local-health-resources`: [GitHub Actions, ejecución 34241300060](https://github.com/Buzo500/atlas-quant/actions/runs/34241300060). La rama está subida; se conservan `master` y la etiqueta original `v0.2.0-rc.1`. Los cambios posteriores que registran esta evidencia son exclusivamente documentales; el SHA citado identifica las fuentes, pruebas y workflow realmente ejecutados.
 

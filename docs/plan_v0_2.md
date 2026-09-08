@@ -1,6 +1,10 @@
 # ATLAS Quant · Plan de v0.2
 
-**Cierre posterior:** preparada la candidata `0.2.0-rc.1`; seguimiento y evidencia del commit en [candidata_v0_2.md](candidata_v0_2.md). Las cifras y el estado del motor citados abajo corresponden al bloque anterior. La condición estable sigue pendiente de sus comprobaciones de cierre.
+**Estado actual · 8 de septiembre de 2026:** candidata `0.2.0-rc.2` **en preparación**. La [PR #1](https://github.com/Buzo500/atlas-quant/pull/1) está fusionada en `master`, commit `e1f6e020a1d75a81bff97eefcbebe726d47bcdb3`. Este bloque añade recorridos de integración/E2E y correcciones de teclado, foco y anuncios accesibles. La nueva CI y la comprobación del escalado físico de Windows al 125 % y 150 % siguen pendientes. El ensayo de 48 horas y su seguimiento continúan aplazados; v0.2 no es estable.
+
+La candidata `0.2.0-rc.1` y sus comprobaciones se conservan como evidencia histórica en [candidata_v0_2.md](candidata_v0_2.md). Las cifras de los bloques anteriores no certifican por sí solas las fuentes de rc.2.
+
+**Cierre local previo a CI:** 446 pruebas Python y 91 subtests, 140 Vitest y cinco E2E con API real y Chromium superados; TypeScript, contratos, lint, `pip check` y compilación correctos. Se han corregido el foco, los anuncios por sondeo, la identificación de procesos E2E y el aislamiento antes de la colección de pytest. La base habitual conserva el contenido completo de la copia de referencia. El control automatizado de Windows bloqueó el cambio de escala; 125 %/150 % continúan sin validar y no se sustituyen por los 35 viewports CSS históricos. ATLAS y el entorno manual están detenidos antes del commit; la etiqueta rc.2 queda condicionada a su CI. Detalles e incidencias preservadas en el registro de candidata.
 
 Fecha: 6 de septiembre de 2026. Estado: implementación inicial completada y probada localmente; cierre de v0.2 pendiente. Este documento define los criterios de aceptación; la evidencia ejecutada se recoge en la [auditoría](auditoria_v0_2.md).
 
@@ -24,7 +28,7 @@ Se conservan demo y proveedor `none`, sin claves y con gasto cero. Quedan fuera 
 
 ## Hitos pequeños y verificables
 
-Los hitos describen unidades de aceptación. H0–H4 tienen implementación y evidencia local; H5 cuenta con instalación independiente y [CI de Windows superada para `3f1d990`](https://github.com/Buzo500/atlas-quant/actions/runs/34241300060). H6 continúa pendiente: el ensayo de 48 horas está aplazado y v0.2 no se declara estable. Consultar la auditoría para los escenarios concretos comprobados y sus límites.
+Los hitos describen unidades de aceptación. H0–H4 tienen implementación y evidencia local; H5 cuenta con instalación independiente y [CI de Windows superada para la revisión anterior `3f1d990`](https://github.com/Buzo500/atlas-quant/actions/runs/34241300060). La CI de rc.2 todavía debe ejecutarse sobre sus fuentes identificadas. H6 continúa pendiente: el ensayo de 48 horas y su seguimiento están aplazados y v0.2 no se declara estable. Consultar la auditoría para los escenarios concretos comprobados y sus límites.
 
 | Hito | Cambio concreto | Criterios de aceptación |
 |---|---|---|
@@ -46,6 +50,7 @@ Orden recomendado: H0 → H1 → H2; diseñar H3/H4 conjuntamente para que la ac
 | **Actualización desde v0.1** | Copia coherente de una base v0.1, con inventario de IDs, saldos, datos, controles y estado de experimentos. Aplicar actualización, verificar integridad y comparar invariantes; repetir el inicio. Conservar código y copia de partida para la vuelta atrás. |
 | **Restauración** | Generar copia con estado identificable, restaurarla en destino aislado y comprobar integridad y contenido. Probar rechazo de copia corrupta/incompatible y restauración con instancia activa. No sustituir la única base del usuario para probar. |
 | **Fallos controlados** | Doble arranque, puerto ocupado por tercero, proceso terminado, PID/registro obsoleto, dependencia o build ausente, fallo de migración y destino de copia no escribible. Verificar limpieza, mensajes y ausencia de duplicación de trabajo. |
+| **Integración y E2E de rc.2** | Interfaz compilada y API real, navegador Chromium, una base nueva por ejecución en `var/validation/e2e-UUID`. Verificar los recorridos de datos, Laboratorio y experimentos sintéticos, contratos, controles y recuperación de errores. Comprobar teclado, foco tras operaciones asíncronas y anuncios sin repetición por sondeo. Registrar aparte el escalado físico de Windows al 125 % y 150 %, todavía pendiente; un viewport CSS no lo sustituye. Procedimiento en [operacion_windows.md](operacion_windows.md#validación-e2e-aislada). |
 | **Prueba sostenida** | Fijar duración, muestreo y umbrales antes de empezar. La v0.1 citaba 48 h como prueba pendiente; la duración de la candidata se concretará y quedará registrada. Usar demo, `provider: none`, sin fuentes de red ni llamadas pagadas. Medir salud, recursos, errores, copias y persistencia; incluir parada/reinicio al final. Una comprobación corta no sustituye esta prueba. |
 
 Las pruebas de fallos y escrituras usan datos aislados. No se termina un proceso ajeno ni se altera una cartera de uso para probar recuperación. Las copias, registros y resultados locales van en rutas excluidas de Git; la documentación conserva resultados resumidos y trazables sin secretos.

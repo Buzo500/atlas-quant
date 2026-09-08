@@ -1,16 +1,38 @@
-# Candidata v0.2.0-rc.1
+# Candidata v0.2 · Registro de preparación y evidencia
 
-Preparación autorizada el 6 de septiembre de 2026. **No es una entrega estable.** El código de motor, OpenAPI, salud e interfaz usa `0.2.0-rc.1`; la etiqueta de candidata identifica el commit que se valida. No confundir esta etiqueta con `v0.2.0`, que requiere cerrar H5/H6.
+## Estado actual · 0.2.0-rc.2 en preparación
+
+Estado previo al commit y la CI del 8 de septiembre de 2026. Motor e interfaz locales usan **`0.2.0-rc.2`**, en la rama `codex/v0.2.0-rc.2`; **no se declara v0.2 estable**. La [PR #1](https://github.com/Buzo500/atlas-quant/pull/1) está fusionada en `master`, commit `e1f6e020a1d75a81bff97eefcbebe726d47bcdb3`. Se conserva la candidata rc.1 y la trazabilidad de sus resultados. La CI histórica no se atribuye a las fuentes nuevas de rc.2; la nueva etiqueta queda condicionada a superar su CI.
+
+| Comprobación | Estado de este punto |
+|---|---|
+| Pruebas locales | **446 pruebas Python + 91 subtests** en 38,34 s, dos avisos previos; **140 pruebas Vitest en 15 archivos** en 13,34 s. TypeScript, contratos, lint, `pip check` y compilación con manifiesto correctos. Son resultados locales, no de CI de rc.2. |
+| Teclado, foco y anuncios | Correcciones implementadas y cubiertas por pruebas de componentes: destinos de foco persistentes tras importar datos, crear experimentos y confirmar movimientos; respeto al cambio de campo o sección durante una espera; mensaje de éxito del ledger conservado al refrescar la versión. `QueryStatus` mantiene las horas fuera de la región viva y evita anunciar sondeos normales. El E2E automatizado comprueba navegación por teclado y foco visible; no equivale a una auditoría con lector de pantalla. |
+| Integración/E2E | **5/5 recorridos superados en 9,6 s**, ejecución `e2e-7e176e2037584e4983d8e2b53428724e`: interfaz compilada, API real y Chromium; salidas de ambos servidores 0, puertos libres, hashes habituales intactos e integridad `ok`. Primer intento fallido antes del navegador conservado; corregida la identificación del intérprete por pertenencia al grupo de procesos propio. |
+| Aislamiento de pytest | `conftest.py` fija una base temporal antes de recoger los módulos; dos regresiones verifican la colección con y sin `ATLAS_DATA_DIR` heredado. La suite final usa además un directorio explícito. |
+| Conservación de la base habitual | Integridad y contenido completo, esquema, secuencias y 539 eventos de auditoría iguales a `backups/atlas-20260908T151716582043Z-af195afe`. El run E2E correcto registra igualdad de hashes antes/después. La diferencia de archivos WAL/SHM del primer intento tiene una reproducción compatible en copias, sin atribución concluyente de su causa original. |
+| Windows 125 % y 150 % | **No validado.** El control de Windows bloqueó la operación porque no pudo identificar una URL de confianza; no se cambió la escala inicial del 100 %. Monitor 1: 2560 × 1440; monitor 2: ultrapanorámico de 3440 píxeles de ancho. Las 35 comprobaciones históricas de viewports CSS no sustituyen el escalado físico. |
+| Entorno manual | `e2e-0de1cebd856c4115984403a8086dc09e` detenido con resultado 0, base habitual intacta y puertos libres. No se realizó ninguna interacción de UI manual. |
+| CI de rc.2 | Pendiente de ejecución sobre fuentes identificadas. |
+| H6 / ensayo sostenido | Ensayo de 48 horas y seguimiento aplazados; este bloque no los reinicia. |
+
+**ATLAS está detenido antes del commit y la CI.** La CI de rc.2 y la publicación de su etiqueta todavía no se presentan como completadas. Se mantiene presupuesto cero, sin claves ni llamadas de pago. Los registros E2E están en `var/validation/`; se conservan también los intentos fallidos. La apertura SQLite con `mode=ro` creó WAL/SHM en copias y una importación posterior de la aplicación los retiró sin cambiar el contenido. El primer intento no conservó hashes individuales: esta reproducción es compatible con aquella diferencia, pero no demuestra su causa. El cierre actual registra cada hash y falla ante integridad, salidas de servidores o liberación de puertos incorrectas.
+
+## Histórico · Candidata v0.2.0-rc.1
+
+Los apartados siguientes describen la preparación y los resultados anteriores a rc.2. Las versiones, ramas, arranques y CI citados pertenecen a esos momentos; el estado vigente figura arriba.
+
+Preparación autorizada el 6 de septiembre de 2026. **No fue una entrega estable.** El código de motor, OpenAPI, salud e interfaz de esa candidata usaba `0.2.0-rc.1`; su etiqueta identifica el commit validado. No confundir esa etiqueta con `v0.2.0`, que requiere cerrar H5/H6.
 
 **Actualización del 8 de septiembre:** la CI de `ef75b7b` pasó, pero el ensayo falló tras 3.900 segundos válidos por agotamiento de archivos abiertos en el supervisor. Se corrigen las conexiones de comprobación HTTP en `codex/fix-local-health-resources`; la etiqueta original permanece intacta. El usuario ha aplazado expresamente el siguiente ensayo y el seguimiento sigue pausado. Posteriormente se recompiló la interfaz y arrancó ATLAS para uso normal. Detalle vigente en [CONTINUIDAD.md](CONTINUIDAD.md).
 
 **Frontend del 08/09/2026:** aplicado el rediseño crema y cobre con autorización del usuario. Las comprobaciones locales de [frontend_crema_cobre.md](frontend_crema_cobre.md) corresponden al árbol modificado, no al SHA de la CI anterior. Identificar y validar de nuevo la candidata que incluya estos cambios antes de repetir el ensayo. No se ha iniciado otro seguimiento ni publicado una versión estable.
 
-## Recorrido de cierre
+## Histórico · Recorrido de cierre de rc.1 y revisión posterior
 
-**CI vigente superada:** `3f1d990ac15c391e638302828d1a720d99d78003`, rama `codex/fix-local-health-resources`, [ejecución 34241300060](https://github.com/Buzo500/atlas-quant/actions/runs/34241300060), del 08/09/2026. El checkout y el resultado del workflow corresponden a ese SHA: 421 pruebas Python y 91 subtests (19,01 s), 126 pruebas de interfaz (37,77 s), instalación limpia, build con manifiesto, TypeScript, contratos, lint, arranque, smoke sintético y parada correctos. No se cambia la etiqueta original. Los commits posteriores que solo registran esta evidencia no modifican las fuentes validadas.
+**CI histórica superada, previa a rc.2:** `3f1d990ac15c391e638302828d1a720d99d78003`, rama `codex/fix-local-health-resources`, [ejecución 34241300060](https://github.com/Buzo500/atlas-quant/actions/runs/34241300060), del 08/09/2026. El checkout y el resultado del workflow corresponden a ese SHA: 421 pruebas Python y 91 subtests (19,01 s), 126 pruebas de interfaz (37,77 s), instalación limpia, build con manifiesto, TypeScript, contratos, lint, arranque, smoke sintético y parada correctos. No se cambia la etiqueta original. Los commits posteriores que solo registraban esta evidencia no modificaban las fuentes de aquella validación.
 
-La consolidación posterior del frontend añade pruebas y modifica los contratos de movimientos, investigación manual y ajustes. Su [validación local](frontend_consolidacion.md) incluye revisión de navegador y conservación de la base del sobremesa; la CI comprueba el recorrido HTTP, sin automatizar navegador. H5 dispone de CI para la revisión actual; **H6 y el ensayo de 48 horas continúan aplazados**. El recorrido original de preparación se conserva a continuación como referencia; no autoriza iniciar ahora el ensayo.
+La consolidación posterior del frontend añadió pruebas y modificó los contratos de movimientos, investigación manual y ajustes. Su [validación local](frontend_consolidacion.md) incluyó revisión de navegador y conservación de la base del sobremesa; aquella CI comprobó el recorrido HTTP, sin automatizar navegador. H5 disponía de CI para esa revisión; **H6 y el ensayo de 48 horas continuaban aplazados**. El recorrido original de preparación se conserva a continuación como referencia histórica; no autoriza iniciar ahora el ensayo.
 
 1. Guardar y revisar las fuentes en la rama `codex/v0.2.0-rc.1`, conservando `master` y el punto anterior `97520b8`.
 2. Ejecutar pruebas, contratos, TypeScript, lint de aplicación y compilación verificada. La suite incluye las regresiones de concurrencia y recuperación, y comprueba que las versiones publicadas por backend e interfaz coinciden.
