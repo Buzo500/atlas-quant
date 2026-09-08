@@ -77,4 +77,4 @@ node tools/benchmarks/v03-max-window-benchmark.cjs e2e-IDENTIFICADOR
 
 El primer script importa datos sintéticos y un depósito en cada conjunto de la **base aislada**; el segundo solo consulta. Verifican identidad, rutas y procesos antes de actuar, bloquean salidas de red ajenas y conservan informes anteriores. El benchmark Python en memoria se ejecuta con `.\.venv\Scripts\python.exe tools/benchmarks/benchmark_v03_prices.py`. No cargar estos fixtures en la cartera habitual.
 
-**CI de esta entrega pendiente.** Se conserva el workflow gratuito existente para validar la rama después de comprobar cuota; sus resultados de rc.2 no se atribuyen a v0.3. No se crea una etiqueta estable.
+**Fuentes: `abf908577c901372e0274aeb34ce95fe4bf1d68a`, [PR #3 en borrador](https://github.com/Buzo500/atlas-quant/pull/3). CI de esta entrega pendiente.** Se conserva el workflow gratuito existente para validar la rama después de comprobar cuota; sus resultados de rc.2 no se atribuyen a v0.3. No se crea una etiqueta estable.
