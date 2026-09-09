@@ -31,7 +31,8 @@ class Lock:
 
 def database(tmp_path, name="source"):
     store = Store(tmp_path / name / "atlas.sqlite3")
-    store.put("ledger", {"id": "portfolio", "events": [{"amount": 123}]}, "ledger.saved")
+    store.put("note", {"id": "metadata", "text": "retained"})
+    store.put("ledger", {"id": "portfolio", "events": [{"id": "deposit", "date": "2026-01-01", "kind": "deposit", "amount": 123}]}, "ledger.saved")
     return store
 
 
@@ -64,7 +65,8 @@ def test_backup_includes_committed_wal_and_excludes_uncommitted_writes(tmp_path)
         assert not any(row[1] == "pending" for row in copied)
         writer.rollback()
     manifest = validate_backup(folder)
-    assert manifest["schema"]["tables"] == {"records": 2, "audit": 1, "versions": 0}
+    assert {k: manifest["schema"]["tables"][k] for k in ("records", "audit", "versions")} == {"records": 2, "audit": 1, "versions": 0}
+    assert manifest["schema"]["tables"]["ledger_entries"] == 1
     assert manifest["sha256"] == hashlib.sha256((folder / "atlas.sqlite3").read_bytes()).hexdigest()
     assert set(p.name for p in folder.iterdir()) == {"atlas.sqlite3", "manifest.json"}
 
@@ -98,10 +100,14 @@ def test_failed_publication_leaves_no_visible_partial_backup(tmp_path, monkeypat
     assert contents(store.path) == before
 
 
-@pytest.mark.parametrize("schema_version", [0, 1])
+@pytest.mark.parametrize("schema_version", [0, 1, 2])
 def test_current_and_legacy_schema_backups_are_supported(tmp_path, schema_version):
     store = database(tmp_path)
     with closing(sqlite3.connect(store.path)) as db, db:
+        if schema_version < 2:
+            from atlas_quant.identity_store import DDL
+            for table in reversed(DDL):
+                db.execute(f"DROP TABLE {table}")
         db.execute(f"PRAGMA user_version={schema_version}")
     folder = create_backup(store.path, tmp_path / "backups")
     assert validate_backup(folder)["schema"]["user_version"] == schema_version

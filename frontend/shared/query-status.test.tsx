@@ -32,9 +32,12 @@ describe('Estado accesible de consultas', () => {
         <QueryStatus label="Cartera" query={{ ...query, loading: true }} />,
       );
       expect(status.textContent).toBe('Cartera: datos cargados.');
+      expect(screen.queryByText(/Actualizando cartera/)).toBeNull();
       expect(
         screen
-          .getByText(/Actualizando cartera/)
+          .getByText(
+            `Última consulta: ${dateTime(new Date(at).toISOString())}.`,
+          )
           .closest('[role="status"], [role="alert"]'),
       ).toBeNull();
       const updatedAt = at + index * 5000;

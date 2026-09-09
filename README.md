@@ -1,8 +1,14 @@
 # ATLAS Quant
 
+**Desarrollo local actual: `0.4.0-dev.1` · D2, identidad y cartera independiente.** Rama `codex/v0.4-d2`, todavía sin publicar ni ejecutar CI remota. En Datos puedes registrar instrumentos/cotizaciones/símbolos, elegir o crear una cartera, consultar su libro y previsualizar fuentes de precios por versión. La selección del conjunto de investigación ya no cambia la cartera activa. [Diseño, migración y validación D2](docs/v0_4_d2.md).
+
+D2 conserva la contabilidad EUR `legacy-eur-v1`. USD se admite **solo como atributo del catálogo**; movimientos/valoración USD, conciliación CSV v2, eventos corporativos nuevos y XIRR corresponden a D3–D8. Las cifras de CI siguientes son históricas de v0.3/v0.2, no validaciones de esta rama.
+
 **Entrega de desarrollo aceptada: `v0.3.0-dev.1`.** G1–G6 cerradas por el usuario el 09/09/2026, con pantalla completa comprobada manualmente en precios y cartera y CI completa correcta. Se acepta una incidencia conocida de espera intermitente en `/api/state`, todavía sin causa determinada. [Cierre y evidencia](docs/revision_final_v0_3.md). El ensayo de 48 horas sigue aplazado; esta aceptación no declara una versión estable.
 
-Versión de desarrollo: **0.3.0-dev.1 · gráficos interactivos**. Conserva como antecedente `0.2.0-rc.2`, candidata publicada con CI verificada; el ensayo de 48 horas sigue aplazado y v0.2 no se declara estable. El [plan de v0.3](docs/plan_v0_3.md) fija el alcance, y la [guía de gráficos](docs/graficos_v0_3.md) explica su uso y validación. La [hoja de ruta](docs/hoja_de_ruta.md) recoge las entregas previstas y [CHANGELOG.md](CHANGELOG.md) sus cambios.
+Alcance aprobado de [v0.4 · Datos y contabilidad trazables](docs/plan_v0_4.md): ocho entregas, CSV propio y EUR/USD. [D1](docs/v0_4_d1.md) concreta contratos y convenciones con referencias numéricas; D2 desarrolla las identidades y la separación de cartera, y D3–D8 siguen pendientes.
+
+Versión anterior: **0.3.0-dev.1 · gráficos interactivos**. Conserva como antecedente `0.2.0-rc.2`, candidata publicada con CI verificada; el ensayo de 48 horas sigue aplazado y v0.2 no se declara estable. El [plan de v0.3](docs/plan_v0_3.md) fija el alcance, y la [guía de gráficos](docs/graficos_v0_3.md) explica su uso y validación. La [hoja de ruta](docs/hoja_de_ruta.md) recoge las entregas previstas y [CHANGELOG.md](CHANGELOG.md) sus cambios.
 
 Aplicación local para analizar una cartera en EUR, comparar estrategias de acciones/ETF y ejecutar experimentos acotados con OpenAI o Anthropic. Incluye simulación de órdenes; no está conectada a ningún bróker.
 

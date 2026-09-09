@@ -201,6 +201,10 @@ class DatasetService:
                 raise ValueError("Conjunto de datos no encontrado.")
             old = work.get("ledger", ident, {"events": []})["events"]
             token = _ledger_preview_token(dataset, old, csv)
+            portfolio_id = work.legacy_portfolio_id(ident)
+            context = {"catalog": work.catalog()["revision"], "portfolio":
+                work.portfolio_record(portfolio_id) if portfolio_id else None, "legacy_token": token}
+            token = hashlib.sha256(json.dumps(context, sort_keys=True).encode()).hexdigest()
             if commit and preview_token is not None and not hmac.compare_digest(preview_token, token):
                 raise LedgerPreviewConflict(
                     "La previsualización ha cambiado. Vuelve a previsualizar los movimientos antes de confirmar.")

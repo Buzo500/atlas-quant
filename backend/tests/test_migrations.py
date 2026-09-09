@@ -19,7 +19,7 @@ def snapshot(path):
 
 
 def legacy_database(path, schema_transform=None):
-    ledger = {"id": "portfolio", "events": [{"id": "deposit", "amount": "1234.56", "currency": "EUR"}]}
+    ledger = {"id": "portfolio", "events": [{"id": "deposit", "date": "2026-01-01", "kind": "deposit", "amount": "1234.56", "currency": "EUR"}]}
     experiment = {"id": "experiment", "status": "observing", "provider": "none",
                   "budget_usd": 0, "spent_usd": 0, "reserved_usd": 0, "auto_paper": False}
     dataset = {"id": "demo", "version": 1, "manifest": "original-hash", "name": "Demostración"}
@@ -46,7 +46,7 @@ def test_v01_schema_adoption_preserves_all_records_versions_and_audit(tmp_path):
     store = Store(path)
     after = snapshot(path)
     assert after == {**before, "version": SCHEMA_VERSION}
-    assert SCHEMA_VERSION == 1
+    assert SCHEMA_VERSION == 2
     assert store.get("ledger", "portfolio") == ledger
     assert store.get("experiment", "experiment") == experiment
     assert store.get("dataset", "demo") == dataset

@@ -9,8 +9,18 @@ export const sections = [
   'settings',
 ] as const;
 export type Section = (typeof sections)[number];
-type Navigation = { tab: Section; dataset: string; experiment: string };
-const initial: Navigation = { tab: 'portfolio', dataset: '', experiment: '' };
+type Navigation = {
+  tab: Section;
+  dataset: string;
+  experiment: string;
+  portfolio: string;
+};
+const initial: Navigation = {
+  tab: 'portfolio',
+  dataset: '',
+  experiment: '',
+  portfolio: '',
+};
 const identifier = (value: string | null) =>
   value && /^[a-zA-Z0-9_-]{1,128}$/.test(value) ? value : '';
 export function readNavigation(search: string): Navigation {
@@ -20,6 +30,7 @@ export function readNavigation(search: string): Navigation {
     tab: sections.includes(tab as Section) ? (tab as Section) : 'portfolio',
     dataset: identifier(params.get('dataset')),
     experiment: identifier(params.get('experiment')),
+    portfolio: identifier(params.get('portfolio')),
   };
 }
 
@@ -43,6 +54,7 @@ export function useNavigation() {
     if (next.tab !== 'portfolio') params.set('tab', next.tab);
     if (next.dataset) params.set('dataset', next.dataset);
     if (next.experiment) params.set('experiment', next.experiment);
+    if (next.portfolio) params.set('portfolio', next.portfolio);
     const query = params.toString();
     const url =
       window.location.pathname +

@@ -23,6 +23,10 @@ from .prices import PricesNotFound
 from .service import Service
 from .store import Store, now
 from .worker_lock import WorkerLock
+from .catalog import CatalogService, InstrumentInput, ListingInput, AliasInput, IdentityNotFound, RevisionConflict
+from .portfolios import PortfolioService
+from .identity_contracts import (CatalogResponse, ListingResponse, PortfolioRecord, PortfolioDetail,
+                                 BindingPreview, PriceBinding, PortfolioLedgerResponse)
 
 
 class StrictModel(BaseModel):
@@ -39,6 +43,16 @@ class PricesInput(StrictModel):
 
 class LedgerInput(StrictModel):
     csv: str = Field(min_length=1,max_length=2_000_000)
+    commit: bool = False
+    preview_token: str | None = Field(default=None, pattern=r"^[0-9a-f]{64}$")
+
+
+class PortfolioInput(StrictModel):
+    name: str = Field(min_length=1, max_length=100)
+
+
+class BindingsInput(StrictModel):
+    bindings: list[PriceBinding] = Field(max_length=100)
     commit: bool = False
     preview_token: str | None = Field(default=None, pattern=r"^[0-9a-f]{64}$")
 
@@ -105,6 +119,8 @@ def create_app(data_dir=None, run_worker=True):
     data_dir = Path(data_dir or os.environ.get("ATLAS_DATA_DIR",Path(__file__).resolve().parents[2]/"var"/"atlas"))
     store = Store(data_dir/"atlas.sqlite3")
     service = Service(store)
+    catalog = CatalogService(store)
+    portfolios = PortfolioService(store)
 
     @asynccontextmanager
     async def lifespan(app):
@@ -155,6 +171,59 @@ def create_app(data_dir=None, run_worker=True):
     async def stale_ledger_preview(request, exc):
         return JSONResponse({"detail":str(exc)},status_code=409)
 
+    @app.exception_handler(RevisionConflict)
+    async def stale_identity(request, exc):
+        return JSONResponse({"detail": str(exc)}, status_code=409)
+
+    @app.exception_handler(IdentityNotFound)
+    async def missing_identity(request, exc):
+        return JSONResponse({"detail": str(exc)}, status_code=404)
+
+    @app.get("/api/catalog", response_model=CatalogResponse, response_model_exclude_unset=True)
+    def read_catalog(revision: int | None = Query(default=None, ge=1)):
+        return catalog.read(revision)
+
+    @app.post("/api/catalog/instruments", response_model=CatalogResponse, response_model_exclude_unset=True)
+    def add_instrument(body: InstrumentInput):
+        return catalog.add("instrument", body.model_dump())
+
+    @app.post("/api/catalog/listings", response_model=CatalogResponse, response_model_exclude_unset=True)
+    def add_listing(body: ListingInput):
+        return catalog.add("listing", body.model_dump())
+
+    @app.post("/api/catalog/aliases", response_model=CatalogResponse, response_model_exclude_unset=True)
+    def add_alias(body: AliasInput):
+        return catalog.add("alias", body.model_dump())
+
+    @app.get("/api/catalog/resolve", response_model=ListingResponse, response_model_exclude_unset=True)
+    def resolve_alias(provider: str = Query(min_length=1, max_length=100),
+                      symbol: str = Query(min_length=1, max_length=50),
+                      date: str = Query(min_length=10, max_length=10),
+                      market: str | None = Query(default=None, max_length=50),
+                      revision: int | None = Query(default=None, ge=1)):
+        return catalog.resolve(provider, symbol, date, market, revision)
+
+    @app.get("/api/portfolios", response_model=list[PortfolioRecord])
+    def list_portfolios():
+        return portfolios.list()
+
+    @app.post("/api/portfolios", response_model=PortfolioRecord, status_code=201)
+    def new_portfolio(body: PortfolioInput):
+        return portfolios.create(body.name)
+
+    @app.get("/api/portfolios/{ident}", response_model=PortfolioDetail)
+    def read_portfolio(ident: str, revision: int | None = Query(default=None, ge=1)):
+        return portfolios.read(ident, revision)
+
+    @app.post("/api/portfolios/{ident}/bindings", response_model=BindingPreview)
+    def bind_portfolio(ident: str, body: BindingsInput):
+        return portfolios.bind(ident, [binding.model_dump() for binding in body.bindings],
+                               body.commit, body.preview_token)
+
+    @app.post("/api/portfolios/{ident}/ledger", response_model=PortfolioLedgerResponse)
+    def portfolio_ledger(ident: str, body: LedgerInput):
+        return portfolios.import_ledger(ident, body.csv, body.commit, body.preview_token)
+
     @app.get("/api/health", response_model=HealthResponse, response_model_exclude_unset=True)
     def health():
         worker = getattr(app.state,"worker",None)
@@ -170,6 +239,7 @@ def create_app(data_dir=None, run_worker=True):
             if job.get("paper_account"):
                 job["paper_account"] = {k:v for k,v in job["paper_account"].items() if k!="observed_bars"}
         return {"datasets":datasets,"experiments":experiments,"settings":service.settings(),
+                "portfolios": [{k: p[k] for k in ("id", "name", "revision")} for p in portfolios.list()],
                 "providers":provider_status(),"audit":store.audit_list(40),"server_time":now()}
 
     @app.post("/api/datasets/demo", response_model=DatasetResponse, response_model_exclude_unset=True)

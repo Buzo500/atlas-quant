@@ -2,6 +2,26 @@
 // Regenerate: python tools/export_contracts.py
 // Verify: python tools/export_contracts.py --check
 
+export type AliasInput = {
+  "expected_revision": number;
+  "listing_id": string;
+  "provider": string;
+  "symbol": string;
+  "valid_from"?: (string) | (null);
+  "valid_to"?: (string) | (null);
+  "source": string;
+};
+
+export type AliasResponse = {
+  "id": string;
+  "listing_id": string;
+  "provider": string;
+  "symbol": string;
+  "valid_from": (string) | (null);
+  "valid_to": (string) | (null);
+  "source": string;
+};
+
 export type AuditEntry = {
   "seq": number;
   "at": string;
@@ -29,9 +49,42 @@ export type BacktestResponse = {
   "max_position_weight": number;
 };
 
+export type BindingPreview = {
+  "portfolio": PortfolioRecord;
+  "context": PortfolioCut;
+  "value": (IdentifiedValue) | (null);
+  "entries": Array<BookEntry>;
+  "status": "available" | "unavailable";
+  "warnings": Array<string>;
+  "committed": boolean;
+  "preview_token": string;
+};
+
+export type BindingsInput = {
+  "bindings": Array<PriceBinding>;
+  "commit"?: boolean;
+  "preview_token"?: (string) | (null);
+};
+
+export type BookEntry = {
+  "event": {
+  [key: string]: JsonValue;
+};
+  "listing_id": (string) | (null);
+  "date": string;
+  "day_sequence": number;
+};
+
 export type CandidateResult = {
   "strategy": Strategy;
   "validation_metrics": Metrics;
+};
+
+export type CatalogResponse = {
+  "revision": number;
+  "instruments": Array<InstrumentResponse>;
+  "listings": Array<ListingResponse>;
+  "aliases": Array<AliasResponse>;
 };
 
 export type ControlInput = {
@@ -160,6 +213,13 @@ export type ExperimentResponse = {
   "execution_active"?: boolean;
 };
 
+export type ExternalCode = {
+  "scheme": string;
+  "value": string;
+  "source": string;
+  "verified"?: boolean;
+};
+
 export type FeedInput = {
   "symbol": string;
   "start": string;
@@ -202,6 +262,47 @@ export type HealthResponse = {
   "worker_interval_seconds": number;
 };
 
+export type IdentifiedPosition = {
+  "symbol": string;
+  "quantity": number;
+  "price": number;
+  "price_date": string;
+  "market_value": number;
+  "weight": number;
+  "cost_basis": number;
+  "unrealized_pnl": number;
+  "listing_id": string;
+};
+
+export type IdentifiedValue = {
+  "nav": number;
+  "cash": number;
+  "net_contributions": number;
+  "pnl": number;
+  "twr": number;
+  "positions": Array<IdentifiedPosition>;
+  "curve": Array<PortfolioPoint>;
+  "warnings": Array<string>;
+};
+
+export type InstrumentInput = {
+  "expected_revision": number;
+  "name": string;
+  "instrument_type"?: "equity" | "ETF" | "unknown";
+  "source": string;
+  "codes"?: Array<ExternalCode>;
+  "verified"?: boolean;
+};
+
+export type InstrumentResponse = {
+  "id": string;
+  "name": string;
+  "instrument_type": "equity" | "ETF" | "unknown";
+  "source": string;
+  "verified": boolean;
+  "codes": Array<ExternalCode>;
+};
+
 export type JsonValue = unknown;
 
 export type LastPrice = {
@@ -222,6 +323,26 @@ export type LedgerResponse = {
   "committed": boolean;
   "portfolio": PortfolioResponse;
   "preview_token": string;
+};
+
+export type ListingInput = {
+  "expected_revision": number;
+  "instrument_id": string;
+  "currency": "EUR" | "USD";
+  "market"?: (string) | (null);
+  "calendar"?: (string) | (null);
+  "verified"?: boolean;
+};
+
+export type ListingResponse = {
+  "id": string;
+  "instrument_id": string;
+  "currency": "EUR" | "USD";
+  "market": (string) | (null);
+  "calendar": (string) | (null);
+  "verified": boolean;
+  "legacy_dataset_id"?: (string) | (null);
+  "legacy_symbol"?: (string) | (null);
 };
 
 export type Manifest = {
@@ -371,10 +492,54 @@ export type PolicyResponse = {
   "requested_hours": number;
 };
 
+export type PortfolioCut = {
+  "portfolio_id": string;
+  "portfolio_revision": number;
+  "catalog_revision": number;
+  "accounting_policy": "legacy-eur-v1";
+  "bindings": Array<PriceBinding>;
+  "data_hash": string;
+};
+
+export type PortfolioDetail = {
+  "portfolio": PortfolioRecord;
+  "context": PortfolioCut;
+  "value": (IdentifiedValue) | (null);
+  "entries": Array<BookEntry>;
+  "status": "available" | "unavailable";
+  "warnings": Array<string>;
+};
+
+export type PortfolioInput = {
+  "name": string;
+};
+
+export type PortfolioLedgerResponse = {
+  "added": number;
+  "duplicates": number;
+  "total": number;
+  "committed": boolean;
+  "portfolio": IdentifiedValue;
+  "preview_token": string;
+};
+
 export type PortfolioPoint = {
   "date": string;
   "nav": number;
   "twr_index": number;
+};
+
+export type PortfolioRecord = {
+  "id": string;
+  "name": string;
+  "account_id": string;
+  "base_currency": "EUR";
+  "accounting_policy": "legacy-eur-v1";
+  "legacy_dataset_id": (string) | (null);
+  "revision": number;
+  "catalog_revision": number;
+  "event_ids": Array<string>;
+  "bindings": Array<PriceBinding>;
 };
 
 export type PortfolioResponse = {
@@ -386,6 +551,12 @@ export type PortfolioResponse = {
   "positions": Array<Position>;
   "curve": Array<PortfolioPoint>;
   "warnings": Array<string>;
+};
+
+export type PortfolioSummary = {
+  "id": string;
+  "name": string;
+  "revision": number;
 };
 
 export type Position = {
@@ -408,6 +579,13 @@ export type PriceBar = {
   "low": number;
   "close": number;
   "volume": number;
+};
+
+export type PriceBinding = {
+  "listing_id": string;
+  "dataset_id": string;
+  "dataset_version": number;
+  "symbol": string;
 };
 
 export type PricesInput = {
@@ -539,6 +717,7 @@ export type SourceMetadata = {
 };
 
 export type StateResponse = {
+  "portfolios"?: Array<PortfolioSummary>;
   "datasets": Array<DatasetResponse>;
   "experiments": Array<ExperimentResponse>;
   "settings": SettingsResponse;

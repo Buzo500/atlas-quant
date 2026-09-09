@@ -52,8 +52,8 @@ def test_unhealthy_interval_is_not_accepted_and_resources_need_consecutive_sampl
 def demo(tmp_path):
     dbpath = tmp_path / "var/atlas/atlas.sqlite3"
     store = Store(dbpath)
-    store.put("dataset", {"id": "demo", "source_kind": "synthetic", "bars": [{"close": 100}]})
-    store.put("ledger", {"id": "demo", "events": [{"cash": 123}]})
+    store.put("dataset", {"id": "demo", "source_kind": "synthetic", "bars": []})
+    store.put("ledger", {"id": "demo", "events": [{"id": "deposit", "date": "2026-01-01", "kind": "deposit", "amount": 123}]})
     store.put("experiment", {"id": "job", "provider": "none", "budget_usd": 0,
         "spent_usd": 0, "reserved_usd": 0, "status": "observing", "auto_paper": False,
         "paper_account": None, "research": {"result": 7}, "observation": {"elapsed_hours": 1}})
@@ -64,7 +64,7 @@ def test_readonly_snapshot_preserves_data_and_allows_only_expected_lifecycle_cha
     store, path = demo
     baseline = soak.database_snapshot(path, full_integrity=True)
     assert baseline["issues"] == []
-    assert baseline["schema"] == 1
+    assert baseline["schema"] == 2
     job = store.get("experiment", "job")
     job.update(status="completed", observation={"elapsed_hours": 49}, phase="finished",
                finished_at="2026-09-08T22:00:00Z", completion_note="Plazo finalizado.")
@@ -72,7 +72,7 @@ def test_readonly_snapshot_preserves_data_and_allows_only_expected_lifecycle_cha
     complete = soak.database_snapshot(path, full_integrity=True)
     assert complete["persistent_digest"] == baseline["persistent_digest"]
     assert complete["issues"] == []
-    assert store.get("ledger", "demo") == {"id": "demo", "events": [{"cash": 123}]}
+    assert store.get("ledger", "demo")["events"][0]["amount"] == 123
     job["research"]["result"] = 8
     store.put("experiment", job)
     assert soak.database_snapshot(path)["persistent_digest"] != baseline["persistent_digest"]
@@ -138,7 +138,9 @@ def test_probe_detects_instance_and_persistence_changes_without_mutation(tmp_pat
         for name, pid in pids.items()})
     probe = soak.Probe(tmp_path, "a" * 40, state["run_id"], replace(soak.Limits(), min_free_bytes=0))
     assert probe.sample()["issues"] == []
-    store.put("ledger", {"id": "demo", "events": [{"cash": 0}]})
+    ledger = store.get("ledger", "demo")
+    ledger["events"].append({"id": "new", "date": "2026-01-02", "kind": "deposit", "amount": 1})
+    store.put("ledger", ledger)
     assert any("persistente cambió" in issue for issue in probe.sample()["issues"])
     atomic_json(tmp_path / "var/runtime.json", {**state, "run_id": "b" * 32})
     assert any("instancia identificada" in issue for issue in probe.sample()["issues"])

@@ -759,6 +759,39 @@ code {
 .data-import {
   grid-row: span 2;
 }
+.data-import textarea {
+  field-sizing: fixed;
+  height: 12rem;
+  max-height: 32rem;
+  overflow: auto;
+}
+.identity-panel {
+  grid-column: 1 / -1;
+  min-width: 0;
+}
+.identity-panel > .field {
+  max-width: 34rem;
+  margin-bottom: 1rem;
+}
+.identity-panel form {
+  margin-block: 1rem;
+}
+.identity-panel .form-grid {
+  align-items: end;
+}
+.identity-panel .details {
+  margin-top: 1rem;
+}
+.binding-row {
+  min-width: 0;
+  margin-block: 1rem;
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+.binding-row legend {
+  padding-inline: 0.4rem;
+}
 .data-import > .field,
 .data-feed > .field {
   max-width: 840px;

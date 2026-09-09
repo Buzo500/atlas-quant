@@ -1,0 +1,20 @@
+{
+  "format": "atlas.v04.d1.reference-cases.v1",
+  "purpose": "Oráculos sintéticos de especificación, no formato de importación ni resultados del motor",
+  "accounting_policy": "atlas-accounting-v2",
+  "decimal_encoding": "strings",
+  "cases": [
+    {"id": "D1-01", "kind": "purchase", "input": {"deposit_eur": "1000.00", "quantity": "4", "price_eur": "100.00", "fee_eur": "2.00", "close_eur": "110.00"}, "expected": {"cash_eur": "598.00", "position_value_eur": "440.00", "nav_eur": "1038.00", "cost_eur": "402.00", "pnl_eur": "38.00"}},
+    {"id": "D1-02", "kind": "partial_sale", "input": {"cash_before_eur": "598.00", "held_before": "4", "cost_before_eur": "402.00", "sold": "2", "sale_price_eur": "115.00", "fee_eur": "4.00", "close_eur": "110.00", "contributions_eur": "1000.00"}, "expected": {"cash_eur": "824.00", "held": "2", "cost_eur": "201.00", "nav_eur": "1044.00", "realized_pnl_eur": "25.00", "unrealized_pnl_eur": "19.00", "pnl_eur": "44.00"}},
+    {"id": "D1-03", "kind": "split", "input": {"held": "10", "ratio_numerator": "2", "ratio_denominator": "1", "cost_eur": "1000.00", "new_close_eur": "50.00"}, "expected": {"held": "20", "cost_eur": "1000.00", "position_value_eur": "1000.00"}},
+    {"id": "D1-04", "kind": "dividend", "input": {"held": "10", "close_before_eur": "100.00", "close_ex_eur": "98.00", "confirmed_gross_right_eur": "20.00", "withholding_on_payment_eur": "3.00", "fee_eur": "0.00"}, "expected": {"nav_ex_eur": "1000.00", "cash_after_payment_eur": "17.00", "right_after_payment_eur": "0.00", "nav_after_payment_same_price_eur": "997.00", "external_flow_eur": "0.00"}},
+    {"id": "D1-05", "kind": "fx_exchange", "input": {"initial_cash_eur": "1000.00", "eur_delivered": "100.00", "usd_received": "110.00", "fee_eur": "1.00", "mark_eur_per_usd": "0.90"}, "expected": {"cash_eur": "899.00", "cash_usd": "110.00", "nav_eur": "998.00", "external_flow_eur": "0.00", "pnl_since_deposit_eur": "-2.00"}},
+    {"id": "D1-06", "kind": "fx_mark", "input": {"native_value_usd": "100.00", "eur_per_usd": "0.90"}, "expected": {"value_eur": "90.00"}},
+    {"id": "D1-07", "kind": "twr_close_flow", "input": {"previous_nav_eur": "1000.00", "closing_nav_eur": "1210.00", "external_deposit_eur": "100.00"}, "expected": {"factor": "1.11", "return": "0.11"}},
+    {"id": "D1-08", "kind": "xirr", "flows": [{"date": "2021-01-01", "amount": "-1000.00"}, {"date": "2022-01-01", "amount": "1100.00"}], "expected": {"status": "ok", "rate": "0.10"}},
+    {"id": "D1-09", "kind": "xirr", "flows": [{"date": "2021-01-01", "amount": "-1000.00"}, {"date": "2022-01-01", "amount": "-500.00"}, {"date": "2023-01-01", "amount": "1760.00"}], "expected": {"status": "ok", "rate": "0.10"}},
+    {"id": "D1-10", "kind": "xirr", "flows": [{"date": "2021-01-01", "amount": "-1000.00"}, {"date": "2021-01-18", "amount": "-200.00"}, {"date": "2021-05-18", "amount": "1200.00"}], "expected": {"status": "ok", "rate": "0.00"}},
+    {"id": "D1-11", "kind": "xirr_ambiguous", "flows": [{"date": "2021-01-01", "amount": "-100.00"}, {"date": "2022-01-01", "amount": "230.00"}, {"date": "2023-01-01", "amount": "-132.00"}], "expected": {"status": "ambiguous", "rate": null, "reference_roots": ["0.10", "0.20"]}},
+    {"id": "D1-12", "kind": "xirr_no_investment", "flows": [{"date": "2021-01-01", "amount": "100.00"}, {"date": "2022-01-01", "amount": "110.00"}], "expected": {"status": "insufficient_cashflows", "rate": null}}
+  ]
+}
