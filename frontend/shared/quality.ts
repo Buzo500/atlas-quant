@@ -1,0 +1,18 @@
+export const qualityLabel: Record<string, string> = {
+  allowed: 'Apta',
+  provisional: 'Provisional',
+  blocked: 'No apta',
+  observed_session: 'Sesión observada',
+  market_closed: 'Mercado cerrado',
+  calendar_unknown: 'Calendario desconocido',
+  missing_session: 'Falta una sesión',
+  missing_price: 'Sin precio anterior',
+  stale_mark: 'Precio obsoleto',
+  unexpected_bar: 'Precio en día cerrado',
+  price_basis_unverified: 'Base de precio sin verificar',
+  price_basis_incompatible: 'Base de precio incompatible',
+  corporate_action_unresolved: 'Evento corporativo pendiente',
+  availability_unknown: 'Disponibilidad histórica desconocida',
+  not_available_at_close: 'No disponible al cierre',
+  not_available_at_cut: 'Disponible después del corte',
+};

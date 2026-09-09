@@ -1,8 +1,10 @@
 # ATLAS Quant · Operación en Windows
 
-Guía actualizada el 9 de septiembre de 2026. Desarrollo local actual: **`0.4.0-dev.1`, D2 y esquema SQLite 2**, validado en este sobremesa y pendiente de publicación/CI. [Alcance, migración y límites](v0_4_d2.md). La entrega anterior publicada es `v0.3.0-dev.1`; el historial de CI y el estado exacto del proceso están en [CONTINUIDAD](CONTINUIDAD.md). **v0.2.0-rc.2 sigue siendo candidata, no estable**: el ensayo de 48 horas permanece aplazado.
+Guía actualizada el 9 de septiembre de 2026. Desarrollo local actual: **`0.4.0-dev.2`, D3 y esquema SQLite 2**, validado en este sobremesa y pendiente de publicación/CI propia. [Calidad, calendarios y revisiones](v0_4_d3.md). Entrega publicada: `v0.4.0-dev.1`, D2 integrado en PR #4; [migración y límites](v0_4_d2.md). El historial de CI y el estado exacto del proceso están en [CONTINUIDAD](CONTINUIDAD.md). **v0.2.0-rc.2 sigue siendo candidata, no estable**: el ensayo de 48 horas permanece aplazado.
 
 ATLAS normal está arrancado; los entornos E2E están cerrados y la base habitual conserva su contenido. El recorrido usa Windows nativo, motor Python e interfaz compilada; no requiere WSL, CUDA, claves ni presupuesto de pago. La ejecución es exclusivamente simulada.
+
+D3 añade «Calidad de precios» en Datos. Calendarios y correcciones históricas requieren previsualizar y confirmar; crean una versión, no cambian automáticamente el vínculo de una cartera. Una revisión del histórico pausa su fuente automática y obliga a revisar la evidencia afectada; los experimentos congelados no continúan sobre historia corregida. No rellenar campos con supuestos para eliminar advertencias. La importación de movimientos de «Cartera de pruebas» sigue pendiente.
 
 **[Escalado físico 125 %/150 % comprobado](validacion_escalado_windows.md)** en el monitor 3440 × 1440 de este PC, mediante Configuración de Windows y Chrome al 100 %, sin emulación; restaurado el 100 % inicial. El intento anterior bloqueado y los 35 viewports CSS se conservan como antecedentes distintos. Ensayo de 48 horas y seguimiento aplazados. Evidencia, arranques e incidencias históricas en [CONTINUIDAD](CONTINUIDAD.md) y [candidata_v0_2.md](candidata_v0_2.md).
 

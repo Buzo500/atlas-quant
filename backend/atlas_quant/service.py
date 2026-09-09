@@ -14,6 +14,7 @@ from .worker_lock import WorkerLock
 from .backtest import backtest, run_research
 from .gates import DEFAULT_POLICY, evaluate_evidence
 from .store import Store, encode, now
+from .quality import POLICY as QUALITY_POLICY, EXPLORATORY_WARNING, check_research, report as quality_report
 
 
 class Service:
@@ -106,6 +107,7 @@ class Service:
         dataset = self.dataset(request["dataset_id"])
         if request["symbol"] not in {b["symbol"] for b in dataset["bars"]}:
             raise ValueError("El activo no pertenece al conjunto de datos.")
+        check_research(dataset, request["symbol"])
         if request["provider"] != "none":
             status = next((s for s in ai.provider_status() if s["provider"] == request["provider"]),None)
             if not status or not status["configured"]:
@@ -118,7 +120,7 @@ class Service:
                 raise ValueError("Modelo no admitido para ese proveedor.")
         policy = {**DEFAULT_POLICY,**request.pop("policy",{}),"requested_hours":request["hours"]}
         cutoff = max(b["date"] for b in dataset["bars"] if b["symbol"]==request["symbol"])
-        job = {**request,"created_at":now(),"status":"queued","phase":"pending",
+        job = {**request,"quality_policy":QUALITY_POLICY,"created_at":now(),"status":"queued","phase":"pending",
                "policy":policy,"dataset_version":dataset["version"],"cutoff":cutoff,
                "frozen_hash":hashlib.sha256(encode(dataset["bars"]).encode()).hexdigest(),
                "spent_usd":0.0,"reserved_usd":0.0,"research":None,"summary":None,
@@ -184,12 +186,15 @@ class Service:
                 job["plan"] = plan["plan"]
             self._save_progress(job, ("plan",), "research.planned")
         if not job.get("research"):
+            quality = check_research(dataset, job["symbol"]) if job.get("quality_policy") == QUALITY_POLICY else None
             job["phase"] = "backtesting"
             self._save_progress(job, ("phase",), "research.started")
             async with self.research_lock:
                 self._checkpoint(job)
                 research = await self._compute(job, run_research, dataset["bars"], job["plan"]["candidates"], **job["costs"])
             research["warnings"].extend(dataset.get("warnings", []))
+            if quality and quality["capabilities"]["historical"] != "allowed":
+                research["warnings"].append(EXPLORATORY_WARNING)
             job.update(research=research, phase="reporting")
             self._save_progress(job, ("research", "phase"), "research.completed")
         if not job.get("summary"):
@@ -220,6 +225,9 @@ class Service:
     async def observe(self, job):
         self._checkpoint(job)
         dataset = self.dataset(job["dataset_id"])
+        revision = dataset.get("price_revision")
+        if revision and revision["previous_version"] >= job["dataset_version"]:
+            raise ValueError("Los precios se han revisado tras congelar el experimento. Se conservan sus resultados; crea una evaluación nueva sobre la versión revisada.")
         elapsed = (datetime.now(timezone.utc)-datetime.fromisoformat(job["observation_started_at"])).total_seconds()/3600
         # Only bars dated AFTER experiment start count; old late-uploaded data are not prospective evidence.
         forward_start = max(job["cutoff"],job["observation_started_at"][:10])
@@ -235,6 +243,20 @@ class Service:
             job["forward_result"] = forward
         job["observation"] = observation
         job["gate"] = evaluate_evidence(job["research"],observation,job["policy"])
+        if job.get("quality_policy") == QUALITY_POLICY:
+            quality = quality_report(dataset, job["symbol"], end=datetime.now(timezone.utc).date().isoformat(), limit=0)
+            allowed = quality["capabilities"]["paper"] == "allowed"
+            job["gate"]["checks"].append(dict(name="price_quality", passed=allowed,
+                actual={"capabilities": quality["capabilities"], "version": dataset["version"],
+                        "evidence_hash": quality["evidence_hash"], "last": quality["last"]},
+                required="quality-v1: calendario, base y disponibilidad compatibles",
+                reason="La promoción exige evidencia de precios y conserva los filtros anteriores."))
+            if not allowed:
+                if job["gate"]["passed"]:
+                    job["gate"]["decision"] = "observe"
+                job["gate"]["passed"] = False
+                if job["status"] == "eligible_paper":
+                    job["status"] = "observing"
         before = job["status"]
         if job["gate"]["passed"]:
             job["status"] = "eligible_paper"

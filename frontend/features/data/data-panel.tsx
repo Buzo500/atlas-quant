@@ -4,6 +4,7 @@ import { Download, Upload, RefreshCw } from 'lucide-react';
 import { api } from '@/lib/api';
 import type { DatasetResponse, PortfolioSummary } from '@/lib/api-types';
 import { IdentityPanel } from './identity-panel';
+import { QualityPanel } from './quality-panel';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -339,6 +340,15 @@ export function DataPanel({
             </>
           )}
         </section>
+      )}
+      {dataset && (
+        <QualityPanel
+          key={`${dataset.id}:${dataset.version}`}
+          dataset={dataset}
+          active={active}
+          refresh={refresh}
+          onError={onError}
+        />
       )}
       {portfolios && selectPortfolio && (
         <IdentityPanel

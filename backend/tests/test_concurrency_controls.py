@@ -196,6 +196,8 @@ def paper_job(service, dataset, *, status="eligible_paper"):
     job = service.create_experiment(request(dataset["id"], costs={
         "initial_cash": 10000, "commission_bps": 5, "slippage_bps": 5,
         "minimum_fee": 1.25, "max_position_weight": .25}))
+    # Seed an already-running legacy account; D3 gates for new accounts have their own integration tests.
+    job.pop("quality_policy", None)
     rule = {"kind": "buy_hold", "symbol": "ETF"}
     account = advance_paper(new_account(started_at_date="2026-09-01"),
         [b for b in dataset["bars"] if b["date"] <= "2026-09-02"], rule, enabled=True)

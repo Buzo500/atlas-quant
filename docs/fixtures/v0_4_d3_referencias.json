@@ -1,0 +1,12 @@
+{
+  "description": "Casos sintéticos; el único precio anterior es 100 EUR el 2026-01-02, salvo indicación.",
+  "cases": [
+    {"name":"cierre acreditado", "end":"2026-01-03", "calendar":"closed", "expected_status":"market_closed", "expected_price":100.0, "expected_age":1},
+    {"name":"sesión ausente", "end":"2026-01-03", "calendar":"open", "expected_status":"missing_session", "expected_price":100.0, "expected_age":1},
+    {"name":"calendario desconocido", "end":"2026-01-03", "calendar":"unknown", "expected_status":"calendar_unknown", "expected_price":100.0, "expected_age":1},
+    {"name":"límite provisional siete días", "end":"2026-01-09", "calendar":"unknown", "expected_status":"calendar_unknown", "expected_price":100.0, "expected_age":7},
+    {"name":"ocho días obsoleto", "end":"2026-01-10", "calendar":"unknown", "expected_status":"stale_mark", "expected_price":null, "expected_age":8},
+    {"name":"barra futura excluida", "end":"2026-01-01", "calendar":"unknown", "expected_status":"missing_price", "expected_price":null, "expected_age":null},
+    {"name":"barra en cierre acreditado", "end":"2026-01-02", "calendar":"closed", "expected_status":"unexpected_bar", "expected_price":null, "expected_age":0}
+  ]
+}

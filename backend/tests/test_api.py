@@ -51,6 +51,8 @@ def _experiment(client, dataset, **overrides):
 def _seed_pending_paper(app, client):
     dataset = _dataset(client)
     job = _experiment(client, dataset, auto_paper=True)
+    # Existing pre-D3 paper account, whose pause/rearm semantics must remain intact.
+    job.pop("quality_policy", None)
     service = app.state.service
     bars = service.dataset(dataset["id"])["bars"]
     account = advance_paper(new_account(1000, started_at_date="2026-01-04"), bars[:1],

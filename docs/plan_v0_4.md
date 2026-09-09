@@ -1,10 +1,12 @@
 # ATLAS Quant · Plan de v0.4: datos y contabilidad trazables
 
-9 de septiembre de 2026. **Alcance aprobado: D1–D8, CSV propio y EUR/USD. D1 es especificación; D2 tiene implementación local autorizada en `codex/v0.4-d2`, `0.4.0-dev.1`. D3–D8 pendientes.** [Diseño y evidencia D2](v0_4_d2.md). Base: `v0.3.0-dev.1`, PR #3 fusionada, commit `2705ffe3cd2b7a7a75bb2fdcca7f2abf280a9819`. G1–G6 de v0.3 aceptadas; timeout de `/api/state` conservado como incidencia conocida abierta. La contabilidad nueva v2 y USD se incorporarán en bloques posteriores; D2 mantiene la política EUR heredada.
+9 de septiembre de 2026. **Alcance aprobado: D1–D8, CSV propio y EUR/USD. D1 especificado, D2 publicado como `v0.4.0-dev.1` y D3 desarrollado localmente en `codex/v0.4-d3`, `0.4.0-dev.2`. D4–D8 pendientes.** [Diseño y evidencia D2](v0_4_d2.md), [contrato y pruebas D3](v0_4_d3.md). Base de D3: fusión de PR #4, `77f8fa0a0056a94f65b257a05ff6f0a79b1d982e`. G1–G6 de v0.3 aceptadas; espera intermitente de API conservada como incidencia conocida abierta. La contabilidad nueva v2 y USD se incorporarán en bloques posteriores; D3 mantiene la política EUR heredada.
 
 [D1: contratos y convenciones](v0_4_d1.md) fija orden, precisión, monedas, fechas, CSV, errores, capacidades, métricas y migración inicial. Incluye [12 casos numéricos](fixtures/v0_4_d1_referencias.json) comprobados mediante aritmética independiente; no son pruebas ejecutadas contra el motor nuevo.
 
 ## Objetivo y alcance
+
+**Avance posterior · 09/09/2026:** D2 integrado en PR #4 y etiqueta `v0.4.0-dev.1`; el usuario autoriza concretar, preparar casos e implementar D3. [Contrato y evidencia D3](v0_4_d3.md), desarrollo local `0.4.0-dev.2`, `codex/v0.4-d3`. D4–D8 pendientes. Este avance sustituye los pendientes de D3 y autorización del registro inicial.
 
 Poder explicar y reproducir el patrimonio, posiciones y rentabilidad de una cartera a partir de movimientos, instrumentos, precios, divisas y eventos identificados. Saber qué cifras están conciliadas, cuáles son provisionales y qué información falta. La prioridad es la corrección del núcleo; se conserva el monolito modular y la interfaz crema/cobre.
 
