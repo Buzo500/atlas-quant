@@ -1,6 +1,6 @@
 # ATLAS Quant · Hoja de ruta
 
-**Desarrollo local vigente · 09/09/2026:** `0.4.0-dev.1`, bloque D2 autorizado: identidades, catálogo y cartera independiente de precios. [Implementación y evidencia](v0_4_d2.md). D1 concretado, D3–D8 pendientes; CSV propio v2 y contabilidad EUR/USD aún no completos. Este estado sustituye los párrafos históricos inferiores que sitúan toda v0.4 solo en planificación. Sin CI remota ni publicación de D2 todavía.
+**Desarrollo vigente · 09/09/2026:** `0.4.0-dev.1`, bloque D2: identidades, catálogo y cartera independiente de precios. [Implementación y evidencia](v0_4_d2.md), [PR #4](https://github.com/Buzo500/atlas-quant/pull/4), [CI gratuita correcta](https://github.com/Buzo500/atlas-quant/actions/runs/34365374994). D1 concretado, D3–D8 pendientes; CSV propio v2 y contabilidad EUR/USD aún no completos. Rama D2 publicada y validada, todavía sin fusión ni etiqueta. Este estado sustituye los párrafos históricos inferiores que sitúan toda v0.4 solo en planificación.
 
 **Última entrega publicada · 09/09/2026:** `0.3.0-dev.1` aceptada, G1–G6 cerradas con la incidencia conocida de API expresamente aceptada. Pantalla completa confirmada por el usuario y CI completa correcta. [Cierre de v0.3](revision_final_v0_3.md). El ensayo de 48 horas de v0.2 permanece aplazado, de modo que rc.2 sigue siendo candidata. El desarrollo local de D2 indicado arriba es posterior a esta publicación.
 

@@ -122,4 +122,4 @@ Fuera: bróker/órdenes reales, cortos/préstamos, derivados, fiscalidad declara
 
 Decisiones de alcance aprobadas: formato CSV propio primero, EUR–USD como primer conjunto de monedas y evolución incremental D1–D8. Se mantiene la cartera inicial sencilla definida en D1. Calendarios/proveedores reales, primer formato de extracto externo y tratamiento de casos de liquidación no cubiertos se concretan cuando se disponga de evidencia; no bloquean los fixtures sintéticos ni justifican contratar servicios. Para convenciones técnicas concretas prevalece D1 sobre las formulaciones preliminares del plan.
 
-La aprobación del plan no autoriza automáticamente cada implementación o publicación. El usuario autorizó después los cinco trabajos de D2; no se infiere permiso de publicación ni de inicio de D3 por su cierre.
+La aprobación del plan no autoriza automáticamente cada implementación o publicación. El usuario autorizó después los cinco trabajos de D2 y, en una petición posterior, su publicación en rama/PR y CI gratuita. Esa publicación no inicia D3 ni autoriza fusión o etiqueta. La importación de movimientos del usuario queda pendiente por decisión expresa.
