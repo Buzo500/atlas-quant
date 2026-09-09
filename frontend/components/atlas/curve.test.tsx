@@ -1,4 +1,11 @@
-import { act, fireEvent, render, screen, within } from '@testing-library/react';
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+  within,
+} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import type { BacktestPoint, PortfolioPoint } from '@/lib/api-types';
@@ -13,7 +20,11 @@ function portfolio(values: number[]): PortfolioPoint[] {
 }
 
 function drawnPoints(container: HTMLElement) {
-  return (container.querySelector('polyline')?.getAttribute('points') ?? '')
+  return (
+    container
+      .querySelector('.chart-viewport polyline')
+      ?.getAttribute('points') ?? ''
+  )
     .split(' ')
     .map((point) => point.split(',').map(Number));
 }
@@ -77,8 +88,8 @@ describe('Curva accesible y representación de valores', () => {
     expect(
       screen.getByRole('img', { name: /Valor inicial 0,00/ }),
     ).not.toBeNull();
-    expect(container.querySelector('circle')).not.toBeNull();
-    expect(container.querySelector('polyline')).toBeNull();
+    expect(container.querySelector('.chart-viewport circle')).not.toBeNull();
+    expect(container.querySelector('.chart-viewport polyline')).toBeNull();
   });
 
   it('explica escala lineal y distancia por observaciones aunque existan saltos de fechas', () => {
@@ -100,7 +111,9 @@ describe('Curva accesible y representación de valores', () => {
       { date: '2026-09-02', equity: 120, benchmark: 115 },
     ];
     const { container } = render(<Curve data={data} />);
-    const benchmark = container.querySelector('polyline[stroke-dasharray]');
+    const benchmark = container.querySelector(
+      '.chart-viewport polyline[stroke-dasharray]',
+    );
     expect(benchmark).not.toBeNull();
     const luminance = (hex: string) => {
       const channels = hex
@@ -133,7 +146,9 @@ describe('Curva accesible y representación de valores', () => {
         ]}
       />,
     );
-    expect(container.querySelector('polyline[stroke-dasharray]')).toBeNull();
+    expect(
+      container.querySelector('.chart-viewport polyline[stroke-dasharray]'),
+    ).toBeNull();
     expect(screen.queryByText('Mantener · mismo peso')).toBeNull();
   });
 
@@ -212,8 +227,50 @@ describe('Curva accesible y representación de valores', () => {
 describe('Inspección y navegación de la curva', () => {
   const detail = () =>
     screen.getByRole('region', { name: 'Detalle de la observación' });
-  const control = () =>
-    screen.getByRole('slider', { name: 'Observación de la curva' });
+  const control = () => screen.getByRole('img') as unknown as SVGSVGElement;
+  const measuredCurve = () => {
+    const observations = new Map<Element, ResizeObserverCallback>();
+    vi.stubGlobal(
+      'ResizeObserver',
+      class {
+        constructor(private callback: ResizeObserverCallback) {}
+        observe(element: Element) {
+          observations.set(element, this.callback);
+        }
+        disconnect() {}
+      },
+    );
+    const result = render(<Curve data={portfolio([100, 105, 110])} />);
+    const viewport = result.container.querySelector('.chart-viewport')!;
+    let dimensions = { width: 366, height: 521.59375 };
+    const box = () => ({
+      ...dimensions,
+      left: 0,
+      top: 0,
+      right: dimensions.width,
+      bottom: dimensions.height,
+      x: 0,
+      y: 0,
+      toJSON: () => ({}),
+    });
+    vi.spyOn(viewport, 'getBoundingClientRect').mockImplementation(box);
+    vi.spyOn(control(), 'getBoundingClientRect').mockImplementation(box);
+    const matrix = { a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 };
+    Object.defineProperty(control(), 'getScreenCTM', {
+      value: () => ({ ...matrix, inverse: () => matrix }),
+    });
+    const resize = (next = dimensions) => {
+      dimensions = next;
+      act(() => observations.get(viewport)?.([], {} as ResizeObserver));
+    };
+    fireEvent.click(
+      screen.getByRole('button', {
+        name: 'Pantalla completa: Curva de cartera',
+      }),
+    );
+    resize();
+    return { ...result, resize };
+  };
   const range = async (from: string, to: string) => {
     fireEvent.change(screen.getByLabelText('Inicio de la curva'), {
       target: { value: from },
@@ -234,13 +291,11 @@ describe('Inspección y navegación de la curva', () => {
     const points = drawnPoints(container);
     const first = points[0][0],
       last = points.at(-1)![0];
-    const gaps = points
-      .slice(1)
-      .map((point, index) => ({
-        width: point[0] - points[index][0],
-        from: points[index][0],
-        to: point[0],
-      }));
+    const gaps = points.slice(1).map((point, index) => ({
+      width: point[0] - points[index][0],
+      from: points[index][0],
+      to: point[0],
+    }));
     const gap = gaps.reduce((best, candidate) =>
       candidate.width > best.width ? candidate : best,
     );
@@ -249,14 +304,22 @@ describe('Inspección y navegación de la curva', () => {
       ((x - first) / (last - first)) * (data.length - 1),
     );
     expect(points.some(([drawnX]) => Math.abs(drawnX - x) < 0.05)).toBe(false);
-    fireEvent.mouseMove(container.querySelector('svg')!, { clientX: x });
+    fireEvent.pointerMove(container.querySelector('.chart-viewport svg')!, {
+      clientX: x,
+    });
     expect(detail().querySelector('time')?.getAttribute('dateTime')).toBe(
       data[index].date,
     );
     expect(detail().querySelector('data')?.getAttribute('value')).toBe(
       String(data[index].nav),
     );
-    expect(Number((control() as HTMLInputElement).value)).toBe(index);
+    const tooltip = screen.getByRole('tooltip');
+    expect(tooltip.querySelector('time')?.getAttribute('dateTime')).toBe(
+      data[index].date,
+    );
+    expect(tooltip.querySelector('data')?.getAttribute('value')).toBe(
+      String(data[index].nav),
+    );
   });
 
   it('mantiene coordenadas originales tras resize y selecciona los extremos reales', () => {
@@ -285,7 +348,7 @@ describe('Inspección y navegación de la curva', () => {
       toJSON: () => ({}),
     });
     act(() => resize?.([], {} as ResizeObserver));
-    const svg = container.querySelector('svg')!;
+    const svg = container.querySelector('.chart-viewport svg')!;
     vi.spyOn(svg, 'getBoundingClientRect').mockReturnValue({
       width: 600,
       height: 175,
@@ -297,14 +360,64 @@ describe('Inspección y navegación de la curva', () => {
       y: 0,
       toJSON: () => ({}),
     });
-    fireEvent.mouseMove(svg, { clientX: 100 });
+    fireEvent.pointerMove(svg, { clientX: 100 });
     expect(detail().querySelector('time')?.getAttribute('dateTime')).toBe(
       '2000-01-01',
     );
-    fireEvent.mouseMove(svg, { clientX: 700 });
+    fireEvent.pointerMove(svg, { clientX: 700 });
     expect(detail().querySelector('time')?.getAttribute('dateTime')).toBe(
       '2000-01-03',
     );
+  });
+
+  it('conserva la primera ficha del ratón cuando la lectura amplía su alto de 24 a 42 píxeles', () => {
+    const { resize } = measuredCurve();
+    fireEvent.pointerMove(control(), { clientX: 200, clientY: 200 });
+    const before = screen.getByRole('tooltip');
+    const position = { left: before.style.left, top: before.style.top };
+    // Real narrow fullscreen geometry: the flex readout grows by 18.28125 px.
+    resize({ width: 366, height: 503.3125 });
+    const after = screen.getByRole('tooltip');
+    expect(after.querySelector('data')?.getAttribute('value')).toBe('105');
+    expect({ left: after.style.left, top: after.style.top }).toEqual(position);
+    // ResizeObserver may notify again without a new effective SVG size.
+    resize({ width: 366, height: 503.3125 });
+    expect(screen.getByRole('tooltip')).toBe(after);
+  });
+
+  it('reancla la ficha del teclado al punto original tras cambiar solo el alto', () => {
+    const { container, resize } = measuredCurve();
+    act(() => control().focus());
+    fireEvent.keyDown(control(), { key: 'Home' });
+    fireEvent.keyDown(control(), { key: 'ArrowRight' });
+    const oldTop = Number.parseFloat(screen.getByRole('tooltip').style.top);
+    resize({ width: 366, height: 503.3125 });
+    const tip = screen.getByRole('tooltip');
+    const [pointX, pointY] = drawnPoints(container)[1];
+    expect(tip.querySelector('data')?.getAttribute('value')).toBe('105');
+    expect(detail().querySelector('time')?.getAttribute('dateTime')).toBe(
+      '2000-01-02',
+    );
+    expect(Number.parseFloat(tip.style.left)).toBeCloseTo(pointX + 16, 1);
+    expect(Number.parseFloat(tip.style.top)).toBeCloseTo(pointY + 16, 1);
+    expect(Number.parseFloat(tip.style.top)).not.toBe(oldTop);
+  });
+
+  it('cierra la ficha ante cambio de ancho, resize de ventana y scroll conservando la selección', () => {
+    const { resize } = measuredCurve();
+    const hover = () =>
+      fireEvent.pointerMove(control(), { clientX: 200, clientY: 200 });
+    hover();
+    resize({ width: 384, height: 503.3125 });
+    expect(screen.queryByRole('tooltip')).toBeNull();
+    expect(detail().querySelector('data')?.getAttribute('value')).toBe('105');
+    hover();
+    fireEvent(window, new Event('resize'));
+    expect(screen.queryByRole('tooltip')).toBeNull();
+    hover();
+    fireEvent.scroll(window);
+    expect(screen.queryByRole('tooltip')).toBeNull();
+    expect(detail().querySelector('data')?.getAttribute('value')).toBe('105');
   });
 
   it('no recorre de nuevo la serie de 100.000 puntos al mover el cursor', () => {
@@ -320,15 +433,19 @@ describe('Inspección y navegación de la curva', () => {
     );
     const { container } = render(<Curve data={data} />);
     reads = 0;
-    fireEvent.mouseMove(container.querySelector('svg')!, { clientX: 300 });
-    fireEvent.mouseMove(container.querySelector('svg')!, { clientX: 330 });
+    fireEvent.pointerMove(container.querySelector('.chart-viewport svg')!, {
+      clientX: 300,
+    });
+    fireEvent.pointerMove(container.querySelector('.chart-viewport svg')!, {
+      clientX: 330,
+    });
     expect(reads).toBeLessThan(200);
     expect(detail().querySelector('data')).not.toBeNull();
   });
 
   it('usa el área pintada del SVG cuando hay márgenes por preserveAspectRatio', () => {
     const { container } = render(<Curve data={portfolio([100, 110, 120])} />);
-    const svg = container.querySelector('svg')!;
+    const svg = container.querySelector('.chart-viewport svg')!;
     vi.spyOn(svg, 'getBoundingClientRect').mockReturnValue({
       width: 1200,
       height: 280,
@@ -342,11 +459,11 @@ describe('Inspección y navegación de la curva', () => {
     });
     const points = drawnPoints(container);
     // 640x280 viewBox in a 1200x280 box: 280 CSS px of horizontal padding.
-    fireEvent.mouseMove(svg, { clientX: 50 + 280 + points[0][0] });
+    fireEvent.pointerMove(svg, { clientX: 50 + 280 + points[0][0] });
     expect(detail().querySelector('time')?.getAttribute('dateTime')).toBe(
       '2000-01-01',
     );
-    fireEvent.mouseMove(svg, { clientX: 50 + 280 + points[1][0] });
+    fireEvent.pointerMove(svg, { clientX: 50 + 280 + points[1][0] });
     expect(detail().querySelector('time')?.getAttribute('dateTime')).toBe(
       '2000-01-02',
     );
@@ -354,12 +471,12 @@ describe('Inspección y navegación de la curva', () => {
 
   it('aplica la matriz real de transformación antes de elegir una observación', () => {
     const { container } = render(<Curve data={portfolio([100, 110, 120])} />);
-    const svg = container.querySelector('svg')!;
+    const svg = container.querySelector('.chart-viewport svg')!;
     const points = drawnPoints(container);
     Object.defineProperty(svg, 'getScreenCTM', {
       value: () => ({ inverse: () => ({ a: 2, c: 0, e: -100 }) }),
     });
-    fireEvent.mouseMove(svg, { clientX: (points[1][0] + 100) / 2 });
+    fireEvent.pointerMove(svg, { clientX: (points[1][0] + 100) / 2 });
     expect(detail().querySelector('time')?.getAttribute('dateTime')).toBe(
       '2000-01-02',
     );
@@ -375,6 +492,12 @@ describe('Inspección y navegación de la curva', () => {
     expect(detail().querySelector('time')?.getAttribute('dateTime')).toBe(
       '2001-01-01',
     );
+    expect(
+      screen
+        .getByRole('tooltip')
+        .querySelector('time')
+        ?.getAttribute('dateTime'),
+    ).toBe('2001-01-01');
     await userEvent.keyboard('{End}');
     expect(detail().querySelector('data')?.getAttribute('value')).toBe('115');
     await userEvent.keyboard('+');
@@ -385,6 +508,7 @@ describe('Inspección y navegación de la curva', () => {
     await userEvent.keyboard('-');
     expect(screen.getByText('4 observaciones')).not.toBeNull();
     await userEvent.keyboard('{Escape}');
+    expect(screen.queryByRole('tooltip')).toBeNull();
     expect(
       within(detail()).getByText(/Selecciona una observación/),
     ).not.toBeNull();
@@ -425,7 +549,14 @@ describe('Inspección y navegación de la curva', () => {
     expect(
       screen.getByText('No hay observaciones en el intervalo seleccionado.'),
     ).not.toBeNull();
-    expect(screen.queryByRole('slider')).toBeNull();
+    expect(
+      screen.queryByRole('slider', { name: 'Observación de la curva' }),
+    ).toBeNull();
+    expect(
+      screen
+        .getByRole('slider', { name: 'Desplazar curva' })
+        .hasAttribute('disabled'),
+    ).toBe(true);
     expect(
       screen
         .getByRole('button', { name: 'Acercar curva' })
@@ -451,6 +582,12 @@ describe('Inspección y navegación de la curva', () => {
     act(() => control().focus());
     await userEvent.keyboard('{Home}');
     expect(within(detail()).getByText('5,00 %')).not.toBeNull();
+    expect(
+      within(screen.getByRole('tooltip')).getByText('5,00 %'),
+    ).not.toBeNull();
+    expect(
+      screen.getByRole('tooltip').querySelector('data')?.getAttribute('value'),
+    ).toBe('200');
     expect(detail().querySelector('data')?.getAttribute('value')).toBe('200');
     expect(
       screen.getByText(/sin reiniciar la base al recortar/),
@@ -473,9 +610,9 @@ describe('Inspección y navegación de la curva', () => {
       screen.getByLabelText('Representación de la curva'),
       'area',
     );
-    expect(container.querySelector('polygon')).not.toBeNull();
+    expect(container.querySelector('.chart-viewport polygon')).not.toBeNull();
     expect(
-      container.querySelector('polyline[stroke-dasharray]'),
+      container.querySelector('.chart-viewport polyline[stroke-dasharray]'),
     ).not.toBeNull();
     act(() => control().focus());
     await userEvent.keyboard('{Home}{ArrowRight}');
@@ -484,6 +621,17 @@ describe('Inspección y navegación de la curva', () => {
         node.getAttribute('value'),
       ),
     ).toEqual(['111', '107']);
+    expect(
+      Array.from(screen.getByRole('tooltip').querySelectorAll('data')).map(
+        (node) => node.getAttribute('value'),
+      ),
+    ).toEqual(['111', '107']);
+    expect(
+      screen
+        .getByRole('tooltip')
+        .querySelector('time')
+        ?.getAttribute('dateTime'),
+    ).toBe('2026-01-05');
     await userEvent.click(
       screen.getByRole('button', { name: 'Acercar curva' }),
     );
@@ -496,26 +644,229 @@ describe('Inspección y navegación de la curva', () => {
     expect(screen.queryByLabelText('Serie de la curva')).toBeNull();
   });
 
+  it('mantiene el extremo final inspeccionado al ampliar con la lupa dentro de un rango y cambiar de estilo', async () => {
+    const data: BacktestPoint[] = [
+      { date: '2026-01-02', equity: 100, benchmark: 102 },
+      { date: '2026-01-05', equity: 111, benchmark: 107 },
+      { date: '2026-01-06', equity: 114, benchmark: 108 },
+      { date: '2026-01-07', equity: 115, benchmark: 109 },
+      { date: '2026-01-08', equity: 118, benchmark: 110 },
+      { date: '2026-01-09', equity: 120, benchmark: 112 },
+    ];
+    const snapshot = JSON.stringify(data);
+    const { container } = render(<Curve data={data} />);
+    await range('2026-01-05', '2026-01-08');
+    act(() => control().focus());
+    await userEvent.keyboard('{End}');
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Acercar curva' }),
+    );
+    expect(screen.getByText('2 observaciones')).not.toBeNull();
+    expect(
+      (
+        screen.getByRole('slider', {
+          name: 'Desplazar curva',
+        }) as HTMLInputElement
+      ).value,
+    ).toBe('3');
+    expect(detail().querySelector('time')?.getAttribute('dateTime')).toBe(
+      '2026-01-08',
+    );
+    expect(
+      Array.from(detail().querySelectorAll('data')).map((node) =>
+        node.getAttribute('value'),
+      ),
+    ).toEqual(['118', '110']);
+    await userEvent.selectOptions(
+      screen.getByLabelText('Representación de la curva'),
+      'area',
+    );
+    expect(container.querySelector('.chart-viewport polygon')).not.toBeNull();
+    expect(detail().querySelector('time')?.getAttribute('dateTime')).toBe(
+      '2026-01-08',
+    );
+    act(() => control().focus());
+    await userEvent.keyboard('{End}');
+    expect(
+      screen
+        .getByRole('tooltip')
+        .querySelector('time')
+        ?.getAttribute('dateTime'),
+    ).toBe('2026-01-08');
+    expect(
+      Array.from(screen.getByRole('tooltip').querySelectorAll('data')).map(
+        (node) => node.getAttribute('value'),
+      ),
+    ).toEqual(['118', '110']);
+    expect(JSON.stringify(data)).toBe(snapshot);
+  });
+
   it('desplaza una ventana conservando su cantidad y acota el cursor', async () => {
     render(<Curve data={portfolio([100, 101, 102, 103, 104, 105])} />);
     await range('2000-01-01', '2000-01-03');
     act(() => control().focus());
     await userEvent.keyboard('{Home}');
-    await userEvent.click(
-      screen.getByRole('button', { name: 'Desplazar curva adelante' }),
-    );
+    const navigation = screen.getByRole('slider', { name: 'Desplazar curva' });
+    fireEvent.change(navigation, { target: { value: '1' } });
     expect(screen.getByText('3 observaciones')).not.toBeNull();
     expect(detail().querySelector('time')?.getAttribute('dateTime')).toBe(
       '2000-01-02',
     );
+    fireEvent.change(navigation, { target: { value: '0' } });
+    expect((navigation as HTMLInputElement).value).toBe('0');
+    expect((navigation as HTMLInputElement).max).toBe('3');
+    expect(
+      screen.queryByRole('button', { name: /Desplazar curva/ }),
+    ).toBeNull();
+  });
+
+  it('abre y cierra la curva ampliada conservando el SVG, el rango y las observaciones', async () => {
+    const data = portfolio([100, 105, 110, 115, 120, 125]);
+    const snapshot = JSON.stringify(data);
+    const { container } = render(<Curve data={data} />);
+    await range('2000-01-02', '2000-01-05');
+    const svg = control();
     await userEvent.click(
-      screen.getByRole('button', { name: 'Desplazar curva atrás' }),
+      screen.getByRole('button', {
+        name: 'Pantalla completa: Curva de cartera',
+      }),
     );
     expect(
-      screen
-        .getByRole('button', { name: 'Desplazar curva atrás' })
-        .hasAttribute('disabled'),
-    ).toBe(true);
+      container.querySelector('.chart-workspace.is-expanded'),
+    ).not.toBeNull();
+    expect(control()).toBe(svg);
+    expect(screen.getByText('4 observaciones')).not.toBeNull();
+    act(() => control().focus());
+    await userEvent.keyboard('{Home}');
+    expect(detail().querySelector('data')?.getAttribute('value')).toBe('105');
+    await userEvent.click(
+      screen.getByRole('button', { name: /Salir de pantalla completa/ }),
+    );
+    expect(container.querySelector('.chart-workspace.is-expanded')).toBeNull();
+    expect(control()).toBe(svg);
+    expect(screen.getByText('4 observaciones')).not.toBeNull();
+    expect(JSON.stringify(data)).toBe(snapshot);
+  });
+
+  it('reserva la rueda para la vista ampliada y conserva los datos originales', async () => {
+    const data = portfolio(
+      Array.from({ length: 12 }, (_, index) => 100 + index),
+    );
+    const snapshot = JSON.stringify(data);
+    const { container } = render(<Curve data={data} />);
+    vi.spyOn(control(), 'getBoundingClientRect').mockReturnValue({
+      width: 640,
+      height: 280,
+      left: 0,
+      right: 640,
+      top: 0,
+      bottom: 280,
+      x: 0,
+      y: 0,
+      toJSON: () => ({}),
+    });
+    fireEvent.wheel(control(), { deltaY: -100, clientX: 300, clientY: 100 });
+    expect(screen.getByText('12 observaciones')).not.toBeNull();
+    await userEvent.click(
+      screen.getByRole('button', {
+        name: 'Pantalla completa: Curva de cartera',
+      }),
+    );
+    fireEvent.wheel(control(), { deltaY: -100, clientX: 300, clientY: 100 });
+    await waitFor(() =>
+      expect(container.querySelector('.chart-period')?.textContent).not.toBe(
+        '12 observaciones',
+      ),
+    );
+    expect(JSON.stringify(data)).toBe(snapshot);
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Restablecer curva' }),
+    );
+    expect(screen.getByText('12 observaciones')).not.toBeNull();
+  });
+
+  it('arrastra la ventana ampliada sin variar su cantidad ni reabrir el tooltip con el click posterior', async () => {
+    const data = portfolio(
+      Array.from({ length: 12 }, (_, index) => 100 + index),
+    );
+    const snapshot = JSON.stringify(data);
+    render(<Curve data={data} />);
+    await range('2000-01-04', '2000-01-09');
+    await userEvent.click(
+      screen.getByRole('button', {
+        name: 'Pantalla completa: Curva de cartera',
+      }),
+    );
+    const svg = control();
+    vi.spyOn(svg, 'getBoundingClientRect').mockReturnValue({
+      width: 640,
+      height: 280,
+      left: 0,
+      right: 640,
+      top: 0,
+      bottom: 280,
+      x: 0,
+      y: 0,
+      toJSON: () => ({}),
+    });
+    Object.defineProperty(svg, 'setPointerCapture', { value: vi.fn() });
+    Object.defineProperty(svg, 'releasePointerCapture', { value: vi.fn() });
+    Object.defineProperty(svg, 'hasPointerCapture', { value: () => true });
+    fireEvent.pointerMove(svg, {
+      clientX: 300,
+      clientY: 100,
+      pointerId: 1,
+      pointerType: 'mouse',
+    });
+    expect(screen.getByRole('tooltip')).not.toBeNull();
+    fireEvent.pointerDown(svg, {
+      clientX: 300,
+      clientY: 100,
+      pointerId: 1,
+      pointerType: 'mouse',
+      button: 0,
+    });
+    fireEvent.pointerMove(svg, {
+      clientX: 460,
+      clientY: 100,
+      pointerId: 1,
+      pointerType: 'mouse',
+      buttons: 1,
+    });
+    fireEvent.pointerUp(svg, {
+      clientX: 460,
+      clientY: 100,
+      pointerId: 1,
+      pointerType: 'mouse',
+      button: 0,
+    });
+    fireEvent.click(svg, { clientX: 460, clientY: 100 });
+    expect(screen.queryByRole('tooltip')).toBeNull();
+    await waitFor(() =>
+      expect(
+        Number(
+          (
+            screen.getByRole('slider', {
+              name: 'Desplazar curva',
+            }) as HTMLInputElement
+          ).value,
+        ),
+      ).toBeLessThan(3),
+    );
+    expect(screen.getByText('6 observaciones')).not.toBeNull();
+    const start = Number(
+      (
+        screen.getByRole('slider', {
+          name: 'Desplazar curva',
+        }) as HTMLInputElement
+      ).value,
+    );
+    act(() => svg.focus());
+    await userEvent.keyboard('{Home}');
+    expect(detail().querySelector('time')?.getAttribute('dateTime')).toBe(
+      data[start].date,
+    );
+    expect(JSON.stringify(data)).toBe(snapshot);
   });
 
   it('no mantiene una selección cuyo día desaparece de una nueva serie', async () => {
@@ -527,6 +878,160 @@ describe('Inspección y navegación de la curva', () => {
     expect(
       within(detail()).getByText(/Selecciona una observación/),
     ).not.toBeNull();
+    expect(screen.queryByRole('tooltip')).toBeNull();
+  });
+
+  it('quita el deslizador y abre el detalle flotante solo al inspeccionar el SVG', () => {
+    render(<Curve data={portfolio([100, 105, 110])} />);
+    expect(
+      screen.queryByRole('slider', { name: 'Observación de la curva' }),
+    ).toBeNull();
+    expect(screen.queryByText('Observación de la curva')).toBeNull();
+    expect(screen.queryByRole('tooltip')).toBeNull();
+    expect(control().getAttribute('tabindex')).toBe('0');
+    act(() => control().focus());
+    expect(screen.queryByRole('tooltip')).toBeNull();
+    fireEvent.pointerMove(control(), { clientX: 300, clientY: 180 });
+    const tooltip = screen.getByRole('tooltip');
+    expect(tooltip.querySelector('time')?.getAttribute('dateTime')).toBe(
+      '2000-01-02',
+    );
+    expect(tooltip.querySelector('data')?.getAttribute('value')).toBe('105');
+    fireEvent.pointerLeave(control());
+    expect(screen.queryByRole('tooltip')).toBeNull();
+    fireEvent.pointerMove(control(), { clientX: 350, clientY: 200 });
+    expect(screen.getByRole('tooltip')).not.toBeNull();
+    fireEvent.blur(control());
+    expect(screen.queryByRole('tooltip')).toBeNull();
+  });
+
+  it('admite eventos de puntero y oculta el detalle al abandonar el gráfico', () => {
+    render(<Curve data={portfolio([100, 105, 110])} />);
+    fireEvent.pointerMove(control(), {
+      clientX: 300,
+      clientY: 180,
+      pointerType: 'mouse',
+    });
+    expect(
+      screen.getByRole('tooltip').querySelector('data')?.getAttribute('value'),
+    ).toBe('105');
+    fireEvent.pointerLeave(control());
+    expect(screen.queryByRole('tooltip')).toBeNull();
+  });
+
+  it('conserva el punto elegido con precisión fraccionaria tras el evento compatible de ratón', () => {
+    const data = portfolio(
+      Array.from({ length: 1100 }, (_, index) => 100 + index),
+    );
+    const { container } = render(<Curve data={data} />);
+    const lastX = drawnPoints(container).at(-1)![0];
+    Object.defineProperty(control(), 'getScreenCTM', {
+      value: () => ({
+        a: 1,
+        b: 0,
+        c: 0,
+        d: 1,
+        e: 0.75,
+        f: 0,
+        inverse: () => ({ a: 1, c: 0, e: -0.75 }),
+      }),
+    });
+    const clientX = lastX + 0.75;
+    fireEvent.pointerMove(control(), {
+      clientX,
+      clientY: 100,
+      pointerType: 'mouse',
+    });
+    expect(
+      screen
+        .getByRole('tooltip')
+        .querySelector('time')
+        ?.getAttribute('dateTime'),
+    ).toBe(data.at(-1)!.date);
+    // Chromium follows PointerEvent coordinates with a compatibility MouseEvent
+    // whose clientX is an integer. It must not replace the precise selection.
+    fireEvent.mouseMove(control(), {
+      clientX: Math.trunc(clientX),
+      clientY: 100,
+    });
+    expect(
+      screen
+        .getByRole('tooltip')
+        .querySelector('time')
+        ?.getAttribute('dateTime'),
+    ).toBe(data.at(-1)!.date);
+    expect(
+      screen.getByRole('tooltip').querySelector('data')?.getAttribute('value'),
+    ).toBe(String(data.at(-1)!.nav));
+    fireEvent.pointerDown(control(), {
+      clientX,
+      clientY: 100,
+      button: 0,
+      pointerId: 1,
+      pointerType: 'mouse',
+    });
+    fireEvent.click(control(), {
+      clientX: Math.trunc(clientX),
+      clientY: 100,
+    });
+    expect(
+      screen.getByRole('tooltip').querySelector('data')?.getAttribute('value'),
+    ).toBe(String(data.at(-1)!.nav));
+  });
+
+  it('ancla la inspección por teclado al punto transformado al espacio de pantalla', async () => {
+    const { container } = render(<Curve data={portfolio([100, 105, 110])} />);
+    const point = drawnPoints(container)[1];
+    Object.defineProperty(control(), 'getScreenCTM', {
+      value: () => ({ a: 0.5, b: 0, c: 0, d: 0.5, e: 100, f: 50 }),
+    });
+    act(() => control().focus());
+    await userEvent.keyboard('{Home}{ArrowRight}');
+    const tooltip = screen.getByRole('tooltip');
+    expect(tooltip.querySelector('data')?.getAttribute('value')).toBe('105');
+    // In jsdom the tooltip has no dimensions; it sits within 32 CSS px of
+    // the transformed original point, rather than using raw SVG coordinates.
+    const left = Number.parseFloat(tooltip.style.left);
+    const top = Number.parseFloat(tooltip.style.top);
+    expect(left - (point[0] * 0.5 + 100)).toBeGreaterThan(0);
+    expect(left - (point[0] * 0.5 + 100)).toBeLessThan(32);
+    expect(top - (point[1] * 0.5 + 50)).toBeGreaterThan(0);
+    expect(top - (point[1] * 0.5 + 50)).toBeLessThan(32);
+  });
+
+  it('oculta el detalle flotante al cambiar de fuente aunque conserve las fechas', () => {
+    const { rerender } = render(<Curve data={portfolio([100, 110])} />);
+    fireEvent.pointerMove(control(), { clientX: 620, clientY: 100 });
+    expect(
+      screen.getByRole('tooltip').querySelector('data')?.getAttribute('value'),
+    ).toBe('110');
+    rerender(<Curve data={portfolio([500, 600])} />);
+    expect(screen.queryByRole('tooltip')).toBeNull();
+    expect(
+      within(detail()).getByText(/Selecciona una observación/),
+    ).not.toBeNull();
+    fireEvent.pointerMove(control(), { clientX: 620, clientY: 100 });
+    expect(
+      screen.getByRole('tooltip').querySelector('data')?.getAttribute('value'),
+    ).toBe('600');
+  });
+
+  it('oculta el detalle flotante al cambiar la representación o la métrica', async () => {
+    render(<Curve data={portfolio([100, 110])} />);
+    fireEvent.pointerMove(control(), { clientX: 620, clientY: 100 });
+    expect(screen.getByRole('tooltip')).not.toBeNull();
+    await userEvent.selectOptions(
+      screen.getByLabelText('Representación de la curva'),
+      'area',
+    );
+    expect(screen.queryByRole('tooltip')).toBeNull();
+    fireEvent.pointerMove(control(), { clientX: 620, clientY: 100 });
+    expect(screen.getByRole('tooltip')).not.toBeNull();
+    await userEvent.selectOptions(
+      screen.getByLabelText('Serie de la curva'),
+      'twr',
+    );
+    expect(screen.queryByRole('tooltip')).toBeNull();
   });
 
   it.each(['2026-02-30', '2000-01-01'])(

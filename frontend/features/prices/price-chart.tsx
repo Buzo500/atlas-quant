@@ -1,10 +1,22 @@
 'use client';
 // A real SVG plot supports pointer and keyboard inspection; an <img> cannot.
-// The native range input below exposes the same observations to assistive tools.
+// Keyboard inspection and the original data table remain available without hover.
 /* oxlint-disable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/no-noninteractive-tabindex, jsx-a11y/prefer-tag-over-role */
-import { useEffect, useId, useRef, useState, type KeyboardEvent } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useId,
+  useRef,
+  useState,
+  type KeyboardEvent,
+} from 'react';
+import {
+  ChartTooltip,
+  type ChartTooltipAnchor,
+} from '@/shared/components/chart-tooltip';
+import { useChartGestures } from '@/shared/components/chart-gestures';
 import { date } from '@/shared/format';
-import type { PriceBar } from './aggregation';
+import { MAX_VISIBLE_BARS, type PriceBar } from './aggregation';
 import { priceValue as price, priceTick } from './format';
 
 export type Representation = 'candles' | 'line' | 'area' | 'ohlc';
@@ -17,6 +29,10 @@ export function PriceChart({
   volume,
   symbol,
   currency,
+  expanded = false,
+  start = 0,
+  total = bars.length,
+  onNavigate = () => {},
 }: {
   bars: PriceBar[];
   selected: number;
@@ -25,30 +41,64 @@ export function PriceChart({
   volume: boolean;
   symbol: string;
   currency: string;
+  expanded?: boolean;
+  start?: number;
+  total?: number;
+  onNavigate?: (start: number, count: number) => void;
 }) {
   const holder = useRef<HTMLDivElement>(null);
   const svg = useRef<SVGSVGElement>(null);
   const description = useId();
+  const tooltipId = useId();
+  const [inspection, setInspection] = useState<{
+    anchor: ChartTooltipAnchor;
+    bars: PriceBar[];
+    index: number;
+    context: string;
+  } | null>(null);
+  const dismiss = useCallback(() => setInspection(null), []);
+  const context = `${representation}:${volume}:${symbol}:${currency}:${expanded}`;
   const [{ width, height }, setSize] = useState({ width: 960, height: 380 });
   useEffect(() => {
     const element = holder.current;
     if (!element) return;
     const observer = new ResizeObserver(([entry]) => {
-      if (entry && entry.contentRect.width > 0)
+      if (entry && entry.contentRect.width > 0) {
+        dismiss();
         setSize({
           width: Math.max(280, entry.contentRect.width),
           height: Math.max(220, entry.contentRect.height),
         });
+      }
     });
     observer.observe(element);
     return () => observer.disconnect();
-  }, []);
-  if (!bars.length) return null;
+  }, [dismiss]);
+  // Discard an old selection as part of deriving this render, without remounting
+  // the focused SVG or waiting for an effect to remove stale floating content.
+  if (
+    inspection &&
+    (inspection.bars !== bars || inspection.context !== context)
+  )
+    setInspection(null);
   const left = 12,
     right = 86,
     top = 20,
     bottom = volume ? height * 0.64 : height - 38;
   const plot = Math.max(80, width - left - right);
+  const gestures = useChartGestures({
+    svgRef: svg,
+    enabled: expanded,
+    start,
+    count: bars.length,
+    total,
+    maxCount: MAX_VISIBLE_BARS,
+    onNavigate,
+    onGesture: dismiss,
+    plotLeft: left,
+    plotWidth: plot,
+  });
+  if (!bars.length) return null;
   const step = plot / bars.length;
   const x = (index: number) => left + (index + 0.5) * step;
   let low = Infinity,
@@ -81,7 +131,39 @@ export function PriceChart({
     ...new Set([0, Math.floor((bars.length - 1) / 2), bars.length - 1]),
   ];
   const currentLabel = `${date(current.first_date)}${current.last_date === current.first_date ? '' : ' a ' + date(current.last_date)}; apertura ${price(current.open)}, máximo ${price(current.high)}, mínimo ${price(current.low)}, cierre ${price(current.close)} ${currency}; volumen ${current.volume === null ? 'sin dato' : price(current.volume)}`;
+  const anchor =
+    inspection?.bars === bars &&
+    inspection.context === context &&
+    inspection.index === selected
+      ? inspection.anchor
+      : null;
+  function pointAnchor(index: number): ChartTooltipAnchor | null {
+    const element = svg.current;
+    if (!element) return null;
+    const matrix = element.getScreenCTM?.();
+    if (matrix && typeof DOMPoint !== 'undefined') {
+      const point = new DOMPoint(
+        x(index),
+        y(bars[index].close),
+      ).matrixTransform(matrix);
+      return Number.isFinite(point.x) && Number.isFinite(point.y)
+        ? { x: point.x, y: point.y }
+        : null;
+    }
+    const box = element.getBoundingClientRect();
+    if (box.width <= 0 || box.height <= 0) return null;
+    const fit = Math.min(box.width / width, box.height / height);
+    return {
+      x: box.left + (box.width - width * fit) / 2 + x(index) * fit,
+      y: box.top + (box.height - height * fit) / 2 + y(bars[index].close) * fit,
+    };
+  }
   function keyboard(event: KeyboardEvent<SVGSVGElement>) {
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      dismiss();
+      return;
+    }
     const next =
       event.key === 'ArrowLeft'
         ? selected - 1
@@ -94,7 +176,12 @@ export function PriceChart({
               : null;
     if (next !== null) {
       event.preventDefault();
-      onSelect(Math.max(0, Math.min(bars.length - 1, next)));
+      const index = Math.max(0, Math.min(bars.length - 1, next));
+      const nextAnchor = pointAnchor(index);
+      onSelect(index);
+      setInspection(
+        nextAnchor ? { anchor: nextAnchor, bars, index, context } : null,
+      );
     }
   }
   return (
@@ -102,36 +189,70 @@ export function PriceChart({
       <div ref={holder} className="price-plot">
         <svg
           ref={svg}
-          className="price-chart-svg"
+          className={`price-chart-svg${expanded ? ' price-chart-interactive' : ''}`}
           viewBox={`0 0 ${width} ${height}`}
           role="img"
           tabIndex={0}
           aria-label={`Gráfico de precios · ${symbol}. ${currentLabel}`}
-          aria-describedby={description}
+          aria-describedby={
+            anchor ? `${description} ${tooltipId}` : description
+          }
           onKeyDown={keyboard}
+          onBlur={dismiss}
+          onPointerLeave={dismiss}
+          onPointerDown={(event) => gestures.onPointerDown(event)}
+          onPointerUp={(event) => gestures.onPointerUp(event)}
+          onPointerCancel={(event) => gestures.onPointerCancel(event)}
+          onLostPointerCapture={(event) => gestures.onLostPointerCapture(event)}
           onPointerMove={(event) => {
+            if (gestures.onPointerMove(event)) return;
             const box = event.currentTarget.getBoundingClientRect();
             if (box.width <= 0 || box.height <= 0) return;
             const matrix = event.currentTarget.getScreenCTM?.();
             const fit = Math.min(box.width / width, box.height / height);
-            const horizontal =
+            const position =
               matrix && typeof DOMPoint !== 'undefined'
                 ? new DOMPoint(event.clientX, event.clientY).matrixTransform(
                     matrix.inverse(),
-                  ).x
-                : (event.clientX - box.left - (box.width - width * fit) / 2) /
-                  fit;
-            onSelect(
-              Math.max(
-                0,
-                Math.min(
-                  bars.length - 1,
-                  Math.floor((horizontal - left) / step),
-                ),
-              ),
+                  )
+                : {
+                    x:
+                      (event.clientX -
+                        box.left -
+                        (box.width - width * fit) / 2) /
+                      fit,
+                    y:
+                      (event.clientY -
+                        box.top -
+                        (box.height - height * fit) / 2) /
+                      fit,
+                  };
+            if (
+              !Number.isFinite(position.x) ||
+              !Number.isFinite(position.y) ||
+              position.x < left ||
+              position.x > left + plot ||
+              position.y < top ||
+              position.y > (volume ? volumeBottom : bottom)
+            ) {
+              dismiss();
+              return;
+            }
+            const index = Math.max(
+              0,
+              Math.min(bars.length - 1, Math.floor((position.x - left) / step)),
             );
+            onSelect(index);
+            setInspection({
+              anchor: { x: event.clientX, y: event.clientY },
+              bars,
+              index,
+              context,
+            });
           }}
-          onClick={() => svg.current?.focus()}
+          onClick={() => {
+            if (!gestures.onClick()) svg.current?.focus();
+          }}
         >
           <g aria-hidden="true">
             {[0, 0.25, 0.5, 0.75, 1].map((ratio) => {
@@ -293,24 +414,59 @@ export function PriceChart({
           </g>
         </svg>
       </div>
-      <label className="price-inspector-label">
-        Inspeccionar barra
-        <input
-          type="range"
-          min={0}
-          max={bars.length - 1}
-          step={1}
-          value={selected}
-          aria-label="Inspeccionar barra"
-          aria-valuetext={currentLabel}
-          onChange={(event) => onSelect(Number(event.target.value))}
-        />
-      </label>
+      <ChartTooltip anchor={anchor} onDismiss={dismiss} id={tooltipId}>
+        <div className="chart-tooltip-heading">
+          <strong>
+            {symbol} · {currency}
+          </strong>
+          <span>
+            <time dateTime={current.first_date}>
+              {date(current.first_date)}
+            </time>
+            {current.last_date !== current.first_date && (
+              <>
+                {' → '}
+                <time dateTime={current.last_date}>
+                  {date(current.last_date)}
+                </time>
+              </>
+            )}
+          </span>
+        </div>
+        <dl>
+          {(
+            [
+              ['Apertura', current.open, 'open'],
+              ['Máximo', current.high, 'high'],
+              ['Mínimo', current.low, 'low'],
+              ['Cierre', current.close, 'close'],
+              ['Volumen', current.volume, 'volume'],
+            ] as const
+          ).map(([label, amount, field]) => (
+            <div key={field}>
+              <dt>{label}</dt>
+              <dd data-price-field={field}>
+                <data value={amount === null ? undefined : String(amount)}>
+                  {amount === null ? 'Sin dato' : price(amount)}
+                </data>
+              </dd>
+            </div>
+          ))}
+        </dl>
+        {current.completeness === 'unknown' && (
+          <p className="chart-tooltip-note">
+            {current.observations} sesiones agregadas · cobertura sin verificar.
+            {(current.partial_start || current.partial_end) &&
+              ' Periodo recortado.'}
+          </p>
+        )}
+      </ChartTooltip>
       <figcaption id={description}>
         Precio en {currency}; eje vertical ajustado al rango visible. Sesiones
         observadas equidistantes, sin rellenar días ausentes. Flechas
-        izquierda/derecha y teclas Inicio/Fin para inspeccionar; el deslizador
-        ofrece el mismo control.
+        izquierda/derecha y teclas Inicio/Fin para inspeccionar. Esc {expanded
+          ? 'sale de pantalla completa'
+          : 'cierra la lectura flotante'}; la tabla conserva los datos originales.
         {representation === 'area' &&
           ' El área parte del mínimo del eje visible, no de cero.'}
         {representation === 'candles' || representation === 'ohlc'

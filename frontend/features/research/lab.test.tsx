@@ -55,7 +55,7 @@ describe('Identidad de una comparación del Laboratorio', () => {
       await screen.findByRole('region', { name: 'Contexto de la ejecución' });
       if (change === 'symbol') {
         await user.click(screen.getByRole('combobox', { name: 'Activo' }));
-        await user.click(screen.getByRole('option', { name: 'B' }));
+        await user.click(await screen.findByRole('option', { name: 'B' }));
       } else if (change === 'costs') {
         fireEvent.change(
           screen.getByRole('spinbutton', { name: 'Capital simulado (€)' }),

@@ -1,0 +1,55 @@
+.chart-tooltip {
+  position: fixed;
+  z-index: 80;
+  box-sizing: border-box;
+  width: max-content;
+  max-width: min(292px, calc(100vw - 16px));
+  max-height: calc(100dvh - 16px);
+  overflow: hidden;
+  pointer-events: none;
+  padding: 12px 14px;
+  border: 1px solid #c8b8a7;
+  border-radius: 7px;
+  background: #fffcf6;
+  color: #30383f;
+  box-shadow: 0 4px 16px rgb(48 56 63 / 12%);
+  font-family: inherit;
+  font-size: 13px;
+  line-height: 1.5;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+.chart-tooltip-heading {
+  display: grid;
+  gap: 2px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #e6ddcf;
+}
+.chart-tooltip-heading strong {
+  font-weight: 600;
+}
+.chart-tooltip-heading time {
+  color: #686158;
+}
+.chart-tooltip dl {
+  display: grid;
+  grid-template-columns: minmax(0, auto) minmax(0, 1fr);
+  gap: 4px 18px;
+  margin: 9px 0 0;
+}
+.chart-tooltip dt {
+  color: #686158;
+}
+.chart-tooltip dl > div {
+  display: contents;
+}
+.chart-tooltip dd {
+  margin: 0;
+  text-align: right;
+  font-weight: 600;
+}
+.chart-tooltip-note {
+  margin: 8px 0 0;
+  font-size: 12px;
+  color: #686158;
+}

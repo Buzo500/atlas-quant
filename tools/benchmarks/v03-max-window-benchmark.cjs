@@ -45,13 +45,15 @@ const sha = (value) => crypto.createHash('sha256').update(value).digest('hex');
 const began = performance.now(), abort = new AbortController();
 let browser;
 const deadline = setTimeout(() => { abort.abort(); void browser?.close(); }, 110000);
-const report = { at: new Date().toISOString(), run_id: runId, base_url: BASE, dataset_id: dataset.dataset_id,
+const report = { report_format: 2, at: new Date().toISOString(), run_id: runId, base_url: BASE, dataset_id: dataset.dataset_id,
   frontend_build_sources_sha256: frontendBuildSources,
   dataset_version: dataset.dataset_version, manifest_hash: dataset.manifest_hash,
   original_benchmark: previousPath, original_benchmark_sha256: sha(previousBytes),
   additional_read_only_validation: true, imports: 0, mutations: 0,
   viewport_css: { width: 1440, height: 1000 }, physical_dpi_validation: false,
-  methodology: 'Dedicated headless Chromium on real compiled UI/API. Expand to 1000 candles, point at 20 rendered candle wicks using their actual SVG coordinates transformed through getScreenCTM, dispatch DOM PointerEvents, await two rAF frames and verify date/OHLCV/previous close against the exact immutable snapshot. This measures DOM pointer handling, not physical mouse hardware. Alternate 1000/500 zoom windows for 20 samples. DOMCounters and heap follow explicit CDP GC.',
+  methodology: 'Dedicated headless Chromium on real compiled UI/API. Expand to 1000 candles, count actual candle groups, point at 20 rendered candle wicks using their actual SVG coordinates transformed through getScreenCTM, dispatch DOM PointerEvents, await two rAF frames and verify date/OHLCV/previous close against the exact immutable snapshot plus the floating tooltip. This measures DOM pointer handling and tooltip rendering, not physical mouse hardware. Alternate 1000/500 zoom windows for 20 samples. DOMCounters and heap follow explicit CDP GC.',
+  interaction_method: 'svg-pointer-tooltip-v2',
+  historical_comparison: 'Earlier reports had a persistent inspector without this floating tooltip. This report removes slider-derived metrics and includes tooltip rendering; historical timings do not validate the changed UI.',
   network_violations: [], page_errors: [], success: false };
 async function api(resource) {
   checkRun(); assert.ok(resource.startsWith('/api/') && !resource.includes('..'));
@@ -75,7 +77,6 @@ async function metrics(page, session) {
       price_svg_nodes: document.querySelectorAll('.price-chart-svg *').length,
       candle_groups: document.querySelectorAll('.price-chart-svg g.price-rise,.price-chart-svg g.price-fall').length,
       volume_bars: document.querySelectorAll('.price-chart-svg .price-volume-bar').length,
-      slider_max: Number(document.querySelector('.prices-panel input[aria-label="Inspeccionar barra"]').max),
     }))) };
 }
 (async () => {
@@ -113,19 +114,22 @@ async function metrics(page, session) {
   report.expansion = await page.evaluate(async () => {
     const wait = () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
     const panel = document.querySelector('.prices-panel');
-    const slider = () => panel.querySelector('input[aria-label="Inspeccionar barra"]');
-    const button = (name) => [...panel.querySelectorAll('button')].find((item) => item.textContent.trim() === name);
+    const size = () => panel.querySelectorAll('.price-chart-svg g.price-rise,.price-chart-svg g.price-fall').length;
+    const button = (name) => [...panel.querySelectorAll('button')].find((item) => (item.getAttribute('aria-label') || item.textContent.trim()) === name);
     const steps = [];
-    for (let turn = 0; Number(slider().max) < 999 && turn < 8; turn++) {
+    for (let turn = 0; size() < 1000 && turn < 8; turn++) {
       const next = button('Alejar precios'); if (!next || next.disabled) throw new Error('Cannot expand to 1000 candles.');
-      const before = Number(slider().max); next.click(); await wait();
-      const after = Number(slider().max); if (after <= before) throw new Error('Zoom-out did not enlarge the price window.');
-      steps.push({ before: before + 1, after: after + 1 });
+      const before = size(); next.click(); await wait();
+      const after = size(); if (after <= before) throw new Error('Zoom-out did not enlarge the price window.');
+      steps.push({ before, after });
     }
-    if (Number(slider().max) !== 999) throw new Error('Expected exactly 1000 visible candles.');
-    const last = button('Última ventana'); if (!last) throw new Error('Missing last-window control.');
-    if (!last.disabled) { last.click(); await wait(); }
-    if (!button('Última ventana').disabled) throw new Error('Price window does not end at the final source observation.');
+    if (size() !== 1000) throw new Error('Expected exactly 1000 visible candles.');
+    const navigator = panel.querySelector('input[type="range"][aria-label="Desplazar precios"]');
+    if (!navigator) throw new Error('Missing price window navigator.');
+    navigator.focus();
+    Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set.call(navigator, navigator.max);
+    navigator.dispatchEvent(new Event('input', { bubbles: true })); await wait();
+    if (navigator.valueAsNumber !== Number(navigator.max)) throw new Error('Price window does not end at the final source observation.');
     const groups = panel.querySelectorAll('svg g.price-rise,svg g.price-fall');
     if (groups.length !== 1000) throw new Error(`Expected 1000 actual candle groups, received ${groups.length}.`);
     return { steps, visible_candles: groups.length, source_first_index: 99000, source_last_index: 99999 };
@@ -150,8 +154,6 @@ async function metrics(page, session) {
       svg.dispatchEvent(new PointerEvent('pointermove', { bubbles: true, pointerType: 'mouse',
         clientX: client.x, clientY: client.y, pointerId: 1, isPrimary: true }));
       await wait(); samples.push(performance.now() - tick);
-      const selected = Number(document.querySelector('.prices-panel input[aria-label="Inspeccionar barra"]').value);
-      if (selected !== index) throw new Error(`Pointer selected bar ${selected} instead of rendered candle ${index}.`);
       const original = expected[index + 1];
       const values = {};
       for (const field of ['open', 'high', 'low', 'close', 'volume']) {
@@ -162,6 +164,9 @@ async function metrics(page, session) {
       }
       const heading = document.querySelector('.price-readout-heading h3').textContent;
       if (!heading.includes(dateFormat.format(new Date(original.date + 'T00:00:00Z')))) throw new Error('Inspector date differs from snapshot.');
+      const tooltip = document.querySelector('[role="tooltip"]');
+      if (!tooltip || !tooltip.textContent.includes(dateFormat.format(new Date(original.date + 'T00:00:00Z')))
+        || tooltip.getBoundingClientRect().width <= 0) throw new Error('Pointer did not display a tooltip for the inspected source date.');
       const previous = document.querySelector('.price-readout [data-price-field="previous-close"] data[value]');
       const previousDate = document.querySelector('.price-readout [data-price-field="previous-close"] time')?.getAttribute('datetime');
       if (Number(previous?.getAttribute('value')) !== expected[index].close || previousDate !== expected[index].date)
@@ -177,10 +182,10 @@ async function metrics(page, session) {
     const wait = () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
     const samples = [], changes = [];
     const panel = document.querySelector('.prices-panel');
-    const size = () => Number(panel.querySelector('input[aria-label="Inspeccionar barra"]').max) + 1;
+    const size = () => panel.querySelectorAll('.price-chart-svg g.price-rise,.price-chart-svg g.price-fall').length;
     for (let i = 0; i < 20; i++) {
       const name = i % 2 === 0 ? 'Acercar precios' : 'Alejar precios';
-      const next = [...panel.querySelectorAll('button')].find((item) => item.textContent.trim() === name);
+      const next = [...panel.querySelectorAll('button')].find((item) => (item.getAttribute('aria-label') || item.textContent.trim()) === name);
       if (!next || next.disabled) throw new Error(`Missing enabled ${name}.`);
       const before = size(), tick = performance.now(); next.click(); await wait();
       samples.push(performance.now() - tick); const after = size();
@@ -192,7 +197,7 @@ async function metrics(page, session) {
   });
   report.zoom = { ...summary(zoom.samples), changes: zoom.changes };
   report.after_zoom = await metrics(page, session);
-  assert.equal(report.after_zoom.candle_groups, 1000); assert.equal(report.after_zoom.slider_max, 999);
+  assert.equal(report.after_zoom.candle_groups, 1000);
   const after = await api(resource);
   assert.equal(after.dataset_version, dataset.dataset_version); assert.equal(after.manifest_hash, dataset.manifest_hash);
   assert.equal(sha(JSON.stringify(after.bars)), report.source_bars_sha256);

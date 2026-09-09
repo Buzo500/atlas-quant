@@ -73,14 +73,6 @@
 .price-inspector-label input {
   accent-color: #995a38;
 }
-.prices-view-controls {
-  border: 0;
-  padding: 0;
-  min-width: 0;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
 .prices-window-summary {
   display: block;
   font-size: 12px;
@@ -108,6 +100,27 @@
 .price-chart-svg:focus-visible {
   outline: 2px solid #995a38;
   outline-offset: 3px;
+}
+.price-chart-interactive {
+  touch-action: none;
+  cursor: grab;
+}
+.price-chart-interactive:active {
+  cursor: grabbing;
+}
+.chart-workspace.is-expanded .price-figure {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+.chart-workspace.is-expanded .price-plot {
+  flex: 1;
+  min-height: 260px;
+}
+.chart-workspace.is-expanded .price-chart-svg {
+  height: 100%;
+  min-height: 260px;
 }
 .price-grid {
   stroke: #dfd8cb;
@@ -160,18 +173,6 @@
   stroke: #995a38;
   stroke-width: 1.5;
   vector-effect: non-scaling-stroke;
-}
-.price-inspector-label {
-  display: grid;
-  grid-template-columns: auto minmax(60px, 1fr);
-  align-items: center;
-  gap: 12px;
-  font-size: 12px;
-  padding-block: 8px;
-}
-.price-inspector-label input {
-  width: 100%;
-  min-width: 0;
 }
 .price-figure figcaption {
   color: #686158;
@@ -283,10 +284,6 @@
   }
   .prices-date-controls button {
     flex: 1 1 130px;
-  }
-  .price-inspector-label {
-    grid-template-columns: 1fr;
-    gap: 6px;
   }
   .price-readout dl {
     grid-template-columns: repeat(2, minmax(0, 1fr));

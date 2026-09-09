@@ -5,6 +5,8 @@ import { api, datasetPricesPath } from '@/lib/api';
 import type { DatasetPricesResponse } from '@/lib/api-types';
 import { dataset, deferred } from '@/test/fixtures';
 import { PriceExplorer, PricesPanel } from './prices-panel';
+import { PriceChart } from './price-chart';
+import { aggregateBars } from './aggregation';
 
 vi.mock('@/lib/api', async (original) => ({
   ...(await original<typeof import('@/lib/api')>()),
@@ -42,6 +44,43 @@ function response(id = 'a', version = 1, symbol = 'A'): DatasetPricesResponse {
 function field(name: string) {
   return screen
     .getByRole('region', { name: 'Lectura de precios' })
+    .querySelector(`[data-price-field="${name}"] data`);
+}
+function graphicLayout() {
+  const graphic = screen.getByRole('img', { name: /Gráfico de precios/ });
+  Object.defineProperty(graphic, 'getBoundingClientRect', {
+    configurable: true,
+    value: () => ({ left: 0, top: 0, width: 960, height: 380 }),
+  });
+  return graphic;
+}
+function hover(graphic: HTMLElement, x: number, y = 120) {
+  fireEvent(
+    graphic,
+    new MouseEvent('pointermove', {
+      bubbles: true,
+      clientX: x,
+      clientY: y,
+    }),
+  );
+}
+function mouseGesture(graphic: HTMLElement, type: string, x: number) {
+  const event = new MouseEvent(type, {
+    bubbles: true,
+    cancelable: true,
+    button: 0,
+    clientX: x,
+    clientY: 120,
+  });
+  Object.defineProperties(event, {
+    pointerId: { value: 7 },
+    pointerType: { value: 'mouse' },
+  });
+  fireEvent(graphic, event);
+}
+function tooltipField(name: string) {
+  return screen
+    .getByRole('tooltip')
     .querySelector(`[data-price-field="${name}"] data`);
 }
 async function choice(label: string, option: string) {
@@ -142,6 +181,107 @@ describe('Consulta de precios con identidad inmutable', () => {
 });
 
 describe('Exploración fiel y accesible de OHLCV', () => {
+  it('elimina el deslizador y muestra los OHLCV originales al lado del puntero solo durante la inspección', () => {
+    render(<PriceExplorer response={response()} />);
+    const graphic = graphicLayout();
+    expect(
+      screen.queryByRole('slider', { name: 'Inspeccionar barra' }),
+    ).toBeNull();
+    expect(
+      screen.getByRole('slider', { name: 'Desplazar precios' }),
+    ).toBeTruthy();
+    expect(screen.queryByText('Inspeccionar barra')).toBeNull();
+    expect(screen.queryByRole('tooltip')).toBeNull();
+    hover(graphic, 443);
+    const tooltip = screen.getByRole('tooltip');
+    expect(tooltip.textContent).toContain('A · EUR');
+    expect(within(tooltip).getByText('04/01/2021')).toBeTruthy();
+    expect(tooltipField('open')?.getAttribute('value')).toBe('15');
+    expect(tooltipField('high')?.getAttribute('value')).toBe('18');
+    expect(tooltipField('low')?.getAttribute('value')).toBe('14');
+    expect(tooltipField('close')?.getAttribute('value')).toBe('17');
+    expect(tooltipField('volume')?.getAttribute('value')).toBe('3');
+    expect(tooltip.style.left).toBe('459px');
+    expect(tooltip.style.top).toBe('136px');
+    expect(graphic.getAttribute('aria-describedby')).toContain(tooltip.id);
+    fireEvent.pointerLeave(graphic);
+    expect(screen.queryByRole('tooltip')).toBeNull();
+    expect(field('close')?.getAttribute('value')).toBe('17');
+    hover(graphic, 443);
+    fireEvent.keyDown(graphic, { key: 'Escape' });
+    expect(screen.queryByRole('tooltip')).toBeNull();
+    hover(graphic, 900);
+    expect(screen.queryByRole('tooltip')).toBeNull();
+  });
+  it('ancla la inspección por teclado al punto dibujado y la descarta al perder foco o cambiar de ventana', async () => {
+    render(<PriceExplorer response={response()} />);
+    const graphic = graphicLayout();
+    fireEvent.focus(graphic);
+    fireEvent.keyDown(graphic, { key: 'Home' });
+    expect(tooltipField('close')?.getAttribute('value')).toBe('12');
+    expect(tooltipField('volume')?.getAttribute('value')).toBe('0');
+    expect(
+      Number.parseFloat(screen.getByRole('tooltip').style.left),
+    ).toBeCloseTo(114.2);
+    fireEvent.keyDown(graphic, { key: 'ArrowRight' });
+    expect(tooltipField('close')?.getAttribute('value')).toBe('15');
+    fireEvent.blur(graphic);
+    expect(screen.queryByRole('tooltip')).toBeNull();
+    hover(graphic, 443);
+    await userEvent
+      .setup()
+      .click(screen.getByRole('button', { name: 'Acercar precios' }));
+    expect(screen.queryByRole('tooltip')).toBeNull();
+    expect(screen.getByRole('img', { name: /Gráfico de precios/ })).toBe(
+      graphic,
+    );
+    fireEvent.keyDown(graphic, { key: 'End' });
+    expect(screen.getByRole('tooltip')).toBeTruthy();
+    fireEvent(window, new Event('scroll'));
+    expect(screen.queryByRole('tooltip')).toBeNull();
+  });
+  it('muestra OHLCV semanales exactos y las fechas realmente observadas', async () => {
+    const data = response();
+    render(<PriceExplorer response={data} />);
+    const graphic = graphicLayout();
+    hover(graphic, 443);
+    await choice('Intervalo del gráfico', 'Semanal');
+    expect(screen.queryByRole('tooltip')).toBeNull();
+    fireEvent.keyDown(graphic, { key: 'Home' });
+    const tooltip = screen.getByRole('tooltip');
+    expect(within(tooltip).getByText('30/12/2020')).toBeTruthy();
+    expect(within(tooltip).getByText('31/12/2020')).toBeTruthy();
+    expect(tooltipField('open')?.getAttribute('value')).toBe('10');
+    expect(tooltipField('high')?.getAttribute('value')).toBe('16');
+    expect(tooltipField('low')?.getAttribute('value')).toBe('9');
+    expect(tooltipField('close')?.getAttribute('value')).toBe('15');
+    expect(tooltipField('volume')?.getAttribute('value')).toBe('2');
+    expect(tooltip.textContent).toContain('2 sesiones agregadas');
+    expect(tooltip.textContent).toContain('Periodo recortado');
+  });
+  it('mantiene el volumen ausente de un agregado sin presentarlo como cero', () => {
+    const bars = aggregateBars(
+      response().bars.map((bar, index) => ({
+        ...bar,
+        volume: index === 1 ? null : bar.volume,
+      })),
+      'W',
+    );
+    render(
+      <PriceChart
+        bars={bars}
+        selected={0}
+        onSelect={vi.fn()}
+        representation="candles"
+        volume
+        symbol="A"
+        currency="EUR"
+      />,
+    );
+    fireEvent.keyDown(graphicLayout(), { key: 'Home' });
+    expect(tooltipField('volume')?.hasAttribute('value')).toBe(false);
+    expect(tooltipField('volume')?.textContent).toBe('Sin dato');
+  });
   it('presenta el cambio redondeado y conserva sus datos numéricos y el OHLC original', () => {
     const data = response();
     const close = 1.050801;
@@ -184,10 +324,7 @@ describe('Exploración fiel y accesible de OHLCV', () => {
       }),
     );
     expect(field('close')?.getAttribute('value')).toBe('12');
-    fireEvent.change(
-      screen.getByRole('slider', { name: 'Inspeccionar barra' }),
-      { target: { value: '4' } },
-    );
+    fireEvent.keyDown(graphic, { key: 'End' });
     expect(field('close')?.getAttribute('value')).toBe('20');
     expect(field('previous-close')?.getAttribute('value')).toBe('18');
   });
@@ -205,10 +342,11 @@ describe('Exploración fiel y accesible de OHLCV', () => {
     expect(screen.getByText(/Completitud desconocida/)).toBeTruthy();
     expect(screen.getByText(/Periodo civil recortado:/)).toBeTruthy();
     await choice('Intervalo del gráfico', 'Mensual');
-    fireEvent.change(
-      screen.getByRole('slider', { name: 'Inspeccionar barra' }),
-      { target: { value: '1' } },
-    );
+    const monthlyGraphic = screen.getByRole('img', {
+      name: /Gráfico de precios/,
+    });
+    fireEvent.keyDown(monthlyGraphic, { key: 'Home' });
+    fireEvent.keyDown(monthlyGraphic, { key: 'ArrowRight' });
     expect(field('open')?.getAttribute('value')).toBe('15');
     expect(field('close')?.getAttribute('value')).toBe('18');
     expect(field('volume')?.getAttribute('value')).toBe('7');
@@ -268,18 +406,21 @@ describe('Exploración fiel y accesible de OHLCV', () => {
     data.available_end = data.last_date = data.bars[129].date;
     render(<PriceExplorer response={data} />);
     expect(
-      screen
-        .getByRole('slider', { name: 'Inspeccionar barra' })
-        .getAttribute('max'),
-    ).toBe('119');
+      document.querySelectorAll(
+        '.price-chart-svg .price-rise, .price-chart-svg .price-fall',
+      ),
+    ).toHaveLength(120);
     const user = userEvent.setup();
     await user.click(screen.getByRole('button', { name: 'Acercar precios' }));
     expect(
-      screen
-        .getByRole('slider', { name: 'Inspeccionar barra' })
-        .getAttribute('max'),
-    ).toBe('59');
-    await user.click(screen.getByRole('button', { name: 'Primera ventana' }));
+      document.querySelectorAll(
+        '.price-chart-svg .price-rise, .price-chart-svg .price-fall',
+      ),
+    ).toHaveLength(60);
+    fireEvent.change(
+      screen.getByRole('slider', { name: 'Desplazar precios' }),
+      { target: { value: '0' } },
+    );
     fireEvent.keyDown(screen.getByRole('img', { name: /Gráfico de precios/ }), {
       key: 'Home',
     });
@@ -296,6 +437,171 @@ describe('Exploración fiel y accesible de OHLCV', () => {
     );
     expect(screen.getAllByRole('row')).toHaveLength(51);
     expect(screen.getByRole('rowheader', { name: '20/02/2026' })).toBeTruthy();
+  });
+  it('conserva la fecha original inspeccionada al cambiar el zoom y desplazar una ventana que aún la contiene', async () => {
+    render(<PriceExplorer response={response()} />);
+    const graphic = graphicLayout();
+    const user = userEvent.setup();
+    hover(graphic, 443);
+    expect(field('close')?.getAttribute('value')).toBe('17');
+    await user.click(screen.getByRole('button', { name: 'Acercar precios' }));
+    expect(
+      document.querySelectorAll(
+        '.price-chart-svg .price-rise, .price-chart-svg .price-fall',
+      ),
+    ).toHaveLength(3);
+    expect(field('close')?.getAttribute('value')).toBe('17');
+    const navigation = screen.getByRole('slider', {
+      name: 'Desplazar precios',
+    });
+    fireEvent.change(navigation, { target: { value: '2' } });
+    expect(navigation.getAttribute('value')).toBe('2');
+    expect(field('close')?.getAttribute('value')).toBe('17');
+    fireEvent.change(navigation, { target: { value: '0' } });
+    expect(navigation.getAttribute('value')).toBe('0');
+    expect(field('close')?.getAttribute('value')).toBe('17');
+    await user.click(screen.getByRole('button', { name: 'Alejar precios' }));
+    expect(field('close')?.getAttribute('value')).toBe('17');
+    expect(
+      screen.queryByRole('button', { name: 'Primera ventana' }),
+    ).toBeNull();
+    expect(
+      screen.queryByRole('button', { name: 'Barras anteriores' }),
+    ).toBeNull();
+    expect(
+      screen.queryByRole('button', { name: 'Barras siguientes' }),
+    ).toBeNull();
+  });
+  it('activa rueda y arrastre solo en pantalla completa y conserva la lectura al volver', async () => {
+    render(<PriceExplorer response={response()} />);
+    const graphic = graphicLayout();
+    const wheel = (ctrlKey = false) => {
+      const event = new WheelEvent('wheel', {
+        bubbles: true,
+        cancelable: true,
+        clientX: 443,
+        clientY: 120,
+        deltaY: -100,
+        ctrlKey,
+      });
+      fireEvent(graphic, event);
+      return event;
+    };
+    expect(wheel().defaultPrevented).toBe(false);
+    hover(graphic, 443);
+    const original = field('close')?.getAttribute('value');
+    await userEvent
+      .setup()
+      .click(
+        screen.getByRole('button', { name: 'Pantalla completa: Precios de A' }),
+      );
+    expect(screen.getByRole('dialog', { name: 'Precios de A' })).toBeTruthy();
+    expect(screen.queryByRole('tooltip')).toBeNull();
+    expect(screen.getByRole('img', { name: /Gráfico de precios/ })).toBe(
+      graphic,
+    );
+    expect(wheel(true).defaultPrevented).toBe(false);
+    expect(wheel().defaultPrevented).toBe(true);
+    expect(
+      document.querySelectorAll(
+        '.price-chart-svg .price-rise, .price-chart-svg .price-fall',
+      ),
+    ).toHaveLength(4);
+    const navigation = screen.getByRole('slider', {
+      name: 'Desplazar precios',
+    });
+    expect(navigation.getAttribute('value')).toBe('1');
+    hover(graphic, 330);
+    expect(screen.getByRole('tooltip')).toBeTruthy();
+    mouseGesture(graphic, 'pointerdown', 443);
+    mouseGesture(graphic, 'pointermove', 643);
+    expect(screen.queryByRole('tooltip')).toBeNull();
+    expect(navigation.getAttribute('value')).toBe('0');
+    mouseGesture(graphic, 'pointerup', 643);
+    fireEvent.click(graphic);
+    expect(screen.queryByRole('tooltip')).toBeNull();
+    fireEvent.keyDown(document, { key: 'Escape' });
+    expect(screen.queryByRole('dialog')).toBeNull();
+    expect(screen.getByRole('img', { name: /Gráfico de precios/ })).toBe(
+      graphic,
+    );
+    expect(field('close')?.getAttribute('value')).toBe(original);
+    expect(wheel().defaultPrevented).toBe(false);
+  });
+  it.each([
+    ['Home', '12', 'Sesión 30/12/2020'],
+    ['End', '20', 'Sesión 01/02/2021'],
+  ])(
+    'ancla las lupas a la observación %s hasta una vela y al volver a ampliar',
+    async (key, close, heading) => {
+      render(<PriceExplorer response={response()} />);
+      fireEvent.keyDown(graphicLayout(), { key });
+      const user = userEvent.setup();
+      for (let index = 0; index < 3; index++) {
+        await user.click(
+          screen.getByRole('button', { name: 'Acercar precios' }),
+        );
+        expect(field('close')?.getAttribute('value')).toBe(close);
+        expect(screen.getByRole('heading', { name: heading })).toBeTruthy();
+      }
+      expect(
+        document.querySelectorAll(
+          '.price-chart-svg .price-rise, .price-chart-svg .price-fall',
+        ),
+      ).toHaveLength(1);
+      for (let index = 0; index < 3; index++) {
+        await user.click(
+          screen.getByRole('button', { name: 'Alejar precios' }),
+        );
+        expect(field('close')?.getAttribute('value')).toBe(close);
+        expect(screen.getByRole('heading', { name: heading })).toBeTruthy();
+      }
+      expect(
+        document.querySelectorAll(
+          '.price-chart-svg .price-rise, .price-chart-svg .price-fall',
+        ),
+      ).toHaveLength(5);
+    },
+  );
+  it('mantiene el límite de mil velas y permite recorrer el histórico completo con la barra de navegación', async () => {
+    const data = response();
+    data.bars = Array.from({ length: 1200 }, (_, index) => ({
+      date: new Date(Date.UTC(2020, 0, index + 1)).toISOString().slice(0, 10),
+      open: 10 + index,
+      high: 12 + index,
+      low: 9 + index,
+      close: 11 + index,
+      volume: index,
+    }));
+    data.available_start = data.first_date = data.bars[0].date;
+    data.available_end = data.last_date = data.bars[data.bars.length - 1].date;
+    render(<PriceExplorer response={data} />);
+    const user = userEvent.setup();
+    for (let index = 0; index < 4; index++) {
+      await user.click(screen.getByRole('button', { name: 'Alejar precios' }));
+      expect(field('close')?.getAttribute('value')).toBe('1210');
+    }
+    expect(
+      document.querySelectorAll(
+        '.price-chart-svg .price-rise, .price-chart-svg .price-fall',
+      ),
+    ).toHaveLength(1000);
+    expect(
+      screen
+        .getByRole('button', { name: 'Alejar precios' })
+        .hasAttribute('disabled'),
+    ).toBe(true);
+    const navigation = screen.getByRole('slider', {
+      name: 'Desplazar precios',
+    });
+    expect(navigation.getAttribute('max')).toBe('200');
+    fireEvent.change(navigation, { target: { value: '0' } });
+    const graphic = graphicLayout();
+    fireEvent.keyDown(graphic, { key: 'Home' });
+    expect(field('close')?.getAttribute('value')).toBe('11');
+    fireEvent.change(navigation, { target: { value: '200' } });
+    fireEvent.keyDown(graphic, { key: 'End' });
+    expect(field('close')?.getAttribute('value')).toBe('1210');
   });
   it.each([Number.MAX_VALUE, Number.MIN_VALUE])(
     'dibuja una sola barra extrema finita %s sin geometría inválida',

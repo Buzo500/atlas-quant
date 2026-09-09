@@ -1,12 +1,25 @@
 'use client';
 
-import { useEffect, useId, useMemo, useRef, useState } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useId,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import type { BacktestPoint, PortfolioPoint } from '@/lib/api-types';
 import { date as dateLabel, moneyEUR, number, percent } from '@/shared/format';
 import {
+  ChartTooltip,
+  type ChartTooltipAnchor,
+} from '@/shared/components/chart-tooltip';
+import { ChartWorkspace } from '@/shared/components/chart-workspace';
+import { useChartGestures } from '@/shared/components/chart-gestures';
+import {
   dateWindow,
   nearestObservation,
-  panWindow,
   zoomWindow,
   type CurveWindow,
 } from './curve-window';
@@ -63,8 +76,11 @@ function seriesValue(point: CurvePoint) {
 /** A measured SVG keeps type and stroke sizes stable on wide and narrow panels. */
 export function Curve({ data: original }: { data: CurvePoint[] }) {
   const viewport = useRef<HTMLDivElement>(null);
-  const observationControl = useRef<HTMLInputElement>(null);
+  const svgRef = useRef<SVGSVGElement>(null);
+  const [expanded, setExpanded] = useState(false);
   const [size, setSize] = useState({ width: 640, height: 280 });
+  const measuredSize = useRef(size);
+  const keyboardGeometry = useRef(size);
   const id = useId();
   const [tableOpen, setTableOpen] = useState(false);
   const [requestedPage, setRequestedPage] = useState(0);
@@ -73,7 +89,21 @@ export function Curve({ data: original }: { data: CurvePoint[] }) {
   const [requestedRange, setRequestedRange] = useState({ from: '', to: '' });
   const [draftRange, setDraftRange] = useState({ from: '', to: '' });
   const [rangeError, setRangeError] = useState('');
-  const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const [selection, setSelection] = useState<{
+    date: string;
+    source: CurvePoint[];
+  } | null>(null);
+  const [tooltip, setTooltip] = useState<{
+    anchor: ChartTooltipAnchor;
+    source: CurvePoint[];
+    range: typeof requestedRange;
+    metric: typeof metric;
+    style: typeof style;
+    keyboard: boolean;
+  } | null>(null);
+  const selectedDate = selection?.source === original ? selection.date : null;
+  const setSelectedDate = (date: string | null) =>
+    setSelection(date === null ? null : { date, source: original });
 
   const source = useMemo(() => {
     let ordered = true;
@@ -121,8 +151,11 @@ export function Curve({ data: original }: { data: CurvePoint[] }) {
       ? index
       : null;
   }, [original, selectedDate, data.length, window]);
-  const valueOf = (point: CurvePoint) =>
-    twrMode && 'twr_index' in point ? point.twr_index - 1 : seriesValue(point);
+  const valueOf = useCallback(
+    (point: CurvePoint) =>
+      twrMode && 'twr_index' in point ? point.twr_index - 1 : seriesValue(point),
+    [twrMode],
+  );
   const formatValue = (value: number | null | undefined) =>
     twrMode ? percent(value) : moneyEUR(value);
   const unit = twrMode ? '%' : 'EUR';
@@ -164,6 +197,11 @@ export function Curve({ data: original }: { data: CurvePoint[] }) {
       // Hidden tabs have no box. Keep the last size until they are visible again.
       if (width <= 0 || height <= 0) return;
       const next = { width: Math.round(width), height: Math.round(height) };
+      // The inspection readout can wrap and take height from the expanded plot.
+      // That must not dismiss the first hover that caused the readout to appear.
+      // Pointer anchors remain in viewport pixels; width changes invalidate them.
+      if (measuredSize.current.width !== next.width) setTooltip(null);
+      measuredSize.current = next;
       setSize((previous) =>
         previous.width === next.width && previous.height === next.height
           ? previous
@@ -256,11 +294,46 @@ export function Curve({ data: original }: { data: CurvePoint[] }) {
   const bottom = size.height - 34;
   const plotWidth = Math.max(1, size.width - left - right);
   const plotHeight = Math.max(1, bottom - top);
-  const x = (index: number) =>
-    left +
-    (values.length === 1 ? 0.5 : index / (values.length - 1)) * plotWidth;
-  const y = (value: number) =>
-    bottom - ((value / magnitude - lower) / range) * plotHeight;
+  const navigate = (start: number, count: number) => {
+    if (
+      !source.valid ||
+      !Number.isFinite(start) ||
+      !Number.isFinite(count) ||
+      count < 1
+    )
+      return;
+    const boundedCount = Math.min(
+      original.length,
+      Math.max(1, Math.round(count)),
+    );
+    const boundedStart = Math.min(
+      original.length - boundedCount,
+      Math.max(0, Math.round(start)),
+    );
+    setWindow({ start: boundedStart, end: boundedStart + boundedCount - 1 });
+  };
+  const gestures = useChartGestures({
+    svgRef,
+    enabled: expanded && valid,
+    start: window.start,
+    count: data.length,
+    total: source.valid ? original.length : 0,
+    onNavigate: navigate,
+    onGesture: () => setTooltip(null),
+    plotLeft: left,
+    plotWidth,
+  });
+  const x = useCallback(
+    (index: number) =>
+      left +
+      (values.length === 1 ? 0.5 : index / (values.length - 1)) * plotWidth,
+    [left, values.length, plotWidth],
+  );
+  const y = useCallback(
+    (value: number) =>
+      bottom - ((value / magnitude - lower) / range) * plotHeight,
+    [bottom, magnitude, lower, range, plotHeight],
+  );
   const visualBudget = Math.max(128, Math.floor(plotWidth) * 2);
   const { primaryPoints, benchmarkPoints, reduced } = useMemo(() => {
     const points = (series: number[]) =>
@@ -308,6 +381,90 @@ export function Curve({ data: original }: { data: CurvePoint[] }) {
   const pointSummary = selectedPoint
     ? `Sesión ${dateLabel(selectedPoint.date)}. ${'nav' in selectedPoint ? `Patrimonio ${moneyEUR(selectedPoint.nav)}. TWR desde el origen ${percent(Number.isFinite(selectedPoint.twr_index) ? selectedPoint.twr_index - 1 : undefined)}.` : `Estrategia ${moneyEUR(selectedPoint.equity)}. Mantener ${moneyEUR(selectedPoint.benchmark)}.`}`
     : 'Selecciona una observación con el cursor o el teclado.';
+  const tooltipAnchor =
+    valid &&
+    selectedPoint &&
+    tooltip?.source === original &&
+    tooltip.range === requestedRange &&
+    tooltip.metric === metric &&
+    tooltip.style === style
+      ? tooltip.anchor
+      : null;
+  const showTooltip = (anchor: ChartTooltipAnchor, keyboard = false) =>
+    setTooltip({
+      anchor,
+      source: original,
+      range: requestedRange,
+      metric,
+      style,
+      keyboard,
+    });
+  const pointAnchor = useCallback(
+    (index: number, svg: SVGSVGElement): ChartTooltipAnchor => {
+      const point = original[index];
+      const localX = x(index - window.start);
+      const localY = y(valueOf(point));
+      const matrix = svg.getScreenCTM?.();
+      if (matrix) {
+        return {
+          x: matrix.a * localX + matrix.c * localY + matrix.e,
+          y: matrix.b * localX + matrix.d * localY + matrix.f,
+        };
+      }
+      const box = svg.getBoundingClientRect();
+      const scale = Math.min(
+        (box.width || size.width) / size.width,
+        (box.height || size.height) / size.height,
+      );
+      return {
+        x:
+          box.left +
+          ((box.width || size.width) - size.width * scale) / 2 +
+          localX * scale,
+        y:
+          box.top +
+          ((box.height || size.height) - size.height * scale) / 2 +
+          localY * scale,
+      };
+    },
+    [original, window.start, x, y, valueOf, size],
+  );
+  const selectByKeyboard = (index: number, svg: SVGSVGElement) => {
+    const next = Math.min(window.end, Math.max(window.start, index));
+    setSelectedDate(original[next].date);
+    showTooltip(pointAnchor(next, svg), true);
+  };
+  useLayoutEffect(() => {
+    if (keyboardGeometry.current === size) return;
+    keyboardGeometry.current = size;
+    // Read the committed SVG transform after a height change, without scanning
+    // the source or changing selection. Pointer tooltips keep their own anchor.
+    const svg = svgRef.current;
+    if (!svg || !valid || selectedIndex === null) return;
+    setTooltip((previous) => {
+      if (
+        !previous?.keyboard ||
+        previous.source !== original ||
+        previous.range !== requestedRange ||
+        previous.metric !== metric ||
+        previous.style !== style
+      )
+        return previous;
+      const anchor = pointAnchor(selectedIndex, svg);
+      return anchor.x === previous.anchor.x && anchor.y === previous.anchor.y
+        ? previous
+        : { ...previous, anchor };
+    });
+  }, [
+    size,
+    valid,
+    selectedIndex,
+    original,
+    requestedRange,
+    metric,
+    style,
+    pointAnchor,
+  ]);
   const selectAt = (event: {
     clientX: number;
     clientY?: number;
@@ -337,6 +494,7 @@ export function Curve({ data: original }: { data: CurvePoint[] }) {
     setSelectedDate(
       original[nearestObservation((localX - left) / plotWidth, window)].date,
     );
+    showTooltip({ x: event.clientX, y: event.clientY ?? box.top });
   };
   const lastPage = Math.max(0, Math.ceil(data.length / TABLE_PAGE_SIZE) - 1);
   const page = Math.min(requestedPage, lastPage);
@@ -423,369 +581,421 @@ export function Curve({ data: original }: { data: CurvePoint[] }) {
             <button className="chart-data-button" type="submit">
               Aplicar rango
             </button>
-            <button className="chart-data-button" type="button" onClick={reset}>
-              Restablecer curva
-            </button>
           </form>
           {rangeError && (
             <p role="alert" className="chart-context">
               {rangeError}
             </p>
           )}
-          <fieldset
-            className="curve-control-row curve-navigation"
-            aria-label="Zoom y desplazamiento de la curva"
-          >
-            <button
-              type="button"
-              className="chart-data-button"
-              disabled={!valid || data.length < 2}
-              onClick={() => zoom(0.5)}
-            >
-              Acercar curva
-            </button>
-            <button
-              type="button"
-              className="chart-data-button"
-              disabled={!valid || data.length >= original.length}
-              onClick={() => zoom(2)}
-            >
-              Alejar curva
-            </button>
-            <button
-              type="button"
-              className="chart-data-button"
-              disabled={!valid || window.start <= 0}
-              onClick={() => setWindow(panWindow(window, original.length, -1))}
-            >
-              Desplazar curva atrás
-            </button>
-            <button
-              type="button"
-              className="chart-data-button"
-              disabled={!valid || window.end >= original.length - 1}
-              onClick={() => setWindow(panWindow(window, original.length, 1))}
-            >
-              Desplazar curva adelante
-            </button>
-          </fieldset>
         </fieldset>
       )}
-      <div className="chart-viewport" ref={viewport}>
-        {!valid ? (
-          <p className="chart-empty muted">{description}</p>
-        ) : (
-          /* oxlint-disable jsx-a11y/prefer-tag-over-role, jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions -- SVG pointer inspection has an equivalent native range control with keyboard support and the same original-observation state. The image retains its title/description. */
-          <svg
-            viewBox={`0 0 ${size.width} ${size.height}`}
-            preserveAspectRatio="xMidYMid meet"
-            role="img"
-            aria-labelledby={`${id}-title ${id}-description`}
-            onMouseMove={selectAt}
-            onPointerDown={(event) => {
-              observationControl.current?.focus({ preventScroll: true });
-              selectAt(event);
-            }}
-            onClick={selectAt}
-            style={{
-              fontFamily: 'inherit',
-              fontVariantNumeric: 'tabular-nums',
-              fontSize: 12,
-            }}
+      <ChartWorkspace
+        title={isBacktest ? 'Curva de backtest' : 'Curva de cartera'}
+        noun="curva"
+        expanded={expanded}
+        onExpandedChange={(next) => {
+          setTooltip(null);
+          setExpanded(next);
+        }}
+        start={window.start}
+        count={valid ? data.length : 0}
+        total={source.valid ? original.length : 0}
+        zoomAnchor={
+          selectedIndex !== null && data.length > 1
+            ? (selectedIndex - window.start) / (data.length - 1)
+            : 0.5
+        }
+        onNavigate={navigate}
+        onReset={reset}
+      >
+        <div className="curve-workspace-content">
+          <div
+            className={`chart-viewport${expanded ? ' curve-expanded-viewport' : ''}`}
+            ref={viewport}
           >
-            <title
-              id={`${id}-title`}
-            >{`${seriesName}: evolución en ${unit}`}</title>
-            <desc id={`${id}-description`}>{description}</desc>
-            <text x={left} y={14} fill="#62666A" fontSize="11">
-              {unit}
-            </text>
-            {ticks.map((_, index) => {
-              const position = bottom - (index / 4) * plotHeight;
-              return (
-                <g key={index}>
-                  <line
-                    x1={left}
-                    y1={position}
-                    x2={left + plotWidth}
-                    y2={position}
-                    stroke="#DCD7CF"
-                    strokeWidth="1"
-                  />
-                  <text
-                    x={left - 10}
-                    y={position}
-                    dy="0.35em"
-                    textAnchor="end"
-                    fill="#62666A"
-                  >
-                    {tickLabels[index]}
-                  </text>
-                </g>
-              );
-            })}
-            {style === 'area' && values.length > 1 && (
-              <polygon
-                points={`${left},${bottom} ${primaryPoints} ${left + plotWidth},${bottom}`}
-                fill="#526B80"
-                fillOpacity="0.1"
-              />
-            )}
-            {benchmark && benchmark.length > 1 && (
-              <polyline
-                points={benchmarkPoints}
-                fill="none"
-                stroke={BENCHMARK_COLOR}
-                strokeWidth="2"
-                strokeDasharray="5 5"
-                strokeLinejoin="round"
-              />
-            )}
-            {values.length > 1 && (
-              <polyline
-                points={primaryPoints}
-                fill="none"
-                stroke="#526B80"
-                strokeWidth="2.5"
-                strokeLinejoin="round"
-                strokeLinecap="round"
-              />
-            )}
-            {values.length === 1 && (
-              <>
-                {benchmark && (
-                  <circle
-                    cx={x(0)}
-                    cy={y(benchmark[0])}
-                    r="5"
-                    fill="#FFFCF6"
-                    stroke={BENCHMARK_COLOR}
-                    strokeWidth="2"
+            {!valid ? (
+              <p className="chart-empty muted">{description}</p>
+            ) : (
+              /* oxlint-disable jsx-a11y/prefer-tag-over-role, jsx-a11y/no-noninteractive-tabindex, jsx-a11y/no-noninteractive-element-interactions -- The SVG is a keyboard-operable chart: arrows, Home/End and zoom inspect the same original observations as the pointer. Its image title and description remain available. */
+              <svg
+                ref={svgRef}
+                viewBox={`0 0 ${size.width} ${size.height}`}
+                preserveAspectRatio="xMidYMid meet"
+                role="img"
+                tabIndex={0}
+                aria-labelledby={`${id}-title ${id}-description`}
+                aria-describedby={`${id}-keys ${id}-detail`}
+                onPointerMove={(event) => {
+                  if (!gestures.onPointerMove(event)) selectAt(event);
+                }}
+                onPointerLeave={() => setTooltip(null)}
+                onBlur={() => setTooltip(null)}
+                onPointerDown={(event) => {
+                  event.currentTarget.focus({ preventScroll: true });
+                  if (!gestures.onPointerDown(event)) selectAt(event);
+                }}
+                onPointerUp={(event) => {
+                  gestures.onPointerUp(event);
+                }}
+                onPointerCancel={(event) => {
+                  gestures.onPointerCancel(event);
+                }}
+                onLostPointerCapture={(event) => {
+                  gestures.onLostPointerCapture(event);
+                }}
+                onKeyDown={(event) => {
+                  const key = event.key;
+                  if (key === '+' || key === '=' || key === '-') {
+                    event.preventDefault();
+                    zoom(key === '-' ? 2 : 0.5);
+                    return;
+                  }
+                  if (key === 'Escape') {
+                    event.preventDefault();
+                    setSelectedDate(null);
+                    setTooltip(null);
+                    return;
+                  }
+                  const current = selectedIndex ?? window.end;
+                  const next =
+                    key === 'Home'
+                      ? window.start
+                      : key === 'End'
+                        ? window.end
+                        : key === 'ArrowLeft' || key === 'ArrowDown'
+                          ? current - 1
+                          : key === 'ArrowRight' || key === 'ArrowUp'
+                            ? current + 1
+                            : null;
+                  if (next !== null) {
+                    event.preventDefault();
+                    selectByKeyboard(next, event.currentTarget);
+                  }
+                }}
+                style={{
+                  fontFamily: 'inherit',
+                  fontVariantNumeric: 'tabular-nums',
+                  fontSize: 12,
+                }}
+              >
+                <title
+                  id={`${id}-title`}
+                >{`${seriesName}: evolución en ${unit}`}</title>
+                <desc id={`${id}-description`}>{description}</desc>
+                <text x={left} y={14} fill="#62666A" fontSize="11">
+                  {unit}
+                </text>
+                {ticks.map((_, index) => {
+                  const position = bottom - (index / 4) * plotHeight;
+                  return (
+                    <g key={index}>
+                      <line
+                        x1={left}
+                        y1={position}
+                        x2={left + plotWidth}
+                        y2={position}
+                        stroke="#DCD7CF"
+                        strokeWidth="1"
+                      />
+                      <text
+                        x={left - 10}
+                        y={position}
+                        dy="0.35em"
+                        textAnchor="end"
+                        fill="#62666A"
+                      >
+                        {tickLabels[index]}
+                      </text>
+                    </g>
+                  );
+                })}
+                {style === 'area' && values.length > 1 && (
+                  <polygon
+                    points={`${left},${bottom} ${primaryPoints} ${left + plotWidth},${bottom}`}
+                    fill="#526B80"
+                    fillOpacity="0.1"
                   />
                 )}
-                <circle cx={x(0)} cy={y(values[0])} r="3.5" fill="#526B80" />
-              </>
-            )}
-            {selectedIndex !== null && selectedPoint && (
-              <g className="curve-crosshair" aria-hidden="true">
-                <line
-                  x1={x(selectedIndex - window.start)}
-                  x2={x(selectedIndex - window.start)}
-                  y1={top}
-                  y2={bottom}
-                  stroke="#975435"
-                  strokeWidth="1"
-                  strokeDasharray="3 3"
-                />
-                <line
-                  x1={left}
-                  x2={left + plotWidth}
-                  y1={y(valueOf(selectedPoint))}
-                  y2={y(valueOf(selectedPoint))}
-                  stroke="#975435"
-                  strokeWidth="1"
-                  strokeDasharray="3 3"
-                />
-                <circle
-                  cx={x(selectedIndex - window.start)}
-                  cy={y(valueOf(selectedPoint))}
-                  r="4"
-                  fill="#FFFCF6"
-                  stroke="#975435"
-                  strokeWidth="2"
-                />
-              </g>
-            )}
-            {values.length === 1 ? (
-              <text
-                x={x(0)}
-                y={size.height - 9}
-                textAnchor="middle"
-                fill="#62666A"
-              >
-                {firstDate}
-              </text>
-            ) : (
-              <>
-                <text
-                  x={left}
-                  y={size.height - 9}
-                  textAnchor="start"
-                  fill="#62666A"
-                >
-                  {firstDate}
-                </text>
-                {size.width >= 560 && data.length > 2 && (
+                {benchmark && benchmark.length > 1 && (
+                  <polyline
+                    points={benchmarkPoints}
+                    fill="none"
+                    stroke={BENCHMARK_COLOR}
+                    strokeWidth="2"
+                    strokeDasharray="5 5"
+                    strokeLinejoin="round"
+                  />
+                )}
+                {values.length > 1 && (
+                  <polyline
+                    points={primaryPoints}
+                    fill="none"
+                    stroke="#526B80"
+                    strokeWidth="2.5"
+                    strokeLinejoin="round"
+                    strokeLinecap="round"
+                  />
+                )}
+                {values.length === 1 && (
+                  <>
+                    {benchmark && (
+                      <circle
+                        cx={x(0)}
+                        cy={y(benchmark[0])}
+                        r="5"
+                        fill="#FFFCF6"
+                        stroke={BENCHMARK_COLOR}
+                        strokeWidth="2"
+                      />
+                    )}
+                    <circle
+                      cx={x(0)}
+                      cy={y(values[0])}
+                      r="3.5"
+                      fill="#526B80"
+                    />
+                  </>
+                )}
+                {selectedIndex !== null && selectedPoint && (
+                  <g className="curve-crosshair" aria-hidden="true">
+                    <line
+                      x1={x(selectedIndex - window.start)}
+                      x2={x(selectedIndex - window.start)}
+                      y1={top}
+                      y2={bottom}
+                      stroke="#975435"
+                      strokeWidth="1"
+                      strokeDasharray="3 3"
+                    />
+                    <line
+                      x1={left}
+                      x2={left + plotWidth}
+                      y1={y(valueOf(selectedPoint))}
+                      y2={y(valueOf(selectedPoint))}
+                      stroke="#975435"
+                      strokeWidth="1"
+                      strokeDasharray="3 3"
+                    />
+                    <circle
+                      cx={x(selectedIndex - window.start)}
+                      cy={y(valueOf(selectedPoint))}
+                      r="4"
+                      fill="#FFFCF6"
+                      stroke="#975435"
+                      strokeWidth="2"
+                    />
+                  </g>
+                )}
+                {values.length === 1 ? (
                   <text
-                    x={x(Math.floor((data.length - 1) / 2))}
+                    x={x(0)}
                     y={size.height - 9}
                     textAnchor="middle"
                     fill="#62666A"
                   >
-                    {dateLabel(data[Math.floor((data.length - 1) / 2)].date)}
+                    {firstDate}
                   </text>
-                )}
-                <text
-                  x={left + plotWidth}
-                  y={size.height - 9}
-                  textAnchor="end"
-                  fill="#62666A"
-                >
-                  {lastDate}
-                </text>
-              </>
-            )}
-          </svg>
-          /* oxlint-enable jsx-a11y/prefer-tag-over-role, jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions */
-        )}
-      </div>
-      {valid && (
-        <div className="curve-inspection">
-          <label
-            className="curve-observation-label"
-            htmlFor={`${id}-observation`}
-          >
-            Observación de la curva
-          </label>
-          <input
-            ref={observationControl}
-            id={`${id}-observation`}
-            type="range"
-            min={window.start}
-            max={window.end}
-            step={1}
-            value={selectedIndex ?? window.end}
-            aria-valuetext={pointSummary}
-            aria-describedby={`${id}-keys`}
-            onFocus={() => {
-              if (selectedIndex === null)
-                setSelectedDate(original[window.end].date);
-            }}
-            onChange={(event) =>
-              setSelectedDate(original[Number(event.target.value)].date)
-            }
-            onKeyDown={(event) => {
-              const key = event.key;
-              if (key === '+' || key === '=' || key === '-') {
-                event.preventDefault();
-                zoom(key === '-' ? 2 : 0.5);
-                return;
-              }
-              if (key === 'Escape') {
-                event.preventDefault();
-                setSelectedDate(null);
-                return;
-              }
-              const current = selectedIndex ?? window.end;
-              const next =
-                key === 'Home'
-                  ? window.start
-                  : key === 'End'
-                    ? window.end
-                    : key === 'ArrowLeft' || key === 'ArrowDown'
-                      ? current - 1
-                      : key === 'ArrowRight' || key === 'ArrowUp'
-                        ? current + 1
-                        : null;
-              if (next !== null) {
-                event.preventDefault();
-                setSelectedDate(
-                  original[Math.min(window.end, Math.max(window.start, next))]
-                    .date,
-                );
-              }
-            }}
-          />
-          <p id={`${id}-keys`} className="chart-context">
-            Flechas: observación anterior/siguiente. Inicio/Fin: extremos. +/−:
-            zoom. Escape: quitar selección. Fechas de sesión; sin hora intradía.
-          </p>
-          <section
-            className="curve-point-detail"
-            aria-label="Detalle de la observación"
-          >
-            {selectedPoint ? (
-              <>
-                <time dateTime={selectedPoint.date}>
-                  {dateLabel(selectedPoint.date)}
-                </time>
-                {'nav' in selectedPoint ? (
-                  <>
-                    <span>
-                      Patrimonio{' '}
-                      <data value={selectedPoint.nav}>
-                        {moneyEUR(selectedPoint.nav)}
-                      </data>
-                    </span>
-                    <span>
-                      TWR desde el origen{' '}
-                      <data
-                        value={
-                          Number.isFinite(selectedPoint.twr_index)
-                            ? selectedPoint.twr_index
-                            : undefined
-                        }
-                      >
-                        {percent(
-                          Number.isFinite(selectedPoint.twr_index)
-                            ? selectedPoint.twr_index - 1
-                            : undefined,
-                        )}
-                      </data>
-                    </span>
-                  </>
                 ) : (
                   <>
-                    <span>
-                      Estrategia{' '}
-                      <data value={selectedPoint.equity}>
-                        {moneyEUR(selectedPoint.equity)}
-                      </data>
-                    </span>
-                    <span>
-                      Mantener · mismo peso{' '}
-                      <data
-                        value={
-                          Number.isFinite(selectedPoint.benchmark)
-                            ? selectedPoint.benchmark
-                            : undefined
-                        }
+                    <text
+                      x={left}
+                      y={size.height - 9}
+                      textAnchor="start"
+                      fill="#62666A"
+                    >
+                      {firstDate}
+                    </text>
+                    {size.width >= 560 && data.length > 2 && (
+                      <text
+                        x={x(Math.floor((data.length - 1) / 2))}
+                        y={size.height - 9}
+                        textAnchor="middle"
+                        fill="#62666A"
                       >
-                        {moneyEUR(selectedPoint.benchmark)}
-                      </data>
-                    </span>
+                        {dateLabel(
+                          data[Math.floor((data.length - 1) / 2)].date,
+                        )}
+                      </text>
+                    )}
+                    <text
+                      x={left + plotWidth}
+                      y={size.height - 9}
+                      textAnchor="end"
+                      fill="#62666A"
+                    >
+                      {lastDate}
+                    </text>
                   </>
                 )}
-              </>
-            ) : (
-              <span>{pointSummary}</span>
-            )}
-          </section>
-        </div>
-      )}
-      {valid && (
-        <figcaption className="chart-caption">
-          <div className="chart-legend">
-            <span>
-              <i className="chart-key" aria-hidden="true" />
-              {seriesName}
-            </span>
-            {benchmark && (
-              <span>
-                <i
-                  className="chart-key benchmark"
-                  style={{ borderColor: BENCHMARK_COLOR }}
-                  aria-hidden="true"
-                />
-                Mantener · mismo peso
-              </span>
+              </svg>
+              /* oxlint-enable jsx-a11y/prefer-tag-over-role, jsx-a11y/no-noninteractive-tabindex, jsx-a11y/no-noninteractive-element-interactions */
             )}
           </div>
-          <span className="chart-period">
-            {number(data.length)} observaciones
-          </span>
-        </figcaption>
-      )}
+          {valid && (
+            <div className="curve-inspection">
+              <p id={`${id}-keys`} className="chart-context">
+                Flechas: observación anterior/siguiente. Inicio/Fin: extremos.
+                +/−: zoom. Escape: {expanded ? 'salir de pantalla completa' : 'quitar selección'}.
+                {' '}Fechas de sesión; sin hora intradía.
+              </p>
+              <section
+                id={`${id}-detail`}
+                className="curve-point-detail"
+                aria-label="Detalle de la observación"
+                aria-live={tooltip?.keyboard ? 'polite' : 'off'}
+              >
+                {selectedPoint ? (
+                  <>
+                    <time dateTime={selectedPoint.date}>
+                      {dateLabel(selectedPoint.date)}
+                    </time>
+                    {'nav' in selectedPoint ? (
+                      <>
+                        <span>
+                          Patrimonio{' '}
+                          <data value={selectedPoint.nav}>
+                            {moneyEUR(selectedPoint.nav)}
+                          </data>
+                        </span>
+                        <span>
+                          TWR desde el origen{' '}
+                          <data
+                            value={
+                              Number.isFinite(selectedPoint.twr_index)
+                                ? selectedPoint.twr_index
+                                : undefined
+                            }
+                          >
+                            {percent(
+                              Number.isFinite(selectedPoint.twr_index)
+                                ? selectedPoint.twr_index - 1
+                                : undefined,
+                            )}
+                          </data>
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        <span>
+                          Estrategia{' '}
+                          <data value={selectedPoint.equity}>
+                            {moneyEUR(selectedPoint.equity)}
+                          </data>
+                        </span>
+                        <span>
+                          Mantener · mismo peso{' '}
+                          <data
+                            value={
+                              Number.isFinite(selectedPoint.benchmark)
+                                ? selectedPoint.benchmark
+                                : undefined
+                            }
+                          >
+                            {moneyEUR(selectedPoint.benchmark)}
+                          </data>
+                        </span>
+                      </>
+                    )}
+                  </>
+                ) : (
+                  <span>{pointSummary}</span>
+                )}
+              </section>
+            </div>
+          )}
+          <ChartTooltip
+            id={`${id}-tooltip`}
+            anchor={tooltipAnchor}
+            onDismiss={() => setTooltip(null)}
+          >
+            {selectedPoint && (
+              <>
+                <time
+                  className="chart-tooltip-heading"
+                  dateTime={selectedPoint.date}
+                >
+                  {dateLabel(selectedPoint.date)}
+                </time>
+                <dl>
+                  {'nav' in selectedPoint ? (
+                    <>
+                      <dt>Patrimonio</dt>
+                      <dd>
+                        <data value={selectedPoint.nav}>
+                          {moneyEUR(selectedPoint.nav)}
+                        </data>
+                      </dd>
+                      <dt>TWR desde el origen</dt>
+                      <dd>
+                        <data
+                          value={
+                            Number.isFinite(selectedPoint.twr_index)
+                              ? selectedPoint.twr_index
+                              : undefined
+                          }
+                        >
+                          {percent(
+                            Number.isFinite(selectedPoint.twr_index)
+                              ? selectedPoint.twr_index - 1
+                              : undefined,
+                          )}
+                        </data>
+                      </dd>
+                    </>
+                  ) : (
+                    <>
+                      <dt>Estrategia</dt>
+                      <dd>
+                        <data value={selectedPoint.equity}>
+                          {moneyEUR(selectedPoint.equity)}
+                        </data>
+                      </dd>
+                      <dt>Mantener · mismo peso</dt>
+                      <dd>
+                        <data
+                          value={
+                            Number.isFinite(selectedPoint.benchmark)
+                              ? selectedPoint.benchmark
+                              : undefined
+                          }
+                        >
+                          {moneyEUR(selectedPoint.benchmark)}
+                        </data>
+                      </dd>
+                    </>
+                  )}
+                </dl>
+                <p className="chart-tooltip-note">
+                  Observación original · Fecha de sesión
+                </p>
+              </>
+            )}
+          </ChartTooltip>
+          {valid && (
+            <figcaption className="chart-caption">
+              <div className="chart-legend">
+                <span>
+                  <i className="chart-key" aria-hidden="true" />
+                  {seriesName}
+                </span>
+                {benchmark && (
+                  <span>
+                    <i
+                      className="chart-key benchmark"
+                      style={{ borderColor: BENCHMARK_COLOR }}
+                      aria-hidden="true"
+                    />
+                    Mantener · mismo peso
+                  </span>
+                )}
+              </div>
+              <span className="chart-period">
+                {number(data.length)} observaciones
+              </span>
+            </figcaption>
+          )}
+        </div>
+      </ChartWorkspace>
       {valid && (
         <p className="chart-context">
           {unit} · Escala lineal · Eje horizontal por observaciones; las fechas

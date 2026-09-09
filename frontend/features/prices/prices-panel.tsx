@@ -9,6 +9,7 @@ import { useRead } from '@/shared/use-read';
 import { QueryStatus } from '@/shared/query-status';
 import { Pagination, usePagination } from '@/shared/pagination';
 import { date, dateTime, number, percent } from '@/shared/format';
+import { ChartWorkspace } from '@/shared/components/chart-workspace';
 import {
   aggregateBars,
   priceChange,
@@ -198,6 +199,7 @@ export function PriceExplorer({
   const [representation, setRepresentation] =
     useState<Representation>('candles');
   const [volume, setVolume] = useState(true);
+  const [expanded, setExpanded] = useState(false);
   const [draft, setDraft] = useState({ start: loadedStart, end: loadedEnd });
   const [range, setRange] = useState(draft);
   const [rangeError, setRangeError] = useState('');
@@ -249,11 +251,13 @@ export function PriceExplorer({
     viewport.key === viewKey ? viewport.start : total - DEFAULT_VISIBLE_BARS,
     viewport.key === viewKey ? viewport.count : DEFAULT_VISIBLE_BARS,
   );
-  const bars = prepared.aggregated.slice(window.start, window.end);
-  const windowKey = `${viewKey}:${window.start}:${window.end}`;
+  const bars = useMemo(
+    () => prepared.aggregated.slice(window.start, window.end),
+    [prepared.aggregated, window.start, window.end],
+  );
   const selected =
-    cursor.key === windowKey
-      ? Math.max(0, Math.min(bars.length - 1, cursor.index))
+    cursor.key === viewKey
+      ? Math.max(0, Math.min(bars.length - 1, cursor.index - window.start))
       : bars.length - 1;
   const current = bars[selected];
   const previous =
@@ -267,17 +271,25 @@ export function PriceExplorer({
     : { absolute: null, relative: null, relativeUnavailable: false };
   function navigate(start: number, count = window.count) {
     const next = visibleWindow(total, start, count);
+    // The cursor identifies an original aggregated observation, independently
+    // of the visible window. Zooming must not silently change its date.
+    setCursor((old) =>
+      old.key === viewKey
+        ? old
+        : {
+            key: viewKey,
+            index: window.start + Math.max(0, selected),
+          },
+    );
     setViewport({ key: viewKey, start: next.start, count: next.count });
   }
-  function zoom(factor: number) {
-    const count = Math.max(
-      1,
-      Math.min(total, MAX_VISIBLE_BARS, Math.round(window.count * factor)),
-    );
-    navigate(
-      window.start + Math.max(0, selected) - Math.floor(count / 2),
-      count,
-    );
+  function resetView() {
+    const all = { start: loadedStart, end: loadedEnd };
+    setDraft(all);
+    setRange(all);
+    setRangeError('');
+    setCursor({ key: '', index: 0 });
+    setViewport({ key: '', start: 0, count: DEFAULT_VISIBLE_BARS });
   }
   function applyDates(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -438,19 +450,6 @@ export function PriceExplorer({
         <Button type="submit" variant="outline">
           Aplicar fechas
         </Button>
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => {
-            const all = { start: loadedStart, end: loadedEnd };
-            setDraft(all);
-            setRange(all);
-            setRangeError('');
-            setViewport({ key: '', start: 0, count: DEFAULT_VISIBLE_BARS });
-          }}
-        >
-          Restablecer vista
-        </Button>
       </form>
       {(loadedStart !== response.available_start ||
         loadedEnd !== response.available_end) && (
@@ -469,64 +468,16 @@ export function PriceExplorer({
           {prepared.error}
         </p>
       ) : !bars.length ? (
-        <output className="price-empty">
-          No hay observaciones diarias en las fechas elegidas.
-        </output>
+        <>
+          <output className="price-empty">
+            No hay observaciones diarias en las fechas elegidas.
+          </output>
+          <Button type="button" variant="outline" onClick={resetView}>
+            Restablecer vista
+          </Button>
+        </>
       ) : (
         <>
-          <fieldset
-            className="prices-view-controls"
-            aria-label="Navegación del gráfico de precios"
-          >
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={window.start === 0}
-              onClick={() => navigate(0)}
-            >
-              Primera ventana
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={window.start === 0}
-              onClick={() => navigate(window.start - window.count)}
-            >
-              Barras anteriores
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={window.end === total}
-              onClick={() => navigate(window.start + window.count)}
-            >
-              Barras siguientes
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={window.end === total}
-              onClick={() => navigate(total - window.count)}
-            >
-              Última ventana
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={window.count <= 1}
-              onClick={() => zoom(0.5)}
-            >
-              Acercar precios
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={window.count >= Math.min(total, MAX_VISIBLE_BARS)}
-              onClick={() => zoom(2)}
-            >
-              Alejar precios
-            </Button>
-          </fieldset>
           <output className="prices-window-summary">
             Barras {number(window.start + 1)}–{number(window.end)} de{' '}
             {number(total)} · {date(bars[0].first_date)} →{' '}
@@ -545,21 +496,39 @@ export function PriceExplorer({
               indican en la lectura.
             </p>
           )}
-          <PriceChart
-            bars={bars}
-            selected={selected}
-            onSelect={(index) =>
-              setCursor((old) =>
-                old.key === windowKey && old.index === index
-                  ? old
-                  : { key: windowKey, index },
-              )
-            }
-            representation={representation}
-            volume={volume}
-            symbol={response.symbol}
-            currency={response.currency}
-          />
+          <ChartWorkspace
+            title={`Precios de ${response.symbol}`}
+            noun="precios"
+            expanded={expanded}
+            onExpandedChange={setExpanded}
+            start={window.start}
+            count={window.count}
+            total={total}
+            maxCount={MAX_VISIBLE_BARS}
+            zoomAnchor={bars.length > 1 ? selected / (bars.length - 1) : 0.5}
+            onNavigate={navigate}
+            onReset={resetView}
+          >
+            <PriceChart
+              bars={bars}
+              selected={selected}
+              onSelect={(index) =>
+                setCursor((old) =>
+                  old.key === viewKey && old.index === window.start + index
+                    ? old
+                    : { key: viewKey, index: window.start + index },
+                )
+              }
+              representation={representation}
+              volume={volume}
+              symbol={response.symbol}
+              currency={response.currency}
+              expanded={expanded}
+              start={window.start}
+              total={total}
+              onNavigate={navigate}
+            />
+          </ChartWorkspace>
           <section className="price-readout" aria-label="Lectura de precios">
             <div className="price-readout-heading">
               <h3>

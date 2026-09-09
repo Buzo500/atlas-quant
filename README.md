@@ -33,7 +33,7 @@ El sobremesa se ha probado el 06/09/2026 con Python 3.14.4, Node 24.15.0 y pnpm 
 ## Primer recorrido
 
 1. **Cargar demostración** añade tres activos ficticios y movimientos sintéticos. No descarga una cartera real.
-2. **Cartera** muestra efectivo, posiciones, aportaciones, P&L y TWR diario. Su curva permite inspeccionar observaciones, elegir línea/área o TWR desde el origen, filtrar fechas y ampliar/desplazar la vista.
+2. **Cartera** muestra efectivo, posiciones, aportaciones, P&L y TWR diario. Su curva permite consultar una ficha junto al cursor o por teclado, elegir línea/área o TWR desde el origen, filtrar fechas y navegar con barra y lupas. En pantalla completa admite arrastre y zoom con la rueda; precios y resultados comparten estos controles.
 3. **Laboratorio** compara mantener y dos cruces de medias con selección cronológica 60/20/20, comisiones, deslizamiento y un mismo límite de posición para estrategia y benchmark.
 4. **Agente IA** crea un experimento de duración y presupuesto limitados. Sin clave, usa «Catálogo fijo · sin IA». Se genera un informe y se observa la regla congelada sobre nuevas sesiones.
 5. **Datos** permite explorar precios de cada activo: velas, línea, área o barras OHLC, volumen y agregación diaria/semanal/mensual. También importa CSV y permite conectar Yahoo diario en EUR. Las importaciones de movimientos se previsualizan antes de confirmar y omiten IDs ya importados.
@@ -60,7 +60,7 @@ Si se cumplen los criterios, activaste la simulación automática y la parada gl
 
 ## Estado y validación
 
-- **0.3.0-dev.1, validación local:** 477 pruebas Python y 91 subtests, 201 de frontend y 7/7 E2E con API real. Contratos, TypeScript, lint y build con manifiesto correctos. Precios/curvas comprobados hasta 100.000 observaciones y 1.000 velas visibles; Windows físico 125 %/150 % revisado y 100 % restaurado. [Evidencia y límites](docs/graficos_v0_3.md). CI de v0.3 pendiente; ensayo sostenido aplazado.
+- **0.3.0-dev.1, revisión local del 09/09/2026:** 244 pruebas de frontend, TypeScript, lint y build con manifiesto correctos. Los cinco recorridos E2E de gráficos pasan; la suite general queda en **9/10** por una espera intermitente de 10 s en `/api/state`, todavía sin causa acreditada. Rendimiento medido con 100.000 observaciones y 1.000 velas visibles. [Revisión, incidencias y evidencia](docs/revision_graficos_20260909.md). Las 477 pruebas Python y 91 subtests y el escalado físico 125 %/150 % corresponden a la entrega inicial; no se repiten en este ajuste de gráficos. CI de v0.3 y comprobación física de los controles actuales pendientes; ensayo sostenido aplazado.
 
 - **0.2.0-rc.2 con CI verificada:** 446 pruebas Python y 91 subtests (22,13 s), 140 Vitest en 15 archivos (43,86 s) y 5/5 E2E (18,7 s) en Windows CI. Validación local separada: 446+91 (38,34 s, dos avisos previos), 140 Vitest (13,34 s) y 5/5 E2E (9,6 s). El [registro de candidata](docs/candidata_v0_2.md) conserva también el primer intento remoto fallido y sus correcciones.
 

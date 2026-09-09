@@ -1,0 +1,206 @@
+.chart-workspace {
+  min-width: 0;
+  width: 100%;
+  color: #30383f;
+}
+.chart-workspace-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.chart-workspace-title {
+  min-width: 0;
+  font-size: 12px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+.chart-workspace-actions {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 3px;
+  min-width: 0;
+  border: 0;
+  padding: 0;
+  margin: 0;
+}
+.chart-workspace-actions button {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  background: transparent;
+  color: #975435;
+  cursor: pointer;
+}
+.chart-workspace-actions button:hover:not(:disabled) {
+  border-color: #ddcabc;
+  background: #f0e3d7;
+}
+.chart-workspace-actions button:focus-visible,
+.chart-workspace-range:focus-visible {
+  outline: 2px solid #975435;
+  outline-offset: 3px;
+}
+.chart-workspace-actions button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+.chart-workspace .chart-workspace-actions svg {
+  width: 18px;
+  height: 18px;
+}
+.chart-workspace-separator {
+  height: 18px;
+  border-left: 1px solid #ded4c7;
+  margin-inline: 5px;
+}
+.chart-workspace-canvas {
+  min-width: 0;
+}
+.chart-workspace-navigation {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+  padding-block: 4px;
+}
+.chart-workspace-range {
+  display: block;
+  min-width: 0;
+  flex: 1;
+  width: 100%;
+  height: 22px;
+  margin: 0;
+  padding: 0;
+  appearance: none;
+  border: 0;
+  border-radius: 4px;
+  background: #ece5da;
+  cursor: ew-resize;
+}
+.chart-workspace-range::-webkit-slider-runnable-track {
+  height: 22px;
+  border-radius: 4px;
+}
+.chart-workspace-range::-moz-range-track {
+  height: 22px;
+  border-radius: 4px;
+  background: #ece5da;
+}
+.chart-workspace-range::-webkit-slider-thumb {
+  appearance: none;
+  height: 22px;
+  width: max(22px, var(--chart-window-width));
+  border: 1px solid #b78161;
+  border-radius: 4px;
+  background: #d8bda6;
+  box-shadow:
+    inset 5px 0 #cfae94,
+    inset -5px 0 #cfae94;
+}
+.chart-workspace-range::-moz-range-thumb {
+  height: 20px;
+  width: max(22px, var(--chart-window-width));
+  border: 1px solid #b78161;
+  border-radius: 4px;
+  background: #d8bda6;
+  box-shadow:
+    inset 5px 0 #cfae94,
+    inset -5px 0 #cfae94;
+}
+.chart-workspace-range:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+.chart-workspace-range-caption {
+  color: #686158;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.chart-workspace:is(.is-expanded, :fullscreen) {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100dvh;
+  max-width: none;
+  margin: 0;
+  padding: 20px 28px;
+  background: #fffcf6;
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+}
+.chart-workspace::backdrop {
+  background: #fffcf6;
+}
+.chart-workspace.is-expanded .chart-workspace-toolbar {
+  flex-shrink: 0;
+  margin-bottom: 6px;
+}
+.chart-workspace.is-expanded .chart-workspace-title {
+  font-size: 15px;
+}
+.chart-workspace-hint {
+  flex-shrink: 0;
+  margin: 0 0 12px;
+  color: #686158;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.chart-workspace.is-expanded .chart-workspace-canvas {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.chart-workspace.is-expanded .chart-workspace-navigation {
+  flex-shrink: 0;
+}
+.chart-workspace.is-expanded :is(.chart-viewport, .price-plot) {
+  flex: 1;
+  min-height: 0;
+  height: auto;
+}
+.chart-workspace.is-expanded :is(.chart-viewport, .price-plot) > svg {
+  height: 100%;
+  cursor: grab;
+  user-select: none;
+  touch-action: pan-y;
+}
+.chart-workspace.is-expanded
+  :is(.chart-viewport, .price-plot)
+  > svg[data-chart-dragging='true'] {
+  cursor: grabbing;
+}
+.chart-workspace :is(.chart-viewport svg, .price-chart-svg):focus:not(:focus-visible) {
+  outline: none;
+}
+.chart-workspace :is(.chart-viewport svg, .price-chart-svg):focus-visible {
+  outline: 2px solid #975435;
+  outline-offset: 3px;
+}
+@media (max-width: 600px) {
+  .chart-workspace:is(.is-expanded, :fullscreen) {
+    padding: 12px;
+  }
+  .chart-workspace-navigation {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .chart-workspace-range-caption {
+    width: 100%;
+    text-align: right;
+  }
+  .chart-workspace-title {
+    font-size: 11px;
+  }
+}

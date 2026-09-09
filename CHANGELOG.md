@@ -8,6 +8,9 @@ Entrega de desarrollo basada en `v0.2.0-rc.2`. El ensayo sostenido y su seguimie
 - Panel de precios en Datos con velas, línea, área, OHLC y volumen; intervalos diarios, semanales y mensuales calculados sobre las sesiones elegidas, con cobertura parcial explícita.
 - Cursor y teclado, fechas, zoom, desplazamiento y tabla diaria original. Ventana explícita de hasta 1.000 barras dibujadas, sin eliminar datos de origen.
 - Curvas de cartera y backtest con inspección de observaciones originales, línea/área y navegación temporal. TWR de cartera calculado desde su origen, sin convertir métricas globales en métricas del tramo visible.
+- Fichas de datos junto al puntero en precios, cartera y resultados; sustituyen los deslizadores de inspección. Se ajustan a los bordes de la pantalla y mantienen inspección por teclado, lecturas de referencia y tablas originales.
+- Barra para desplazar el intervalo visible y herramientas de lupa, restablecimiento y pantalla completa. La vista ampliada permite arrastrar la serie y hacer zoom con la rueda, conservando datos, selección y límites del histórico.
+- Revisión del 09/09: la primera ficha de una curva estrecha ya no desaparece cuando su lectura ocupa otra línea y cambia la altura del gráfico; la ficha de teclado se recoloca junto al punto. Regresiones de ratón/teclado y mediciones repetidas de navegación, con [resultados y una incidencia de API pendiente](docs/revision_graficos_20260909.md).
 - Contratos regenerados, pruebas de lectura inmutable y agregación, y recorridos de navegador con la API real. [Uso, evidencia y límites](docs/graficos_v0_3.md).
 
 ## v0.2.0-rc.2 · Candidata con CI verificada · 2026-09-08
