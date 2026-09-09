@@ -4,6 +4,8 @@ Versión de desarrollo: **0.3.0-dev.1 · gráficos interactivos**. Conserva como
 
 Aplicación local para analizar una cartera en EUR, comparar estrategias de acciones/ETF y ejecutar experimentos acotados con OpenAI o Anthropic. Incluye simulación de órdenes; no está conectada a ningún bróker.
 
+Estado de entrega y comprobaciones pendientes: [revisión final de v0.3](docs/revision_final_v0_3.md). Incluye el diagnóstico optativo de API y la evidencia actual de escalado; no declara la versión estable.
+
 Preferencias confirmadas: OpenAI y Anthropic seleccionables desde la app, integración preparada sin consumo hasta decidir un presupuesto y primera etapa en el PC. El presupuesto inicial sigue en cero. La entrega se ha probado en Windows; Ubuntu no se ha validado todavía.
 
 Los gráficos de v0.3 se desarrollan por autorización expresa del usuario. Aprendizaje acumulativo, indicadores nuevos, móvil, ejecución remota e informes LaTeX mantienen su alcance futuro en el [backlog](docs/backlog_planificacion.md).

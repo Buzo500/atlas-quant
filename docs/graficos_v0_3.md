@@ -8,7 +8,7 @@ Entrega de desarrollo **0.3.0-dev.1**, iniciada por autorización expresa el 08/
 
 Corregida la ficha que desaparecía en la primera lectura de una curva estrecha al cambiar su altura. Pasan 244 pruebas frontend y los cinco recorridos E2E de gráficos; la suite general queda en **9/10** por una espera intermitente de `/api/state`, aún sin causa acreditada. TypeScript, lint y build correctos. [Revisión completa, incidencias y fuentes probadas](revision_graficos_20260909.md).
 
-Mediciones nuevas con NAV variable y API real: precios de 100.000 observaciones en 1,66 s, curva en 1,98 s, inspección/zoom p95 ≤34,9 ms; hasta 1.000 velas y 20 ciclos de pantalla completa por escenario comprobados. Navegación, actualización de arrastre y rueda p95 inferior a 100 ms, sin aumento de nodos/listeners tras calentamiento. Sigue pendiente repetir el escalado físico de los controles actuales. La evidencia siguiente del 08/09 es histórica.
+Mediciones nuevas con NAV variable y API real: precios de 100.000 observaciones en 1,66 s, curva en 1,98 s, inspección/zoom p95 ≤34,9 ms; hasta 1.000 velas y 20 ciclos de pantalla completa por escenario comprobados. Navegación, actualización de arrastre y rueda p95 inferior a 100 ms, sin aumento de nodos/listeners tras calentamiento. [Escalado físico de los controles actuales comprobado](escalado_controles_20260909.md) al 125 %/150 %, con 100 % restaurado. Queda sin certificar la ocultación del marco de Chrome en uso normal. [Revisión final y pendientes](revision_final_v0_3.md). La evidencia siguiente del 08/09 es histórica.
 
 ## Ajuste anterior: navegación y pantalla completa · 08/09/2026
 
