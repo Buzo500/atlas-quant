@@ -4,7 +4,7 @@ const path = require('node:path');
 const root = fs.realpathSync(path.resolve(__dirname, '../..'));
 const data = fs.realpathSync(process.env.ATLAS_DATA_DIR || '');
 const run = path.dirname(data);
-if (path.dirname(run) !== fs.realpathSync(path.join(root, 'var/validation')) ||
+if (path.dirname(run) !== path.join(root, 'var/validation') ||
     !/^e2e-[a-f0-9]{32}$/.test(path.basename(run)) || path.basename(data) !== 'data' ||
     path.resolve(process.env.ATLAS_STOP_FILE || '') !== path.join(run, 'servers.stop')) {
   throw new Error('El diagnóstico requiere una base E2E y su parada aislada.');

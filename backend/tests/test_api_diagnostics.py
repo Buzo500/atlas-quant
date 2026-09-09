@@ -23,15 +23,22 @@ def test_backend_rejects_foreign_data_even_with_python_optimization(tmp_path, op
     assert not ordinary.exists()
 
 
-def test_proxy_rejects_ordinary_data_before_installing_hooks(tmp_path):
+@pytest.mark.parametrize("fresh_checkout", [False, True])
+def test_proxy_rejects_ordinary_data_before_installing_hooks(tmp_path, fresh_checkout):
     node = shutil.which("node")
     if not node:
         pytest.skip("Node is needed for the optional proxy diagnostic")
     ordinary = tmp_path / "ordinary"
     ordinary.mkdir()
+    preload = ROOT / "tools/diagnostics/api_proxy.cjs"
+    if fresh_checkout:
+        # A fresh checkout has no var/validation until the first E2E run.
+        preload = tmp_path / "checkout/tools/diagnostics/api_proxy.cjs"
+        preload.parent.mkdir(parents=True)
+        shutil.copyfile(ROOT / "tools/diagnostics/api_proxy.cjs", preload)
     environment = {**os.environ, "ATLAS_DATA_DIR": str(ordinary),
                    "ATLAS_STOP_FILE": str(tmp_path / "servers.stop")}
-    result = subprocess.run([node, "--require", str(ROOT / "tools/diagnostics/api_proxy.cjs"),
+    result = subprocess.run([node, "--require", str(preload),
                              "-e", "console.log('HOOKS_INSTALLED')"], env=environment,
                             capture_output=True, text=True, encoding="utf-8", timeout=15)
     assert result.returncode != 0
