@@ -92,7 +92,7 @@ export function PortfolioPanel({
                 <p className="muted">Valoración diaria · EUR</p>
               </div>
             </div>
-            <Curve data={portfolio.curve} />
+            <Curve key={`${dataset?.id}:${dataset?.version}`} data={portfolio.curve} />
           </section>
         </div>
       ) : dataset && (portfolioQuery.loading || portfolioQuery.error) ? (

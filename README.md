@@ -1,18 +1,22 @@
 # ATLAS Quant
 
-Versión vigente: **0.2.0-rc.2, candidata con CI verificada**. No es todavía v0.2 estable. El [registro de candidata](docs/candidata_v0_2.md) identifica las fuentes y comprobaciones de cada revisión, incluida la candidata histórica rc.1. La [hoja de ruta](docs/hoja_de_ruta.md) recoge las versiones previstas y el [plan de v0.2](docs/plan_v0_2.md) sus criterios de cierre. El historial de cambios está en [CHANGELOG.md](CHANGELOG.md).
+**Entrega de desarrollo aceptada: `v0.3.0-dev.1`.** G1–G6 cerradas por el usuario el 09/09/2026, con pantalla completa comprobada manualmente en precios y cartera y CI completa correcta. Se acepta una incidencia conocida de espera intermitente en `/api/state`, todavía sin causa determinada. [Cierre y evidencia](docs/revision_final_v0_3.md). El ensayo de 48 horas sigue aplazado; esta aceptación no declara una versión estable.
+
+Versión de desarrollo: **0.3.0-dev.1 · gráficos interactivos**. Conserva como antecedente `0.2.0-rc.2`, candidata publicada con CI verificada; el ensayo de 48 horas sigue aplazado y v0.2 no se declara estable. El [plan de v0.3](docs/plan_v0_3.md) fija el alcance, y la [guía de gráficos](docs/graficos_v0_3.md) explica su uso y validación. La [hoja de ruta](docs/hoja_de_ruta.md) recoge las entregas previstas y [CHANGELOG.md](CHANGELOG.md) sus cambios.
 
 Aplicación local para analizar una cartera en EUR, comparar estrategias de acciones/ETF y ejecutar experimentos acotados con OpenAI o Anthropic. Incluye simulación de órdenes; no está conectada a ningún bróker.
 
+Estado de entrega y comprobaciones pendientes: [revisión final de v0.3](docs/revision_final_v0_3.md). Incluye el diagnóstico optativo de API y la evidencia actual de escalado; no declara la versión estable.
+
 Preferencias confirmadas: OpenAI y Anthropic seleccionables desde la app, integración preparada sin consumo hasta decidir un presupuesto y primera etapa en el PC. El presupuesto inicial sigue en cero. La entrega se ha probado en Windows; Ubuntu no se ha validado todavía.
 
-Cambios solicitados el 06/09/2026, todavía en planificación: [inspección de gráficos, velas y aprendizaje acumulativo de IA](docs/backlog_planificacion.md).
+Los gráficos de v0.3 se desarrollan por autorización expresa del usuario. Aprendizaje acumulativo, indicadores nuevos, móvil, ejecución remota e informes LaTeX mantienen su alcance futuro en el [backlog](docs/backlog_planificacion.md).
 
 Para trabajar en otro equipo: [traslado al sobremesa y conversación nueva en Codex](docs/traslado_sobremesa.md). El contexto para retomar el proyecto está en [CONTINUIDAD.md](docs/CONTINUIDAD.md); Git no traslada automáticamente el chat original ni los experimentos locales.
 
 Interfaz local actual: [diseño crema y cobre, adaptación ultrapanorámica y validación](docs/frontend_crema_cobre.md). Incluye las cinco secciones existentes; los informes LaTeX siguen en planificación.
 
-Consolidación posterior: [nueve mejoras de fiabilidad, trazabilidad y pruebas del frontend](docs/frontend_consolidacion.md), más correcciones de foco, anuncios de estado y aislamiento de pruebas. La [CI de rc.2](https://github.com/Buzo500/atlas-quant/actions/runs/34249730107) valida `412918b`: 446 pruebas del motor y 91 subtests, 140 de interfaz y cinco E2E con Chromium y API real, además de instalación limpia, compilación, contratos, arranque y parada. El cierre posterior solo modifica documentación; la integración mediante la [PR #2](https://github.com/Buzo500/atlas-quant/pull/2) y la etiqueta `v0.2.0-rc.2` siguen el procedimiento autorizado. El escalado físico de Windows al 125 % y 150 % continúa pendiente: los 35 viewports CSS anteriores no lo sustituyen. Ensayo de 48 horas y seguimiento aplazados. [Evidencia, incidencias y límites](docs/candidata_v0_2.md).
+Consolidación posterior: [nueve mejoras de fiabilidad, trazabilidad y pruebas del frontend](docs/frontend_consolidacion.md), más correcciones de foco, anuncios de estado y aislamiento de pruebas. [PR #2](https://github.com/Buzo500/atlas-quant/pull/2) fusionada y `v0.2.0-rc.2` publicada sobre `9aee422`; la [CI de la etiqueta](https://github.com/Buzo500/atlas-quant/actions/runs/34251099444) pasó con 446 pruebas del motor y 91 subtests, 140 de interfaz y cinco E2E. **[Escalado físico de Windows al 125 % y 150 % comprobado](docs/validacion_escalado_windows.md)** en el monitor 3440 × 1440 de este PC, con el 100 % inicial restaurado. Ensayo de 48 horas y seguimiento aplazados. [Evidencia, incidencias y límites](docs/candidata_v0_2.md).
 
 ## Abrir la aplicación
 
@@ -33,10 +37,10 @@ El sobremesa se ha probado el 06/09/2026 con Python 3.14.4, Node 24.15.0 y pnpm 
 ## Primer recorrido
 
 1. **Cargar demostración** añade tres activos ficticios y movimientos sintéticos. No descarga una cartera real.
-2. **Cartera** muestra efectivo, posiciones, aportaciones, P&L y TWR diario.
+2. **Cartera** muestra efectivo, posiciones, aportaciones, P&L y TWR diario. Su curva permite consultar una ficha junto al cursor o por teclado, elegir línea/área o TWR desde el origen, filtrar fechas y navegar con barra y lupas. En pantalla completa admite arrastre y zoom con la rueda; precios y resultados comparten estos controles.
 3. **Laboratorio** compara mantener y dos cruces de medias con selección cronológica 60/20/20, comisiones, deslizamiento y un mismo límite de posición para estrategia y benchmark.
 4. **Agente IA** crea un experimento de duración y presupuesto limitados. Sin clave, usa «Catálogo fijo · sin IA». Se genera un informe y se observa la regla congelada sobre nuevas sesiones.
-5. **Datos** importa CSV y permite conectar Yahoo diario en EUR. Las importaciones de movimientos se previsualizan antes de confirmar y omiten IDs ya importados.
+5. **Datos** permite explorar precios de cada activo: velas, línea, área o barras OHLC, volumen y agregación diaria/semanal/mensual. También importa CSV y permite conectar Yahoo diario en EUR. Las importaciones de movimientos se previsualizan antes de confirmar y omiten IDs ya importados.
 6. **Ajustes** controla la parada de ejecución simulada y el límite de peso. La parada está activada por defecto.
 
 ## Conectar OpenAI o Anthropic
@@ -59,6 +63,10 @@ El motor propone un máximo de ocho candidatos, ejecuta pruebas, congela el gana
 Si se cumplen los criterios, activaste la simulación automática y la parada global está desactivada, abre una cuenta paper independiente. Una señal al cierre solo puede ejecutarse en una apertura posterior recibida. Los datos sintéticos nunca habilitan esa promoción. No hay endpoint de órdenes reales.
 
 ## Estado y validación
+
+- **0.3.0-dev.1, CI de Windows superada el 09/09/2026:** [ejecución 34340199451](https://github.com/Buzo500/atlas-quant/actions/runs/34340199451), fuentes `c8f4eb6`: **477 pruebas Python y 91 subtests, 244 de frontend y 10/10 E2E**, instalación limpia, build, tipos, contratos, lint, arranque y parada correctos. Dentro de la cuota gratuita comprobada. [PR #3](https://github.com/Buzo500/atlas-quant/pull/3) en borrador; sin fusión ni etiqueta nueva. El cierre documental posterior no cambia las fuentes validadas.
+
+- **0.3.0-dev.1, revisión local del 09/09/2026:** 244 pruebas de frontend, TypeScript, lint y build con manifiesto correctos. Los cinco recorridos E2E de gráficos pasan; aquel intento local queda en **9/10** por una espera intermitente de 10 s en `/api/state`, todavía sin causa acreditada. La CI posterior pasa 10/10 sin aumentar límites ni añadir reintentos; no acredita resuelta la intermitencia. Rendimiento medido con 100.000 observaciones y 1.000 velas visibles. [Revisión, incidencias y evidencia](docs/revision_graficos_20260909.md). El escalado físico 125 %/150 % corresponde a la entrega inicial y sigue pendiente repetirlo sobre los controles actuales; ensayo sostenido aplazado.
 
 - **0.2.0-rc.2 con CI verificada:** 446 pruebas Python y 91 subtests (22,13 s), 140 Vitest en 15 archivos (43,86 s) y 5/5 E2E (18,7 s) en Windows CI. Validación local separada: 446+91 (38,34 s, dos avisos previos), 140 Vitest (13,34 s) y 5/5 E2E (9,6 s). El [registro de candidata](docs/candidata_v0_2.md) conserva también el primer intento remoto fallido y sus correcciones.
 

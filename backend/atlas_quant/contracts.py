@@ -147,6 +147,36 @@ class DatasetResponse(ResponseModel):
     warnings: list[str] | None = None
 
 
+class DatasetPriceBar(ResponseModel):
+    date: str
+    open: float = Field(gt=0)
+    high: float = Field(gt=0)
+    low: float = Field(gt=0)
+    close: float = Field(gt=0)
+    volume: float = Field(ge=0)
+
+
+class DatasetPricesResponse(ResponseModel):
+    dataset_id: str
+    dataset_version: int = Field(ge=1)
+    manifest_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    symbol: str
+    currency: Literal["EUR"]
+    source_kind: Literal["observed", "synthetic"]
+    source: str
+    source_metadata: SourceMetadata | None
+    price_basis: str
+    calendar: str
+    warnings: list[str]
+    available_start: str = Field(description="Primera sesión disponible del símbolo en esta versión.")
+    available_end: str = Field(description="Última sesión disponible del símbolo en esta versión.")
+    first_date: str | None = Field(description="Primera sesión del intervalo solicitado, o null si está vacío.")
+    last_date: str | None = Field(description="Última sesión del intervalo solicitado, o null si está vacío.")
+    preceding_close: float | None = Field(description="Cierre de la sesión anterior a la primera barra devuelta, si existe.")
+    preceding_date: str | None
+    bars: list[DatasetPriceBar] = Field(max_length=100_000)
+
+
 class Position(ResponseModel):
     symbol: str
     quantity: float

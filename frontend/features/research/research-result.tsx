@@ -119,7 +119,7 @@ export function ResearchResult({ result }: { result: StoredResearch }) {
             <h2>Resultado fuera de muestra</h2>
             <span className="tag">{result.selected_strategy.kind}</span>
           </div>
-          <Curve data={result.out_of_sample.curve ?? []} />
+          <Curve key={result.execution?.id ?? result.data_hash} data={result.out_of_sample.curve ?? []} />
           <div className="split-periods">
             {(
               ['train_period', 'validation_period', 'test_period'] as const

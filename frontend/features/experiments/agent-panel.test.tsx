@@ -200,7 +200,7 @@ describe('Creación acotada sin llamadas reales', () => {
     const user = userEvent.setup();
     await user.click(screen.getByRole('combobox', { name: 'Proveedor de IA' }));
     await user.click(
-      screen.getByRole('option', { name: 'OpenAI · GPT-5.4 mini' }),
+      await screen.findByRole('option', { name: 'OpenAI · GPT-5.4 mini' }),
     );
     expect(screen.getByText(/Falta la clave local de openai/)).not.toBeNull();
     const submit = screen.getByRole('button', {
