@@ -4,6 +4,8 @@
 
 [D1: contratos y convenciones](v0_4_d1.md) fija orden, precisión, monedas, fechas, CSV, errores, capacidades, métricas y migración inicial. Incluye [12 casos numéricos](fixtures/v0_4_d1_referencias.json) comprobados mediante aritmética independiente; no son pruebas ejecutadas contra el motor nuevo.
 
+La [arquitectura objetivo](arquitectura_objetivo.md), concretada el 09/09/2026, conserva D1–D8. El evaluador compartido, la construcción de posiciones objetivo, el riesgo continuo y el gestor de órdenes se desarrollarán en v0.5–v0.7 según la [hoja de ruta](hoja_de_ruta.md); no amplían esta entrega ni alteran los contratos heredados de v0.4.
+
 ## Objetivo y alcance
 
 **Avance posterior · 09/09/2026:** D2 integrado en PR #4 y etiqueta `v0.4.0-dev.1`; el usuario autoriza concretar, preparar casos e implementar D3. [Contrato y evidencia D3](v0_4_d3.md), desarrollo local `0.4.0-dev.2`, `codex/v0.4-d3`. D4–D8 pendientes. Este avance sustituye los pendientes de D3 y autorización del registro inicial.
@@ -124,4 +126,4 @@ Fuera: bróker/órdenes reales, cortos/préstamos, derivados, fiscalidad declara
 
 Decisiones de alcance aprobadas: formato CSV propio primero, EUR–USD como primer conjunto de monedas y evolución incremental D1–D8. Se mantiene la cartera inicial sencilla definida en D1. Calendarios/proveedores reales, primer formato de extracto externo y tratamiento de casos de liquidación no cubiertos se concretan cuando se disponga de evidencia; no bloquean los fixtures sintéticos ni justifican contratar servicios. Para convenciones técnicas concretas prevalece D1 sobre las formulaciones preliminares del plan.
 
-La aprobación del plan no autoriza automáticamente cada implementación o publicación. El usuario autorizó después los cinco trabajos de D2 y, en una petición posterior, su publicación en rama/PR y CI gratuita. Esa publicación no inicia D3 ni autoriza fusión o etiqueta. La importación de movimientos del usuario queda pendiente por decisión expresa.
+La aprobación del plan no autoriza automáticamente cada implementación o publicación. D2 se publicó, fusionó y etiquetó con autorización; D3 se concretó e implementó después por petición del usuario y sigue local, pendiente de publicación y CI propia. La autorización posterior de arquitectura cubre documentación y ajuste de la hoja de ruta; no inicia D4–D8 ni habilita un bróker. La importación de movimientos del usuario queda pendiente por decisión expresa.

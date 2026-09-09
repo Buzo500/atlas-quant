@@ -8,6 +8,8 @@ Acciones y ETF · Análisis, simulación y órdenes reales · Automatización co
 
 **Estado de la entrega:** especificación para implementar y validar. Los controles, pruebas y objetivos de rendimiento descritos son requisitos del producto; todavía no se han construido ni superado. ATLAS Quant es un nombre de trabajo.
 
+**Concreción posterior · 09/09/2026:** la [arquitectura objetivo](arquitectura_objetivo.md) desarrolla los recorridos de investigación y operación, los límites del monolito modular, sus contratos y la recuperación. La secuencia vigente está en la [hoja de ruta](hoja_de_ruta.md) y el estado implementado en [CONTINUIDAD](CONTINUIDAD.md). Este diseño original conserva su fecha y versión documental; no describe por sí solo las funciones disponibles ni se ha regenerado su PDF en esta actualización.
+
 ## 1. Decisión de producto
 
 Diseñaría una aplicación personal que reúna posiciones, efectivo, rentabilidades, riesgo, análisis de acciones y ETF, planificación de aportaciones y rebalanceo. Su principal utilidad será poder responder: cuánto tengo, cómo se explica el resultado, qué riesgos estoy acumulando y qué operaciones cumplen mi política de inversión.

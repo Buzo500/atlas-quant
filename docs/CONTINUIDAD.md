@@ -4,6 +4,14 @@ Actualizado: 9 de septiembre de 2026. Este documento resume decisiones y estado 
 
 Preferencia de comunicación: al terminar cada proceso, presentar cinco siguientes pasos concretos, en orden de prioridad, con su utilidad, dependencias y una recomendación. El usuario elegirá; la lista no autoriza por sí misma esos pasos ni reactiva el ensayo aplazado.
 
+## Última planificación: arquitectura y hoja de ruta · 09/09/2026
+
+El usuario autoriza concretar los cinco trabajos de diseño tras proponer un esquema Research/Data/Backtest/Validation/Risk/Execution: [arquitectura objetivo](arquitectura_objetivo.md). Se documentan los dos recorridos, módulos y propietarios del estado, contratos lógicos con invariantes, promoción/suspensión/recuperación y escenarios de aceptación. IA investigadora con salidas restringidas; ejecución bajo mandato y controles independientes. Se mantienen monolito modular, un ejecutor por base y versiones/políticas históricas.
+
+La [hoja de ruta](hoja_de_ruta.md) conserva numeración y orden. v0.4 mantiene D1–D8; v0.5 explicita construcción de cartera y riesgo reutilizable; v0.6 concreta DSL/evaluador, validación, registro de candidatas y memoria; v0.7 se desglosa en lectura/conciliación, paper supervisado, paper automático acotado y cierre de recuperación. v1.3 se identifica como automatización **real**. No se incorporan notebooks, feature store específico, datos alternativos, LLM local ni ML como requisitos obligatorios para el primer paper.
+
+Entrega solo documental sobre el código `93c7f7d`. Sin cambios de código, contratos HTTP, esquema, versión, build, proceso o datos; no se necesitan pruebas del motor para estos documentos. Enlaces locales y diff revisados. No se realiza publicación ni CI remota. La implementación D3 y su validación son las del cierre inferior. D4–D8, la importación personal, el ensayo de 48 horas y desarrollos posteriores conservan su estado pendiente; los cinco trabajos autorizados aquí son de arquitectura y planificación.
+
 ## Estado actual: D2 integrado y D3 implementado y validado localmente
 
 **Cinco pasos autorizados completados · 09/09/2026:** [PR #4](https://github.com/Buzo500/atlas-quant/pull/4) fusionada mediante squash en `77f8fa0a0056a94f65b257a05ff6f0a79b1d982e`; etiqueta anotada [v0.4.0-dev.1](https://github.com/Buzo500/atlas-quant/tree/v0.4.0-dev.1) publicada y comprobada en remoto sobre ese commit. Integración con contenido idéntico a la cabeza revisada de D2; su CI gratuita es la indicada en el registro inferior. No se ha ejecutado otra CI por la fusión.

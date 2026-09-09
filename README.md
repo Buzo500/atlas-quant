@@ -10,6 +10,8 @@ Se conserva contabilidad EUR `legacy-eur-v1`. USD se admite **solo como atributo
 
 Alcance aprobado de [v0.4 · Datos y contabilidad trazables](docs/plan_v0_4.md): ocho entregas, CSV propio y EUR/USD. [D1](docs/v0_4_d1.md) concreta contratos y convenciones con referencias numéricas; D2 está integrado, D3 desarrollado localmente y D4–D8 pendientes.
 
+[Arquitectura objetivo y contratos entre módulos](docs/arquitectura_objetivo.md): recorridos de investigación y ejecución, estrategia compartida, construcción de cartera, riesgo continuo, mandatos y conciliación. Es planificación autorizada; concreta v0.5–v0.7 sin renumerar versiones ni añadir bloques a v0.4. El paper externo automático se prevé en v0.7 y la automatización real en v1.3.
+
 Versión anterior: **0.3.0-dev.1 · gráficos interactivos**. Conserva como antecedente `0.2.0-rc.2`, candidata publicada con CI verificada; el ensayo de 48 horas sigue aplazado y v0.2 no se declara estable. El [plan de v0.3](docs/plan_v0_3.md) fija el alcance, y la [guía de gráficos](docs/graficos_v0_3.md) explica su uso y validación. La [hoja de ruta](docs/hoja_de_ruta.md) recoge las entregas previstas y [CHANGELOG.md](CHANGELOG.md) sus cambios.
 
 Aplicación local para analizar una cartera en EUR, comparar estrategias de acciones/ETF y ejecutar experimentos acotados con OpenAI o Anthropic. Incluye simulación de órdenes; no está conectada a ningún bróker.
