@@ -1,6 +1,16 @@
 # Cambios de ATLAS Quant
 
-## 0.4.0-dev.1 · D2 · Desarrollo local, sin publicar · 2026-09-09
+## 0.4.0-dev.2 · D3 · Desarrollo local, sin publicar · 2026-09-09
+
+- Calidad por serie/fecha: calendario explícito versionado, cobertura, antigüedad y disponibilidad histórica. Estados separados para dibujo, valoración de precios, investigación exploratoria, investigación acreditada al cierre y promoción paper.
+- Calendario y evidencia CSV previsualizados; confirmación protegida frente a cambios concurrentes. No deduce festivos ni disponibilidad desde descargas. Informes paginados fuera de `/api/state`.
+- Revisión expresa de precios históricos con motivo, nueva versión, evidencia afectada invalidada y feed pausado. Versiones anteriores y vínculos de cartera intactos; una revisión posterior detiene el seguimiento de experimentos congelados conservando sus resultados.
+- Los experimentos nuevos usan `quality-v1` y exigen calidad antes de promoción; cuentas anteriores mantienen su política. La cartera identifica calidad de fuentes sobre sus cifras heredadas, sin cambiar contabilidad ni conciliar eventos automáticamente.
+- Interfaz crema/cobre conservada, formularios revisables, tabla por fecha y pruebas de concurrencia, recuperación, controles y navegador. [Reglas y evidencia](docs/v0_4_d3.md).
+
+## v0.4.0-dev.1 · D2 · Publicado · 2026-09-09
+
+PR #4 fusionada y etiqueta anotada sobre `77f8fa0a0056a94f65b257a05ff6f0a79b1d982e`. CI [34365374994](https://github.com/Buzo500/atlas-quant/actions/runs/34365374994) correcta sobre las fuentes D2; integración con contenido idéntico. Entrega de desarrollo, sin ensayo de 48 horas ni declaración de estabilidad.
 
 - El lanzador permite configurar `REQUESTS_CA_BUNDLE` desde `.env`, manteniendo precedencia del entorno y verificación HTTPS. Resuelve en este PC la confianza de la raíz de inspección de Avast mediante un bundle local. 48 pruebas runtime/feed y 28 subtests, descarga y gráfico NVIDIA comprobados; detalle en `docs/diagnostico_yahoo_windows.md`.
 

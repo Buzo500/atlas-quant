@@ -1,12 +1,16 @@
 # ATLAS Quant
 
-**Desarrollo local actual: `0.4.0-dev.1` · D2, identidad y cartera independiente.** Rama `codex/v0.4-d2`, todavía sin publicar ni ejecutar CI remota. En Datos puedes registrar instrumentos/cotizaciones/símbolos, elegir o crear una cartera, consultar su libro y previsualizar fuentes de precios por versión. La selección del conjunto de investigación ya no cambia la cartera activa. [Diseño, migración y validación D2](docs/v0_4_d2.md).
+**Desarrollo local actual: `0.4.0-dev.2` · D3, calidad y revisiones de precios.** Rama `codex/v0.4-d3`. En Datos, «Calidad de precios» distingue cobertura, sesiones ausentes, cierres acreditados y disponibilidad histórica; permite previsualizar calendarios/base y correcciones de precios como versiones nuevas. Las carteras conservan sus vínculos fijados. [Reglas y validación D3](docs/v0_4_d3.md).
 
-D2 conserva la contabilidad EUR `legacy-eur-v1`. USD se admite **solo como atributo del catálogo**; movimientos/valoración USD, conciliación CSV v2, eventos corporativos nuevos y XIRR corresponden a D3–D8. Las cifras de CI siguientes son históricas de v0.3/v0.2, no validaciones de esta rama.
+**Entrega publicada: [v0.4.0-dev.1](https://github.com/Buzo500/atlas-quant/tree/v0.4.0-dev.1)**, D2 integrado mediante [PR #4](https://github.com/Buzo500/atlas-quant/pull/4), CI de Windows correcta: 497 Python + 91 subtests, 246 frontend y 12 E2E. D2 permite catálogo y carteras independientes del conjunto de investigación. [Diseño y migración](docs/v0_4_d2.md). D3 es posterior y tiene su propia validación local; no confundir su código con las fuentes de esa CI.
+
+Se conserva contabilidad EUR `legacy-eur-v1`. USD se admite **solo como atributo del catálogo**; movimientos/valoración USD, conciliación CSV v2, eventos corporativos nuevos y XIRR corresponden a D4–D8. La evidencia de calidad debe ser declarada y contrastada; ninguna descarga certifica automáticamente un calendario.
 
 **Entrega de desarrollo aceptada: `v0.3.0-dev.1`.** G1–G6 cerradas por el usuario el 09/09/2026, con pantalla completa comprobada manualmente en precios y cartera y CI completa correcta. Se acepta una incidencia conocida de espera intermitente en `/api/state`, todavía sin causa determinada. [Cierre y evidencia](docs/revision_final_v0_3.md). El ensayo de 48 horas sigue aplazado; esta aceptación no declara una versión estable.
 
-Alcance aprobado de [v0.4 · Datos y contabilidad trazables](docs/plan_v0_4.md): ocho entregas, CSV propio y EUR/USD. [D1](docs/v0_4_d1.md) concreta contratos y convenciones con referencias numéricas; D2 desarrolla las identidades y la separación de cartera, y D3–D8 siguen pendientes.
+Alcance aprobado de [v0.4 · Datos y contabilidad trazables](docs/plan_v0_4.md): ocho entregas, CSV propio y EUR/USD. [D1](docs/v0_4_d1.md) concreta contratos y convenciones con referencias numéricas; D2 está integrado, D3 desarrollado localmente y D4–D8 pendientes.
+
+[Arquitectura objetivo y contratos entre módulos](docs/arquitectura_objetivo.md): recorridos de investigación y ejecución, estrategia compartida, construcción de cartera, riesgo continuo, mandatos y conciliación. Es planificación autorizada; concreta v0.5–v0.7 sin renumerar versiones ni añadir bloques a v0.4. El paper externo automático se prevé en v0.7 y la automatización real en v1.3.
 
 Versión anterior: **0.3.0-dev.1 · gráficos interactivos**. Conserva como antecedente `0.2.0-rc.2`, candidata publicada con CI verificada; el ensayo de 48 horas sigue aplazado y v0.2 no se declara estable. El [plan de v0.3](docs/plan_v0_3.md) fija el alcance, y la [guía de gráficos](docs/graficos_v0_3.md) explica su uso y validación. La [hoja de ruta](docs/hoja_de_ruta.md) recoge las entregas previstas y [CHANGELOG.md](CHANGELOG.md) sus cambios.
 

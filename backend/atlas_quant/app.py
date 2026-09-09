@@ -22,6 +22,9 @@ from .datasets import LedgerPreviewConflict
 from .prices import PricesNotFound
 from .service import Service
 from .store import Store, now
+from .quality import EvidenceRequest, RevisionRequest, check_research, EXPLORATORY_WARNING
+from .quality_service import QualityService
+from .quality_contracts import QualityReport, EvidencePreview, RevisionPreview
 from .worker_lock import WorkerLock
 from .catalog import CatalogService, InstrumentInput, ListingInput, AliasInput, IdentityNotFound, RevisionConflict
 from .portfolios import PortfolioService
@@ -121,6 +124,8 @@ def create_app(data_dir=None, run_worker=True):
     service = Service(store)
     catalog = CatalogService(store)
     portfolios = PortfolioService(store)
+    quality = QualityService(store)
+
 
     @asynccontextmanager
     async def lifespan(app):
@@ -224,6 +229,21 @@ def create_app(data_dir=None, run_worker=True):
     def portfolio_ledger(ident: str, body: LedgerInput):
         return portfolios.import_ledger(ident, body.csv, body.commit, body.preview_token)
 
+    @app.get("/api/datasets/{ident}/quality", response_model=QualityReport)
+    def read_quality(ident: str, version: int = Query(ge=1), symbol: str = Query(min_length=1, max_length=40),
+                     start: str | None = Query(default=None, max_length=10),
+                     end: str | None = Query(default=None, max_length=10),
+                     offset: int = Query(default=0, ge=0), limit: int = Query(default=100, ge=1, le=500)):
+        return quality.read(ident, version, symbol, start=start, end=end, offset=offset, limit=limit)
+
+    @app.post("/api/datasets/{ident}/quality", response_model=EvidencePreview)
+    def update_quality(ident: str, body: EvidenceRequest):
+        return quality.evidence(ident, body)
+
+    @app.post("/api/datasets/{ident}/revisions", response_model=RevisionPreview)
+    def revise_prices(ident: str, body: RevisionRequest):
+        return quality.revise(ident, body)
+
     @app.get("/api/health", response_model=HealthResponse, response_model_exclude_unset=True)
     def health():
         worker = getattr(app.state,"worker",None)
@@ -232,7 +252,7 @@ def create_app(data_dir=None, run_worker=True):
 
     @app.get("/api/state", response_model=StateResponse, response_model_exclude_unset=True)
     def state():
-        datasets = [{k:v for k,v in d.items() if k!="bars"} for d in store.list("dataset")]
+        datasets = [{k:v for k,v in d.items() if k not in ("bars", "quality_evidence", "price_revision")} for d in store.list("dataset")]
         experiments = [{k:v for k,v in j.items() if k not in ("research","forward_result","plan")}
                        for j in store.list("experiment")]
         for job in experiments:
@@ -245,7 +265,7 @@ def create_app(data_dir=None, run_worker=True):
     @app.post("/api/datasets/demo", response_model=DatasetResponse, response_model_exclude_unset=True)
     async def demo():
         dataset = service.load_demo()
-        return {k:v for k,v in dataset.items() if k!="bars"}
+        return {k:v for k,v in dataset.items() if k not in ("bars", "quality_evidence", "price_revision")}
 
     @app.post("/api/datasets", response_model=DatasetResponse, response_model_exclude_unset=True)
     async def import_prices(body: PricesInput):
@@ -253,18 +273,18 @@ def create_app(data_dir=None, run_worker=True):
         if len(bars)>100_000:
             raise ValueError("Máximo 100.000 barras por conjunto.")
         result = service.save_dataset(bars,body.name,body.source_kind,body.source,body.dataset_id)
-        return {k:v for k,v in result.items() if k!="bars"}
+        return {k:v for k,v in result.items() if k not in ("bars", "quality_evidence", "price_revision")}
 
     @app.post("/api/feeds", response_model=DatasetResponse, response_model_exclude_unset=True)
     async def feed_connect(body: FeedInput):
         async with service.feed_lock:
             result = await service.connect_feed(body.symbol,body.start,body.end)
-        return {k:v for k,v in result.items() if k!="bars"}
+        return {k:v for k,v in result.items() if k not in ("bars", "quality_evidence", "price_revision")}
 
     @app.post("/api/feeds/{ident}/refresh", response_model=DatasetResponse, response_model_exclude_unset=True)
     async def feed_refresh(ident: str):
         result = await service.datasets.refresh_feed(ident, min_interval_seconds=60)
-        return {k:v for k,v in result.items() if k!="bars"}
+        return {k:v for k,v in result.items() if k not in ("bars", "quality_evidence", "price_revision")}
 
     @app.get("/api/datasets/{ident}/portfolio", response_model=PortfolioResponse, response_model_exclude_unset=True)
     def portfolio(ident: str):
@@ -295,6 +315,7 @@ def create_app(data_dir=None, run_worker=True):
     @app.post("/api/research", response_model=ResearchResponse, response_model_exclude_unset=True)
     async def research(body: ResearchInput):
         dataset = service.dataset(body.dataset_id)
+        quality_result = check_research(dataset, body.symbol)
         costs = body.costs.model_dump()
         execution_id = uuid4().hex
         candidates = [{"kind":"buy_hold","symbol":body.symbol},
@@ -303,6 +324,8 @@ def create_app(data_dir=None, run_worker=True):
         async with service.research_lock:
             started_at = now()
             result = await asyncio.to_thread(run_research,dataset["bars"],candidates,**costs)
+        if quality_result["capabilities"]["historical"] != "allowed":
+            result["warnings"].append(EXPLORATORY_WARNING)
         execution = {"id": execution_id, "dataset_id": dataset["id"], "dataset_name": dataset["name"],
                      "dataset_version": dataset["version"], "dataset_manifest_hash": dataset["manifest"]["sha256"],
                      "symbol": result["selected_strategy"]["symbol"], "costs": costs,

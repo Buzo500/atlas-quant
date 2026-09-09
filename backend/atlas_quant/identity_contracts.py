@@ -5,6 +5,7 @@ from pydantic import Field, JsonValue
 
 from .catalog import ExternalCode
 from .contracts import ResponseModel, Position, PortfolioResponse, LedgerResponse
+from .quality_contracts import QualityReport
 
 
 class InstrumentResponse(ResponseModel):
@@ -89,6 +90,7 @@ class BookEntry(ResponseModel):
 
 
 class PortfolioDetail(ResponseModel):
+    quality: list[QualityReport] = Field(default_factory=list)
     portfolio: PortfolioRecord
     context: PortfolioCut
     value: IdentifiedValue | None

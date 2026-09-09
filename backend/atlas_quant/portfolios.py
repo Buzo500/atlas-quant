@@ -10,6 +10,7 @@ from datetime import datetime, timezone
 from .analytics import portfolio_snapshot
 from .catalog import IdentityNotFound, RevisionConflict
 from .data import parse_ledger_csv
+from .quality import report as quality_report
 
 
 def fingerprint(value):
@@ -91,11 +92,19 @@ class PortfolioService:
         snapshot["positions"].sort(key=lambda position: (position["symbol"], position["listing_id"]))
         if not events:
             snapshot["warnings"] = ["Importa movimientos para valorar tu cartera."]
+        quality = []
+        if snapshot["curve"]:
+            cutoff = snapshot["curve"][-1]["date"]
+            held = {p["listing_id"] for p in snapshot["positions"]}
+            for binding in context["bindings"]:
+                if binding["listing_id"] in held:
+                    dataset = datasets[(binding["dataset_id"], binding["dataset_version"])]
+                    quality.append(quality_report(dataset, binding["symbol"], start=cutoff, end=cutoff, limit=0))
         return dict(portfolio=portfolio, context=dict(portfolio_id=portfolio["id"],
             portfolio_revision=portfolio["revision"], catalog_revision=context["catalog"]["revision"],
             accounting_policy=portfolio["accounting_policy"], bindings=context["bindings"],
             data_hash=fingerprint(context["datasets"])), value=snapshot,
-            entries=context["entries"], status="available", warnings=[])
+            entries=context["entries"], status="available", warnings=[], quality=quality)
 
     def read(self, ident, revision=None):
         context = self.store.atomic(lambda work: self._context(work, ident, revision))

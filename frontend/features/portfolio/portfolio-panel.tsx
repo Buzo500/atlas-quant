@@ -16,6 +16,7 @@ import { Metric, DataTable } from '@/shared/ui';
 import { Curve } from '@/components/atlas/curve';
 import { Wallet } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { qualityLabel } from '@/shared/quality';
 
 export function PortfolioPanel({
   dataset,
@@ -76,6 +77,19 @@ export function PortfolioPanel({
           {detail.warnings.join(' ')} El libro se conserva; revisa sus fuentes
           en Datos.
         </output>
+      )}
+      {!!detail?.quality?.length && (
+        <p className="notice">
+          Valoración heredada al {date(detail.quality[0].end)}. Calidad de sus
+          precios:{' '}
+          {detail.quality
+            .map(
+              (q) => `${q.symbol}: ${qualityLabel[q.capabilities.valuation]}`,
+            )
+            .join(' · ')}
+          . Esta lectura conserva la política EUR original; no acredita
+          conciliación ni rentabilidad definitiva.
+        </p>
       )}
       <div className="stats portfolio-stats">
         <Metric

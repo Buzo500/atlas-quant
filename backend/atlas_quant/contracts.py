@@ -473,6 +473,7 @@ class PaperAccount(ResponseModel):
 
 
 class ExperimentResponse(ResponseModel):
+    quality_policy: Literal["quality-v1"] | None = None
     id: str
     dataset_id: str
     dataset_version: int

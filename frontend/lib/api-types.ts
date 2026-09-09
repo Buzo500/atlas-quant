@@ -50,6 +50,7 @@ export type BacktestResponse = {
 };
 
 export type BindingPreview = {
+  "quality"?: Array<QualityReport>;
   "portfolio": PortfolioRecord;
   "context": PortfolioCut;
   "value": (IdentifiedValue) | (null);
@@ -162,6 +163,32 @@ export type DatasetResponse = {
   "warnings"?: (Array<string>) | (null);
 };
 
+export type EvidencePreview = {
+  "dataset_id": string;
+  "version": number;
+  "committed": boolean;
+  "preview_token": string;
+  "quality": QualityReport;
+};
+
+export type EvidenceRequest = {
+  "symbol": string;
+  "calendar_name"?: string;
+  "market"?: string;
+  "timezone"?: string;
+  "calendar_source"?: string;
+  "calendar_verified"?: boolean;
+  "calendar_csv"?: string;
+  "price_basis"?: "raw" | "split_adjusted" | "total_return" | "unknown";
+  "basis_verified"?: boolean;
+  "basis_source"?: string;
+  "availability_csv"?: string;
+  "availability_source"?: string;
+  "expected_version": number;
+  "commit"?: boolean;
+  "preview_token"?: (string) | (null);
+};
+
 export type ExperimentInput = {
   "dataset_id": string;
   "symbol": string;
@@ -176,6 +203,7 @@ export type ExperimentInput = {
 };
 
 export type ExperimentResponse = {
+  "quality_policy"?: ("quality-v1") | (null);
   "id": string;
   "dataset_id": string;
   "dataset_version": number;
@@ -502,6 +530,7 @@ export type PortfolioCut = {
 };
 
 export type PortfolioDetail = {
+  "quality"?: Array<QualityReport>;
   "portfolio": PortfolioRecord;
   "context": PortfolioCut;
   "value": (IdentifiedValue) | (null);
@@ -608,6 +637,52 @@ export type ProviderResponse = {
   "models": Array<ProviderModel>;
 };
 
+export type QualityCapabilities = {
+  "draw": "allowed" | "provisional" | "blocked";
+  "valuation": "allowed" | "provisional" | "blocked";
+  "exploratory": "allowed" | "provisional" | "blocked";
+  "historical": "allowed" | "provisional" | "blocked";
+  "paper": "allowed" | "provisional" | "blocked";
+};
+
+export type QualityDay = {
+  "close_at"?: (string) | (null);
+  "available_at"?: (string) | (null);
+  "date": string;
+  "status": "observed_session" | "market_closed" | "calendar_unknown" | "missing_session" | "missing_price" | "stale_mark" | "unexpected_bar";
+  "price_date": (string) | (null);
+  "age_days": (number) | (null);
+  "price": (number) | (null);
+  "valuation": "allowed" | "provisional" | "blocked";
+  "reasons": Array<string>;
+};
+
+export type QualityReport = {
+  "calendar_market"?: (string) | (null);
+  "calendar_timezone"?: (string) | (null);
+  "policy": "quality-v1";
+  "dataset_id": string;
+  "dataset_version": number;
+  "symbol": string;
+  "start": string;
+  "end": string;
+  "evidence_hash": string;
+  "calendar_name": (string) | (null);
+  "calendar_verified": boolean;
+  "calendar_source": (string) | (null);
+  "price_basis": "raw" | "split_adjusted" | "total_return" | "unknown";
+  "basis_verified": boolean;
+  "capabilities": QualityCapabilities;
+  "counts": {
+  [key: string]: number;
+};
+  "total_days": number;
+  "offset": number;
+  "days": Array<QualityDay>;
+  "last": QualityDay;
+  "warnings": Array<string>;
+};
+
 export type ResearchExecution = {
   "id": string;
   "dataset_id": string;
@@ -655,6 +730,25 @@ export type ResearchResult = {
   "warnings"?: (Array<string>) | (null);
   "max_position_weight"?: (number) | (null);
   "execution"?: (ResearchExecution) | (null);
+};
+
+export type RevisionPreview = {
+  "dataset_id": string;
+  "version": number;
+  "committed": boolean;
+  "preview_token": string;
+  "changed": number;
+  "added": number;
+  "affected_symbols": Array<string>;
+  "feed_paused": boolean;
+};
+
+export type RevisionRequest = {
+  "expected_version": number;
+  "csv": string;
+  "reason": string;
+  "commit"?: boolean;
+  "preview_token"?: (string) | (null);
 };
 
 export type RiskLimits = {

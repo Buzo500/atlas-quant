@@ -1,8 +1,10 @@
 # ATLAS · Funcionalidades pendientes y planificación
 
-Actualizado: 8 de septiembre de 2026. UI-001 implementado; GRAPH-001/002 en desarrollo autorizado como `0.3.0-dev.1`, con alcance en el [plan de v0.3](plan_v0_3.md). El resto sigue como planificación; registrarlo no autoriza su implementación.
+Actualizado: 9 de septiembre de 2026. UI-001 y GRAPH-001/002 implementados; `v0.3.0-dev.1` aceptada y publicada. D2 de v0.4 publicado y D3 desarrollado localmente; [estado exacto](CONTINUIDAD.md). El resto de este backlog sigue como planificación; registrarlo no autoriza su implementación.
 
-El usuario solicita guardar tres mejoras para futuras versiones: información al pasar el ratón por los gráficos, velas y otros tipos de gráfico, y una IA que acumule experiencia y aprenda de sus investigaciones. Pide estudiar si conviene entrenarla en local. La elección de arquitectura que aparece aquí es una recomendación del asistente, todavía no una decisión adoptada por el usuario.
+El usuario solicitó guardar mejoras de gráficos y una IA que acumule experiencia y aprenda de sus investigaciones. La [arquitectura objetivo](arquitectura_objetivo.md), concretada por su autorización el 09/09/2026, separa IA investigadora, memoria, modelos cuantitativos y controles de ejecución. Desarrollar ese diseño no significa que se hayan implementado sus módulos pendientes ni elegido un modelo, proveedor o presupuesto nuevo.
+
+La memoria y la DSL restringida se concretan para v0.6; el agente propone contratos que el programa valida. Feature store específico, notebooks integrados, datos alternativos y piloto de LLM local siguen opcionales. Los modelos cuantitativos conservan su evaluación posterior en v1.1. El paper externo acotado de v0.7 no depende de entrenar un modelo ni de completar móvil/remoto. Esta precisión sustituye el estado anterior de arquitectura solo sugerida, manteniendo las decisiones de fuentes y modelos por concretar.
 
 Ampliación del 06/09/2026: también solicita enviar estrategias desde el portátil al sobremesa para ejecutarlas durante ausencias y una app móvil para elegir/controlar estrategias y consultar resultados. Se registra exclusivamente como planificación y viabilidad en [ejecucion_remota_movil.md](ejecucion_remota_movil.md), sin cambios al programa. El orden de versiones vigente está en la [hoja de ruta](hoja_de_ruta.md).
 

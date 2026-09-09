@@ -101,7 +101,7 @@ class UnitOfWork(IdentityWork):
         row = self.db.execute("SELECT body FROM versions WHERE dataset_id=? AND version=?", (ident, version)).fetchone()
         return json.loads(row[0]) if row else None
 
-    def save_dataset(self, value, *, prepare=None):
+    def save_dataset(self, value, *, prepare=None, allow_revision=False):
         value = dict(value)
         value.setdefault("id", uuid.uuid4().hex)
         ident = value["id"]
@@ -118,13 +118,13 @@ class UnitOfWork(IdentityWork):
         if current:
             # Validate against the committed version, never an earlier snapshot.
             lookup = {(bar["date"], bar["symbol"]): bar for bar in value["bars"]}
-            if any(lookup.get((bar["date"], bar["symbol"])) != bar for bar in current["bars"]):
+            if not allow_revision and any(lookup.get((bar["date"], bar["symbol"])) != bar for bar in current["bars"]):
                 raise ValueError("La actualización debe conservar todas las barras anteriores sin cambios. Importe las revisiones como un conjunto nuevo.")
             prior_keys = {(bar["date"], bar["symbol"]) for bar in current["bars"]}
             last_dates = {}
             for bar in current["bars"]:
                 last_dates[bar["symbol"]] = max(last_dates.get(bar["symbol"], ""), bar["date"])
-            if any((bar["date"], bar["symbol"]) not in prior_keys
+            if not allow_revision and any((bar["date"], bar["symbol"]) not in prior_keys
                    and bar["date"] <= last_dates.get(bar["symbol"], "") for bar in value["bars"]):
                 raise ValueError("Solo se pueden añadir barras posteriores al último día de cada activo; no insertar historia pasada.")
             value["source_kind"], value["source"] = current["source_kind"], current["source"]

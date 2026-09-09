@@ -765,6 +765,7 @@ code {
   max-height: 32rem;
   overflow: auto;
 }
+.quality-panel,
 .identity-panel {
   grid-column: 1 / -1;
   min-width: 0;
@@ -1388,4 +1389,21 @@ code {
   font-size: 11px;
   color: var(--muted-foreground);
   white-space: normal;
+}
+
+.quality-fields {
+  min-width: 0;
+  margin: 16px 0;
+  padding: 12px;
+  border: 1px solid var(--border);
+}
+.quality-panel textarea {
+  min-height: 100px;
+  max-height: 220px;
+  overflow: auto;
+  resize: vertical;
+}
+.quality-panel p,
+.quality-panel output {
+  overflow-wrap: anywhere;
 }
