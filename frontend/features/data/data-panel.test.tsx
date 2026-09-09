@@ -52,10 +52,16 @@ describe('Lectura de archivos CSV', () => {
     const { file, pending } = delayedFile();
     chooseFile(file);
     const user = userEvent.setup();
-    await user.click(screen.getByRole('combobox', { name: 'Tipo de archivo' }));
+    // This test exercises invalidation of an in-flight File.text(), not pointer
+    // placement in Base UI's portal (jsdom has no layout). Use the keyboard
+    // opening path and await the option before changing the import type.
+    act(() => screen.getByRole('combobox', { name: 'Tipo de archivo' }).focus());
+    await user.keyboard('{ArrowDown}');
     await user.click(
-      screen.getByRole('option', { name: 'Movimientos de cartera' }),
+      await screen.findByRole('option', { name: 'Movimientos de cartera' }),
     );
+    expect(screen.getByRole('combobox', { name: 'Tipo de archivo' }).textContent)
+      .toContain('Movimientos de cartera');
     await act(async () => pending.resolve('precios antiguos'));
     expect(
       (

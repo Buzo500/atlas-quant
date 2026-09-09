@@ -47,3 +47,11 @@ node tools/diagnostics/api_clients.cjs e2e-IDENTIFICADOR
 El cliente rechaza estados HTTP distintos de 200, proveedores configurados, experimentos existentes, datos no sintéticos y descriptores incompletos/inactivos o de otra ejecución. Los wrappers rechazan una base ajena o una parada de otra carpeta antes de cargar la aplicación o instalar hooks; la protección Python sigue activa con `-O`. Estos controles complementan al lanzador, que comprueba la propiedad real de los puertos y conserva el bloqueo de mantenimiento. No son autenticación frente a un proceso local que pueda alterar los archivos de ejecución.
 
 Informes y logs completos permanecen excluidos de Git en `var/validation/` y `output/validation/`. El informe del cliente se crea sin sobrescribir uno previo. Los comandos no cargan claves ni hacen llamadas pagadas.
+
+## Intento de CI conservado y preparación de la corrección
+
+La CI [34345374202](https://github.com/Buzo500/atlas-quant/actions/runs/34345374202), sobre `46df937`, terminó con **243/244 pruebas frontend correctas en 69,05 s**; no llegó a Python ni E2E. Falló la búsqueda inmediata de «Movimientos de cartera» tras abrir el selector en la prueba de lectura CSV pendiente. El DOM registraba el selector cerrado. No se ha demostrado la secuencia exacta que lo cerró; no se atribuye a la API real, que ese test no utiliza.
+
+El test usa ahora la apertura por teclado del selector, espera la opción con el límite existente y comprueba expresamente el cambio de tipo antes de resolver la lectura antigua. Mantiene la aserción de descarte del archivo, sin reintentos ni ampliación de tiempos. Validación local posterior: **244/244 frontend, 23 archivos, 20,45 s**, TypeScript, lint desde la carpeta frontend y build con manifiesto correctos. El build se regenera porque su huella incluye los tests; no se cambió lógica de la aplicación. Se conserva también la corrección del diagnóstico para checkouts nuevos y sus 28 pruebas, descrita en el [diagnóstico](diagnostico_api_20260909.md).
+
+La cancelación que se intentó durante esa CI fue rechazada por la revisión automática al considerar que la autorización para ejecutarla no incluía detenerla. Se dejó terminar; no se sorteó el rechazo. El fallo remoto y su log se conservan en `output/validation/v03-ci-34345374202-job.log`.
