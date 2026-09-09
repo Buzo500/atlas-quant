@@ -2,6 +2,18 @@
 
 **Resultado: no reproducida; causa todavía sin determinar.** Se ha seguido la petición entre cliente, proxy y motor sobre bases sintéticas nuevas. No se ha aplicado una corrección a la aplicación, aumentado tiempos de espera ni añadido reintentos. La CI correcta y los ensayos de este documento no convierten en resuelto el fallo local anterior de `/api/state`.
 
+## Decisión de seguimiento tras revisar la CI final
+
+**Aceptación expresa del usuario · 09/09/2026:** se acepta esta incidencia conocida para la entrega de desarrollo `0.3.0-dev.1` y se autoriza el cierre de G6. Se mantienen la incidencia abierta, los límites y el procedimiento de captura si reaparece. Esta decisión sustituye las referencias inferiores a una aceptación pendiente; no demuestra una corrección.
+
+Revisión del 09/09/2026, autorizada por el usuario: **mantener como incidencia conocida abierta, sin otra repetición genérica ahora**. Siete repeticiones del recorrido original, lecturas concurrentes, pruebas con pausas y suite instrumentada no reprodujeron el síntoma; las CI `34340199451` y `34346311068` también terminaron con 10/10 E2E. No hay evidencia nueva que discrimine una hipótesis concreta. La falta de reproducción no permite estimar su frecuencia ni descartarlo en otras carteras.
+
+Impacto demostrado: demora de lectura de estado y fallo de un recorrido automatizado. No se ha observado corrupción de datos en estos ensayos, pero eso no acredita ausencia de otros efectos ni permite atribuir la causa al motor, proxy o navegador. No se cambian tiempos, reintentos, dependencias o lógica de ejecución por conjetura.
+
+Si reaparece, conservar hora, acción, identificador de ejecución y logs antes de otra prueba. En una base E2E nueva, usar el diagnóstico optativo y emparejar la petición lenta entre cliente, proxy y ASGI según el procedimiento inferior. Conservar también respuestas fallidas y el cierre seguro del entorno; no dejar procesos activos para preservar evidencia que ya está en disco. Una recurrencia identificada, fallos de controles o pérdida de coherencia obligarían a reabrir la investigación antes de aceptar la entrega afectada.
+
+**Recomendación de entrega:** puede proponerse como limitación explícita de `0.3.0-dev.1` para uso local supervisado, sujeta a aceptación del usuario; no se declara corregida ni se cierra G6 por esta decisión. No se añade seguimiento automático ni se reactiva el ensayo de 48 horas. Las trazas siguen desactivadas en el arranque habitual.
+
 ## Qué se ha observado
 
 El fallo original sigue en `e2e-08bd90a1b5ac4b31b17bcdf153f93389`: un GET de Playwright agotó 10.013,609 ms; una lectura simultánea del navegador terminó con 200 tras 10.094,533 ms. El proxy registró `UND_ERR_SOCKET`, pero carecía de tiempos e identificadores para vincularlo a una petición concreta. El detalle de ese antecedente se conserva en `output/validation/v03-review-state-timeout-20260909.json`.

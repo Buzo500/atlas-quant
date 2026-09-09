@@ -2,6 +2,8 @@
 
 ## v0.3.0-dev.1 · Gráficos interactivos · 2026-09-08
 
+Cierre de desarrollo aceptado el **09/09/2026**: G1–G6 cerradas por decisión expresa del usuario. Pantalla completa verificada manualmente en precios y cartera; escalado físico Windows 125 %/150 % correcto. CI final [34346311068](https://github.com/Buzo500/atlas-quant/actions/runs/34346311068), fuentes `d5c3b09`: **482 Python + 91 subtests, 244 frontend y 10/10 E2E**, instalación/build, contratos, tipos, lint, dependencias, arranque/proxy/parada correctos. El cierre posterior solo modifica documentación e instrucciones. El timeout histórico se acepta como incidencia conocida abierta, sin atribuirle una corrección. La integración por PR #3 y etiqueta `v0.3.0-dev.1` sigue la autorización del usuario. Los pendientes de los registros anteriores quedan sustituidos por este cierre.
+
 Entrega de desarrollo basada en `v0.2.0-rc.2`. El ensayo sostenido y su seguimiento siguen aplazados; no se publica una versión estable por omitirlos.
 
 - Fuentes revisadas `c8f4eb6` subidas y [CI gratuita de Windows superada el 09/09](https://github.com/Buzo500/atlas-quant/actions/runs/34340199451): 477 Python y 91 subtests, 244 frontend y 10/10 E2E, instalación, compilación, contratos, lint, arranque y parada correctos. Se conserva la incidencia intermitente del intento local; PR en borrador y escalado físico de los controles actuales pendiente.
