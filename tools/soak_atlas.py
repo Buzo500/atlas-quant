@@ -151,6 +151,10 @@ def database_snapshot(path, *, full_integrity=False, audit_prefix_count=None):
                     db.execute("SELECT dataset_id,version,body FROM versions ORDER BY dataset_id,version")]
         audit = list(db.execute("SELECT seq,at,event,entity,details FROM audit ORDER BY seq"))
         schema = db.execute("PRAGMA user_version").fetchone()[0]
+        identities = {}
+        if schema == 2:
+            from atlas_quant.identity_store import DDL
+            identities = {table: db.execute(f"SELECT * FROM {table} ORDER BY rowid").fetchall() for table in DDL}
     issues = []
     stable = []
     experiments, datasets = {}, []
@@ -174,7 +178,7 @@ def database_snapshot(path, *, full_integrity=False, audit_prefix_count=None):
     if not datasets or not experiments:
         issues.append("demo_and_settled_experiment_required")
     prefix = audit if audit_prefix_count is None else audit[:audit_prefix_count]
-    return {"schema": schema, "persistent_digest": digest([schema, stable, versions]),
+    return {"schema": schema, "persistent_digest": digest([schema, stable, versions, identities]),
             "audit_count": len(audit), "audit_prefix_digest": digest(prefix),
             "dataset_ids": datasets, "experiments": experiments, "issues": issues,
             "full_integrity": full_integrity}

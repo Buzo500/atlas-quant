@@ -138,7 +138,7 @@ test('movimientos: revisar, invalidar al editar, confirmar y conservar tras reca
   const previews: LedgerResponse[] = [];
   const preview = async () => {
     const response = page.waitForResponse((reply) =>
-      reply.url().endsWith(`/datasets/${dataset.id}/ledger`),
+      /\/portfolios\/[^/]+\/ledger$/.test(reply.url()),
     );
     await page
       .getByRole('button', { name: 'Previsualizar movimientos', exact: true })
@@ -163,7 +163,7 @@ test('movimientos: revisar, invalidar al editar, confirmar y conservar tras reca
   expect(revised.portfolio.nav).toBeCloseTo(before.nav + 150, 6);
   const committed = page.waitForResponse(
     (reply) =>
-      reply.url().endsWith(`/datasets/${dataset.id}/ledger`) &&
+      /\/portfolios\/[^/]+\/ledger$/.test(reply.url()) &&
       reply.request().postDataJSON()?.commit === true,
   );
   await page
@@ -508,7 +508,7 @@ test('interrupción de conexión y reintento contra la misma cartera real', asyn
     await context.setOffline(false);
   }
   const retry = page.waitForResponse((reply) =>
-    reply.url().endsWith(`/datasets/${dataset.id}/portfolio`),
+    /\/api\/portfolios\/[^/]+$/.test(reply.url()),
   );
   await page
     .getByRole('button', { name: 'Reintentar cartera', exact: true })
@@ -790,7 +790,9 @@ test('curva estrecha: la primera lectura sobrevive al ajuste de altura', async (
 }, testInfo) => {
   await page.addInitScript(() => {
     Element.prototype.requestFullscreen = () =>
-      Promise.reject(new DOMException('Exercise window fallback', 'NotAllowedError'));
+      Promise.reject(
+        new DOMException('Exercise window fallback', 'NotAllowedError'),
+      );
   });
   const dataset = await ensureDemo(page);
   const source = await readApi<PortfolioResponse>(
@@ -815,21 +817,42 @@ test('curva estrecha: la primera lectura sobrevive al ajuste de altura', async (
       await page.keyboard.press('End');
     }
     await page.evaluate(
-      () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))),
+      () =>
+        new Promise((resolve) =>
+          requestAnimationFrame(() => requestAnimationFrame(resolve)),
+        ),
     );
     const tooltip = await expectFloatingReading(page);
-    await expect(tooltip.locator('time')).toHaveAttribute('datetime', last.date);
-    await expect(tooltip.locator('data').first()).toHaveAttribute('value', String(last.nav));
-    await page.screenshot({ path: testInfo.outputPath(`first-reading-${input}.png`) });
+    await expect(tooltip.locator('time')).toHaveAttribute(
+      'datetime',
+      last.date,
+    );
+    await expect(tooltip.locator('data').first()).toHaveAttribute(
+      'value',
+      String(last.nav),
+    );
+    await page.screenshot({
+      path: testInfo.outputPath(`first-reading-${input}.png`),
+    });
     // A real browser resize still dismisses the floating reading, while the
     // selected original observation remains available in the fixed details.
     await page.setViewportSize({ width: 420, height: 844 });
     await expect(page.getByRole('tooltip')).toHaveCount(0);
-    await expect(curve.locator('.curve-point-detail time')).toHaveAttribute('datetime', last.date);
+    await expect(curve.locator('.curve-point-detail time')).toHaveAttribute(
+      'datetime',
+      last.date,
+    );
     await page.keyboard.press('Escape');
-    await expect(curve.getByRole('button', { name: /^Pantalla completa:/ })).toBeFocused();
+    await expect(
+      curve.getByRole('button', { name: /^Pantalla completa:/ }),
+    ).toBeFocused();
   }
-  expect(await readApi<PortfolioResponse>(page, `/api/datasets/${dataset.id}/portfolio`)).toEqual(source);
+  expect(
+    await readApi<PortfolioResponse>(
+      page,
+      `/api/datasets/${dataset.id}/portfolio`,
+    ),
+  ).toEqual(source);
 });
 
 for (const mode of ['native', 'fallback'] as const) {

@@ -91,11 +91,11 @@ export function QueryStatus({
         <span className="sr-only">{label}. </span>
         {query.error
           ? `${label}: ${query.error} `
-          : query.loading
-            ? `${query.data ? 'Actualizando' : 'Cargando'} ${label.toLowerCase()}… `
+          : query.loading && query.data == null
+            ? `Cargando ${label.toLowerCase()}… `
             : ''}
         {query.updatedAt != null &&
-          `${query.error || query.loading ? 'Últimos datos disponibles' : 'Última consulta'}: ${dateTime(new Date(query.updatedAt).toISOString())}.`}
+          `${query.error ? 'Últimos datos disponibles' : 'Última consulta'}: ${dateTime(new Date(query.updatedAt).toISOString())}.`}
       </span>
       <output aria-live="polite" aria-atomic="true" className="sr-only">
         {retrying ? `Reintentando ${label.toLowerCase()}…` : notice.text}

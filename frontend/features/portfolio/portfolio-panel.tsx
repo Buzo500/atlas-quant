@@ -1,15 +1,27 @@
-"use client";
-import type { DatasetResponse, PortfolioResponse } from "@/lib/api-types";
-import { useRead } from "@/shared/use-read";
-import { QueryStatus } from "@/shared/query-status";
-import { moneyEUR as money, percent as pct, number, date } from "@/shared/format";
-import { Metric, DataTable } from "@/shared/ui";
-import { Curve } from "@/components/atlas/curve";
-import { Wallet } from "lucide-react";
-import { Button } from "@/components/ui/button";
+'use client';
+import type {
+  DatasetResponse,
+  PortfolioResponse,
+  PortfolioDetail,
+} from '@/lib/api-types';
+import { useRead } from '@/shared/use-read';
+import { QueryStatus } from '@/shared/query-status';
+import {
+  moneyEUR as money,
+  percent as pct,
+  number,
+  date,
+} from '@/shared/format';
+import { Metric, DataTable } from '@/shared/ui';
+import { Curve } from '@/components/atlas/curve';
+import { Wallet } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 export function PortfolioPanel({
   dataset,
+  portfolioId,
+  portfolioRevision,
+  portfolioName,
   auditSequence,
   active,
   connected,
@@ -19,6 +31,9 @@ export function PortfolioPanel({
   onDemo,
 }: {
   dataset: DatasetResponse | undefined;
+  portfolioId?: string;
+  portfolioRevision?: number;
+  portfolioName?: string;
   auditSequence?: number;
   active: boolean;
   connected: boolean;
@@ -27,20 +42,58 @@ export function PortfolioPanel({
   onImport: () => void;
   onDemo: () => Promise<void>;
 }) {
-  const portfolioQuery = useRead<PortfolioResponse>({
-    path: dataset ? "/datasets/" + dataset.id + "/portfolio" : null,
-    revision: `${dataset?.version}:${auditSequence}`,
+  const portfolioQuery = useRead<PortfolioResponse | PortfolioDetail>({
+    path: portfolioId
+      ? `/portfolios/${portfolioId}`
+      : dataset
+        ? '/datasets/' + dataset.id + '/portfolio'
+        : null,
+    revision: `${portfolioId ? portfolioRevision : dataset?.version}:${auditSequence}`,
     enabled: active,
   });
-  const portfolio = portfolioQuery.data;
+  const detail =
+    portfolioQuery.data && 'value' in portfolioQuery.data
+      ? portfolioQuery.data
+      : null;
+  const portfolio = detail
+    ? detail.value
+    : (portfolioQuery.data as PortfolioResponse | null);
+  const identity = portfolioId || dataset?.id;
   return (
     <>
-      {dataset && <QueryStatus label="Cartera" query={portfolioQuery} />}
+      {(dataset || portfolioId) && (
+        <QueryStatus label="Cartera" query={portfolioQuery} />
+      )}
+      {portfolioId && (
+        <p className="muted">
+          {portfolioName || 'Cartera'} · revisión{' '}
+          {detail?.context.portfolio_revision ?? portfolioRevision} · Fuentes de
+          valoración configuradas en Datos
+        </p>
+      )}
+      {detail?.status === 'unavailable' && (
+        <output className="notice">
+          {detail.warnings.join(' ')} El libro se conserva; revisa sus fuentes
+          en Datos.
+        </output>
+      )}
       <div className="stats portfolio-stats">
-        <Metric title="Valor de la cartera" value={portfolio ? money(portfolio.nav) : "—"} />
-        <Metric title="Efectivo disponible" value={portfolio ? money(portfolio.cash) : "—"} />
-        <Metric title="Resultado acumulado" value={portfolio ? money(portfolio.pnl) : "—"} />
-        <Metric title="Rentabilidad TWR" value={portfolio ? pct(portfolio.twr) : "—"} />
+        <Metric
+          title="Valor de la cartera"
+          value={portfolio ? money(portfolio.nav) : '—'}
+        />
+        <Metric
+          title="Efectivo disponible"
+          value={portfolio ? money(portfolio.cash) : '—'}
+        />
+        <Metric
+          title="Resultado acumulado"
+          value={portfolio ? money(portfolio.pnl) : '—'}
+        />
+        <Metric
+          title="Rentabilidad TWR"
+          value={portfolio ? pct(portfolio.twr) : '—'}
+        />
       </div>
       {portfolio?.curve?.length ? (
         <div className="portfolio-layout">
@@ -50,11 +103,20 @@ export function PortfolioPanel({
                 <h2>Posiciones</h2>
                 <p className="muted">Distribución actual de activos</p>
               </div>
-              <span className="tag neutral">{portfolio.positions.length} activos</span>
+              <span className="tag neutral">
+                {portfolio.positions.length} activos
+              </span>
             </div>
             <DataTable
-              key={dataset?.id}
-              heads={["Activo", "Cantidad", "Último precio", "Valor", "Peso", "P&L no realizado"]}
+              key={identity}
+              heads={[
+                'Activo',
+                'Cantidad',
+                'Último precio',
+                'Valor',
+                'Peso',
+                'P&L no realizado',
+              ]}
               numericColumns={[1, 2, 3, 4, 5]}
               emptyMessage="No hay posiciones abiertas en esta cartera."
               rows={portfolio.positions.map((p) => [
@@ -67,15 +129,19 @@ export function PortfolioPanel({
                 <span key="price">
                   {money(p.price)}
                   <time className="price-date" dateTime={p.price_date}>
-                    {p.price_date && p.price_date < (dataset?.manifest.date_max ?? "")
-                      ? "Precio anterior · "
-                      : ""}
+                    {p.price_date &&
+                    p.price_date < (portfolio.curve.at(-1)?.date ?? '')
+                      ? 'Precio anterior · '
+                      : ''}
                     {date(p.price_date)}
                   </time>
                 </span>,
                 money(p.market_value),
                 pct(p.weight),
-                <span key="pnl" className={p.unrealized_pnl >= 0 ? "positive" : "negative"}>
+                <span
+                  key="pnl"
+                  className={p.unrealized_pnl >= 0 ? 'positive' : 'negative'}
+                >
                   {money(p.unrealized_pnl)}
                 </span>,
               ])}
@@ -92,15 +158,23 @@ export function PortfolioPanel({
                 <p className="muted">Valoración diaria · EUR</p>
               </div>
             </div>
-            <Curve key={`${dataset?.id}:${dataset?.version}`} data={portfolio.curve} />
+            <Curve
+              key={`${identity}:${detail?.context.portfolio_revision ?? dataset?.version}`}
+              data={portfolio.curve}
+            />
           </section>
         </div>
-      ) : dataset && (portfolioQuery.loading || portfolioQuery.error) ? (
+      ) : detail?.status === 'unavailable' ? null : (dataset || portfolioId) &&
+        (portfolioQuery.loading || portfolioQuery.error) ? (
         <section className="panel empty">
           <h2>
-            {portfolioQuery.loading ? "Cargando cartera…" : "No se pudo consultar la cartera"}
+            {portfolioQuery.loading
+              ? 'Cargando cartera…'
+              : 'No se pudo consultar la cartera'}
           </h2>
-          <p>Los movimientos se mostrarán cuando termine una consulta correcta.</p>
+          <p>
+            Los movimientos se mostrarán cuando termine una consulta correcta.
+          </p>
         </section>
       ) : (
         <section className="panel">
@@ -108,19 +182,23 @@ export function PortfolioPanel({
             <Wallet size={32} />
             <h2>
               {!connected && !stateLoaded
-                ? "Conectando con ATLAS"
+                ? 'Conectando con ATLAS'
                 : dataset
-                  ? "Importa tus movimientos"
-                  : "Empieza con un conjunto de datos"}
+                  ? 'Importa tus movimientos'
+                  : 'Empieza con un conjunto de datos'}
             </h2>
             <p>
               {dataset
-                ? "Añade depósitos, compras y otros movimientos desde Datos para construir tu cartera."
-                : "Explora tres activos ficticios con la demostración o importa tu historial de precios y operaciones."}
+                ? 'Añade depósitos, compras y otros movimientos desde Datos para construir tu cartera.'
+                : 'Explora tres activos ficticios con la demostración o importa tu historial de precios y operaciones.'}
             </p>
             <div className="actions centered">
               <Button onClick={onImport}>Importar datos</Button>
-              <Button variant="outline" disabled={busy || !connected} onClick={onDemo}>
+              <Button
+                variant="outline"
+                disabled={busy || !connected}
+                onClick={onDemo}
+              >
                 Explorar demo
               </Button>
             </div>
@@ -130,7 +208,8 @@ export function PortfolioPanel({
       {portfolio && portfolio.warnings.length > 0 && (
         <details className="details valuation-notes">
           <summary>
-            Convenciones de valoración <span className="muted">({portfolio.warnings.length})</span>
+            Convenciones de valoración{' '}
+            <span className="muted">({portfolio.warnings.length})</span>
           </summary>
           <ul>
             {portfolio.warnings.map((w, i) => (

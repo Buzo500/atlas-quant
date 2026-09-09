@@ -52,7 +52,8 @@ def load_env(path, env):
         if not line or line.startswith("#"):
             continue
         key, separator, value = line.partition("=")
-        if separator and key.strip() in {"OPENAI_API_KEY", "ANTHROPIC_API_KEY"}:
+        # Optional local CA bundle for verified HTTPS (e.g. antivirus TLS inspection).
+        if separator and key.strip() in {"OPENAI_API_KEY", "ANTHROPIC_API_KEY", "REQUESTS_CA_BUNDLE"}:
             env.setdefault(key.strip(), value.strip().strip('"').strip("'"))
 
 

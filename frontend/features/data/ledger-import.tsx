@@ -10,6 +10,8 @@ import type { DatasetResponse, LedgerResponse } from '@/lib/api-types';
 /** The parent keys this confirmation by dataset revision and CSV edit revision. */
 export function LedgerImport({
   dataset,
+  portfolioId,
+  portfolioName,
   csv,
   refresh,
   onError,
@@ -17,6 +19,8 @@ export function LedgerImport({
   onConfirmationRemoved,
 }: {
   dataset: DatasetResponse | undefined;
+  portfolioId?: string;
+  portfolioName?: string;
   csv: string;
   refresh: () => Promise<void>;
   onError: (message: string) => void;
@@ -36,14 +40,22 @@ export function LedgerImport({
   }, []);
 
   async function submit(commit: boolean) {
-    if (!dataset || !csv || inFlight.current || (commit && !preview)) return;
+    if (
+      (!dataset && !portfolioId) ||
+      !csv ||
+      inFlight.current ||
+      (commit && !preview)
+    )
+      return;
     inFlight.current = true;
     setBusy(true);
     onMessage('');
     onError('');
     try {
       const result = await api<LedgerResponse>(
-        `/datasets/${dataset.id}/ledger`,
+        portfolioId
+          ? `/portfolios/${portfolioId}/ledger`
+          : `/datasets/${dataset!.id}/ledger`,
         {
           csv,
           commit,
@@ -78,7 +90,7 @@ export function LedgerImport({
     <>
       <div className="actions">
         <Button
-          disabled={busy || !dataset || !csv}
+          disabled={busy || (!dataset && !portfolioId) || !csv}
           onClick={() => void submit(false)}
         >
           {busy ? 'Validando…' : 'Previsualizar movimientos'}
@@ -96,7 +108,9 @@ export function LedgerImport({
             duplicados
           </strong>
           <span>
-            {dataset?.name} · versión {dataset?.version}
+            {portfolioId
+              ? portfolioName
+              : `${dataset?.name} · versión ${dataset?.version}`}
           </span>
           <span>Valor resultante: {moneyEUR(preview.portfolio.nav)}</span>
           <Button

@@ -11,8 +11,10 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from .data import build_provenance_manifest
+from .identity_store import IdentityWork, migrate_v2, validate_schema
+from .worker_lock import WorkerLock
 
-SCHEMA_VERSION = 1
+SCHEMA_VERSION = 2
 
 
 def migrate(db):
@@ -41,8 +43,10 @@ def migrate(db):
         actual = [(row[1], row[2].upper(), row[3], row[5]) for row in db.execute(f"PRAGMA table_info({table})")]
         if actual != columns:
             raise ValueError(f"Esquema incompatible en {table}; no se ha migrado la base.")
-    if version == 0:
-        db.execute("PRAGMA user_version=1")
+    if version < 2:
+        migrate_v2(UnitOfWork(db))
+    else:
+        validate_schema(db)
 
 
 def now() -> str:
@@ -53,7 +57,7 @@ def encode(value):
     return json.dumps(value, ensure_ascii=False, allow_nan=False, separators=(",", ":"))
 
 
-class UnitOfWork:
+class UnitOfWork(IdentityWork):
     """Record operations sharing one short SQLite transaction.
 
     Callbacks must be synchronous and must not open another Store transaction,
@@ -64,23 +68,38 @@ class UnitOfWork:
         self.db = db
 
     def get(self, kind, ident, default=None):
+        if kind == "ledger":
+            portfolio_id = self.legacy_portfolio_id(ident)
+            if portfolio_id:
+                portfolio = self.portfolio_record(portfolio_id)
+                return {"id": ident, "events": [item["event"] for item in self.portfolio_events(portfolio)]}
         row = self.db.execute("SELECT body FROM records WHERE kind=? AND id=?", (kind, ident)).fetchone()
         return json.loads(row[0]) if row else deepcopy(default)
 
     def list(self, kind):
+        if kind == "ledger":
+            return [{"id": p["legacy_dataset_id"], "events": [item["event"] for item in self.portfolio_events(p)]}
+                    for p in self.portfolio_list() if p.get("legacy_dataset_id")]
         return [json.loads(row[0]) for row in self.db.execute(
             "SELECT body FROM records WHERE kind=? ORDER BY rowid DESC", (kind,))]
 
     def put(self, kind, value, event=None):
         value = dict(value)
         value.setdefault("id", uuid.uuid4().hex)
-        self.db.execute("INSERT OR REPLACE INTO records VALUES(?,?,?)", (kind, value["id"], encode(value)))
+        if kind == "ledger":
+            self.put_legacy_ledger(value)
+        else:
+            self.db.execute("INSERT OR REPLACE INTO records VALUES(?,?,?)", (kind, value["id"], encode(value)))
         if event:
             self.audit(event, value["id"], {"status": value.get("status")})
         return value
 
     def audit(self, event, entity=None, details=None):
         Store._audit(self.db, event, entity, details or {})
+
+    def dataset_version(self, ident, version):
+        row = self.db.execute("SELECT body FROM versions WHERE dataset_id=? AND version=?", (ident, version)).fetchone()
+        return json.loads(row[0]) if row else None
 
     def save_dataset(self, value, *, prepare=None):
         value = dict(value)
@@ -119,6 +138,7 @@ class UnitOfWork:
         self.db.execute("INSERT INTO versions VALUES(?,?,?)", (ident, version, payload))
         self.db.execute("INSERT OR REPLACE INTO records VALUES('dataset',?,?)", (ident, payload))
         self.audit("dataset.saved", ident, {"version": version, "hash": value["manifest"]})
+        self.local_identities(ident, {bar["symbol"] for bar in value["bars"]})
         return value
 
 
@@ -128,7 +148,13 @@ class Store:
         self.path.parent.mkdir(parents=True, exist_ok=True)
         self.lock = threading.RLock()
         with self.transaction() as db:
-            migrate(db)
+            if db.execute("PRAGMA user_version").fetchone()[0] < SCHEMA_VERSION:
+                # Never migrate underneath an executor from the previous version.
+                with WorkerLock(str(self.path) + ".worker.lock"):
+                    with WorkerLock(str(self.path) + ".tick.lock"):
+                        migrate(db)
+            else:
+                migrate(db)
 
     @contextmanager
     def transaction(self):

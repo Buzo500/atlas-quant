@@ -1,5 +1,16 @@
 # Cambios de ATLAS Quant
 
+## 0.4.0-dev.1 · D2 · Desarrollo local, sin publicar · 2026-09-09
+
+- El lanzador permite configurar `REQUESTS_CA_BUNDLE` desde `.env`, manteniendo precedencia del entorno y verificación HTTPS. Resuelve en este PC la confianza de la raíz de inspección de Avast mediante un bundle local. 48 pruebas runtime/feed y 28 subtests, descarga y gráfico NVIDIA comprobados; detalle en `docs/diagnostico_yahoo_windows.md`.
+
+- Catálogo con IDs estables para instrumento/cotización, mercado y moneda declarados, códigos externos y alias por proveedor/periodo. Altas revisionadas; ninguna fusión por ticker o ISIN.
+- Carteras/libros separados de los conjuntos. Fuentes de precios explícitas y fijadas por versión, previsualización y confirmación protegidas frente a cambios concurrentes. Lectura de cortes históricos y movimientos originales.
+- Migración transaccional SQLite 1 → 2, archivo legado intacto y un único libro activo. Copias/restauración compatibles con ambos esquemas; bloqueo de migración ante otro ejecutor. La comprobación de persistencia operativa incluye las nuevas tablas, sin reactivar el ensayo aplazado.
+- Datos incorpora catálogo y configuración de cartera; Cartera mantiene su selección aunque cambie el conjunto de investigación. Importación CSV v1 existente dirigida a la cartera elegida. Editor CSV acotado con desplazamiento interno y corrector ortográfico desactivado.
+- El sondeo del estado mantiene estable el texto de la última consulta cuando hay datos, evitando saltos de altura que cerraban la ficha de precios en pantallas estrechas. Carga inicial y errores siguen visibles; regresión con sondeo real en navegador.
+- Conserva contabilidad EUR heredada, controles y resultados de investigación. USD solo en el catálogo; D3–D8, LaTeX, aprendizaje, remoto y móvil pendientes. [Evidencia y límites D2](docs/v0_4_d2.md).
+
 ## v0.3.0-dev.1 · Gráficos interactivos · 2026-09-08
 
 Cierre de desarrollo aceptado el **09/09/2026**: G1–G6 cerradas por decisión expresa del usuario. Pantalla completa verificada manualmente en precios y cartera; escalado físico Windows 125 %/150 % correcto. CI final [34346311068](https://github.com/Buzo500/atlas-quant/actions/runs/34346311068), fuentes `d5c3b09`: **482 Python + 91 subtests, 244 frontend y 10/10 E2E**, instalación/build, contratos, tipos, lint, dependencias, arranque/proxy/parada correctos. El cierre posterior solo modifica documentación e instrucciones. El timeout histórico se acepta como incidencia conocida abierta, sin atribuirle una corrección. La integración por PR #3 y etiqueta `v0.3.0-dev.1` sigue la autorización del usuario. Los pendientes de los registros anteriores quedan sustituidos por este cierre.

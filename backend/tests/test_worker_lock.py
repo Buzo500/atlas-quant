@@ -113,6 +113,7 @@ def test_stale_file_contents_are_not_treated_as_ownership(tmp_path):
 
 def test_worker_ownership_does_not_hold_main_database_write_lock(tmp_path):
     path = tmp_path / "atlas.sqlite3"
+    Store(path)  # Schema initialization precedes ownership of the executor.
     with WorkerLock(path.with_suffix(".sqlite3.worker.lock")):
         first = Store(path)
         second = Store(path)

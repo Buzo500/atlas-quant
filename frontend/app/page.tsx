@@ -44,6 +44,8 @@ export default function Home() {
   const connected = !!state && !stateQuery.error;
   const datasetId = navigation.dataset || state?.datasets[0]?.id || '';
   const dataset = state?.datasets.find((d) => d.id === datasetId);
+  const portfolioId = navigation.portfolio || state?.portfolios?.[0]?.id;
+  const portfolio = state?.portfolios?.find((p) => p.id === portfolioId);
   useEffect(() => {
     const context = (
       document as Document & {
@@ -288,6 +290,9 @@ export default function Home() {
         <TabsContent keepMounted value="portfolio">
           <PortfolioPanel
             dataset={dataset}
+            portfolioId={portfolioId}
+            portfolioRevision={portfolio?.revision}
+            portfolioName={portfolio?.name}
             auditSequence={state?.audit[0]?.seq}
             active={tab === 'portfolio'}
             connected={connected}
@@ -322,6 +327,11 @@ export default function Home() {
         </TabsContent>
         <TabsContent keepMounted value="data">
           <DataPanel
+            portfolios={state?.portfolios}
+            portfolioId={portfolioId}
+            selectPortfolio={(portfolio) => navigate({ portfolio })}
+            datasets={state?.datasets}
+            auditSequence={state?.audit[0]?.seq}
             active={tab === 'data'}
             dataset={dataset}
             refresh={refresh}

@@ -1,6 +1,6 @@
 # ATLAS Quant · Operación en Windows
 
-Guía actualizada el 8 de septiembre de 2026. **v0.2.0-rc.2 es una candidata con CI verificada, no estable.** La [CI 34249730107](https://github.com/Buzo500/atlas-quant/actions/runs/34249730107) valida `412918b5e9067e44f293b0633068ca932a472d64`: 446 Python y 91 subtests, 140 Vitest, cinco E2E, instalación limpia, compilación, contratos, tipos, lint, dependencias, smoke, arranque y parada correctos. El cierre posterior solo modifica documentación; integración mediante la [PR #2](https://github.com/Buzo500/atlas-quant/pull/2) y etiqueta `v0.2.0-rc.2` según el procedimiento autorizado.
+Guía actualizada el 9 de septiembre de 2026. Desarrollo local actual: **`0.4.0-dev.1`, D2 y esquema SQLite 2**, validado en este sobremesa y pendiente de publicación/CI. [Alcance, migración y límites](v0_4_d2.md). La entrega anterior publicada es `v0.3.0-dev.1`; el historial de CI y el estado exacto del proceso están en [CONTINUIDAD](CONTINUIDAD.md). **v0.2.0-rc.2 sigue siendo candidata, no estable**: el ensayo de 48 horas permanece aplazado.
 
 ATLAS normal está arrancado; los entornos E2E están cerrados y la base habitual conserva su contenido. El recorrido usa Windows nativo, motor Python e interfaz compilada; no requiere WSL, CUDA, claves ni presupuesto de pago. La ejecución es exclusivamente simulada.
 
@@ -126,7 +126,15 @@ No hay actualizador automático ni un script `Update-Atlas.ps1`. `Install-Atlas.
 
 La base se guarda en `var/atlas/atlas.sqlite3`, fuera de Git. La actualización del código no debe sustituirla. Tampoco copies `.venv` o `frontend/node_modules` desde otro equipo: se reconstruyen localmente. Conserva `frontend/.openai/hosting.json`, necesario para la compilación local.
 
-El esquema actual se identifica con `user_version=1`; la base de v0.1 sin versión explícita usa 0 y se reconoce al abrirla. Los esquemas futuros no admitidos se rechazan. Volver a un código anterior puede requerir restaurar una copia compatible: conservar el código y la copia del mismo punto permite preparar esa recuperación. No mezcles bases ni reemplaces archivos SQLite de una instancia activa.
+El esquema actual se identifica con `user_version=2`. El arranque reconoce los esquemas 0 (v0.1 sin versión explícita) y 1 y los migra mediante una transacción con exclusión del ejecutor. Se conserva el historial heredado y se crea el catálogo/libro independiente. Los esquemas futuros no admitidos se rechazan. No mezcles bases ni reemplaces archivos SQLite de una instancia activa.
+
+Antes de actualizar desde v0.3, conserva una copia manual de esquema 1 y sus fuentes/build. El lanzador hace además su copia automática antes de arrancar. La copia de este equipo previa a D2 es `backups/atlas-20260909T131226845071Z-9973d0f5`; se ha probado su migración y la recuperación de esquema 2 sobre copias aisladas. Para repetir esa comprobación sin modificar la base habitual:
+
+```powershell
+.\.venv\Scripts\python.exe tools/check_d2_migration.py backups/atlas-20260909T131226845071Z-9973d0f5
+```
+
+El código v0.3 no puede abrir una base de esquema 2. Para volver atrás, detén ATLAS, restaura una copia de esquema 1 siguiendo el procedimiento inferior y recupera las fuentes/build de v0.3 antes de iniciar. Esa restauración recupera el punto guardado; no incorpora movimientos posteriores al backup. La herramienta de ensayo anterior verifica copias, no ejecuta la vuelta atrás habitual.
 
 ## Copias de seguridad
 
@@ -184,6 +192,8 @@ La recuperación conserva datos y saldos, pero aplica estas medidas operativas:
 Después, inicia ATLAS y revisa la cartera y cada experimento antes de reanudarlo. La restauración no arranca el programa ni realiza llamadas a proveedores. Tampoco recupera `.env`: las claves pertenecen a la configuración local de cada equipo.
 
 ## Diagnóstico y límites de operación
+
+Si Yahoo falla con `CertificateVerifyError` / curl 60 y no aparece un conjunto nuevo, consulta el [diagnóstico HTTPS de Windows](diagnostico_yahoo_windows.md). En este equipo Avast inspecciona TLS; el lanzador admite `REQUESTS_CA_BUNDLE` en `.env` para usar un bundle local de certificados ya confiados por Windows más certifi. Se mantiene la verificación HTTPS. El archivo y `.env` son locales, no se versionan; una renovación de la raíz del antivirus exige regenerar el bundle.
 
 La pausa y cancelación se guardan aunque haya un cálculo en curso. La interfaz indica que está cerrando esa operación y no permite reanudar hasta terminarla. Una petición de IA ya enviada puede terminar y contabilizarse; no empieza la siguiente fase mientras permanezca pausado/cancelado. La parada global controla la simulación, no cancela la investigación. Detalle y pruebas en [consolidacion_core.md](consolidacion_core.md).
 

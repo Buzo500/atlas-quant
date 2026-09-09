@@ -1,6 +1,8 @@
 # ATLAS Quant · Hoja de ruta
 
-**Estado vigente · 09/09/2026:** entrega de desarrollo `0.3.0-dev.1` aceptada, G1–G6 cerradas con la incidencia conocida de API expresamente aceptada. Pantalla completa confirmada por el usuario y CI completa correcta. [Cierre de v0.3](revision_final_v0_3.md). El ensayo de 48 horas de v0.2 permanece aplazado, de modo que rc.2 sigue siendo candidata. v0.4 y posteriores son planificación, sin nueva implementación autorizada. Este estado sustituye las referencias inferiores a v0.3 en desarrollo.
+**Desarrollo vigente · 09/09/2026:** `0.4.0-dev.1`, bloque D2: identidades, catálogo y cartera independiente de precios. [Implementación y evidencia](v0_4_d2.md), [PR #4](https://github.com/Buzo500/atlas-quant/pull/4), [CI gratuita correcta](https://github.com/Buzo500/atlas-quant/actions/runs/34365374994). D1 concretado, D3–D8 pendientes; CSV propio v2 y contabilidad EUR/USD aún no completos. Rama D2 publicada y validada, todavía sin fusión ni etiqueta. Este estado sustituye los párrafos históricos inferiores que sitúan toda v0.4 solo en planificación.
+
+**Última entrega publicada · 09/09/2026:** `0.3.0-dev.1` aceptada, G1–G6 cerradas con la incidencia conocida de API expresamente aceptada. Pantalla completa confirmada por el usuario y CI completa correcta. [Cierre de v0.3](revision_final_v0_3.md). El ensayo de 48 horas de v0.2 permanece aplazado, de modo que rc.2 sigue siendo candidata. El desarrollo local de D2 indicado arriba es posterior a esta publicación.
 
 Actualizado: 8 de septiembre de 2026. La v0.1 es la última entrega cerrada; **0.2.0-rc.2 es una candidata con CI verificada, todavía no v0.2 estable**. La [CI 34249730107](https://github.com/Buzo500/atlas-quant/actions/runs/34249730107) valida `412918b5e9067e44f293b0633068ca932a472d64`: 446 Python y 91 subtests, 140 Vitest y cinco E2E, además del recorrido de instalación y operación. El cierre posterior solo modifica documentación; la integración por la [PR #2](https://github.com/Buzo500/atlas-quant/pull/2) y la etiqueta `v0.2.0-rc.2` siguen el procedimiento autorizado.
 
@@ -9,6 +11,8 @@ La candidata incorpora correcciones de foco, anuncios accesibles, aislamiento de
 El alcance disponible se describe en [v0.1](version_0_1.md) y las comprobaciones de cada equipo en [CONTINUIDAD](CONTINUIDAD.md). El [diseño completo](atlas_quant_diseno.md) describe el objetivo del producto. Esta hoja de ruta establece el orden de trabajo actual y sustituye la prioridad histórica de conectar IBKR inmediatamente después de v0.1.
 
 ## Versiones y condiciones de cierre
+
+**Alcance aprobado: [v0.4 · Datos y contabilidad trazables](plan_v0_4.md).** El usuario acepta ocho bloques D1–D8, CSV propio y EUR/USD. [D1 concretado](v0_4_d1.md): contratos, convenciones y doce casos numéricos independientes. D2 implementado y validado localmente; D3–D8 pendientes. Esta aceptación es posterior a la entrega de v0.3.
 
 **En desarrollo autorizado: `0.3.0-dev.1`.** Se implementan GRAPH-001/002 mediante el [plan de v0.3](plan_v0_3.md), preservando la candidata rc.2 y el ensayo aplazado. [Uso y validación de los gráficos](graficos_v0_3.md). Las versiones posteriores siguen como planificación.
 

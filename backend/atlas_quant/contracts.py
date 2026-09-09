@@ -511,7 +511,14 @@ class ExperimentResponse(ResponseModel):
     execution_token: str | None = Field(default=None, exclude=True)
 
 
+class PortfolioSummary(ResponseModel):
+    id: str
+    name: str
+    revision: int
+
+
 class StateResponse(ResponseModel):
+    portfolios: list[PortfolioSummary] = Field(default_factory=list)
     datasets: list[DatasetResponse]
     experiments: list[ExperimentResponse]
     settings: SettingsResponse

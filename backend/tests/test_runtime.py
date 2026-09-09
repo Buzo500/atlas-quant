@@ -82,6 +82,19 @@ def test_env_file_only_adds_allowed_provider_keys_and_respects_existing_values(t
     assert environment == {"OPENAI_API_KEY": "existing-fake", "ANTHROPIC_API_KEY": "second-fake", "PATH": "keep"}
 
 
+def test_env_file_accepts_local_ca_bundle_without_overriding_environment_or_tls_checks(tmp_path):
+    path = tmp_path / ".env"
+    bundle = tmp_path / "certificates with spaces" / "trusted.pem"
+    path.write_text(f'REQUESTS_CA_BUNDLE="{bundle}"\nPYTHONHTTPSVERIFY=0\nNODE_TLS_REJECT_UNAUTHORIZED=0\n',
+                    encoding="utf-8")
+    environment = {}
+    run_atlas.load_env(path, environment)
+    assert environment == {"REQUESTS_CA_BUNDLE": str(bundle)}
+    environment["REQUESTS_CA_BUNDLE"] = "inherited.pem"
+    run_atlas.load_env(path, environment)
+    assert environment == {"REQUESTS_CA_BUNDLE": "inherited.pem"}
+
+
 @pytest.fixture
 def compiled_frontend(tmp_path):
     frontend = tmp_path / "frontend"

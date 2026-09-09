@@ -2,7 +2,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { Download, Upload, RefreshCw } from 'lucide-react';
 import { api } from '@/lib/api';
-import type { DatasetResponse } from '@/lib/api-types';
+import type { DatasetResponse, PortfolioSummary } from '@/lib/api-types';
+import { IdentityPanel } from './identity-panel';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -19,12 +20,22 @@ export function DataPanel({
   selectDataset,
   onError,
   active = true,
+  portfolios,
+  portfolioId,
+  selectPortfolio,
+  datasets,
+  auditSequence,
 }: {
   dataset: DatasetResponse | undefined;
   refresh: () => Promise<void>;
   selectDataset: (id: string) => void;
   onError: (s: string) => void;
   active?: boolean;
+  portfolios?: PortfolioSummary[];
+  portfolioId?: string;
+  selectPortfolio?: (id: string) => void;
+  datasets?: DatasetResponse[];
+  auditSequence?: number;
 }) {
   const [kind, setKind] = useState('prices'),
     [csv, setCsv] = useState(''),
@@ -168,6 +179,7 @@ export function DataPanel({
         <Field label="Contenido CSV">
           <Textarea
             ref={csvEditor}
+            spellCheck={false}
             rows={7}
             value={csv}
             onChange={(e) => {
@@ -183,7 +195,9 @@ export function DataPanel({
         </Field>
         {kind === 'ledger' ? (
           <LedgerImport
-            key={`${dataset?.id}:${dataset?.version}:${csvRevision}`}
+            key={`${portfolioId || dataset?.id}:${portfolioId ? portfolios?.find((p) => p.id === portfolioId)?.revision : dataset?.version}:${csvRevision}`}
+            portfolioId={portfolioId}
+            portfolioName={portfolios?.find((p) => p.id === portfolioId)?.name}
             dataset={dataset}
             csv={readingFile ? '' : csv}
             refresh={refresh}
@@ -325,6 +339,18 @@ export function DataPanel({
             </>
           )}
         </section>
+      )}
+      {portfolios && selectPortfolio && (
+        <IdentityPanel
+          portfolios={portfolios}
+          portfolioId={portfolioId}
+          selectPortfolio={selectPortfolio}
+          datasets={datasets || []}
+          active={active}
+          revision={auditSequence}
+          refresh={refresh}
+          onError={onError}
+        />
       )}
     </div>
   );
