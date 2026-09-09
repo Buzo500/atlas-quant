@@ -1,5 +1,15 @@
 # ATLAS · Revisión de gráficos del 09/09/2026
 
+## Actualización posterior: publicación y CI
+
+Las fuentes revisadas se han subido en `c8f4eb615ca40993c7ad021fa195e60c62b61ed7`, [PR #3 en borrador](https://github.com/Buzo500/atlas-quant/pull/3). La [CI 34340199451](https://github.com/Buzo500/atlas-quant/actions/runs/34340199451) pasa en su primer intento: job Windows de 6 min 16 s, **477 pruebas Python y 91 subtests** (24,57 s, dos avisos previos), **244 frontend/23 archivos** (65,68 s), **10/10 E2E** (56,3 s), instalación limpia, build, tipos, contratos, lint, dependencias, arranque, smoke y parada correctos. E2E remoto `e2e-5e7d502b8c0f4b24b06aa35c446551ef`: resultado 0, conservación de la base de control del runner, integridad `ok` y puertos libres.
+
+Cuota comprobada antes de lanzar: 50/2.000 minutos, 0/0,5 GB de almacenamiento y 0 USD facturables; un job estándar con límite de 20 minutos, sin artefactos remotos ni cambios de facturación. Informes locales `output/validation/v03-ci-quota-before-20260909.json`, `v03-ci-34340199451.json` y `v03-ci-34340199451-job.log`. No se ha fusionado ni etiquetado. Este cierre solo cambia documentación respecto a las fuentes verificadas.
+
+El intento local anterior sigue siendo 9/10: que la CI pase no demuestra resuelta la causa de la espera intermitente de `/api/state`. Tampoco sustituye el escalado físico pendiente ni el ensayo de 48 horas aplazado. Los apartados siguientes conservan la revisión local anterior a esta publicación.
+
+## Revisión local anterior a la CI
+
 Revisión local de las fichas, barra de navegación, lupas y pantalla completa de **0.3.0-dev.1**, en `codex/v0.3-graficos`. Se corrige un defecto de la primera ficha en curvas estrechas y se verifican valores, teclado, gestos, rendimiento y restauración de la vista. Los gráficos pasan sus cinco recorridos E2E; la suite general queda en **9/10** por una espera intermitente de `/api/state` que sigue pendiente. Esta revisión no acredita el cierre de G6 ni una versión estable.
 
 Fuentes locales sobre `0a5b8136f7ea5c946f43cf089151e9990c5daec9`, todavía sin commit ni subida. Huella del frontend realmente probado y compilado: `03d013e3a2e4ed500adc2f18e1a081e10e84658cab920e5c38a0256d999547ed`. No se modifican motor, contratos ni dependencias. No se ejecuta CI ni el ensayo de 48 horas.

@@ -4,9 +4,11 @@ Entrega de desarrollo **0.3.0-dev.1**, iniciada por autorización expresa el 08/
 
 ## Revisión actual · 09/09/2026
 
+**Fuentes subidas en `c8f4eb615ca40993c7ad021fa195e60c62b61ed7`; [CI de Windows superada](https://github.com/Buzo500/atlas-quant/actions/runs/34340199451)** en un único intento gratuito: 477 Python y 91 subtests, 244 frontend y 10/10 E2E, con instalación limpia, build, tipos, contratos, lint, arranque y parada correctos. La PR #3 sigue en borrador. La evidencia local siguiente se conserva con su fallo original; el resultado remoto no demuestra resuelta la intermitencia. El cierre documental posterior no cambia fuentes ni pruebas.
+
 Corregida la ficha que desaparecía en la primera lectura de una curva estrecha al cambiar su altura. Pasan 244 pruebas frontend y los cinco recorridos E2E de gráficos; la suite general queda en **9/10** por una espera intermitente de `/api/state`, aún sin causa acreditada. TypeScript, lint y build correctos. [Revisión completa, incidencias y fuentes probadas](revision_graficos_20260909.md).
 
-Mediciones nuevas con NAV variable y API real: precios de 100.000 observaciones en 1,66 s, curva en 1,98 s, inspección/zoom p95 ≤34,9 ms; hasta 1.000 velas y 20 ciclos de pantalla completa por escenario comprobados. Navegación, actualización de arrastre y rueda p95 inferior a 100 ms, sin aumento de nodos/listeners tras calentamiento. Fuentes locales sin commit ni subida; CI y repetición del escalado físico de los controles actuales pendientes. La evidencia siguiente del 08/09 es histórica.
+Mediciones nuevas con NAV variable y API real: precios de 100.000 observaciones en 1,66 s, curva en 1,98 s, inspección/zoom p95 ≤34,9 ms; hasta 1.000 velas y 20 ciclos de pantalla completa por escenario comprobados. Navegación, actualización de arrastre y rueda p95 inferior a 100 ms, sin aumento de nodos/listeners tras calentamiento. Sigue pendiente repetir el escalado físico de los controles actuales. La evidencia siguiente del 08/09 es histórica.
 
 ## Ajuste anterior: navegación y pantalla completa · 08/09/2026
 

@@ -4,6 +4,7 @@
 
 Entrega de desarrollo basada en `v0.2.0-rc.2`. El ensayo sostenido y su seguimiento siguen aplazados; no se publica una versión estable por omitirlos.
 
+- Fuentes revisadas `c8f4eb6` subidas y [CI gratuita de Windows superada el 09/09](https://github.com/Buzo500/atlas-quant/actions/runs/34340199451): 477 Python y 91 subtests, 244 frontend y 10/10 E2E, instalación, compilación, contratos, lint, arranque y parada correctos. Se conserva la incidencia intermitente del intento local; PR en borrador y escalado físico de los controles actuales pendiente.
 - Consulta de precios por conjunto, versión inmutable, activo y fechas inclusivas, con procedencia, advertencias y cierre anterior. Lectura local sin descargas ni mutaciones de dominio.
 - Panel de precios en Datos con velas, línea, área, OHLC y volumen; intervalos diarios, semanales y mensuales calculados sobre las sesiones elegidas, con cobertura parcial explícita.
 - Cursor y teclado, fechas, zoom, desplazamiento y tabla diaria original. Ventana explícita de hasta 1.000 barras dibujadas, sin eliminar datos de origen.
