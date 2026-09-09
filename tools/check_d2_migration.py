@@ -18,7 +18,7 @@ from atlas_quant.analytics import portfolio_snapshot  # noqa: E402
 from atlas_quant.backup import create_backup, restore_backup, validate_backup  # noqa: E402
 from atlas_quant.identity_store import DDL  # noqa: E402
 from atlas_quant.portfolios import PortfolioService  # noqa: E402
-from atlas_quant.store import Store  # noqa: E402
+from atlas_quant.store import Store, SCHEMA_VERSION  # noqa: E402
 from atlas_quant.worker_lock import WorkerLock  # noqa: E402
 
 
@@ -81,7 +81,7 @@ def check(folder):
             require(db.execute("PRAGMA integrity_check").fetchall() == [("ok",)], "Integridad inválida.")
             require(not db.execute("PRAGMA foreign_key_check").fetchall(), "Referencias inválidas.")
     result = dict(source=str(source), source_unchanged=True, source_sha256=original_hash,
-        directory=str(directory), schema_before=1, schema_after=2, migration_seconds=elapsed,
+        directory=str(directory), schema_before=1, schema_after=SCHEMA_VERSION, migration_seconds=elapsed,
         history_preserved=True, reopened_unchanged=True, restored_identity_tables_equal=True,
         integrity="ok", comparisons=comparisons)
     report = directory / "report.json"

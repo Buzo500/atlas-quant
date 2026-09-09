@@ -57,7 +57,7 @@ class PortfolioRecord(ResponseModel):
     name: str
     account_id: str
     base_currency: Literal["EUR"]
-    accounting_policy: Literal["legacy-eur-v1"]
+    accounting_policy: Literal["legacy-eur-v1", "atlas-accounting-v2"]
     legacy_dataset_id: str | None
     revision: int
     catalog_revision: int
@@ -77,7 +77,7 @@ class PortfolioCut(ResponseModel):
     portfolio_id: str
     portfolio_revision: int
     catalog_revision: int
-    accounting_policy: Literal["legacy-eur-v1"]
+    accounting_policy: Literal["legacy-eur-v1", "atlas-accounting-v2"]
     bindings: list[PriceBinding]
     data_hash: str
 

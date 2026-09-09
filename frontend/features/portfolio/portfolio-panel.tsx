@@ -17,6 +17,7 @@ import { Curve } from '@/components/atlas/curve';
 import { Wallet } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { qualityLabel } from '@/shared/quality';
+import { BookSummary } from '@/features/data/book-panel';
 
 export function PortfolioPanel({
   dataset,
@@ -60,6 +61,8 @@ export function PortfolioPanel({
     ? detail.value
     : (portfolioQuery.data as PortfolioResponse | null);
   const identity = portfolioId || dataset?.id;
+  const nativeBook =
+    detail?.portfolio.accounting_policy === 'atlas-accounting-v2';
   return (
     <>
       {(dataset || portfolioId) && (
@@ -68,16 +71,27 @@ export function PortfolioPanel({
       {portfolioId && (
         <p className="muted">
           {portfolioName || 'Cartera'} · revisión{' '}
-          {detail?.context.portfolio_revision ?? portfolioRevision} · Fuentes de
-          valoración configuradas en Datos
+          {detail?.context.portfolio_revision ?? portfolioRevision} ·{' '}
+          {nativeBook
+            ? 'Libro contable EUR v2'
+            : 'Fuentes de valoración configuradas en Datos'}
         </p>
       )}
-      {detail?.status === 'unavailable' && (
-        <output className="notice">
-          {detail.warnings.join(' ')} El libro se conserva; revisa sus fuentes
-          en Datos.
-        </output>
-      )}
+      {detail?.portfolio.accounting_policy === 'atlas-accounting-v2' &&
+        portfolioId && (
+          <BookSummary
+            portfolioId={portfolioId}
+            revision={portfolioRevision}
+            active={active}
+          />
+        )}
+      {detail?.status === 'unavailable' &&
+        detail.portfolio.accounting_policy !== 'atlas-accounting-v2' && (
+          <output className="notice">
+            {detail.warnings.join(' ')} El libro se conserva; revisa sus fuentes
+            en Datos.
+          </output>
+        )}
       {!!detail?.quality?.length && (
         <p className="notice">
           Valoración heredada al {date(detail.quality[0].end)}. Calidad de sus
@@ -91,24 +105,26 @@ export function PortfolioPanel({
           conciliación ni rentabilidad definitiva.
         </p>
       )}
-      <div className="stats portfolio-stats">
-        <Metric
-          title="Valor de la cartera"
-          value={portfolio ? money(portfolio.nav) : '—'}
-        />
-        <Metric
-          title="Efectivo disponible"
-          value={portfolio ? money(portfolio.cash) : '—'}
-        />
-        <Metric
-          title="Resultado acumulado"
-          value={portfolio ? money(portfolio.pnl) : '—'}
-        />
-        <Metric
-          title="Rentabilidad TWR"
-          value={portfolio ? pct(portfolio.twr) : '—'}
-        />
-      </div>
+      {!nativeBook && (
+        <div className="stats portfolio-stats">
+          <Metric
+            title="Valor de la cartera"
+            value={portfolio ? money(portfolio.nav) : '—'}
+          />
+          <Metric
+            title="Efectivo disponible"
+            value={portfolio ? money(portfolio.cash) : '—'}
+          />
+          <Metric
+            title="Resultado acumulado"
+            value={portfolio ? money(portfolio.pnl) : '—'}
+          />
+          <Metric
+            title="Rentabilidad TWR"
+            value={portfolio ? pct(portfolio.twr) : '—'}
+          />
+        </div>
+      )}
       {portfolio?.curve?.length ? (
         <div className="portfolio-layout">
           <section className="panel positions-panel">

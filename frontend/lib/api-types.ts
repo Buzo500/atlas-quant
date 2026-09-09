@@ -67,6 +67,76 @@ export type BindingsInput = {
   "preview_token"?: (string) | (null);
 };
 
+export type BookBalance = {
+  "as_of_date": string;
+  "currency": "EUR";
+  "cash": string;
+  "net_contributions": string;
+  "realized_pnl": (string) | (null);
+  "positions": Array<BookPosition>;
+  "warnings": Array<string>;
+};
+
+export type BookContext = {
+  "portfolio_id": string;
+  "portfolio_revision": number;
+  "catalog_revision": number;
+  "accounting_policy": "legacy-eur-v1" | "atlas-accounting-v2";
+  "as_of_date": string;
+};
+
+export type BookDetail = {
+  "context": BookContext;
+  "balance": BookBalance;
+  "entries": Array<BookEntry>;
+  "total": number;
+  "offset": number;
+  "limit": number;
+  "sources": Array<BookSource>;
+};
+
+export type BookDocument = {
+  "id": string;
+  "kind": "import" | "reconciliation" | "correction";
+  "portfolio_revision": number;
+  "catalog_revision": number;
+  "as_of_date": string;
+  "source": string;
+  "source_account": string;
+  "created_at": string;
+  "status": "recorded" | "matched" | "differences";
+  "added": number;
+  "duplicates": number;
+  "current": boolean;
+  "evidence": {
+  [key: string]: JsonValue;
+};
+  "balance": BookBalance;
+  "differences": Array<ReconciliationRow>;
+};
+
+export type BookDocumentSummary = {
+  "id": string;
+  "kind": "import" | "reconciliation" | "correction";
+  "portfolio_revision": number;
+  "catalog_revision": number;
+  "as_of_date": string;
+  "source": string;
+  "source_account": string;
+  "created_at": string;
+  "status": "recorded" | "matched" | "differences";
+  "added": number;
+  "duplicates": number;
+  "current": boolean;
+};
+
+export type BookDocuments = {
+  "documents": Array<BookDocumentSummary>;
+  "total": number;
+  "offset": number;
+  "limit": number;
+};
+
 export type BookEntry = {
   "event": {
   [key: string]: JsonValue;
@@ -74,6 +144,43 @@ export type BookEntry = {
   "listing_id": (string) | (null);
   "date": string;
   "day_sequence": number;
+};
+
+export type BookErrorResponse = {
+  "detail": Array<BookIssue>;
+};
+
+export type BookIssue = {
+  "type": string;
+  "msg": string;
+  "loc": Array<(string) | (number)>;
+};
+
+export type BookPosition = {
+  "listing_id": string;
+  "quantity": string;
+  "cost_basis": string;
+};
+
+export type BookPreview = {
+  "context": BookContext;
+  "balance": BookBalance;
+  "entries": Array<BookEntry>;
+  "total": number;
+  "offset": number;
+  "limit": number;
+  "sources": Array<BookSource>;
+  "added": number;
+  "duplicates": number;
+  "historical_insertion": boolean;
+  "committed": boolean;
+  "preview_token": string;
+  "document_id": string;
+};
+
+export type BookSource = {
+  "source": string;
+  "source_account": string;
 };
 
 export type CandidateResult = {
@@ -99,6 +206,24 @@ export type CorporateAction = {
   "value": number;
   "currency": "EUR";
   "applied_to_ledger": false;
+};
+
+export type CorrectionInput = {
+  "expected_revision": number;
+  "commit"?: boolean;
+  "preview_token"?: (string) | (null);
+  "offset"?: number;
+  "limit"?: number;
+  "event_id": string;
+  "action": "void" | "replace";
+  "reason": string;
+  "csv"?: string;
+  "mapping"?: {
+  [key: string]: string;
+};
+  "gross_explanations"?: {
+  [key: string]: string;
+};
 };
 
 export type Costs = {
@@ -313,6 +438,25 @@ export type IdentifiedValue = {
   "warnings": Array<string>;
 };
 
+export type ImportInput = {
+  "expected_revision": number;
+  "commit"?: boolean;
+  "preview_token"?: (string) | (null);
+  "offset"?: number;
+  "limit"?: number;
+  "format_id": "atlas-ledger-v2";
+  "source": string;
+  "source_account": string;
+  "as_of_date": string;
+  "csv": string;
+  "mapping"?: {
+  [key: string]: string;
+};
+  "gross_explanations"?: {
+  [key: string]: string;
+};
+};
+
 export type InstrumentInput = {
   "expected_revision": number;
   "name": string;
@@ -524,7 +668,7 @@ export type PortfolioCut = {
   "portfolio_id": string;
   "portfolio_revision": number;
   "catalog_revision": number;
-  "accounting_policy": "legacy-eur-v1";
+  "accounting_policy": "legacy-eur-v1" | "atlas-accounting-v2";
   "bindings": Array<PriceBinding>;
   "data_hash": string;
 };
@@ -541,6 +685,7 @@ export type PortfolioDetail = {
 
 export type PortfolioInput = {
   "name": string;
+  "accounting_policy"?: "legacy-eur-v1" | "atlas-accounting-v2";
 };
 
 export type PortfolioLedgerResponse = {
@@ -563,7 +708,7 @@ export type PortfolioRecord = {
   "name": string;
   "account_id": string;
   "base_currency": "EUR";
-  "accounting_policy": "legacy-eur-v1";
+  "accounting_policy": "legacy-eur-v1" | "atlas-accounting-v2";
   "legacy_dataset_id": (string) | (null);
   "revision": number;
   "catalog_revision": number;
@@ -681,6 +826,46 @@ export type QualityReport = {
   "days": Array<QualityDay>;
   "last": QualityDay;
   "warnings": Array<string>;
+};
+
+export type ReconciliationInput = {
+  "expected_revision": number;
+  "commit"?: boolean;
+  "preview_token"?: (string) | (null);
+  "offset"?: number;
+  "limit"?: number;
+  "format_id": "atlas-statement-v2";
+  "source": string;
+  "source_account": string;
+  "as_of_date": string;
+  "csv": string;
+  "mapping"?: {
+  [key: string]: string;
+};
+  "complete_statement": true;
+};
+
+export type ReconciliationPreview = {
+  "context": BookContext;
+  "balance": BookBalance;
+  "status": "matched" | "differences";
+  "differences": Array<ReconciliationRow>;
+  "total": number;
+  "offset": number;
+  "limit": number;
+  "committed": boolean;
+  "preview_token": string;
+  "document_id": string;
+};
+
+export type ReconciliationRow = {
+  "record_type": "cash" | "position";
+  "listing_id": (string) | (null);
+  "currency": "EUR";
+  "book": string;
+  "reference": string;
+  "difference": string;
+  "matched": boolean;
 };
 
 export type ResearchExecution = {

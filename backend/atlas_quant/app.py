@@ -25,6 +25,10 @@ from .store import Store, now
 from .quality import EvidenceRequest, RevisionRequest, check_research, EXPLORATORY_WARNING
 from .quality_service import QualityService
 from .quality_contracts import QualityReport, EvidencePreview, RevisionPreview
+from .book import BookError, MOVEMENT_COLUMNS, STATEMENT_COLUMNS
+from .book_service import BookService
+from .book_contracts import (ImportInput, ReconciliationInput, CorrectionInput, BookDetail,
+                            BookPreview, ReconciliationPreview, BookDocuments, BookDocument, BookErrorResponse)
 from .worker_lock import WorkerLock
 from .catalog import CatalogService, InstrumentInput, ListingInput, AliasInput, IdentityNotFound, RevisionConflict
 from .portfolios import PortfolioService
@@ -52,6 +56,7 @@ class LedgerInput(StrictModel):
 
 class PortfolioInput(StrictModel):
     name: str = Field(min_length=1, max_length=100)
+    accounting_policy: Literal["legacy-eur-v1", "atlas-accounting-v2"] = "legacy-eur-v1"
 
 
 class BindingsInput(StrictModel):
@@ -125,6 +130,7 @@ def create_app(data_dir=None, run_worker=True):
     catalog = CatalogService(store)
     portfolios = PortfolioService(store)
     quality = QualityService(store)
+    books = BookService(store)
 
 
     @asynccontextmanager
@@ -167,6 +173,10 @@ def create_app(data_dir=None, run_worker=True):
         response.headers["X-Content-Type-Options"] = "nosniff"
         response.headers["Referrer-Policy"] = "no-referrer"
         return response
+
+    @app.exception_handler(BookError)
+    async def book_error(request, exc):
+        return JSONResponse({"detail": exc.detail()}, status_code=422)
 
     @app.exception_handler(ValueError)
     async def invalid(request, exc):
@@ -214,7 +224,7 @@ def create_app(data_dir=None, run_worker=True):
 
     @app.post("/api/portfolios", response_model=PortfolioRecord, status_code=201)
     def new_portfolio(body: PortfolioInput):
-        return portfolios.create(body.name)
+        return portfolios.create(body.name, body.accounting_policy)
 
     @app.get("/api/portfolios/{ident}", response_model=PortfolioDetail)
     def read_portfolio(ident: str, revision: int | None = Query(default=None, ge=1)):
@@ -228,6 +238,42 @@ def create_app(data_dir=None, run_worker=True):
     @app.post("/api/portfolios/{ident}/ledger", response_model=PortfolioLedgerResponse)
     def portfolio_ledger(ident: str, body: LedgerInput):
         return portfolios.import_ledger(ident, body.csv, body.commit, body.preview_token)
+
+    @app.get("/api/portfolios/{ident}/book", response_model=BookDetail)
+    def read_book(ident: str, as_of_date: str | None = Query(default=None, max_length=10),
+                  revision: int | None = Query(default=None, ge=1),
+                  offset: int = Query(default=0, ge=0), limit: int = Query(default=100, ge=1, le=500)):
+        return books.read(ident, as_of_date, revision, offset, limit)
+
+    @app.post("/api/portfolios/{ident}/imports", response_model=BookPreview, responses={422: {"model": BookErrorResponse}})
+    def import_book(ident: str, body: ImportInput):
+        return books.import_movements(ident, body)
+
+    @app.post("/api/portfolios/{ident}/reconciliations", response_model=ReconciliationPreview, responses={422: {"model": BookErrorResponse}})
+    def reconcile_book(ident: str, body: ReconciliationInput):
+        return books.reconcile(ident, body)
+
+    @app.post("/api/portfolios/{ident}/corrections", response_model=BookPreview, responses={422: {"model": BookErrorResponse}})
+    def correct_book(ident: str, body: CorrectionInput):
+        return books.correct(ident, body)
+
+    @app.get("/api/portfolios/{ident}/book-documents", response_model=BookDocuments)
+    def book_documents(ident: str, offset: int = Query(default=0, ge=0), limit: int = Query(default=100, ge=1, le=500)):
+        return books.documents(ident, offset, limit)
+
+    @app.get("/api/portfolios/{ident}/book-documents/{document_id}", response_model=BookDocument)
+    def book_document(ident: str, document_id: str):
+        return books.documents(ident, document_id=document_id)
+
+    @app.get("/api/templates/book-movements", response_class=PlainTextResponse)
+    def book_movement_template():
+        return PlainTextResponse(",".join(MOVEMENT_COLUMNS) + "\n", media_type="text/csv",
+                                 headers={"Content-Disposition": 'attachment; filename="atlas-movements-v2.csv"'})
+
+    @app.get("/api/templates/book-statement", response_class=PlainTextResponse)
+    def book_statement_template():
+        return PlainTextResponse(",".join(STATEMENT_COLUMNS) + "\n", media_type="text/csv",
+                                 headers={"Content-Disposition": 'attachment; filename="atlas-statement-v2.csv"'})
 
     @app.get("/api/datasets/{ident}/quality", response_model=QualityReport)
     def read_quality(ident: str, version: int = Query(ge=1), symbol: str = Query(min_length=1, max_length=40),

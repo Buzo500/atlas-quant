@@ -1,6 +1,6 @@
 # ATLAS Quant · Plan de v0.4: datos y contabilidad trazables
 
-9 de septiembre de 2026. **Alcance aprobado: D1–D8, CSV propio y EUR/USD. D1 especificado, D2 publicado como `v0.4.0-dev.1` y D3 desarrollado localmente en `codex/v0.4-d3`, `0.4.0-dev.2`. D4–D8 pendientes.** [Diseño y evidencia D2](v0_4_d2.md), [contrato y pruebas D3](v0_4_d3.md). Base de D3: fusión de PR #4, `77f8fa0a0056a94f65b257a05ff6f0a79b1d982e`. G1–G6 de v0.3 aceptadas; espera intermitente de API conservada como incidencia conocida abierta. La contabilidad nueva v2 y USD se incorporarán en bloques posteriores; D3 mantiene la política EUR heredada.
+9 de septiembre de 2026. **Alcance aprobado: D1–D8, CSV propio y EUR/USD. D1 especificado, D2/D3 publicados y D4 desarrollado localmente en `codex/v0.4-d4`, `0.4.0-dev.3`. D5–D8 pendientes.** [D2](v0_4_d2.md), [D3](v0_4_d3.md) y [D4: CSV y conciliación EUR](v0_4_d4.md). D4 parte de la fusión de PR #5 y etiqueta `v0.4.0-dev.2`, `cdb59b1461d3d26ff88d6f7de90bdf4534ca5fe3`. Las carteras anteriores conservan su política EUR; el libro nuevo v2 incorpora saldos/coste sin NAV/TWR hasta D6/D7. USD sigue reservado a D6. Espera intermitente de API conservada como incidencia conocida abierta.
 
 [D1: contratos y convenciones](v0_4_d1.md) fija orden, precisión, monedas, fechas, CSV, errores, capacidades, métricas y migración inicial. Incluye [12 casos numéricos](fixtures/v0_4_d1_referencias.json) comprobados mediante aritmética independiente; no son pruebas ejecutadas contra el motor nuevo.
 
@@ -46,7 +46,7 @@ Los códigos D1–D8 son bloques de trabajo, no ocho versiones comerciales. Cada
 | **D7 · Rentabilidad y explicación contable** | MWR/XIRR por periodo y desglose coherente de flujos, costes y patrimonio; TWR con convención identificada. | D5–D6 | Casos con fechas irregulares, flujos intermedios, patrimonio inicial, raíz ausente/ambigua y datos insuficientes; no convertir fallos en 0 %. |
 | **D8 · Integración y entrega** | Migración/recuperación, contratos, pruebas de navegador, rendimiento, documentación y CI gratuita. | D1–D7 | Todos los casos aceptados; una lectura identifica el mismo corte de libro/precios/FX/eventos; datos habituales conservados; límites publicados y sin regresiones de v0.3. |
 
-**Secuencia actual: revisar e integrar D2; después concretar D3.** D1 ya está especificado y D2 implementado localmente. D6 no debe empezar como una ampliación de `Literal["EUR"]`: admitir una moneda en un formulario antes de resolver efectivo, FX y valoración produciría capacidades aparentes sin soporte contable.
+**Secuencia actual: revisar y publicar D4; después concretar D5.** D2/D3 están integrados. D6 no debe empezar como una ampliación de `Literal["EUR"]`: admitir una moneda en un formulario antes de resolver efectivo, FX y valoración produciría capacidades aparentes sin soporte contable.
 
 ## Decisiones de arquitectura propuestas
 
@@ -126,4 +126,4 @@ Fuera: bróker/órdenes reales, cortos/préstamos, derivados, fiscalidad declara
 
 Decisiones de alcance aprobadas: formato CSV propio primero, EUR–USD como primer conjunto de monedas y evolución incremental D1–D8. Se mantiene la cartera inicial sencilla definida en D1. Calendarios/proveedores reales, primer formato de extracto externo y tratamiento de casos de liquidación no cubiertos se concretan cuando se disponga de evidencia; no bloquean los fixtures sintéticos ni justifican contratar servicios. Para convenciones técnicas concretas prevalece D1 sobre las formulaciones preliminares del plan.
 
-La aprobación del plan no autoriza automáticamente cada implementación o publicación. D2 se publicó, fusionó y etiquetó con autorización; D3 se concretó e implementó después por petición del usuario y sigue local, pendiente de publicación y CI propia. La autorización posterior de arquitectura cubre documentación y ajuste de la hoja de ruta; no inicia D4–D8 ni habilita un bróker. La importación de movimientos del usuario queda pendiente por decisión expresa.
+La aprobación del plan no autoriza automáticamente cada implementación o publicación. Los cinco pasos posteriores autorizan publicar D3, ejecutar su CI gratuita, fusionar/etiquetar si pasa, concretar D4 e implementarlo con pruebas. D3 está publicado; D4 sigue local, pendiente de revisión y CI remota propias. La arquitectura futura no habilita un bróker ni inicia D5–D8. La importación de movimientos del usuario queda pendiente por decisión expresa.

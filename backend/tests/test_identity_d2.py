@@ -32,6 +32,9 @@ def legacy(path):
     snapshot = service.portfolio(dataset["id"])
     # Build the actual schema-1 layout, with a ledger keyed by dataset.
     with closing(sqlite3.connect(path)) as db, db:
+        from atlas_quant.book_store import DDL as BOOK_DDL
+        for table in reversed(BOOK_DDL):
+            db.execute(f"DROP TABLE {table}")
         for table in reversed(DDL):
             db.execute(f"DROP TABLE {table}")
         db.execute("INSERT INTO records VALUES('ledger',?,?)", (dataset["id"], json.dumps(events)))
@@ -90,7 +93,7 @@ def test_v2_backup_restoration_preserves_catalog_books_and_revisions(tmp_path):
     Service(source).load_demo()
     saved = logical_dump(source.path)
     backup = create_backup(source.path, tmp_path / "backups")
-    assert validate_backup(backup)["schema"]["user_version"] == 2
+    assert validate_backup(backup)["schema"]["user_version"] == 3
     target = tmp_path / "target.sqlite3"
     restore_backup(backup, target, tmp_path / "before", instance_lock=WorkerLock(str(target) + ".instance.lock"))
     restored = logical_dump(Store(target).path)

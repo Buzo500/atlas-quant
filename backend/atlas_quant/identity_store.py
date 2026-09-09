@@ -109,13 +109,18 @@ class IdentityWork:
         return [self.portfolio_record(r[0]) for r in self.db.execute("SELECT id FROM portfolios ORDER BY rowid")]
 
     def portfolio_events(self, portfolio):
+        if portfolio["accounting_policy"] == "atlas-accounting-v2":
+            rows = {item["event"]["id"]: item for item in self.native_entries(portfolio["id"])}
+            return [rows[ident] for ident in portfolio["event_ids"]]
         rows = {r[0]: dict(event=json.loads(r[4]), listing_id=r[1], date=r[2], day_sequence=r[3])
                 for r in self.db.execute("SELECT event_id,listing_id,effective_date,day_sequence,body FROM ledger_entries WHERE portfolio_id=?", (portfolio["id"],))}
         return [rows[ident] for ident in portfolio["event_ids"]]
 
-    def create_portfolio(self, name, legacy_dataset_id=None, bindings=None):
+    def create_portfolio(self, name, legacy_dataset_id=None, bindings=None, accounting_policy="legacy-eur-v1"):
+        if accounting_policy not in {"legacy-eur-v1", "atlas-accounting-v2"} or (legacy_dataset_id and accounting_policy != "legacy-eur-v1"):
+            raise ValueError("Política contable no compatible con el origen de cartera.")
         value = dict(id=uuid4().hex, name=name, base_currency="EUR", account_id=uuid4().hex,
-                     accounting_policy="legacy-eur-v1", legacy_dataset_id=legacy_dataset_id)
+                     accounting_policy=accounting_policy, legacy_dataset_id=legacy_dataset_id)
         self.db.execute("INSERT INTO portfolios VALUES(?,?,?)", (value["id"], legacy_dataset_id, encoded(value)))
         self.write_portfolio_revision(value["id"], [], bindings or [])
         return self.portfolio_record(value["id"])
@@ -126,6 +131,8 @@ class IdentityWork:
             encoded(dict(event_ids=event_ids, bindings=bindings, catalog_revision=self.catalog()["revision"]))))
 
     def append_entries(self, portfolio, entries):
+        if portfolio["accounting_policy"] != "legacy-eur-v1":
+            raise ValueError("El libro v2 requiere la importación de movimientos v2.")
         current = self.portfolio_events(portfolio)
         known = {item["event"]["id"]: item for item in current}
         sequence = Counter(item["date"] for item in current)

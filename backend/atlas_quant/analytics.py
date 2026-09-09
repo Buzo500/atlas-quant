@@ -122,6 +122,48 @@ def _normalize_events(events: list[dict]) -> list[dict]:
     return sorted(normalized, key=lambda item: item["date"])
 
 
+def apply_legacy_event(state: dict, event: dict) -> Decimal:
+    """Shared legacy economic transition; no prices or change of conventions."""
+    cash, contributions = state["cash"], state["contributions"]
+    quantities, costs = state["quantities"], state["costs"]
+    day, flow = event["date"], ZERO
+    kind, symbol = event["kind"], event["symbol"]
+    amount, fee = event["amount"], event["fee"]
+    quantity, price = event["quantity"], event["price"]
+    if kind == "deposit":
+        cash += amount - fee
+        contributions += amount
+        flow += amount
+    elif kind == "withdrawal":
+        cash -= amount + fee
+        contributions -= amount
+        flow -= amount
+    elif kind == "buy":
+        gross_cost = quantity * price + fee
+        cash -= gross_cost
+        quantities[symbol] = quantities.get(symbol, ZERO) + quantity
+        costs[symbol] = costs.get(symbol, ZERO) + gross_cost
+    elif kind == "sell":
+        held = quantities.get(symbol, ZERO)
+        if quantity > held:
+            raise ValueError(f"Venta de {symbol} excede la posición; no se admiten cortos.")
+        costs[symbol] -= costs[symbol] * quantity / held
+        quantities[symbol] -= quantity
+        cash += quantity * price - fee
+    elif kind == "dividend":
+        cash += amount - fee
+    elif kind == "fee":
+        cash -= amount
+    elif kind == "split":
+        if quantities.get(symbol, ZERO) == ZERO:
+            raise ValueError(f"Split de {symbol} sin una posición abierta.")
+        quantities[symbol] *= quantity
+    if cash < ZERO:
+        raise ValueError(f"Efectivo insuficiente después del movimiento {event['id']} ({day}).")
+    state["cash"], state["contributions"] = cash, contributions
+    return flow
+
+
 def portfolio_snapshot(events: list[dict], bars: list[dict]) -> dict:
     ledger = _normalize_events(events)
     market = normalize_bars(bars)
@@ -156,42 +198,13 @@ def portfolio_snapshot(events: list[dict], bars: list[dict]) -> dict:
     for day in all_dates:
         flow = ZERO
         for event in event_days.get(day, []):
-            kind, symbol = event["kind"], event["symbol"]
-            amount, fee = event["amount"], event["fee"]
-            quantity, price = event["quantity"], event["price"]
-            if kind == "deposit":
-                cash += amount - fee
-                contributions += amount
-                flow += amount
-            elif kind == "withdrawal":
-                cash -= amount + fee
-                contributions -= amount
-                flow -= amount
-            elif kind == "buy":
-                gross_cost = quantity * price + fee
-                cash -= gross_cost
-                quantities[symbol] = quantities.get(symbol, ZERO) + quantity
-                costs[symbol] = costs.get(symbol, ZERO) + gross_cost
-            elif kind == "sell":
-                held = quantities.get(symbol, ZERO)
-                if quantity > held:
-                    raise ValueError(f"Venta de {symbol} excede la posición; no se admiten cortos.")
-                costs[symbol] -= costs[symbol] * quantity / held
-                quantities[symbol] -= quantity
-                cash += quantity * price - fee
-            elif kind == "dividend":
-                cash += amount - fee
-            elif kind == "fee":
-                cash -= amount
-            elif kind == "split":
-                if quantities.get(symbol, ZERO) == ZERO:
-                    raise ValueError(f"Split de {symbol} sin una posición abierta.")
-                quantities[symbol] *= quantity
-                # Previously observed prices are on the old share basis. Require a new mark.
-                prices.pop(symbol, None)
-                price_dates.pop(symbol, None)
-            if cash < ZERO:
-                raise ValueError(f"Efectivo insuficiente después del movimiento {event['id']} ({day}).")
+            state = dict(cash=cash, contributions=contributions, quantities=quantities, costs=costs)
+            flow += apply_legacy_event(state, event)
+            cash, contributions = state["cash"], state["contributions"]
+            if event["kind"] == "split":
+                # The previous mark is on the old share basis.
+                prices.pop(event["symbol"], None)
+                price_dates.pop(event["symbol"], None)
         for bar in market_days.get(day, []):
             prices[bar["symbol"]] = bar["close"]
             price_dates[bar["symbol"]] = day

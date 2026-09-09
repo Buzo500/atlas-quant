@@ -2,6 +2,18 @@
 
 Actualizado: 9 de septiembre de 2026. Este documento resume decisiones y estado para una conversación nueva de Codex; no contiene la transcripción completa del chat original.
 
+## Estado vigente: D3 publicado y D4 local
+
+El usuario autoriza los cinco pasos: publicar D3 y arquitectura, ejecutar CI gratuita, fusionar/etiquetar si pasa, especificar D4 e implementarlo con pruebas. **D3 publicado** en [PR #5](https://github.com/Buzo500/atlas-quant/pull/5), squash `cdb59b1461d3d26ff88d6f7de90bdf4534ca5fe3`; etiqueta anotada `v0.4.0-dev.2` verificada en remoto. [CI 34376199945](https://github.com/Buzo500/atlas-quant/actions/runs/34376199945) correcta sobre `864097448b8200c8d9c8b0295598c84ba465fcf9`, árbol integrado idéntico: 523 Python + 91 subtests, 249 frontend y 13 E2E. Un único intento. Facturación posterior comprobada: 105/2.000 minutos, 0/0,5 GB, 0 USD facturables; presupuesto cero con bloqueo del uso de pago.
+
+**D4 desarrollado localmente**, rama `codex/v0.4-d4` desde la etiqueta D3; versión `0.4.0-dev.3`, esquema 3. [Contrato, uso y evidencia D4](v0_4_d4.md). Libro nuevo `atlas-accounting-v2` EUR: CSV v2, efectivo/posiciones/coste sin precios, extractos completos, diferencias sin ajustes, revisiones/correcciones y evidencia inmutable. Formularios en Datos, saldos en Cartera, contexto y confirmación atómicos. API antigua sin política conserva `legacy-eur-v1`; carteras existentes y gráficos anteriores intactos. El libro v2 no tiene todavía NAV/TWR: corresponde a D6/D7. USD, dividendos/splits nuevos y D5–D8 pendientes. No ejecutar código D3 sobre una base de esquema 3.
+
+**Pruebas:** regresión 569 Python + 91 subtests y prueba adicional heredada 1/1; 255 frontend y seis del panel repetidas tras el ajuste final; 14/14 E2E en 51,7 s (`e2e-90ffdf4e4e85464e9364e1f0acd201c5`). Tipos, lint, contratos, dependencias y build con manifiesto correctos. Integridad `ok`, base habitual intacta y procesos E2E cerrados. Se conserva la evidencia de intentos fallidos y no se declara resuelta la intermitencia de API ni validado un escalado físico nuevo.
+
+**Migración/recuperación:** ATLAS detenido antes de editar; copia previa `backups/atlas-20260909T162440667503Z-1d55fabf`, esquema 2. Su migración y restauración aisladas conservan todas las tablas anteriores, ambas carteras, vínculos/versiones y valoraciones. Informe `var/validation/d4-migration-ee74166399194cc5aa23fee45795b74f/report.json`. Las tablas nuevas están vacías. Esa copia y fuentes/build D3 permiten retroceder al punto anterior; nunca reutilizar una base de esquema 3 con D3.
+
+D4 todavía sin subida/PR/CI remota propia. Presupuesto cero, sin importación de movimientos personales, sin nuevos indicadores ni aprendizaje. La importación de «Cartera de pruebas» y el ensayo de 48 horas siguen aplazados; v0.2 no se declara estable. Los apartados inferiores son históricos y sus pendientes D3/D4 quedan sustituidos por este estado.
+
 Preferencia de comunicación: al terminar cada proceso, presentar cinco siguientes pasos concretos, en orden de prioridad, con su utilidad, dependencias y una recomendación. El usuario elegirá; la lista no autoriza por sí misma esos pasos ni reactiva el ensayo aplazado.
 
 ## Última planificación: arquitectura y hoja de ruta · 09/09/2026
