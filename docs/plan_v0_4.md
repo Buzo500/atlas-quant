@@ -1,6 +1,6 @@
 # ATLAS Quant · Plan de v0.4: datos y contabilidad trazables
 
-10 de septiembre de 2026. **Alcance aprobado: D1–D8, CSV propio y EUR/USD. D1 especificado y D2–D4 publicados. D5.1–D5.5 autorizados e implementados en `0.4.0-dev.4`, esquema 4; D6–D8 pendientes.** [D2](v0_4_d2.md), [D3](v0_4_d3.md), [D4: CSV y conciliación EUR](v0_4_d4.md) y [D5: dividendos/splits conciliados](v0_4_d5.md). D4 publicado como `v0.4.0-dev.3`, PR #6, squash `39d922cf63a95c4f39fbe8f35e88047d86d2807f`, CI gratuita 34456773938 correcta. Las carteras anteriores conservan su política EUR; el libro nuevo v2 incorpora saldos/coste sin NAV/TWR hasta D6/D7. USD sigue reservado a D6. Espera intermitente de API conservada como incidencia conocida abierta.
+10 de septiembre de 2026. **Alcance aprobado: D1–D8, CSV propio y EUR/USD. D1 especificado y D2–D5 publicados; D6–D8 pendientes.** [D2](v0_4_d2.md), [D3](v0_4_d3.md), [D4: CSV y conciliación EUR](v0_4_d4.md) y [D5: dividendos/splits conciliados](v0_4_d5.md). D5 publicado como `v0.4.0-dev.4`, esquema 4, PR #7, squash `a91f077648f209e49dfba2c630fd2c6ccecfd1a0`, CI gratuita 34479828915 correcta. Las carteras anteriores conservan su política EUR; el libro nuevo v2 incorpora saldos/coste sin NAV/TWR hasta D6/D7. USD sigue reservado a D6. Espera intermitente de API conservada como incidencia conocida abierta.
 
 [D1: contratos y convenciones](v0_4_d1.md) fija orden, precisión, monedas, fechas, CSV, errores, capacidades, métricas y migración inicial. Incluye [12 casos numéricos](fixtures/v0_4_d1_referencias.json) comprobados mediante aritmética independiente; no son pruebas ejecutadas contra el motor nuevo.
 
@@ -46,7 +46,7 @@ Los códigos D1–D8 son bloques de trabajo, no ocho versiones comerciales. Cada
 | **D7 · Rentabilidad y explicación contable** | MWR/XIRR por periodo y desglose coherente de flujos, costes y patrimonio; TWR con convención identificada. | D5–D6 | Casos con fechas irregulares, flujos intermedios, patrimonio inicial, raíz ausente/ambigua y datos insuficientes; no convertir fallos en 0 %. |
 | **D8 · Integración y entrega** | Migración/recuperación, contratos, pruebas de navegador, rendimiento, documentación y CI gratuita. | D1–D7 | Todos los casos aceptados; una lectura identifica el mismo corte de libro/precios/FX/eventos; datos habituales conservados; límites publicados y sin regresiones de v0.3. |
 
-**Secuencia actual: cerrar la validación/publicación de D5 y concretar D6.** D2–D4 están integrados; D5 implementa contratos/eventos, dividendos, splits, revisión e integración autorizados. No inicia D6: antes hay que cerrar efectivo por moneda, FX y valoración. El estado remoto y la evidencia están en continuidad.
+**Secuencia actual: concretar D6 tras publicar D5.** D2–D5 están integrados. La publicación no inicia D6: antes hay que acordar efectivo por moneda, FX y valoración, y sus casos de referencia. El estado remoto y la evidencia están en continuidad.
 
 ## Decisiones de arquitectura propuestas
 

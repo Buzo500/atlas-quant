@@ -2,7 +2,19 @@
 
 Actualizado: 10 de septiembre de 2026. Este documento resume decisiones y estado para una conversación nueva de Codex; no contiene la transcripción completa del chat original.
 
-## Estado vigente: D5 implementado · cierre de validación
+## Estado vigente: D5 publicado · cinco pasos de cierre completados
+
+**[PR #7](https://github.com/Buzo500/atlas-quant/pull/7) fusionada** mediante squash en `a91f077648f209e49dfba2c630fd2c6ccecfd1a0`. **[Etiqueta anotada `v0.4.0-dev.4`](https://github.com/Buzo500/atlas-quant/tree/v0.4.0-dev.4) publicada y verificada en remoto**, objeto `2161b14e3ddf088608c3e0688b65f14974c8fa20`. El árbol integrado coincide exactamente con la cabeza validada `5c3e8a7453418d2f5b7f6eb3feddefa44c28db92`. Copia local actualizada a `master`; el registro de cierre se publica después de la etiqueta mediante un cambio exclusivamente documental.
+
+**[CI gratuita 34479828915](https://github.com/Buzo500/atlas-quant/actions/runs/34479828915) correcta**, job `102879544233`: **623 Python + 91 subtests** (48,60 s, dos avisos de deprecación previos), **266 frontend/28 archivos** (87,96 s) y **18/18 E2E** (2,5 min). Instalación limpia, compilación con manifiesto, TypeScript, contratos, lint, arranque/proxy y parada correctos. E2E `e2e-56ba51cbda5348e58f2e272337f72fa7`: integridad `ok`, base ordinaria del runner intacta y puertos liberados. El recorrido sintético del proxy devuelve salud `0.4.0-dev.4` y gasto IA cero. Evidencia local `output/validation/d5-ci-34479828915.log`.
+
+Corrección de previsualización publicada: el formulario espera identidad/revisión coincidentes entre cartera y derechos antes de inicializarse. Las tres regresiones permanentes cubren ambos órdenes de respuesta y cambios de cartera sin aviso global; comprueban conservación del borrador y envío único con campos vigentes. Pasan también las ocho pruebas anteriores del panel. Revisión sin bloqueantes identificados; no había revisiones ni conversaciones de revisión pendientes en la PR. Los tres intentos remotos fallidos se conservan debajo. **La incidencia separada de latencia/502 de API sigue abierta**; esta CI correcta no demuestra su eliminación.
+
+**Coste verificado:** antes 166,7/2.000 minutos; después 183,3/2.000 minutos, 0/0,5 GB y **0 USD facturables**. Presupuesto Actions 0 USD y Stop usage Yes comprobados antes de ejecutar; no se modificaron los controles. No se lanza otra CI por la fusión o la etiqueta de desarrollo.
+
+**Operación y alcance:** ATLAS habitual continúa detenido, sin migrar su base ni importar movimientos personales. Copia pre-D5 de esquema 3 `backups/atlas-20260910T091254560815Z-782be607` conservada. El primer arranque D5 realizará la migración 3→4 ya validada en copias; volver a D4 exige copia compatible y fuentes/build D4. Inicio `Abrir-ATLAS.cmd`, parada `Detener-ATLAS.cmd`. D5 EUR publicado; el uso de USD, la valoración del libro exacto y su rentabilidad siguen pendientes de D6/D7. D6–D8, movimientos personales y ensayo de 48 horas no se inician. Se mantiene la condición de desarrollo y v0.2 candidata, sin declaración de estabilidad.
+
+## Antecedente: D5 implementado · cierre de validación
 
 El usuario acepta los cinco pasos D5.1–D5.5 y sus límites: contratos/eventos, dividendos, splits, interfaz/correcciones y validación/publicación de desarrollo tras CI gratuita. Rama `codex/v0.4-d5`, versión **`0.4.0-dev.4`**, esquema **4**; parte de D4 publicado y del plan documental `e59caf4`. [Uso, contratos físicos y límites](v0_4_d5.md). D6–D8 no iniciados.
 

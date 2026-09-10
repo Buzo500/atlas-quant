@@ -1,11 +1,14 @@
 # Cambios de ATLAS Quant
 
-## v0.4.0-dev.4 · D5 · 2026-09-10
+## v0.4.0-dev.4 · D5 · Publicado · 2026-09-10
+
+[PR #7](https://github.com/Buzo500/atlas-quant/pull/7) fusionada mediante squash en `a91f077648f209e49dfba2c630fd2c6ccecfd1a0`; etiqueta anotada verificada en remoto. [CI 34479828915](https://github.com/Buzo500/atlas-quant/actions/runs/34479828915) correcta sobre `5c3e8a7453418d2f5b7f6eb3feddefa44c28db92`, con árbol integrado idéntico: 623 Python + 91 subtests, 266 frontend y 18 E2E. Instalación limpia, build, contratos, tipos, lint, arranque/proxy y parada correctos; 0 USD facturables. Este registro documental es posterior a la etiqueta.
 
 - Eventos corporativos EUR con identidad compartida, fuentes explícitas, propuestas, revisiones y cancelaciones inmutables.
 - Derechos de dividendo separados del efectivo; elegibilidad acreditada a exfecha, bruto/retención/comisión explícitos, enlace de cobro existente sin doble abono y un pago completo por derecho.
 - Splits y reverse splits exactos, coste total conservado y validación de operaciones posteriores. Fracciones solo acreditadas y representables con hasta 12 decimales. Compatibilidad de precios separada del efecto contable; no habilita investigación global.
 - Previsualización y confirmación atómicas con auditoría, revisión conjunta de dependencias, historial/cortes y evidencia JSON. Formularios en Datos, derechos en Cartera y CSV propios sin nuevas dependencias.
+- Corregida la inicialización del formulario con derechos de una revisión anterior a la cartera; tres regresiones permanentes cubren el orden de respuestas y la conservación del borrador, sin aumentar tiempos ni introducir reintentos.
 - Migración aditiva 3→4 y recuperación aislada; carteras/políticas antiguas intactas. D6–D8, movimientos personales y ensayo sostenido pendientes. [Contrato, límites y pruebas](docs/v0_4_d5.md); [cierre local/remoto](docs/CONTINUIDAD.md).
 
 
