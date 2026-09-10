@@ -34,14 +34,14 @@ def values(store, day):
     return result
 
 
-def check(folder):
+def check(folder, *, schema_before=3, new_tables=DDL, read_values=values, run_prefix='d5'):
     manifest = validate_backup(folder)
-    require(manifest["schema"]["user_version"] == 3, "Se requiere una copia de esquema 3 anterior a D5.")
+    require(manifest["schema"]["user_version"] == schema_before, f"Se requiere una copia de esquema {schema_before}.")
     source = folder / "atlas.sqlite3"
     original_hash = hashlib.sha256(source.read_bytes()).hexdigest()
     day = datetime.now(timezone.utc).date().isoformat()
-    original, expected = dump(source), values(ReadOnly(source), day)
-    directory = ROOT / "var/validation" / ("d5-migration-" + uuid4().hex)
+    original, expected = dump(source), read_values(ReadOnly(source), day)
+    directory = ROOT / "var/validation" / (run_prefix + "-migration-" + uuid4().hex)
     directory.mkdir(parents=True, exist_ok=False)
     target = directory / "migrated.sqlite3"
     with closing(sqlite3.connect(source.resolve().as_uri() + "?mode=ro", uri=True)) as origin, closing(sqlite3.connect(target)) as destination:
@@ -49,8 +49,8 @@ def check(folder):
     store = Store(target)
     migrated = dump(target)
     require(all(migrated[name] == rows for name, rows in original.items()), "La migración modificó registros históricos.")
-    require(all(migrated[name] == [] for name in DDL), "Se crearon eventos o aplicaciones durante la migración.")
-    require(values(store, day) == expected, "Cambiaron carteras, vínculos o resultados.")
+    require(all(migrated[name] == [] for name in new_tables), "Se crearon datos durante la migración.")
+    require(read_values(store, day) == expected, "Cambiaron carteras, vínculos o resultados.")
     Store(target)
     require(dump(target) == migrated, "La reapertura modificó datos.")
     copied = create_backup(target, directory / "backups")
@@ -70,7 +70,7 @@ def check(folder):
         if kind != "settings":
             require(recovered == value, "Cambió un registro fuera de la pausa de fuentes.")
     require(after_records[("settings", "main")]["kill_switch"] is True, "La restauración no activó la parada.")
-    require(values(restored_store, day) == expected, "La recuperación cambió libros o valoraciones.")
+    require(read_values(restored_store, day) == expected, "La recuperación cambió libros o valoraciones.")
     for path in (target, restored):
         with closing(sqlite3.connect(path)) as db:
             require(db.execute("PRAGMA user_version").fetchone()[0] == SCHEMA_VERSION, "Esquema inesperado.")
@@ -78,7 +78,7 @@ def check(folder):
             require(not db.execute("PRAGMA foreign_key_check").fetchall(), "Referencias inválidas.")
     require(hashlib.sha256(source.read_bytes()).hexdigest() == original_hash, "La copia original cambió.")
     result = dict(source=str(source), source_sha256=original_hash, source_unchanged=True,
-                  schema_before=3, schema_after=SCHEMA_VERSION, history_preserved=True,
+                  schema_before=schema_before, schema_after=SCHEMA_VERSION, history_preserved=True,
                   new_tables_empty=True, reopened_unchanged=True, recovery_equal=True, integrity="ok",
                   portfolios=[dict(id=ident, revision=v["detail"]["portfolio"]["revision"],
                                    events=len(v["detail"]["entries"]), exact_equal=True) for ident, v in expected.items()])

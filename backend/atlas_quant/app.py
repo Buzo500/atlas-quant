@@ -28,6 +28,7 @@ from .quality_contracts import QualityReport, EvidencePreview, RevisionPreview
 from .book import BookError, MOVEMENT_COLUMNS, STATEMENT_COLUMNS
 from .book_service import BookService
 from .corporate_routes import register_corporate_routes
+from .multicurrency_routes import register_multicurrency_routes
 from .book_contracts import (ImportInput, ReconciliationInput, CorrectionInput, BookDetail,
                             BookPreview, ReconciliationPreview, BookDocuments, BookDocument, BookErrorResponse)
 from .worker_lock import WorkerLock
@@ -152,6 +153,7 @@ def create_app(data_dir=None, run_worker=True):
 
     app = FastAPI(title="ATLAS Quant",version=__version__,lifespan=lifespan)
     register_corporate_routes(app, store)
+    register_multicurrency_routes(app, store)
     app.state.service = service
     app.add_middleware(TrustedHostMiddleware,allowed_hosts=["localhost","127.0.0.1","testserver"])
 

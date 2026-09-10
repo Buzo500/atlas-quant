@@ -2,7 +2,23 @@
 
 Actualizado: 10 de septiembre de 2026. Este documento resume decisiones y estado para una conversación nueva de Codex; no contiene la transcripción completa del chat original.
 
-## Estado vigente: diagnóstico, uso normal D5 y plan D6 · puntos 1–4
+## Estado vigente: D6.1/D6.2 local y diagnósticos · cinco tareas
+
+**Autorización posterior:** «a por las 5 tareas más»: diagnosticar Yahoo, dirigir la captura API al cuerpo/cancelación, publicar el plan anterior, implementar D6.1 y D6.2. Plan documental `8f33625` publicado mediante avance directo de `master`; el workflow no se activa por push ordinario y no se ha lanzado CI remota. Desarrollo local en `codex/v0.4-d6`, **`0.4.0-dev.5`, esquema 5**, sin publicación del código ni etiqueta nuevas. [Contratos, uso y límites de esta implementación](v0_4_d6_implementacion.md).
+
+**Libro nativo EUR/USD por API `/api/v2`:** balances/posiciones/realizado con moneda explícita, conversiones de dos piernas y comisión atómicas, conciliación completa por moneda, correcciones con dependencias y dividendos/splits USD. Reutiliza servicios y transacciones D4/D5. API antigua conserva EUR y rechaza cortes/documentos con USD; `legacy-eur-v1` no cambia. Interfaz multidivisa D6.5, series/precios USD D6.3 y NAV D6.4 todavía pendientes. No se habilitan backtests/paper USD.
+
+**Validación local:** 650 Python + 91 subtests, 266 frontend, tipos/lint, contratos regenerados y comprobados, build con manifiesto correctos. Suite final `d6-python-final.log`: 67,18 s, dos avisos de deprecación previos. Incluye regresión del documento con saldo EUR y fila USD en el extracto: API antigua devuelve 422 explícito. Referencias aritméticas 15/15 y 59 resultados exactos; no acreditan NAV futuro. Migración 4→5 sobre copia aislada, tablas/históricos y saldos EUR exactos, tablas nuevas vacías, reapertura y recuperación correctas: `var/validation/d6-migration-a7cd99985eed4a4e9f4703c67026dca5/report.json`. Navegador: **18/18 E2E** en 1,1 min, `e2e-aa269c16968c47c2b37c78e23289edff`, integridad correcta, base habitual intacta y puertos liberados. Sonda final: 3/3 D5 en 16,3 s (`e2e-268f9c4f9e6d4e779a24fd1a1ee53252`). No supone nueva aceptación visual física del escalado.
+
+**Estado final:** ATLAS habitual arrancado y comprobado, run `f7ff0e7472b04d72af70e9721692613c`, interfaz compilada en `http://127.0.0.1:3000/`, salud `0.4.0-dev.5`, base migrada a esquema 5 e integridad `ok`. Tres carteras conservadas (dos legacy revisión 2, demo D5 revisión 5); tablas históricas, libros/contextos y respuestas EUR idénticos a la copia de esquema 4. Parada global activa; gasto/reserva IA cero. No se importó USD en estas carteras; la validación multidivisa usa fixtures aisladas. Evidencia `output/validation/d6-ordinary-start.json`.
+
+**Operación:** se detuvo ATLAS antes de editar. Copia previa de esquema 4 `backups/atlas-20260910T142414461441Z-bc5cf98f`. D5 no abre esquema 5: retroceso con esta copia y fuentes/build `v0.4.0-dev.4`. No se importan movimientos personales ni nuevas operaciones de demostración en la base habitual durante este trabajo.
+
+**Yahoo:** reproducida caché AppData inaccesible; corregida su ubicación a la carpeta de datos ATLAS y comprobada su apertura. La descarga real todavía falla por cadena TLS; una sonda separada con certificados de confianza del sistema obtuvo HTTP 429. No se deshabilita verificación ni se insiste tras el límite; precios anteriores conservados. El fallo de caché está corregido, la actualización diaria aún no validada. **API:** se amplía sonda optativa de cuerpo/aborto sobre bases E2E aisladas; la espera original sigue abierta. [Diagnóstico](diagnostico_api_20260910.md).
+
+D6.3–D6.6, D7/D8, importaciones personales, monitor y ensayo de 48 horas siguen pendientes. Proponerlos no autoriza ejecutarlos. Inicio `Abrir-ATLAS.cmd`, parada `Detener-ATLAS.cmd`.
+
+## Antecedente: diagnóstico, uso normal D5 y plan D6 · puntos 1–4
 
 **Último alcance autorizado:** diagnosticar la API, comprobar D5 en la instalación habitual con demostración, concretar D6 y preparar referencias independientes. El usuario limita expresamente a «hasta el 4 incluido»: **no implementar D6**. Trabajo local en `codex/v0.4-d6-plan`, desde `a93bf8d` de `master`, sin nueva CI remota, subida, PR, fusión o etiqueta. La aplicación sigue en D5 publicado `0.4.0-dev.4`.
 

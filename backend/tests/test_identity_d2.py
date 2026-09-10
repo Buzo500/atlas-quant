@@ -32,6 +32,9 @@ def legacy(path):
     snapshot = service.portfolio(dataset["id"])
     # Build the actual schema-1 layout, with a ledger keyed by dataset.
     with closing(sqlite3.connect(path)) as db, db:
+        from atlas_quant.valuation_store import DDL as VALUATION_DDL
+        for table in reversed(VALUATION_DDL):
+            db.execute(f'DROP TABLE {table}')
         from atlas_quant.corporate_store import DDL as CORPORATE_DDL
         for table in reversed(CORPORATE_DDL):
             db.execute(f"DROP TABLE {table}")

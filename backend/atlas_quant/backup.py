@@ -24,10 +24,11 @@ from .worker_lock import WorkerLock
 from .identity_store import DDL, validate_schema
 from .book_store import DDL as BOOK_DDL, validate_schema as validate_book_schema
 from .corporate_store import DDL as CORPORATE_DDL, validate_schema as validate_corporate_schema
+from .valuation_store import DDL as VALUATION_DDL, validate_schema as validate_valuation_schema
 
 
 FORMAT_VERSION = 1
-SCHEMA_VERSIONS = {0, 1, 2, 3, 4}
+SCHEMA_VERSIONS = {0, 1, 2, 3, 4, 5}
 DATABASE_NAME = "atlas.sqlite3"
 MANIFEST_NAME = "manifest.json"
 _SCHEMA = {
@@ -95,6 +96,8 @@ def _validate_database(path: Path) -> dict:
             tables = set(_SCHEMA) | (set(DDL) if version >= 2 else set()) | (set(BOOK_DDL) if version >= 3 else set())
             if version >= 4:
                 tables |= set(CORPORATE_DDL)
+            if version >= 5:
+                tables |= set(VALUATION_DDL)
             if set(objects) != {("table", name) for name in tables}:
                 raise BackupError("La base no tiene las tablas de ATLAS esperadas.")
             for table, expected in _SCHEMA.items():
@@ -122,6 +125,12 @@ def _validate_database(path: Path) -> dict:
                     for (payload,) in db.execute(f"SELECT body FROM {table}"):
                         _object(payload)
                     counts[table] = db.execute(f"SELECT COUNT(*) FROM {table}").fetchone()[0]
+            if version >= 5:
+                validate_valuation_schema(db)
+                for table in VALUATION_DDL:
+                    for (payload,) in db.execute(f'SELECT body FROM {table}'):
+                        _object(payload)
+                    counts[table] = db.execute(f'SELECT COUNT(*) FROM {table}').fetchone()[0]
             for table, column in (("records", "body"), ("versions", "body"), ("audit", "details")):
                 count = 0
                 for (payload,) in db.execute(f"SELECT {column} FROM {table}"):

@@ -1,6 +1,8 @@
 # ATLAS Quant · Operación en Windows
 
-Guía actualizada el 10 de septiembre de 2026. Código actual: **`0.4.0-dev.4`, D5 publicado y esquema SQLite 4**; [eventos, dividendos y splits](v0_4_d5.md), PR #7, etiqueta `v0.4.0-dev.4` y CI gratuita 34479828915 correcta. D4 anterior: `v0.4.0-dev.3`, PR #6 y CI gratuita 34456773938. El historial de pruebas y el estado exacto del proceso están en [CONTINUIDAD](CONTINUIDAD.md). **v0.2.0-rc.2 sigue siendo candidata, no estable**: el ensayo de 48 horas permanece aplazado.
+**Actualización local D6.1/D6.2:** `0.4.0-dev.5`, esquema 5; contratos EUR/USD por API, interfaz EUR actual conservada. [Uso y recuperación](v0_4_d6_implementacion.md), [estado de arranque](CONTINUIDAD.md). Antes de volver a D5, recuperar copia de esquema 4 con fuentes/build D5; no abrir la base nueva con código antiguo.
+
+Guía actualizada el 10 de septiembre de 2026. Última entrega publicada: **`0.4.0-dev.4`, D5 y esquema SQLite 4**; [eventos, dividendos y splits](v0_4_d5.md), PR #7, etiqueta `v0.4.0-dev.4` y CI gratuita 34479828915 correcta. D4 anterior: `v0.4.0-dev.3`, PR #6 y CI gratuita 34456773938. El historial de pruebas y el estado exacto del proceso están en [CONTINUIDAD](CONTINUIDAD.md). **v0.2.0-rc.2 sigue siendo candidata, no estable**: el ensayo de 48 horas permanece aplazado.
 
 El recorrido usa Windows nativo, motor Python e interfaz compilada; no requiere WSL, CUDA, claves ni presupuesto de pago. La ejecución es exclusivamente simulada. Consultar `Status-Atlas.ps1` para conocer el proceso actual; los ensayos E2E usan bases aisladas.
 

@@ -3,7 +3,7 @@ from .book import BookError, number, decimal_text, text_field, listing
 from .corporate import ratio
 
 
-def parse(raw, line, mapping, corporate, unaccredited, reviews):
+def parse(raw, line, mapping, corporate, unaccredited, reviews, *, multicurrency=False):
     kind, external = raw["kind"], raw["external_id"]
     ident = listing(raw["listing_ref"], mapping, line)
     reference = raw["corporate_event_ref"]
@@ -12,16 +12,19 @@ def parse(raw, line, mapping, corporate, unaccredited, reviews):
         raise BookError("corporate_event_unknown", "Mapea la referencia corporativa a un evento revisado.", line, "corporate_event_ref")
     if event and (event["listing_id"] != ident or event["event_type"] != ("dividend" if kind == "dividend_payment" else "split")):
         raise BookError("corporate_movement_mismatch", "Tipo o cotización incompatible con el evento.", line)
-    if raw["currency"] != "EUR":
+    currency = raw['currency']
+    if currency not in (('EUR', 'USD') if multicurrency else ('EUR',)):
         raise BookError("unsupported_currency", "D5 solo admite EUR.", line)
+    if event and event['currency'] != currency:
+        raise BookError('currency_mismatch', 'El pago/split debe conservar la moneda del evento.', line)
     forbidden = ["quantity", "unit_price", "fx_to_amount", "fx_to_currency"]
     result = dict(external_id=external, date=raw["date"], day_sequence=int(raw["day_sequence"]),
-                  kind=kind, listing_id=ident, currency="EUR", quantity=None, unit_price=None,
+                  kind=kind, listing_id=ident, currency=currency, quantity=None, unit_price=None,
                   gross_explanation=None, corporate_event_id=event["id"] if event else None)
     if kind == "dividend_payment":
         forbidden += ["ratio_numerator", "ratio_denominator"]
-        if raw["fee_currency"] != "EUR" or raw["tax_currency"] != "EUR":
-            raise BookError("unsupported_currency", "Comisión y retención deben declarar EUR.", line)
+        if raw["fee_currency"] != currency or raw["tax_currency"] != currency:
+            raise BookError("unsupported_currency", "Comisión y retención deben declarar la moneda del cobro.", line)
         gross = number(raw["gross_amount"], "gross_amount", 2, line, positive=True)
         fee = number(raw["fee_amount"], "fee_amount", 2, line)
         tax = number(raw["tax_amount"], "tax_amount", 2, line)

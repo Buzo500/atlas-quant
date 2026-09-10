@@ -1,6 +1,7 @@
 """Provider-contract tests use no network and do not require yfinance/pandas."""
 
 import threading
+import tempfile
 import unittest
 from datetime import date, datetime, timedelta, timezone
 from types import SimpleNamespace
@@ -25,6 +26,17 @@ class Frame:
 
 
 class FeedTests(unittest.TestCase):
+    def test_provider_cache_is_local_and_configured_before_first_ticker(self):
+        provider = SimpleNamespace(set_tz_cache_location=Mock())
+        with tempfile.TemporaryDirectory() as directory, patch.dict(feed.os.environ, {"ATLAS_DATA_DIR": directory}), patch.object(feed, "_PROVIDER_CACHE", None), patch.object(feed.importlib, "import_module", return_value=provider):
+            self.assertIs(feed._load_provider(), provider)
+            self.assertIs(feed._load_provider(), provider)
+            target = feed.Path(directory).resolve() / "cache" / "yfinance"
+            self.assertTrue(target.is_dir())
+            provider.set_tz_cache_location.assert_called_once_with(str(target))
+            with patch.dict(feed.os.environ, {"ATLAS_DATA_DIR": str(target / "other")}), self.assertRaisesRegex(feed.FeedError, "Reinicia"):
+                feed._load_provider()
+
     def setUp(self):
         self.today = patch.object(feed, "_today_utc", return_value=date(2026, 9, 5))
         self.today.start()

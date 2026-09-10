@@ -14,9 +14,10 @@ from .data import build_provenance_manifest
 from .identity_store import IdentityWork, migrate_v2, validate_schema
 from .book_store import BookWork, migrate_v3, validate_schema as validate_book_schema
 from .corporate_store import CorporateWork, migrate_v4, validate_schema as validate_corporate_schema
+from .valuation_store import migrate_v5, validate_schema as validate_valuation_schema
 from .worker_lock import WorkerLock
 
-SCHEMA_VERSION = 4
+SCHEMA_VERSION = 5
 
 
 def migrate(db):
@@ -57,6 +58,10 @@ def migrate(db):
         migrate_v4(db)
     else:
         validate_corporate_schema(db)
+    if version < 5:
+        migrate_v5(db)
+    else:
+        validate_valuation_schema(db)
 
 
 def now() -> str:

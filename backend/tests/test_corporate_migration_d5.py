@@ -3,9 +3,10 @@ from contextlib import closing
 import sqlite3
 import pytest
 
-from atlas_quant.store import Store
+from atlas_quant.store import Store, SCHEMA_VERSION
 from atlas_quant.backup import create_backup, restore_backup, validate_backup
 from atlas_quant.corporate_store import DDL
+from atlas_quant.valuation_store import DDL as VALUATION_DDL
 from atlas_quant.corporate_service import CorporateService
 from atlas_quant.worker_lock import WorkerLock
 from atlas_quant.service import Service
@@ -19,6 +20,8 @@ def schema3(path):
     dataset = Service(store).load_demo()
     expected = Service(store).portfolio(dataset['id'])
     with closing(sqlite3.connect(path)) as db, db:
+        for table in reversed(VALUATION_DDL):
+            db.execute(f'DROP TABLE {table}')
         for table in reversed(DDL):
             db.execute(f'DROP TABLE {table}')
         db.execute('PRAGMA user_version=3')
@@ -37,7 +40,7 @@ def test_schema3_migration_preserves_all_old_tables_and_values(tmp_path):
     Store(path)
     assert dump(path) == after
     with closing(sqlite3.connect(path)) as db:
-        assert db.execute('PRAGMA user_version').fetchone()[0] == 4
+        assert db.execute('PRAGMA user_version').fetchone()[0] == SCHEMA_VERSION
         assert db.execute('PRAGMA foreign_key_check').fetchall() == []
 
 
@@ -86,7 +89,7 @@ def test_backup_restore_keeps_events_rights_book_and_documents(setup, tmp_path):
     store = setup[0]
     before = dump(store.path)
     folder = create_backup(store.path, tmp_path / 'backups')
-    assert validate_backup(folder)['schema']['user_version'] == 4
+    assert validate_backup(folder)['schema']['user_version'] == SCHEMA_VERSION
     target = tmp_path / 'restored.sqlite3'
     restore_backup(folder, target, tmp_path / 'before', instance_lock=WorkerLock(str(target)+'.instance.lock'))
     restored = Store(target)

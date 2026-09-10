@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 from decimal import Decimal, localcontext
 import hmac
 
-from .book import BookError, balance, cutoff, parse_movements, resolve_mapping, text_field, decimal_text, bounded
+from .book import BookError, balance, cutoff, parse_movements, resolve_mapping, text_field, decimal_text, bounded, validate_currencies
 from .book_service import BookService, payload
 from .catalog import IdentityNotFound, RevisionConflict
 from .corporate import (parse_events, event_economics, event_for, application, link_movement,
@@ -16,21 +16,33 @@ def now():
 
 
 class CorporateService:
-    def __init__(self, store):
+    def __init__(self, store, *, multicurrency=False):
         self.store = store
+        self.multicurrency = multicurrency
+        self.books = BookService(store, multicurrency=multicurrency)
+
+    def _parse_events(self, body, catalog):
+        mapping = self.books._mapping(body.mapping, catalog)
+        parsed = parse_events(body.csv, mapping, body.verified, body.evidence, multicurrency=self.multicurrency)
+        validate_currencies(parsed, catalog)
+        return parsed
+
+    def _currency(self, event):
+        if not self.multicurrency and event['currency'] != 'EUR':
+            raise BookError('unsupported_currency', 'El evento USD requiere la API multidivisa /api/v2.')
 
     @staticmethod
     def _context(work):
         return dict(catalog=work.catalog(), corporate=work.corporate_state())
 
-    @staticmethod
-    def _catalog(context, offset=0, limit=100):
+    def _catalog(self, context, offset=0, limit=100):
         state = context["corporate"]
-        events = state["events"][offset:offset+limit]
+        all_events = [e for e in state['events'] if self.multicurrency or e['currency'] == 'EUR']
+        events = all_events[offset:offset+limit]
         ids = {e["id"] for e in events}
         return dict(revision=state["revision"], catalog_revision=context["catalog"]["revision"],
                     events=events, sources=[s for s in state["sources"] if s["event_id"] in ids],
-                    total=len(state["events"]), offset=offset, limit=limit)
+                    total=len(all_events), offset=offset, limit=limit)
 
     def catalog(self, offset=0, limit=100):
         return self._catalog(self.store.atomic(self._context), offset, limit)
@@ -39,6 +51,7 @@ class CorporateService:
         result = self.store.atomic(lambda w: w.corporate_version(ident, revision))
         if result is None:
             raise IdentityNotFound("Revisión del evento no encontrada.")
+        self._currency(result)
         return result
 
     @staticmethod
@@ -77,8 +90,7 @@ class CorporateService:
         if context["corporate"]["revision"] != body.expected_revision:
             raise RevisionConflict("El catálogo de eventos cambió.")
         source = text_field(body.source, "source")
-        mapping = resolve_mapping(body.mapping, context["catalog"])
-        parsed = parse_events(body.csv, mapping, body.verified, body.evidence)
+        parsed = self._parse_events(body, context['catalog'])
         events = {e["id"]: e for e in context["corporate"]["events"]}
         sources = {(s["source"], s["external_id"]): s for s in context["corporate"]["sources"]}
         added, aliases, duplicates, seen = [], [], 0, set()
@@ -130,6 +142,7 @@ class CorporateService:
         previous = next((e for e in state["events"] if e["id"] == body.event_id), None)
         if previous is None:
             raise IdentityNotFound("Evento no encontrado.")
+        self._currency(previous)
         if previous["revision"] != body.event_revision:
             raise RevisionConflict("La revisión del evento cambió.")
         reason = text_field(body.reason, "reason", limit=500)
@@ -140,7 +153,7 @@ class CorporateService:
                 raise BookError("corporate_already_cancelled", "El evento ya está cancelado.")
             value = {**previous, "cancelled": True}
         else:
-            parsed = parse_events(body.csv, resolve_mapping(body.mapping, context["catalog"]), body.verified, body.evidence)
+            parsed = self._parse_events(body, context['catalog'])
             if len(parsed) != 1 or parsed[0][2]["listing_id"] != previous["listing_id"] or parsed[0][2]["event_type"] != previous["event_type"]:
                 raise BookError("corporate_revision_target", "Una revisión conserva identidad, cotización y tipo; requiere una fila.")
             if not any(s["event_id"] == body.event_id and s["external_id"] == parsed[0][1] for s in state["sources"]):
@@ -175,16 +188,16 @@ class CorporateService:
         context["prices"] = prices
         return context
 
-    @staticmethod
-    def _portfolio(context, day, offset=0, limit=100):
+    def _portfolio(self, context, day, offset=0, limit=100):
         current = {e["id"]: e for e in context["corporate"]["events"]}
         entries = context["entries"]
         movements = {e["event"].get("external_key"): e for e in entries}
-        applications, linked, pending = [], set(), Decimal(0)
+        applications, linked, pending = [], set(), {'EUR': Decimal(0)}
         for app in context["applications"]:
             if app["effective_date"] > day:
                 continue
             event = app["event_snapshot"]
+            self._currency(event)
             valid = bool(current.get(app["event_id"], {}).get("revision") == app["event_revision"])
             warnings = []
             if not valid:
@@ -196,8 +209,8 @@ class CorporateService:
             receivable = Decimal(app["gross_amount"]) if app["event_type"] == "dividend" and not paid and not app["cancelled"] else Decimal(0)
             with localcontext() as ctx:
                 ctx.prec = 64
-                pending += receivable
-                bounded(pending, "pending_receivables")
+                pending[event['currency']] = pending.get(event['currency'], Decimal(0)) + receivable
+                bounded(pending[event['currency']], "pending_receivables")
             status = "cancelled" if app["cancelled"] else "outdated" if not valid else (
                 "applied" if app["event_type"] == "split" else "reconciled" if paid else "pending_payment")
             price_status = "not_applicable"
@@ -218,11 +231,16 @@ class CorporateService:
         warnings = ["Cobros sin derecho histórico acreditado: el tramo exfecha–pago no permite rentabilidad completa."] if unlinked else []
         if any(not a["current"] and not a["cancelled"] for a in applications):
             warnings.append("Hay aplicaciones desactualizadas que requieren revisión.")
-        return dict(portfolio_id=context["portfolio"]["id"], portfolio_revision=context["portfolio"]["revision"],
+        result = dict(portfolio_id=context["portfolio"]["id"], portfolio_revision=context["portfolio"]["revision"],
             corporate_revision=context["corporate"]["revision"], as_of_date=day,
             applications=applications[offset:offset+limit], total=len(applications), offset=offset, limit=limit,
-            balance=balance(entries, day, context["portfolio"]["accounting_policy"]),
-            pending_receivables=decimal_text(pending, money=True), unlinked_payments=unlinked, warnings=warnings)
+            balance=self.books._balance(entries, day, context["portfolio"]["accounting_policy"]),
+            unlinked_payments=unlinked, warnings=warnings)
+        if self.multicurrency:
+            result['pending_receivables_by_currency'] = [dict(currency=c, amount=decimal_text(v, money=True)) for c, v in sorted(pending.items())]
+        else:
+            result['pending_receivables'] = decimal_text(pending['EUR'], money=True)
+        return result
 
     def read(self, ident, day=None, revision=None, offset=0, limit=100):
         day = cutoff(day or datetime.now(timezone.utc).date().isoformat())
@@ -236,6 +254,8 @@ class CorporateService:
         BookService._source(context, body.source, body.source_account)
         apps = {a["event_id"]: a for a in context["applications"]}
         previous = apps.get(body.event_id)
+        if previous:
+            self._currency(previous['event_snapshot'])
         entries, added = list(context["entries"]), []
         day = datetime.now(timezone.utc).date().isoformat()
         if body.action == "cancel":
@@ -251,11 +271,13 @@ class CorporateService:
             if not body.review:
                 raise BookError("corporate_review_required", "Revisión de evidencia y secuencia requerida.")
             event = event_for(context["corporate"], body.event_id, body.review.event_revision)
+            self._currency(event)
             if body.csv and body.movement_id:
                 raise BookError("corporate_duplicate", "Elige crear un movimiento o enlazar uno existente, nunca ambos.")
             if body.csv:
                 parsed = parse_movements(body.csv, {"ASSET": event["listing_id"]}, day, {},
-                    corporate={"EVENT": event}, reviews={event["id"]: body.review.model_dump()})
+                    corporate={"EVENT": event}, reviews={event["id"]: body.review.model_dump()}, multicurrency=self.multicurrency)
+                validate_currencies(parsed, context['catalog'])
                 if len(parsed) != 1 or parsed[0][1].get("corporate_event_id") != event["id"]:
                     raise BookError("corporate_movement_mismatch", "Una fila de pago/split para ASSET y EVENT; el resto usa el importador del libro.")
                 added, _ = BookService.merge_entries(context, parsed, body.source, body.source_account)
@@ -280,7 +302,7 @@ class CorporateService:
                     raise BookError("corporate_split_movement", "El split requiere crear o enlazar su movimiento.")
         apps[body.event_id] = updated
         validate_dependencies(list(apps.values()), entries)
-        balance(entries, day)
+        self.books._balance(entries, day)
         next_revision = context["portfolio"]["revision"]+1
         updated["portfolio_revision"] = next_revision
         proposed = {**context, "entries": entries, "applications": list(apps.values()),
