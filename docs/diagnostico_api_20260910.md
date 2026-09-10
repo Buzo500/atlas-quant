@@ -1,5 +1,11 @@
 # Diagnóstico de API en D5/D6 · 10/09/2026
 
+## Actualización: espera original reproducida antes de ASGI
+
+Durante D6 completo, `e2e-6df81e53a5f148e1a1ba9a1f36166d5b` reproduce la espera de 10 s: GET `/api/state`, `proxy-38548-52`, 16:05:58 UTC. Creación/envío de cabeceras upstream inmediato, `bodySent` a 10008,9 ms y aborto del cliente a 10015 ms con `UND_ERR_SOCKET`. No existe entrada ASGI con esa correlación. Reutiliza el socket del POST demo anterior, terminado en ~98 ms. La evidencia acota el fallo al envío/transporte previo al motor; no identifica la causa exacta ni acredita una reparación.
+
+La siguiente suite `e2e-72c2b7425cbb4fa083222032ef47fa2a` pasa 19/19. Otro error de socket de ~5 s sigue asociado a cancelación anterior. La sonda optativa añade exclusivamente encuadre HTTP (content-length, transfer-encoding, connection, expect), cork y tamaño de cola: no cuerpos ni credenciales. No se modifican tiempos del producto ni dependencias. Incidencia abierta; una suite correcta no sustituye su diagnóstico.
+
 ## Ampliación posterior: consumo de cuerpo y aborto del cliente
 
 Autorizada dentro de las cinco tareas de D6.1/D6.2. Se instrumentan las lecturas existentes (`fromWeb`, lectores y Body mixin), sin `tee`, lectura anticipada, contenido ni nuevos reintentos. El stream que entrega vinext no conserva la identidad del objeto `body` obtenido por fetch; se correlaciona mediante el contexto de petición y se declara `upstream_body_identity=false`. Se mide la entrega de ese stream, no se presupone que sea el objeto original. El contexto se guarda en WeakMap para poder observar después de un aborto sin retener peticiones finalizadas.

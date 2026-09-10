@@ -3,11 +3,12 @@
 import { useState } from 'react';
 import type {
   CorporateApplicationInput,
-  CorporateApplicationPreview,
-  CorporateEvent,
+  NativeCorporateApplicationPreview as CorporateApplicationPreview,
+  NativeCorporateEvent as CorporateEvent,
+  NativeCorporatePortfolio,
   CorporatePortfolio,
   CorporateReview,
-  BookDetail,
+  NativeBookDetail as BookDetail,
   PortfolioRecord,
 } from '@/lib/api-types';
 import { useRead } from '@/shared/use-read';
@@ -36,7 +37,7 @@ export function CorporateApplicationForm({
 }: {
   portfolio: PortfolioRecord;
   event: CorporateEvent;
-  current?: CorporatePortfolio;
+  current?: CorporatePortfolio | NativeCorporatePortfolio;
   refresh: () => Promise<void>;
   onError: (v: string) => void;
 }) {
@@ -67,12 +68,12 @@ export function CorporateApplicationForm({
   const [reason, setReason] = useState('');
   const [entryOffset, setEntryOffset] = useState(0);
   const book = useRead<BookDetail>({
-    path: `/portfolios/${portfolio.id}/book?offset=${entryOffset}&limit=100`,
+    path: `/v2/portfolios/${portfolio.id}/book?offset=${entryOffset}&limit=100`,
     revision: portfolio.revision,
     enabled: mode === 'link',
   });
   const operation = useCorporateReview<CorporateApplicationPreview>(
-    `/portfolios/${portfolio.id}/corporate-actions`,
+    `/v2/portfolios/${portfolio.id}/corporate-actions`,
     refresh,
     onError,
   );
@@ -120,16 +121,16 @@ export function CorporateApplicationForm({
           event.event_type === 'split' ? sequence : movementSequence,
         kind: event.event_type === 'dividend' ? 'dividend_payment' : 'split',
         listing_ref: 'ASSET',
-        currency: 'EUR',
+        currency: event.currency,
         corporate_event_ref: 'EVENT',
       };
       if (event.event_type === 'dividend')
         Object.assign(values, {
           gross_amount: gross,
           fee_amount: fee,
-          fee_currency: 'EUR',
+          fee_currency: event.currency,
           tax_amount: tax,
-          tax_currency: 'EUR',
+          tax_currency: event.currency,
         });
       else
         Object.assign(values, {
@@ -160,7 +161,7 @@ export function CorporateApplicationForm({
       <h3>Aplicar a «{portfolio.name}»</h3>
       <p>
         {event.event_type === 'dividend'
-          ? `Dividendo de ${event.gross_per_unit} EUR por título · exfecha ${event.effective_date || 'pendiente'}`
+          ? `Dividendo de ${event.gross_per_unit} ${event.currency} por título · exfecha ${event.effective_date || 'pendiente'}`
           : `Split ${event.ratio_numerator}:${event.ratio_denominator} · fecha ${event.effective_date || 'pendiente'}`}{' '}
         · revisión {event.revision}
       </p>
@@ -315,9 +316,24 @@ export function CorporateApplicationForm({
                         true,
                         'number',
                       )}
-                      {input('Bruto del cobro EUR', gross, setGross, true)}
-                      {input('Retención del cobro EUR', tax, setTax, true)}
-                      {input('Comisión del cobro EUR', fee, setFee, true)}
+                      {input(
+                        `Bruto del cobro ${event.currency}`,
+                        gross,
+                        setGross,
+                        true,
+                      )}
+                      {input(
+                        `Retención del cobro ${event.currency}`,
+                        tax,
+                        setTax,
+                        true,
+                      )}
+                      {input(
+                        `Comisión del cobro ${event.currency}`,
+                        fee,
+                        setFee,
+                        true,
+                      )}
                     </>
                   )}
                 </div>
@@ -400,7 +416,7 @@ export function CorporateApplicationForm({
               heads={[
                 'Cotización',
                 'Cantidad resultante',
-                'Coste total conservado EUR',
+                `Coste total conservado ${event.currency}`,
               ]}
               numericColumns={[1, 2]}
               rows={operation.preview.balance.positions.map((p) => [

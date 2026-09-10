@@ -2,7 +2,19 @@
 
 Actualizado: 10 de septiembre de 2026. Este documento resume decisiones y estado para una conversación nueva de Codex; no contiene la transcripción completa del chat original.
 
-## Estado vigente: D6.1/D6.2 local y diagnósticos · cinco tareas
+## Trabajo en curso: diez tareas autorizadas · D6 completo, D7, D8 y alcance v0.5
+
+El usuario ha autorizado «Vale, haz las 10», referidas a las dos listas consecutivas: [registro y orden de las diez tareas](ejecucion_diez_tareas_v0_4.md). Mantener este trabajo activo hasta completarlo; proponer siguientes pasos no sustituye esta autorización. Ensayo de 48 horas, movimientos personales, bróker, entrenamiento y servicios pagados siguen excluidos. No implementar v0.5: solo concretar su primer alcance.
+
+Punto 1 completado: rama `codex/v0.4-d6` subida, PR #8 abierta y CI gratuita [34496563421](https://github.com/Buzo500/atlas-quant/actions/runs/34496563421) correcta sobre `5650c46` (9m01s). Actions comprobado a 0 USD y Stop usage Yes, cuota incluida 183,3/2.000 minutos antes del lanzamiento. PR abierta para recibir el resto de D6; todavía sin fusionar ni etiquetar.
+
+D6 completo implementado y revisado localmente, pendiente de CI final/publicación en PR #8. [Uso y evidencia](v0_4_d6_cierre.md). **677 Python + 91 subcasos, 270 frontend**, tipos/lint/contratos y build con manifiesto correctos. Suite completa 19/19 E2E; regresión final D6 1/1 en `e2e-cedb38e141874ac192eff98cd1e4c1c3`, base habitual intacta, integridad ok y puertos liberados. Benchmark de 100.000 barras/10.000 movimientos: máximo 0,729 s, pico Python 143,26 MiB, controles de servicios p95 0,0649 s y recuperación exacta. Instantáneas SQLite de solo lectura evitan mantener el bloqueo escritor durante lectura pesada; publicación comprueba revisiones. D7/D8 aún pendientes y siguen autorizados.
+
+Diagnóstico API: el primer E2E `e2e-6df81e53a5f148e1a1ba9a1f36166d5b` reprodujo la espera real de 10 s en GET `/api/state`. Correlación `proxy-38548-52`: creación/envío de cabeceras upstream inmediato, `bodySent` a 10008,9 ms, aborto cliente a 10015 ms, `UND_ERR_SOCKET`; no entrada ASGI para esa correlación. Ocurre al reutilizar la conexión después de POST demo completado. Esto acota el fallo al envío/transporte previo al backend, **no identifica aún la causa ni la declara resuelta**. La siguiente suite pasó; otro error de socket a ~5 s está asociado a cancelación previa. Sonda ampliada con cabeceras de encuadre exclusivamente (sin credenciales/cuerpo), cork y cola del socket.
+
+Yahoo: una única sonda posterior con bundle de certificados públicos de certifi y almacenes Windows autorizados para SERVER_AUTH supera TLS y devuelve HTTP 429. No desactivar verificación ni insistir ante el límite; todavía no hay descarga real validada ni modificación de cotizaciones habituales. Bundle diagnóstico en output ignorado. ATLAS habitual permanece detenido desde el inicio de estas diez tareas. Copia previa esquema 5: `backups/atlas-20260910T152641167910Z-d35a888b`.
+
+## Antecedente: D6.1/D6.2 local y diagnósticos · cinco tareas
 
 **Autorización posterior:** «a por las 5 tareas más»: diagnosticar Yahoo, dirigir la captura API al cuerpo/cancelación, publicar el plan anterior, implementar D6.1 y D6.2. Plan documental `8f33625` publicado mediante avance directo de `master`; el workflow no se activa por push ordinario y no se ha lanzado CI remota. Desarrollo local en `codex/v0.4-d6`, **`0.4.0-dev.5`, esquema 5**, sin publicación del código ni etiqueta nuevas. [Contratos, uso y límites de esta implementación](v0_4_d6_implementacion.md).
 

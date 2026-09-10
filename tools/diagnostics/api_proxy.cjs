@@ -138,10 +138,17 @@ for (const event of ['create', 'bodySent', 'headers', 'trailers', 'error']) {
       status: response?.statusCode, code: error?.code });
   });
 }
-dc.channel('undici:client:sendHeaders').subscribe(({ request, socket }) => {
+dc.channel('undici:client:sendHeaders').subscribe(({ request, socket, headers }) => {
   if (String(request.origin) !== 'http://127.0.0.1:8000') return;
   const { start, ...fields } = requests.get(request) || {};
-  emit('upstream_send', { ...fields, port: socket.localPort,
+  const framing = {};
+  for (const line of String(headers || '').split('\r\n')) {
+    const index = line.indexOf(':');
+    const key = line.slice(0, index).toLowerCase();
+    if (['content-length', 'transfer-encoding', 'connection', 'expect'].includes(key)) framing[key] = line.slice(index + 1).trim();
+  }
+  emit('upstream_send', { ...fields, port: socket.localPort, framing,
+    corked: socket.writableCorked, queued_bytes: socket.writableLength, needs_drain: socket.writableNeedDrain,
     ms: start === undefined ? null : performance.now() - start });
 });
 let previous = performance.now();

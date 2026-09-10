@@ -14,7 +14,7 @@ from .data import build_provenance_manifest
 from .identity_store import IdentityWork, migrate_v2, validate_schema
 from .book_store import BookWork, migrate_v3, validate_schema as validate_book_schema
 from .corporate_store import CorporateWork, migrate_v4, validate_schema as validate_corporate_schema
-from .valuation_store import migrate_v5, validate_schema as validate_valuation_schema
+from .valuation_store import ValuationWork, migrate_v5, validate_schema as validate_valuation_schema
 from .worker_lock import WorkerLock
 
 SCHEMA_VERSION = 5
@@ -72,7 +72,7 @@ def encode(value):
     return json.dumps(value, ensure_ascii=False, allow_nan=False, separators=(",", ":"))
 
 
-class UnitOfWork(IdentityWork, BookWork, CorporateWork):
+class UnitOfWork(IdentityWork, BookWork, CorporateWork, ValuationWork):
     """Record operations sharing one short SQLite transaction.
 
     Callbacks must be synchronous and must not open another Store transaction,
@@ -120,6 +120,8 @@ class UnitOfWork(IdentityWork, BookWork, CorporateWork):
         value = dict(value)
         value.setdefault("id", uuid.uuid4().hex)
         ident = value["id"]
+        if self.get('native_price', ident) is not None:
+            raise ValueError('La serie nativa conserva su identidad; usa su importador versionado de precios.')
         current = self.get("dataset", ident)
         if prepare is not None:
             prepared = prepare(deepcopy(current), value)
@@ -197,6 +199,20 @@ class Store:
         """Commit a domain operation and its audit together, or roll back both."""
         with self.transaction() as db:
             return callback(UnitOfWork(db))
+
+    def read(self, callback):
+        """One WAL snapshot without occupying the application's writer lock.
+
+        The connection is read-only at SQLite's boundary. Callbacks are still
+        synchronous; publication rechecks immutable revision references in atomic().
+        """
+        db = sqlite3.connect(self.path.resolve().as_uri() + '?mode=ro', uri=True, timeout=10)
+        try:
+            db.execute('PRAGMA query_only=ON')
+            db.execute('BEGIN')
+            return callback(UnitOfWork(db))
+        finally:
+            db.close()
 
     def put(self, kind, value, event=None):
         return self.atomic(lambda work: work.put(kind, value, event))

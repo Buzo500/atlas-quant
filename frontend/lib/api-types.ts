@@ -506,6 +506,21 @@ export type DatasetResponse = {
   "warnings"?: (Array<string>) | (null);
 };
 
+export type EvidenceInput = {
+  "symbol": string;
+  "calendar_name"?: string;
+  "market"?: string;
+  "timezone"?: string;
+  "calendar_source"?: string;
+  "calendar_verified"?: boolean;
+  "calendar_csv"?: string;
+  "price_basis"?: "raw" | "split_adjusted" | "total_return" | "unknown";
+  "basis_verified"?: boolean;
+  "basis_source"?: string;
+  "availability_csv"?: string;
+  "availability_source"?: string;
+};
+
 export type EvidencePreview = {
   "dataset_id": string;
   "version": number;
@@ -591,6 +606,16 @@ export type ExternalCode = {
   "verified"?: boolean;
 };
 
+export type ExternalFlow = {
+  "event_id": string;
+  "date": string;
+  "currency": "EUR" | "USD";
+  "native_amount": string;
+  "eur_amount": (string) | (null);
+  "status": "complete" | "provisional" | "incomplete";
+  "fx": (Mark) | (null);
+};
+
 export type FeedInput = {
   "symbol": string;
   "start": string;
@@ -603,6 +628,30 @@ export type FeedResponse = {
   "last_attempt": string;
   "error": (string) | (null);
   "interval_hours": number;
+};
+
+export type FxBinding = {
+  "portfolio_id": string;
+  "portfolio_revision": number;
+  "series_id": (string) | (null);
+  "series_version": (number) | (null);
+};
+
+export type FxBindingInput = {
+  "expected_revision": number;
+  "series_id": string;
+  "series_version": number;
+  "commit"?: boolean;
+  "preview_token"?: (string) | (null);
+};
+
+export type FxBindingPreview = {
+  "portfolio_id": string;
+  "portfolio_revision": number;
+  "series_id": (string) | (null);
+  "series_version": (number) | (null);
+  "committed": boolean;
+  "preview_token": string;
 };
 
 export type Gate = {
@@ -765,6 +814,91 @@ export type Manifest = {
   "price_basis": string;
   "calendar": string;
   "warnings": Array<string>;
+};
+
+export type Mark = {
+  "status": "complete" | "provisional" | "incomplete";
+  "value": (string) | (null);
+  "series_id": (string) | (null);
+  "version": (number) | (null);
+  "sha256": (string) | (null);
+  "source": (string) | (null);
+  "date": (string) | (null);
+  "age_days": (number) | (null);
+  "available_at": (string) | (null);
+  "historical_known": boolean;
+  "reasons": Array<string>;
+  "historical_reasons": Array<string>;
+};
+
+export type MarketCatalog = {
+  "series": Array<MarketSeries>;
+};
+
+export type MarketDetail = {
+  "series": MarketSeries;
+  "evidence": {
+  [key: string]: JsonValue;
+};
+  "observations": Array<MarketObservation>;
+  "offset": number;
+  "limit": number;
+  "total": number;
+};
+
+export type MarketImport = {
+  "name": string;
+  "source": string;
+  "series_id"?: (string) | (null);
+  "expected_version"?: number;
+  "listing_id"?: (string) | (null);
+  "listing_ref"?: string;
+  "csv": string;
+  "evidence"?: (EvidenceInput) | (null);
+  "revise_history"?: boolean;
+  "reason"?: string;
+  "commit"?: boolean;
+  "preview_token"?: (string) | (null);
+};
+
+export type MarketObservation = {
+  "date": string;
+  "available_at": (string) | (null);
+  "open"?: (string) | (null);
+  "high"?: (string) | (null);
+  "low"?: (string) | (null);
+  "close"?: (string) | (null);
+  "volume"?: (string) | (null);
+  "rate"?: (string) | (null);
+};
+
+export type MarketPreview = {
+  "series": MarketSeries;
+  "added": number;
+  "changed": number;
+  "affected_portfolios": Array<string>;
+  "committed": boolean;
+  "preview_token": string;
+};
+
+export type MarketSeries = {
+  "id": string;
+  "kind": "prices" | "fx";
+  "name": string;
+  "source": string;
+  "version": number;
+  "listing_id": (string) | (null);
+  "symbol": string;
+  "currency": "EUR" | "USD";
+  "format_id": "atlas-prices-v2" | "atlas-fx-v1";
+  "sha256": string;
+  "date_min": string;
+  "date_max": string;
+  "row_count": number;
+  "received_at": string;
+  "price_basis": string;
+  "basis_verified": boolean;
+  "calendar_verified": boolean;
 };
 
 export type Metrics = {
@@ -1477,4 +1611,74 @@ export type ValidationError = {
   [key: string]: unknown;
 };
   [key: string]: unknown;
+};
+
+export type ValuationComponent = {
+  "kind": "cash" | "position" | "receivable";
+  "reference": string;
+  "currency": "EUR" | "USD";
+  "quantity": (string) | (null);
+  "native_value": (string) | (null);
+  "eur_value": (string) | (null);
+  "display_eur": (string) | (null);
+  "status": "complete" | "provisional" | "incomplete";
+  "price": (Mark) | (null);
+  "fx": (Mark) | (null);
+  "reasons": Array<string>;
+};
+
+export type ValuationCut = {
+  "id": string;
+  "portfolio_id": string;
+  "portfolio_revision": number;
+  "catalog_revision": number;
+  "corporate_revision": number;
+  "context_hash": string;
+  "policy": "atlas-nav-v1";
+  "mode": "reconstruction_at_close";
+  "as_of_date": string;
+  "decision_at": string;
+  "created_at": string;
+  "current": boolean;
+  "saved": boolean;
+  "status": "complete" | "provisional" | "incomplete";
+  "value": (string) | (null);
+  "exact_value": (string) | (null);
+  "known_subtotal": string;
+  "rounding_difference": string;
+  "balance": NativeBalance;
+  "components": Array<ValuationComponent>;
+  "flows": Array<ExternalFlow>;
+  "reasons": Array<string>;
+  "historical_known": boolean;
+  "historical_reasons": Array<string>;
+};
+
+export type ValuationHistory = {
+  "cuts": Array<ValuationSummary>;
+  "offset": number;
+  "limit": number;
+};
+
+export type ValuationInput = {
+  "as_of_date": string;
+  "decision_at"?: (string) | (null);
+  "expected_revision": number;
+  "commit"?: boolean;
+  "preview_token"?: (string) | (null);
+};
+
+export type ValuationPreview = {
+  "cut": ValuationCut;
+  "preview_token": string;
+  "committed": boolean;
+};
+
+export type ValuationSummary = {
+  "id": string;
+  "as_of_date": string;
+  "created_at": string;
+  "portfolio_revision": number;
+  "status": "complete" | "provisional" | "incomplete";
+  "value": (string) | (null);
 };

@@ -1,5 +1,7 @@
 # D6.1 y D6.2 · contratos y libro EUR/USD
 
+**Actualización posterior:** las diez tareas autorizadas amplían este trabajo a D6 completo. Este documento conserva la evidencia inicial D6.1/D6.2; consultar [D6.3–D6.6, uso y cierre](v0_4_d6_cierre.md) y [continuidad](CONTINUIDAD.md) para el estado vigente.
+
 10/09/2026. Desarrollo local `codex/v0.4-d6`, **`0.4.0-dev.5`, esquema 5**. El usuario autoriza las cinco tareas posteriores al plan: diagnóstico de Yahoo, sonda dirigida de API, publicar la documentación anterior e implementar D6.1 y D6.2. El plan anterior se publicó en `master` mediante `8f33625`; este código no está publicado ni ha pasado una nueva CI remota.
 
 ## Disponible y pendiente

@@ -36,7 +36,7 @@ class PortfolioService:
         return self.store.atomic(save)
 
     @staticmethod
-    def _context(work, ident, revision=None, bindings=None):
+    def _context(work, ident, revision=None, bindings=None, *, include_entries=True):
         try:
             portfolio = work.portfolio_record(ident, revision)
         except KeyError as exc:
@@ -67,7 +67,10 @@ class PortfolioService:
                 raise ValueError("El símbolo no pertenece a esa versión de precios.")
             if any(bar.get("currency", "EUR") != listings[listing_id]["currency"] for bar in bars):
                 raise ValueError("La moneda de los precios no coincide con la cotización.")
-        return dict(portfolio=portfolio, catalog=catalog, entries=work.portfolio_events(portfolio),
+            identity = datasets[key].get('listing_id')
+            if identity is not None and identity != listing_id:
+                raise ValueError('La serie nativa pertenece a otra cotización; no se puede cambiar su identidad mediante un vínculo.')
+        return dict(portfolio=portfolio, catalog=catalog, entries=work.portfolio_events(portfolio) if include_entries else [],
                     bindings=selected, datasets=list(datasets.values()))
 
     @staticmethod

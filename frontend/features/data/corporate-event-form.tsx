@@ -3,9 +3,9 @@
 import { useState } from 'react';
 import type {
   CatalogResponse,
-  CorporateCatalog,
-  CorporateEvent,
-  CorporatePreview,
+  NativeCorporateCatalog as CorporateCatalog,
+  NativeCorporateEvent as CorporateEvent,
+  NativeCorporatePreview as CorporatePreview,
   CorporateInput,
   CorporateRevisionInput,
 } from '@/lib/api-types';
@@ -48,8 +48,8 @@ export function CorporateEventForm({
   const [distinct, setDistinct] = useState<MappingRow[]>([]);
   const operation = useCorporateReview<CorporatePreview>(
     mode === 'import'
-      ? '/corporate-events/imports'
-      : '/corporate-events/revisions',
+      ? '/v2/corporate-events/imports'
+      : '/v2/corporate-events/revisions',
     refresh,
     onError,
   );
@@ -57,12 +57,10 @@ export function CorporateEventForm({
     operation.invalidate();
     set(value);
   };
-  const options = catalog.listings
-    .filter((l) => l.currency === 'EUR')
-    .map((l) => ({
-      value: l.id,
-      label: `${catalog.instruments.find((i) => i.id === l.instrument_id)?.name || l.id.slice(0, 8)} · ${l.market || 'Local'} · ${l.id.slice(0, 8)}`,
-    }));
+  const options = catalog.listings.map((l) => ({
+    value: l.id,
+    label: `${catalog.instruments.find((i) => i.id === l.instrument_id)?.name || l.id.slice(0, 8)} · ${l.market || 'Local'} · ${l.currency} · ${l.id.slice(0, 8)}`,
+  }));
   function submit() {
     try {
       let body: CorporateInput | CorporateRevisionInput;

@@ -148,9 +148,10 @@ class FeedTests(unittest.TestCase):
         ticker.history.return_value = Frame([("2026-09-04", row())])
         ticker.get_history_metadata.return_value = self.metadata
         provider = SimpleNamespace(Ticker=Mock(return_value=ticker), __version__="test")
-        with patch.object(feed, "_load_provider", return_value=provider):
+        session = object()
+        with patch.object(feed, "_load_provider", return_value=provider), patch.object(feed, '_provider_session', return_value=session):
             frame, metadata, version = feed._call_provider("EXAMPLE.DE", "2026-09-01", "2026-09-05")
-        provider.Ticker.assert_called_once_with("EXAMPLE.DE")
+        provider.Ticker.assert_called_once_with("EXAMPLE.DE", session=session)
         kwargs = ticker.history.call_args.kwargs
         self.assertEqual(kwargs["interval"], "1d")
         self.assertEqual(kwargs["timeout"], 10)

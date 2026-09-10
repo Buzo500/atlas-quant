@@ -38,6 +38,8 @@ class DatasetService:
     def dataset(self, ident):
         value = self.store.get("dataset", ident)
         if value is None:
+            if self.store.get('native_price', ident):
+                raise ValueError('Esta serie nativa se consulta en Datos y valora carteras. Investigación y paper aún requieren un conjunto EUR compatible.')
             raise ValueError("Conjunto de datos no encontrado.")
         return value
 
@@ -46,6 +48,8 @@ class DatasetService:
         snapshot = self.store.get_dataset_version(ident, version)
         if snapshot is None:
             raise PricesNotFound("Conjunto o versión de datos no encontrado.")
+        if snapshot.get('format_id') == 'atlas-prices-v2':
+            raise ValueError('Precios nativos: usa la consulta de series /api/v2/market/prices; el contrato EUR anterior se conserva.')
         return project_prices(snapshot, symbol, start, end)
 
     def _prepare(self, current, incoming):

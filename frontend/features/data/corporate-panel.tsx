@@ -3,9 +3,10 @@
 import { useState } from 'react';
 import type {
   CatalogResponse,
-  CorporateCatalog,
+  NativeCorporateCatalog as CorporateCatalog,
+  NativeCorporatePortfolio,
   CorporatePortfolio,
-  CorporateEvent,
+  NativeCorporateEvent as CorporateEvent,
   CorporateDocuments,
   CorporateDocument,
   PortfolioRecord,
@@ -30,8 +31,8 @@ export function CorporateSummary({
   active: boolean;
 }) {
   const [offset, setOffset] = useState(0);
-  const query = useRead<CorporatePortfolio>({
-    path: `/portfolios/${portfolioId}/corporate-actions?offset=${offset}`,
+  const query = useRead<CorporatePortfolio | NativeCorporatePortfolio>({
+    path: `/v2/portfolios/${portfolioId}/corporate-actions?offset=${offset}`,
     revision,
     enabled: active,
   });
@@ -74,14 +75,14 @@ export function CorporatePanel({
   const [cut, setCut] = useState('');
   const [appOffset, setAppOffset] = useState(0);
   const events = useRead<CorporateCatalog>({
-    path: `/corporate-events?offset=${offset}`,
+    path: `/v2/corporate-events?offset=${offset}`,
     revision,
     enabled: active,
   });
   const native = portfolio?.accounting_policy === 'atlas-accounting-v2';
-  const applications = useRead<CorporatePortfolio>({
+  const applications = useRead<CorporatePortfolio | NativeCorporatePortfolio>({
     path: portfolio
-      ? `/portfolios/${portfolio.id}/corporate-actions?offset=${appOffset}${cut ? `&as_of_date=${cut}` : ''}`
+      ? `/v2/portfolios/${portfolio.id}/corporate-actions?offset=${appOffset}${cut ? `&as_of_date=${cut}` : ''}`
       : null,
     revision: `${revision ?? ''}:${portfolio?.revision ?? ''}`,
     enabled: active && native,
@@ -103,7 +104,7 @@ export function CorporatePanel({
     <section className="panel corporate-panel" aria-label="Dividendos y splits">
       <div className="panel-heading">
         <h2>Dividendos y splits</h2>
-        <span className="tag neutral">EUR · eventos revisionados</span>
+        <span className="tag neutral">EUR / USD · eventos revisionados</span>
       </div>
       <p className="muted">
         Contrasta la fuente del evento y revisa su efecto en cada cartera. Un
@@ -129,7 +130,7 @@ export function CorporatePanel({
                 .join(' / '),
               event.payment_date || '—',
               event.gross_per_unit
-                ? `${event.gross_per_unit} EUR/título`
+                ? `${event.gross_per_unit} ${event.currency}/título`
                 : `${event.ratio_numerator}:${event.ratio_denominator}`,
               event.cancelled
                 ? 'Cancelado'
@@ -247,7 +248,7 @@ function EventEvidence({ event }: { event: CorporateEvent }) {
   const [draft, setDraft] = useState(String(event.revision));
   const [version, setVersion] = useState(event.revision);
   const query = useRead<CorporateEvent>({
-    path: `/corporate-events/${event.id}/versions/${version}`,
+    path: `/v2/corporate-events/${event.id}/versions/${version}`,
   });
   const value = query.data || event;
   return (

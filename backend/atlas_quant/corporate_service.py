@@ -180,7 +180,7 @@ class CorporateService:
         prices = []
         for binding in context["portfolio"]["bindings"]:
             data = work.dataset_version(binding["dataset_id"], binding["dataset_version"])
-            current = work.get("dataset", binding["dataset_id"])
+            current = work.get("dataset", binding["dataset_id"]) or work.get('native_price', binding['dataset_id'])
             if data:
                 prices.append(dict(binding=binding, current_version=current["version"] if current else None,
                     evidence=data.get("quality_evidence", {}).get(binding["symbol"], {}),

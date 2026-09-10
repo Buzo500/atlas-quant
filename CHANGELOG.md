@@ -1,11 +1,13 @@
 # Cambios de ATLAS Quant
 
-## 0.4.0-dev.5 · D6.1/D6.2 · Desarrollo local · 2026-09-10
+## 0.4.0-dev.5 · D6 completo · En revisión · 2026-09-10
 
 - Esquema 5 aditivo, API versionada para saldos y documentos EUR/USD; compatibilidad EUR conservada.
-- Conversiones con importes reales/comisión, conciliación por moneda, correcciones atómicas y dividendos/splits USD. Sin NAV ni nueva interfaz multidivisa.
+- Conversiones con importes reales/comisión, conciliación por moneda, correcciones atómicas y dividendos/splits USD.
+- CSV de precios EUR/USD y FX versionados, evidencia/calendarios explícitos, vínculos y cortes de patrimonio EUR inmutables. Formularios multidivisa y detalle de procedencia.
+- Lecturas SQLite coherentes de solo lectura y verificación breve antes de publicar; rendimiento y recuperación dentro del objetivo D6. [Uso y evidencia](docs/v0_4_d6_cierre.md).
 - Caché Yahoo dentro de los datos ATLAS; diagnóstico TLS/429 y latencia API todavía abiertos.
-- Pruebas, migración/recuperación y límites en [D6.1/D6.2](docs/v0_4_d6_implementacion.md). Sin nueva publicación ni CI remota.
+- CI inicial de D6.1/D6.2 correcta; PR #8 recibe D6 completo y requiere CI del head definitivo. TWR/MWR nativos y D8 continúan después.
 
 ## v0.4.0-dev.4 · D5 · Publicado · 2026-09-10
 

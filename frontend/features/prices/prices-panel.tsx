@@ -191,7 +191,9 @@ export function PricesPanel({
 export function PriceExplorer({
   response,
 }: {
-  response: DatasetPricesResponse;
+  response: Omit<DatasetPricesResponse, 'currency'> & {
+    currency: 'EUR' | 'USD';
+  };
 }) {
   const loadedStart = response.first_date ?? response.available_start;
   const loadedEnd = response.last_date ?? response.available_end;

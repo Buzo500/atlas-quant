@@ -21,3 +21,5 @@ Antes de continuar una tarea sobre este proyecto, lee `docs/CONTINUIDAD.md` y `R
 - `frontend/.openai/hosting.json` es necesario para importar la configuración local; conservarlo. `pdf-mobile/` es una publicación y repositorio independientes, excluidos del repositorio principal.
 - Distinguir pruebas históricas en el portátil de validaciones realizadas en el equipo actual. No declarar una migración validada solo porque la instalación original funcionó.
 - Al cambiar de equipo, actualizar la documentación de continuidad con el estado relevante del proyecto; no asumir que otra conversación tiene este historial.
+
+- Diez tareas posteriores autorizadas: terminar/publicar D6 tras CI gratuita, concretar e implementar D7, cerrar D8 y definir primer alcance v0.5 (sin implementarlo). Registro `docs/ejecucion_diez_tareas_v0_4.md`. D6 completo local `0.4.0-dev.5`, esquema 5, PR #8: leer `docs/v0_4_d6_cierre.md` y continuidad. Incluye UI EUR/USD, CSV nativo/FX y NAV; estado anterior D6.1/D6.2 es antecedente. Instantánea de solo lectura + comprobación de revisiones antes de guardar. Mantener ensayo, datos personales y gasto aplazados.
