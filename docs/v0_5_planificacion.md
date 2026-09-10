@@ -1,6 +1,6 @@
 # v0.5 · Planificación, comparación y escenarios
 
-10/09/2026. Implementación autorizada por «Vale, pues a por las 10». Esta ampliación reemplaza el límite de la primera entrega que aplazaba propuestas y agregación. Conserva el monolito, los cortes D6, TWR D7, los objetivos versionados y esquema 5. Identificación prevista: `0.5.0-dev.2`; no declara v0.5 completa ni v0.2 estable.
+10/09/2026. Implementación autorizada por «Vale, pues a por las 10». Esta ampliación reemplaza el límite de la primera entrega que aplazaba propuestas y agregación. Conserva el monolito, los cortes D6, TWR D7, los objetivos versionados y esquema 5. Publicada como `v0.5.0-dev.2` en PR #11; no declara v0.5 completa ni v0.2 estable.
 
 ## Trabajo y estado
 
@@ -13,7 +13,7 @@
 7. Agregación de objetivos de varias estrategias: implementada y probada.
 8. Comparador de referencia: implementado y probado.
 9. Escenarios de precios y divisa: implementados y probados.
-10. Pruebas integradas, recuperación y carga correctas; CI gratuita 34525527095 aprobada. Fusión/publicación preparadas en PR #11; ver cierre en continuidad.
+10. Pruebas integradas, recuperación y carga correctas; CI gratuita 34525527095 aprobada. PR #11 fusionada en `bde915b` y etiqueta `v0.5.0-dev.2` publicada; instalación habitual arrancada y verificada.
 
 Copia anterior al bloque: `backups/atlas-20260910T191907486422Z-568bddf8`. ATLAS detenido antes de modificar fuentes. Movimientos personales y ensayo de 48 horas siguen aplazados.
 
@@ -65,6 +65,8 @@ Revisión final: el ajuste inicial de lotes asumía coste lineal; al redondear c
 [34525527095](https://github.com/Buzo500/atlas-quant/actions/runs/34525527095), revisión exacta `e6f462568ee02614e756809e7fa2971fdfeb1caf`, **correcta**: instalación limpia en Windows, 783 Python + 91 subcasos, 287 frontend, ocho Node, contratos/tipos/lint/build y 19/19 E2E en 4,0 min. Recorrido ampliado 38,5 s, sin reintentos; límites individuales intactos. E2E remoto `e2e-3bdfd91935c747618d3a7379ff4d394d`, integridad/base ordinaria/limpieza correctas. Arranque, recorrido sintético a través del proxy y parada correctos; gasto IA cero. El registro documental posterior solo cambia Markdown, no las fuentes validadas.
 
 Coste comprobado al terminar: **0 USD facturables**, 310/2.000 minutos incluidos y 0/0,5 GB. Consumo bruto 1,86 USD cubierto íntegramente por descuento; presupuesto Actions 0 USD con bloqueo conservado. No se activa CI automática al publicar esta etiqueta de desarrollo.
+
+**Publicación y operación:** PR #11 fusionada en `bde915bb775572eaaf18b2ef360df6dc8023ab39`, árbol idéntico al de `d139701` (solo Markdown posterior a CI). Etiqueta anotada `v0.5.0-dev.2`, objeto remoto `28e29be0dc86ae68022532534a292dfbc2f27042`, apunta a ese squash. Carpeta habitual en `master`, manifiesto regenerado con el constructor canónico. Run final `1288342934d740faa0bf40e892c8fa64`: interfaz/motor conectados, esquema 5 e integridad correctos, tres carteras/libros/respuestas EUR intactos y solo las dos nuevas versiones Yahoo ya descritas. Parada previa cooperativa, ambos procesos código 0, sin forzar. Parada global activa, gasto/reserva cero y sin análisis ficticios añadidos. Evidencia final `output/validation/v05-expanded-yahoo-ordinary.json`. Inicio `Abrir-ATLAS.cmd`; parada `Detener-ATLAS.cmd`. Este registro se publica como documentación posterior a la etiqueta, sin cambios de código.
 
 ## Qué falta para cerrar toda v0.5
 

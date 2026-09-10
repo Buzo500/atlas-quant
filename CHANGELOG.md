@@ -1,6 +1,8 @@
 # Cambios de ATLAS Quant
 
-## v0.5.0-dev.2 · En validación · 2026-09-10
+## v0.5.0-dev.2 · Publicado · 2026-09-10
+
+[PR #11](https://github.com/Buzo500/atlas-quant/pull/11) fusionada mediante squash `bde915bb775572eaaf18b2ef360df6dc8023ab39`; etiqueta anotada `v0.5.0-dev.2` verificada en remoto. [CI gratuita 34525527095](https://github.com/Buzo500/atlas-quant/actions/runs/34525527095) correcta sobre `e6f462568ee02614e756809e7fa2971fdfeb1caf`: 783 Python + 91 subcasos, 287 frontend, ocho Node, 19 E2E y arranque/parada. Fuentes integradas iguales a las validadas; cierre documental posterior. 0 USD facturables.
 
 - Simulador de aportaciones y rebalanceo: lotes, comisiones, prioridad determinista, caja EUR/USD separada, remanentes y límites posteriores. Sin órdenes ni escrituras contables.
 - Objetivos combinados por presupuestos de estrategias manuales, sin doble asignación ni relajación de los límites globales.
