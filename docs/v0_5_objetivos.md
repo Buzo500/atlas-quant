@@ -37,3 +37,9 @@ API bajo `/api/v2/portfolios/{id}`: `targets` (historial y borrador), `targets/a
 - Recorrido de navegador EUR/USD desde CSV hasta informe por fechas, objetivos y recuperación del diagnóstico, con capturas 390/1280/3440. 19/19 recorridos completos; editor y diagnóstico revisados en los tres anchos. Ocho pruebas Node de transporte y 40 respuestas reales de Uvicorn de 2,1 MB. El cierre remoto se registra en continuidad; no equivale a aceptación física nueva de la escala de Windows.
 
 Yahoo devolvió 429 en la comprobación del 10/09 a las 18:01:53 UTC con TLS verificado. La actualización real sigue condicionada al proveedor. Ensayo de 48 horas, movimientos personales, bróker y presupuesto pagado siguen aplazados.
+
+## Cierre remoto y operación
+
+[PR #10](https://github.com/Buzo500/atlas-quant/pull/10) lista para revisión. [CI gratuita 34517010948](https://github.com/Buzo500/atlas-quant/actions/runs/34517010948) correcta sobre `1992eb5442dbed8e1abb33846901271114884e91`, con los mismos recuentos locales y 19 E2E en 3,2 min. Instalación, arranque/proxy y parada correctos; 0 USD facturables. Documentación de cierre posterior sin cambios de código; sin fusión ni etiqueta nueva.
+
+ATLAS habitual arrancado en Windows con esta entrega. Tres carteras, libros e históricos iguales a la copia previa; esquema 5/integridad correctos, parada global activa y gasto cero. No se han añadido operaciones, objetivos o fuentes ficticias a las carteras habituales. Para iniciar, `Abrir-ATLAS.cmd`; para detener, `Detener-ATLAS.cmd`.

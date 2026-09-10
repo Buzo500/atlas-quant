@@ -1,6 +1,6 @@
 # ATLAS Quant · Hoja de ruta
 
-Actualizado: 10 de septiembre de 2026. **La secuencia de versiones se conserva.** La [arquitectura objetivo](arquitectura_objetivo.md) concreta recorridos, módulos y condiciones de promoción/recuperación. Monolito modular. D1–D8 integrados como desarrollo: D6 publicado en `v0.4.0-dev.5`; D7/D8 en `v0.4.0-dev.6` (PR #9, CI gratuita 34509155203 correcta). El [primer alcance v0.5](v0_5_alcance_inicial.md) está autorizado e implementado en `0.5.0-dev.1`, pendiente del cierre de revisión/CI.
+Actualizado: 10 de septiembre de 2026. **La secuencia de versiones se conserva.** La [arquitectura objetivo](arquitectura_objetivo.md) concreta recorridos, módulos y condiciones de promoción/recuperación. Monolito modular. D1–D8 integrados como desarrollo: D6 publicado en `v0.4.0-dev.5`; D7/D8 en `v0.4.0-dev.6` (PR #9, CI gratuita 34509155203 correcta). El [primer alcance v0.5](v0_5_alcance_inicial.md) está autorizado e implementado en `0.5.0-dev.1`, con CI gratuita correcta y PR #10 lista para revisión; sin fusión ni etiqueta nueva.
 
 ## Estado vigente
 
