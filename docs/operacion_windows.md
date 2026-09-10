@@ -1,8 +1,10 @@
 # ATLAS Quant · Operación en Windows
 
-Guía actualizada el 10 de septiembre de 2026. Entrega publicada: **`v0.4.0-dev.3`, D4 y esquema SQLite 3**, PR #6 fusionada y CI gratuita 34456773938 correcta. [Libro exacto y conciliación](v0_4_d4.md). D5 está especificado, sin implementar. El historial de pruebas y el estado exacto del proceso están en [CONTINUIDAD](CONTINUIDAD.md). **v0.2.0-rc.2 sigue siendo candidata, no estable**: el ensayo de 48 horas permanece aplazado.
+Guía actualizada el 10 de septiembre de 2026. Código actual: **`0.4.0-dev.4`, D5 y esquema SQLite 4**; [eventos, dividendos y splits](v0_4_d5.md). D4 anterior: `v0.4.0-dev.3`, PR #6 y CI gratuita 34456773938. El historial de pruebas y el estado exacto del proceso están en [CONTINUIDAD](CONTINUIDAD.md). **v0.2.0-rc.2 sigue siendo candidata, no estable**: el ensayo de 48 horas permanece aplazado.
 
 El recorrido usa Windows nativo, motor Python e interfaz compilada; no requiere WSL, CUDA, claves ni presupuesto de pago. La ejecución es exclusivamente simulada. Consultar `Status-Atlas.ps1` para conocer el proceso actual; los ensayos E2E usan bases aisladas.
+
+D5 añade «Dividendos y splits» y derechos separados del efectivo. Antes del primer arranque D5, conservar la copia de esquema 3 `backups/atlas-20260910T091254560815Z-782be607`. D4 no abre esquema 4: volver requiere esa copia y fuentes/build D4; `tools/check_d5_migration.py` verifica migración/recuperación sobre copias aisladas.
 
 D4 añade «Libro y conciliación» en Datos. Para CSV v2 se crea una cartera con «Libro exacto»; las carteras anteriores conservan CSV v1 y sus gráficos. Revisar extractos no registra ajustes. Antes de migrar se conserva la copia de esquema 2 `backups/atlas-20260909T162440667503Z-1d55fabf`. D3 no abre esquema 3: para retroceder, detener ATLAS, restaurar esa copia y recuperar fuentes/build D3. Los datos posteriores al backup no se incorporan al retroceso.
 

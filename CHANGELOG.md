@@ -1,5 +1,14 @@
 # Cambios de ATLAS Quant
 
+## v0.4.0-dev.4 · D5 · 2026-09-10
+
+- Eventos corporativos EUR con identidad compartida, fuentes explícitas, propuestas, revisiones y cancelaciones inmutables.
+- Derechos de dividendo separados del efectivo; elegibilidad acreditada a exfecha, bruto/retención/comisión explícitos, enlace de cobro existente sin doble abono y un pago completo por derecho.
+- Splits y reverse splits exactos, coste total conservado y validación de operaciones posteriores. Fracciones solo acreditadas y representables con hasta 12 decimales. Compatibilidad de precios separada del efecto contable; no habilita investigación global.
+- Previsualización y confirmación atómicas con auditoría, revisión conjunta de dependencias, historial/cortes y evidencia JSON. Formularios en Datos, derechos en Cartera y CSV propios sin nuevas dependencias.
+- Migración aditiva 3→4 y recuperación aislada; carteras/políticas antiguas intactas. D6–D8, movimientos personales y ensayo sostenido pendientes. [Contrato, límites y pruebas](docs/v0_4_d5.md); [cierre local/remoto](docs/CONTINUIDAD.md).
+
+
 ## v0.4.0-dev.3 · D4 · Publicado · 2026-09-10
 
 [PR #6](https://github.com/Buzo500/atlas-quant/pull/6) fusionada mediante squash en `39d922cf63a95c4f39fbe8f35e88047d86d2807f`; etiqueta anotada verificada en remoto. [CI 34456773938](https://github.com/Buzo500/atlas-quant/actions/runs/34456773938) correcta al primer intento sobre `aa7ad176b5d851ca093f05689386e2942d2bc935`, árbol integrado idéntico: 570 Python + 91 subtests, 255 frontend y 14 E2E. Instalación, build, contratos, tipos, lint, arranque/proxy y parada correctos. La especificación posterior de D5 no forma parte del código de esta etiqueta.

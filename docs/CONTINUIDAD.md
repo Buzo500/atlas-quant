@@ -2,7 +2,23 @@
 
 Actualizado: 10 de septiembre de 2026. Este documento resume decisiones y estado para una conversación nueva de Codex; no contiene la transcripción completa del chat original.
 
-## Estado vigente: D4 publicado y D5 especificado
+## Estado vigente: D5 implementado · cierre de validación
+
+El usuario acepta los cinco pasos D5.1–D5.5 y sus límites: contratos/eventos, dividendos, splits, interfaz/correcciones y validación/publicación de desarrollo tras CI gratuita. Rama `codex/v0.4-d5`, versión **`0.4.0-dev.4`**, esquema **4**; parte de D4 publicado y del plan documental `e59caf4`. [Uso, contratos físicos y límites](v0_4_d5.md). D6–D8 no iniciados.
+
+Implementados eventos revisionados compartidos, derechos/cobros EUR separados, enlace sin doble abono, splits/reverse splits exactos y correcciones dependientes con confirmación atómica. El libro anterior `legacy-eur-v1` se conserva. Libro v2 sin NAV/TWR/XIRR todavía; EUR operativo, USD solo en catálogo. Conciliar una cartera no cambia restricciones de calidad globales. Sin evidencia inventada para NVIDIA, importación personal, nuevas claves o llamadas de pago.
+
+**Pruebas locales del sobremesa:** 623 Python + 91 subtests (60,29 s, dos avisos previos), 263 frontend/27 archivos (21,55 s), contratos, tipos, lint, dependencias y compilación con manifiesto correctos. **17/17 E2E completos** en 1,1 min (`e2e-57ae1577e6074637b345f34f04aed1c1`); tras ampliar al ancho completo los paneles contables, **4/4 recorridos afectados** repetidos en 20,4 s. Viewports CSS 3440/1280/390, integridad `ok`, base habitual intacta y procesos cerrados. Revisión visual de los paneles realizada. Publicación remota pendiente en este registro. Evidencia `output/validation/d5-python-full.log`, `d5-frontend-full.log`, `d5-build-final.log`, `d5-e2e-release.log`, `d5-e2e-layout.log`.
+
+**Migración/recuperación:** copia pre-D5 `backups/atlas-20260910T091254560815Z-782be607`, esquema 3. `check_d5_migration.py` valida sobre copias aisladas: historial, ambas carteras, libros, vínculos y valoraciones conservados, cinco tablas nuevas vacías, reapertura idempotente e integridad `ok`. Informe `var/validation/d5-migration-61460f9c6c17493386af3c95f3e54bff/report.json`. Restaurar pausa las fuentes y activa la parada; no borra sus datos. La base habitual no se ha migrado ni se han usado movimientos personales como fixtures. No abrir esquema 4 con D4; recuperar copia y fuentes/build `v0.4.0-dev.3`.
+
+**Operación:** ATLAS estaba detenido antes de editar. Los ensayos usan una base nueva aislada y paran sus procesos al acabar. El arranque ordinario realizará la migración ya comprobada en copia; abrir con `Abrir-ATLAS.cmd`, parar con `Detener-ATLAS.cmd`. El ensayo de 48 horas y su monitor siguen aplazados; no se declara v0.2 ni v0.4 estable.
+
+**Intentos conservados:** dos E2E D5 iniciales correctos (`e2e-a138cc4a4cf3440d80df9d3d648122aa`). La primera suite conjunta conservó 14 recorridos previos correctos y falló en un supuesto del nuevo fixture: exigía un único conjunto tras las pruebas D2/D3. Se corrigió el fixture. El siguiente intento (`e2e-e4e76e996cb546dbad55b4c692b04707`) mostró el rechazo HTTP 409 correcto de la confirmación concurrente, pero el observador del test capturaba antes el 200 de previsualización; ahora identifica `commit=true`. En ese intento reapareció la espera intermitente de API: cuerpo de creación de cartera demoró ~9,9 s y la lectura de precios devolvió 502. Sigue abierta; no se ampliaron tiempos ni añadieron reintentos. El intento conjunto `e2e-acc5bc1b360e47dea360bed1510139c6` identificó otra carrera del fixture: leía el catálogo antes de terminar la confirmación; ahora espera su fila visible. Los tres recorridos D5 pasaron después (`e2e-39b01442214546edbff4408b47c2fb01`) antes de repetir la suite completa. No se atribuye a D5 una corrección de la incidencia de API ni una validación física nueva de escalado.
+
+GitHub comprobado antes de preparar CI: 120/2.000 minutos, 0/0,5 GB, 0 USD facturables; presupuesto Actions 0 USD y Stop usage Yes. Cierre remoto pendiente en este punto del registro.
+
+## Antecedente: D4 publicado y D5 especificado
 
 El usuario autorizó los cinco pasos: revisar D4, subirlo/abrir PR, ejecutar CI gratuita, fusionar/etiquetar si pasa y concretar D5. **Completados**. [PR #6](https://github.com/Buzo500/atlas-quant/pull/6) fusionada mediante squash `39d922cf63a95c4f39fbe8f35e88047d86d2807f`; [etiqueta anotada `v0.4.0-dev.3`](https://github.com/Buzo500/atlas-quant/tree/v0.4.0-dev.3) verificada en remoto (objeto `98c362a171c273099fbdd5961b9908e22159bbae`). Árbol idéntico al head validado `aa7ad176b5d851ca093f05689386e2942d2bc935`. Revisión técnica sin bloqueantes identificados; no se atribuye al usuario una prueba manual nueva.
 

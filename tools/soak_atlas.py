@@ -158,6 +158,9 @@ def database_snapshot(path, *, full_integrity=False, audit_prefix_count=None):
         if schema >= 3:
             from atlas_quant.book_store import DDL as BOOK_DDL
             identities.update({table: db.execute(f"SELECT * FROM {table} ORDER BY rowid").fetchall() for table in BOOK_DDL})
+        if schema >= 4:
+            from atlas_quant.corporate_store import DDL as CORPORATE_DDL
+            identities.update({table: db.execute(f"SELECT * FROM {table} ORDER BY rowid").fetchall() for table in CORPORATE_DDL})
     issues = []
     stable = []
     experiments, datasets = {}, []

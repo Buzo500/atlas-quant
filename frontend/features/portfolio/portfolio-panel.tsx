@@ -18,6 +18,7 @@ import { Wallet } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { qualityLabel } from '@/shared/quality';
 import { BookSummary } from '@/features/data/book-panel';
+import { CorporateSummary } from '@/features/data/corporate-panel';
 
 export function PortfolioPanel({
   dataset,
@@ -79,11 +80,19 @@ export function PortfolioPanel({
       )}
       {detail?.portfolio.accounting_policy === 'atlas-accounting-v2' &&
         portfolioId && (
-          <BookSummary
-            portfolioId={portfolioId}
-            revision={portfolioRevision}
-            active={active}
-          />
+          <>
+            <BookSummary
+              portfolioId={portfolioId}
+              revision={portfolioRevision}
+              active={active}
+            />
+            <CorporateSummary
+              key={portfolioId}
+              portfolioId={portfolioId}
+              revision={portfolioRevision}
+              active={active}
+            />
+          </>
         )}
       {detail?.status === 'unavailable' &&
         detail.portfolio.accounting_policy !== 'atlas-accounting-v2' && (

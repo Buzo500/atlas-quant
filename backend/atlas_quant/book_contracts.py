@@ -21,6 +21,18 @@ class ReviewInput(BaseModel):
     limit: int = Field(default=100, ge=1, le=500)
 
 
+class CorporateReview(BaseModel):
+    model_config = ConfigDict(extra="forbid", strict=True)
+    event_revision: int = Field(ge=1)
+    day_sequence: int = Field(ge=1, le=999_999_999)
+    evidence: Note
+    eligible_quantity: str | None = Field(default=None, max_length=64)
+    discrepancy_reason: str = Field(default="", max_length=500)
+    gross_amount: str | None = Field(default=None, max_length=64)
+    gross_explanation: str = Field(default="", max_length=500)
+    fraction_evidence: str = Field(default="", max_length=500)
+
+
 class ImportInput(ReviewInput):
     format_id: Literal["atlas-ledger-v2"]
     source: Text
@@ -29,6 +41,9 @@ class ImportInput(ReviewInput):
     csv: str = Field(min_length=1, max_length=8_000_000)
     mapping: dict[Text, Text] = Field(default_factory=dict, max_length=100)
     gross_explanations: dict[Text, Note] = Field(default_factory=dict, max_length=10_000)
+    corporate_mapping: dict[Text, Text] = Field(default_factory=dict, max_length=100)
+    corporate_reviews: dict[Text, CorporateReview] = Field(default_factory=dict, max_length=100)
+    unaccredited_payments: dict[Text, Note] = Field(default_factory=dict, max_length=10_000)
 
 
 class ReconciliationInput(ReviewInput):
@@ -48,6 +63,9 @@ class CorrectionInput(ReviewInput):
     csv: str = Field(default="", max_length=8_000_000)
     mapping: dict[Text, Text] = Field(default_factory=dict, max_length=100)
     gross_explanations: dict[Text, Note] = Field(default_factory=dict, max_length=10_000)
+    corporate_mapping: dict[Text, Text] = Field(default_factory=dict, max_length=100)
+    corporate_reviews: dict[Text, CorporateReview] = Field(default_factory=dict, max_length=100)
+    unaccredited_payments: dict[Text, Note] = Field(default_factory=dict, max_length=10_000)
 
 
 class BookPosition(ResponseModel):
