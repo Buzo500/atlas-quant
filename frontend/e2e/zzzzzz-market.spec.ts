@@ -5,6 +5,7 @@ import type {
   PortfolioRecord,
   MarketCatalog,
   ValuationHistory,
+  PerformanceHistory,
 } from '../lib/api-types';
 
 const headers = { 'X-Atlas-Client': 'local-v1' };
@@ -221,7 +222,9 @@ test('D6: CSV USD y FX, vínculo explícito y patrimonio completo en tres anchos
     valuation.getByText('986.10 EUR', { exact: true }).first(),
   ).toBeVisible();
   await expect(
-    page.getByRole('tabpanel', {name:'Cartera', exact:true}).getByText('Efectivo: 598.00 USD', { exact: true }),
+    page
+      .getByRole('tabpanel', { name: 'Cartera', exact: true })
+      .getByText('Efectivo: 598.00 USD', { exact: true }),
   ).toBeVisible();
   for (const width of [3440, 1280, 390]) {
     await page.setViewportSize({ width, height: 1000 });
@@ -250,4 +253,66 @@ test('D6: CSV USD y FX, vínculo explícito y patrimonio completo en tres anchos
         ).cuts.length,
     )
     .toBe(1);
+  const performance = page.getByRole('region', {
+    name: 'Rentabilidad por periodo',
+    exact: true,
+  });
+  await performance
+    .getByLabel('Cierre inicial del periodo', { exact: true })
+    .fill('2026-01-05');
+  await performance
+    .getByLabel('Cierre final del periodo', { exact: true })
+    .fill('2026-01-06');
+  await performance
+    .getByRole('button', { name: 'Calcular rentabilidad', exact: true })
+    .click();
+  await expect(performance.getByText('87,90 €', { exact: true })).toBeVisible();
+  await expect(
+    performance.getByText(/La tasa queda fuera del dominio/),
+  ).toBeVisible();
+  for (const width of [3440, 1280, 390]) {
+    await page.setViewportSize({ width, height: 1000 });
+    await performance.scrollIntoViewIfNeeded();
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+    ).toBe(true);
+    await page.screenshot({
+      path: info.outputPath(`d7-performance-${width}.png`),
+      fullPage: true,
+    });
+  }
+  await performance
+    .getByRole('button', {
+      name: 'Guardar informe de rentabilidad',
+      exact: true,
+    })
+    .click();
+  await expect
+    .poll(
+      async () =>
+        (
+          await readApi<PerformanceHistory>(
+            page,
+            `/api/v2/portfolios/${portfolio.id}/performance`,
+          )
+        ).reports.length,
+    )
+    .toBe(1);
+  await page.reload();
+  await performance
+    .getByText('Informes de rentabilidad guardados', { exact: true })
+    .click();
+  await performance
+    .getByRole('button', {
+      name: 'Consultar informe 2026-01-05 a 2026-01-06',
+      exact: true,
+    })
+    .click();
+  await expect(
+    performance
+      .getByRole('region', { name: 'Detalle de rentabilidad', exact: true })
+      .getByText('87,90 €', { exact: true }),
+  ).toBeVisible();
 });

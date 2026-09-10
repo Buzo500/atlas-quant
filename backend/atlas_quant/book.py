@@ -235,79 +235,106 @@ def balance(entries, as_of_date, policy=POLICY, *, multicurrency=False):
     currencies |= {e['event']['fx_to_currency'] for e in entries if e['date'] <= as_of_date and e['event']['kind'] == 'fx_exchange'}
     if not currencies <= {'EUR', 'USD'} or (not multicurrency and currencies != {'EUR'}):
         raise BookError('unsupported_currency', 'Este corte requiere la API multidivisa /api/v2; no se convierte ni omite USD.')
-    amounts = {c: [ZERO, ZERO, ZERO] for c in currencies}
-    positions, sequences = {}, set()
-    with localcontext() as context:
-        context.prec, context.rounding = 64, ROUND_HALF_EVEN
-        for item in sorted(entries, key=lambda e: (e["date"], e["day_sequence"])):
-            event = item["event"]
-            key = item["date"], item["day_sequence"]
-            if key in sequences:
-                raise BookError("event_order_ambiguous", "Dos movimientos efectivos ocupan la misma fecha y secuencia.", event.get("source_row"), "day_sequence")
-            sequences.add(key)
-            if item["date"] > as_of_date:
-                continue
-            gross, fee = Decimal(event["gross_amount"] or "0"), Decimal(event["fee_amount"] or "0")
-            kind, ident = event["kind"], item["listing_id"]
-            currency = event['currency']
-            cash, contributions, realized = amounts[currency]
-            if kind == "deposit":
-                cash += gross - fee
-                contributions += gross
-            elif kind == "withdrawal":
-                cash -= gross + fee
-                contributions -= gross
-            elif kind == "fee":
-                cash -= gross
-            elif kind == "dividend_payment":
-                cash += gross - fee - Decimal(event["tax_amount"])
-            elif kind == "split":
-                from .corporate import split_quantity
-                position = positions.setdefault(ident, [ZERO, ZERO, currency])
-                if position[2] != currency:
-                    raise BookError('currency_mismatch', 'La posición cambia de moneda.')
-                if position[0] <= 0:
-                    raise BookError("corporate_position_empty", "El split requiere una posición anterior positiva.")
-                position[0] = split_quantity(position[0], event["ratio_numerator"], event["ratio_denominator"], event["fraction_evidence"])
-            elif kind in {"buy", "sell"}:
-                quantity = Decimal(event["quantity"])
-                position = positions.setdefault(ident, [ZERO, ZERO, currency])
-                if position[2] != currency:
-                    raise BookError('currency_mismatch', 'La posición cambia de moneda.')
-                if kind == "buy":
-                    cash -= gross + fee
-                    position[0] += quantity
-                    position[1] += gross + fee
-                else:
-                    if quantity > position[0]:
-                        raise BookError("short_position", "La venta excede la posición disponible.", event.get("source_row"), "quantity")
-                    assigned = position[1] if quantity == position[0] else (position[1] * quantity / position[0]).quantize(SCALE)
-                    position[0] -= quantity
-                    position[1] -= assigned
-                    cash += gross - fee
-                    realized += gross - fee - assigned
-                bounded(position[0], "quantity")
-                bounded(position[1], "cost_basis")
-            elif kind == 'fx_exchange':
-                cash -= gross
-                amounts[event['fx_to_currency']][0] += Decimal(event['fx_to_amount'])
-                if event['fee_currency'] == currency:
-                    cash -= fee
-                else:
-                    amounts[event['fee_currency']][0] -= fee
-            else:
-                raise BookError("unsupported_kind", "Movimiento nativo no soportado.")
-            amounts[currency] = [cash, contributions, realized]
-            for code, values in amounts.items():
-                if values[0] < 0:
-                    raise BookError('insufficient_cash', f'Efectivo insuficiente en {code} después del movimiento.', event.get('source_row'), 'gross_amount')
-                for name, value in zip(('cash', 'net_contributions', 'realized_pnl'), values):
-                    bounded(value, name, event.get('source_row'))
-    result = dict(as_of_date=as_of_date, balances=[dict(currency=c, cash=decimal_text(v[0], money=True),
-                  net_contributions=decimal_text(v[1], money=True), realized_pnl=decimal_text(v[2])) for c, v in sorted(amounts.items())],
-                  positions=[dict(listing_id=k, currency=v[2], quantity=decimal_text(v[0]), cost_basis=decimal_text(v[1]))
-                             for k, v in sorted(positions.items()) if v[0]], warnings=[])
+    cursor = NativeBook()
+    sequences = set()
+    for item in sorted(entries, key=lambda e: (e['date'], e['day_sequence'])):
+        key = item['date'], item['day_sequence']
+        if key in sequences:
+            raise BookError('event_order_ambiguous', 'Dos movimientos efectivos ocupan la misma fecha y secuencia.', item['event'].get('source_row'), 'day_sequence')
+        sequences.add(key)
+        if item['date'] <= as_of_date:
+            cursor.apply(item)
+    result = cursor.snapshot(as_of_date)
     return result if multicurrency else eur_from_multi(result)
+
+
+class NativeBook:
+    """The same exact reducer for a single cut or an ordered series of cuts."""
+    def __init__(self):
+        self.amounts = {'EUR': [ZERO, ZERO, ZERO]}
+        self.positions = {}
+        self.last_key = None
+
+    def apply(self, item):
+        key = item['date'], item['day_sequence']
+        if self.last_key is not None and key <= self.last_key:
+            raise BookError('event_order_ambiguous', 'El libro incremental requiere orden cronológico estricto.')
+        event = item['event']
+        for currency in (event['currency'], event.get('fx_to_currency')):
+            if currency:
+                if currency not in ('EUR', 'USD'):
+                    raise BookError('unsupported_currency', 'Moneda no soportada.')
+                self.amounts.setdefault(currency, [ZERO, ZERO, ZERO])
+        with localcontext() as context:
+            context.prec, context.rounding = 64, ROUND_HALF_EVEN
+            self._apply(item)
+        self.last_key = key
+
+    def _apply(self, item):
+        event = item['event']
+        gross, fee = Decimal(event["gross_amount"] or "0"), Decimal(event["fee_amount"] or "0")
+        kind, ident = event["kind"], item["listing_id"]
+        currency = event['currency']
+        cash, contributions, realized = self.amounts[currency]
+        if kind == "deposit":
+            cash += gross - fee
+            contributions += gross
+        elif kind == "withdrawal":
+            cash -= gross + fee
+            contributions -= gross
+        elif kind == "fee":
+            cash -= gross
+        elif kind == "dividend_payment":
+            cash += gross - fee - Decimal(event["tax_amount"])
+        elif kind == "split":
+            from .corporate import split_quantity
+            position = self.positions.setdefault(ident, [ZERO, ZERO, currency])
+            if position[2] != currency:
+                raise BookError('currency_mismatch', 'La posición cambia de moneda.')
+            if position[0] <= 0:
+                raise BookError("corporate_position_empty", "El split requiere una posición anterior positiva.")
+            position[0] = split_quantity(position[0], event["ratio_numerator"], event["ratio_denominator"], event["fraction_evidence"])
+        elif kind in {"buy", "sell"}:
+            quantity = Decimal(event["quantity"])
+            position = self.positions.setdefault(ident, [ZERO, ZERO, currency])
+            if position[2] != currency:
+                raise BookError('currency_mismatch', 'La posición cambia de moneda.')
+            if kind == "buy":
+                cash -= gross + fee
+                position[0] += quantity
+                position[1] += gross + fee
+            else:
+                if quantity > position[0]:
+                    raise BookError("short_position", "La venta excede la posición disponible.", event.get("source_row"), "quantity")
+                assigned = position[1] if quantity == position[0] else (position[1] * quantity / position[0]).quantize(SCALE)
+                position[0] -= quantity
+                position[1] -= assigned
+                cash += gross - fee
+                realized += gross - fee - assigned
+            bounded(position[0], "quantity")
+            bounded(position[1], "cost_basis")
+        elif kind == 'fx_exchange':
+            cash -= gross
+            self.amounts[event['fx_to_currency']][0] += Decimal(event['fx_to_amount'])
+            if event['fee_currency'] == currency:
+                cash -= fee
+            else:
+                self.amounts[event['fee_currency']][0] -= fee
+        else:
+            raise BookError("unsupported_kind", "Movimiento nativo no soportado.")
+        self.amounts[currency] = [cash, contributions, realized]
+        for code, values in self.amounts.items():
+            if values[0] < 0:
+                raise BookError('insufficient_cash', f'Efectivo insuficiente en {code} después del movimiento.', event.get('source_row'), 'gross_amount')
+            for name, value in zip(('cash', 'net_contributions', 'realized_pnl'), values):
+                bounded(value, name, event.get('source_row'))
+
+    def snapshot(self, as_of_date):
+        result = dict(as_of_date=as_of_date, balances=[dict(currency=c, cash=decimal_text(v[0], money=True),
+                      net_contributions=decimal_text(v[1], money=True), realized_pnl=decimal_text(v[2])) for c, v in sorted(self.amounts.items())],
+                      positions=[dict(listing_id=k, currency=v[2], quantity=decimal_text(v[0]), cost_basis=decimal_text(v[1]))
+                                 for k, v in sorted(self.positions.items()) if v[0]], warnings=[])
+        return result
 
 
 def multi_from_eur(value):

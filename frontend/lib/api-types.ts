@@ -444,6 +444,17 @@ export type CorrectionInput = {
 };
 };
 
+export type CostItem = {
+  "event_id": string;
+  "date": string;
+  "kind": "fee" | "tax" | "charge";
+  "currency": "EUR" | "USD";
+  "native_amount": string;
+  "eur_amount": (string) | (null);
+  "status": "complete" | "provisional" | "incomplete";
+  "fx": (Mark) | (null);
+};
+
 export type Costs = {
   "initial_cash"?: number;
   "commission_bps"?: number;
@@ -914,6 +925,20 @@ export type Metrics = {
   "observations": number;
 };
 
+export type MoneyWeighted = {
+  "value": (string) | (null);
+  "status": "complete" | "provisional" | "incomplete" | "unavailable";
+  "reasons": Array<string>;
+  "convention": "actual-days/365";
+  "domain": Array<string>;
+  "iterations": number;
+  "bracket_width": (string) | (null);
+  "normalized_residual": (string) | (null);
+  "rate_tolerance": string;
+  "residual_tolerance": string;
+  "max_iterations": number;
+};
+
 export type NativeBalance = {
   "as_of_date": string;
   "balances": Array<NativeCash>;
@@ -1195,6 +1220,92 @@ export type PaperPoint = {
   "enabled": boolean;
 };
 
+export type PerformanceHistory = {
+  "reports": Array<PerformanceSummary>;
+  "offset": number;
+  "limit": number;
+};
+
+export type PerformanceInput = {
+  "start_date": string;
+  "end_date": string;
+  "expected_revision": number;
+  "commit"?: boolean;
+  "preview_token"?: (string) | (null);
+};
+
+export type PerformanceMetric = {
+  "value": (string) | (null);
+  "status": "complete" | "provisional" | "incomplete" | "unavailable";
+  "reasons": Array<string>;
+};
+
+export type PerformancePoint = {
+  "date": string;
+  "nav": (string) | (null);
+  "nav_exact": (string) | (null);
+  "flow_eur": (string) | (null);
+  "status": "complete" | "provisional" | "incomplete";
+  "twr_factor": (string) | (null);
+  "historical_known": boolean;
+  "reasons": Array<string>;
+};
+
+export type PerformancePreview = {
+  "report": PerformanceReport;
+  "committed": boolean;
+  "preview_token": string;
+};
+
+export type PerformanceReport = {
+  "id": string;
+  "portfolio_id": string;
+  "portfolio_revision": number;
+  "context_hash": string;
+  "created_at": string;
+  "current": boolean;
+  "saved": boolean;
+  "policy": "atlas-performance-v1";
+  "start_date": string;
+  "end_date": string;
+  "initial_nav": (string) | (null);
+  "final_nav": (string) | (null);
+  "external_net": PerformanceMetric;
+  "pnl": PnlMetric;
+  "twr": TimeWeighted;
+  "mwr": MoneyWeighted;
+  "costs": Array<CostItem>;
+  "costs_eur": PerformanceMetric;
+  "flows": Array<ExternalFlow>;
+  "points": Array<PerformancePoint>;
+  "unlinked_payments": Array<string>;
+  "historical_known": boolean;
+  "source_context": PerformanceSources;
+};
+
+export type PerformanceSources = {
+  "portfolio_id": string;
+  "portfolio_revision": number;
+  "catalog_revision": number;
+  "corporate_revision": number;
+  "bindings": Array<PriceBinding>;
+  "fx_binding": (FxBinding) | (null);
+  "price_heads": Array<PriceHead>;
+  "fx_head": (number) | (null);
+};
+
+export type PerformanceSummary = {
+  "id": string;
+  "portfolio_id": string;
+  "portfolio_revision": number;
+  "start_date": string;
+  "end_date": string;
+  "created_at": string;
+  "pnl": PnlMetric;
+  "twr": PerformanceMetric;
+  "mwr": PerformanceMetric;
+};
+
 export type Period = {
   "start": string;
   "end": string;
@@ -1206,6 +1317,13 @@ export type Plan = {
   "candidates": Array<Strategy>;
   "risks": Array<string>;
   "horizon_hours"?: (number) | (null);
+};
+
+export type PnlMetric = {
+  "value": (string) | (null);
+  "status": "complete" | "provisional" | "incomplete" | "unavailable";
+  "reasons": Array<string>;
+  "display_value": (string) | (null);
 };
 
 export type Policy = {
@@ -1323,6 +1441,11 @@ export type PriceBinding = {
   "dataset_id": string;
   "dataset_version": number;
   "symbol": string;
+};
+
+export type PriceHead = {
+  "series_id": string;
+  "version": (number) | (null);
 };
 
 export type PricesInput = {
@@ -1480,6 +1603,14 @@ export type ResearchResult = {
   "execution"?: (ResearchExecution) | (null);
 };
 
+export type ReturnSegment = {
+  "value": (string) | (null);
+  "status": "complete" | "provisional" | "incomplete" | "unavailable";
+  "reasons": Array<string>;
+  "start_date": string;
+  "end_date": string;
+};
+
 export type RevisionPreview = {
   "dataset_id": string;
   "version": number;
@@ -1585,6 +1716,16 @@ export type Summary = {
   "provider": "none" | "openai" | "anthropic";
   "model"?: (string) | (null);
   "usage"?: (Usage) | (null);
+};
+
+export type TimeWeighted = {
+  "value": (string) | (null);
+  "status": "complete" | "provisional" | "incomplete" | "unavailable";
+  "reasons": Array<string>;
+  "convention": "daily-external-flows-at-close";
+  "start_date": (string) | (null);
+  "end_date": string;
+  "segments": Array<ReturnSegment>;
 };
 
 export type Trade = {

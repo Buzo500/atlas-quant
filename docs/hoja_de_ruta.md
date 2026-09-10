@@ -33,6 +33,8 @@ El historial de fuentes, pruebas y decisiones se conserva en [CONTINUIDAD](CONTI
 
 ## Ajuste de arquitectura sin renumerar versiones
 
+[Primer alcance pequeño de v0.5](v0_5_alcance_inicial.md): objetivos manuales, bandas y diagnóstico de desviaciones sobre cortes de v0.4. Solo definido, sin implementación autorizada por este documento; propuestas de operaciones y agregación completa vendrán después.
+
 El recorrido de investigación es **idea → especificación → backtest → validación → candidata congelada → autorización**. El recorrido operativo es **datos → estrategia activa → posiciones objetivo → riesgo → OMS/adaptador → ejecuciones → libro/conciliación**, con estado de vuelta hacia cartera y riesgo. Datos, operación y auditoría sirven a ambos; el LLM participa en investigación y análisis.
 
 | Entrega | Desglose para acotar su desarrollo | Evidencia necesaria |

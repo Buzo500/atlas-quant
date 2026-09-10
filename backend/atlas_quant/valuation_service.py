@@ -7,6 +7,7 @@ from .book_service import BookService
 from .catalog import IdentityNotFound, RevisionConflict
 from .portfolios import fingerprint, PortfolioService
 from .valuation import Valuator
+from .computation import bounded_calculation
 
 
 class ValuationService:
@@ -31,6 +32,7 @@ class ValuationService:
     def signature(context):
         return fingerprint(context['stamp'])
 
+    @bounded_calculation
     def calculate(self, ident, body):
         day = cutoff(body.as_of_date)
         context = self.store.read(lambda w: self.context(w, ident))

@@ -3,7 +3,7 @@ from bisect import bisect_right
 from datetime import date, datetime, timezone
 from decimal import Decimal, localcontext, ROUND_HALF_EVEN
 
-from .book import balance, decimal_text, bounded, CENT
+from .book import balance, NativeBook, decimal_text, bounded, CENT
 from .quality import timestamp
 
 ORDER = {'complete': 0, 'provisional': 1, 'incomplete': 2}
@@ -69,17 +69,23 @@ class Valuator:
         self.fx = MarkSeries(context['fx'], 'USD_EUR', 'fx') if context['fx'] else None
         self.entries = sorted(context['entries'], key=lambda e: (e['date'], e['day_sequence']))
         self.entry_dates = [e['date'] for e in self.entries]
-        self._book_cache = {}
+        self._cursor, self._index = NativeBook(), 0
+        self._last_book = None
+        self.payment_dates = {e['event'].get('external_key'): e['date'] for e in self.entries}
 
     def fx_mark(self, day, decision_at):
         return self.fx.select(day, decision_at) if self.fx else missing('missing_fx')
 
     def book(self, day):
-        # Repeated daily cuts with an unchanged book share its reconstruction.
         index = bisect_right(self.entry_dates, day)
-        if index not in self._book_cache:
-            self._book_cache[index] = balance(self.entries[:index], day, multicurrency=True)
-        return {**self._book_cache[index], 'as_of_date': day}
+        if index < self._index:
+            self._cursor, self._index, self._last_book = NativeBook(), 0, None
+        if index != self._index or self._last_book is None:
+            for entry in self.entries[self._index:index]:
+                self._cursor.apply(entry)
+            self._index = index
+            self._last_book = self._cursor.snapshot(day)
+        return {**self._last_book, 'as_of_date': day}
 
     def flows(self, end, start=None):
         result = []
@@ -129,7 +135,6 @@ class Valuator:
                 component('cash', b['currency'], b['currency'], Decimal(b['cash']))
             events = {e['id']: e for e in context['corporate']['events']}
             apps = {a['event_id']: a for a in context['applications'] if a['effective_date'] <= day}
-            movements = {e['event'].get('external_key'): e for e in self.entries if e['date'] <= day}
             split_dates = {}
             for app in apps.values():
                 if app['cancelled']:
@@ -141,7 +146,8 @@ class Valuator:
                 available = event.get('available_at')
                 if not available or timestamp(available) > timestamp(decision_at):
                     historical.append('corporate_availability_unknown' if not available else 'corporate_available_after_decision')
-                if event['event_type'] == 'dividend' and app['movement_key'] not in movements:
+                payment_date = self.payment_dates.get(app['movement_key'])
+                if event['event_type'] == 'dividend' and (payment_date is None or payment_date > day):
                     component('receivable', app['event_id'], event['currency'], Decimal(app['gross_amount']),
                               reasons=[] if valid else ['corporate_action_unresolved'])
                 if event['event_type'] == 'split':
