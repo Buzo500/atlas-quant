@@ -197,14 +197,24 @@ def _variant(cut, spec, catalog, corporate, body, market, mode):
                 quantity=min(quantity,affordable)
             quantity=(quantity/step).to_integral_value(rounding=ROUND_DOWN)*step
             if side=='buy' and quantity>0:
-                overspend=quantity*quote+fee(quantity*quote,rule)-budget
-                if overspend>0:
-                    steps=(overspend/(step*quote*(1+D(rule.fee_bps)/10000))).to_integral_value(rounding=ROUND_UP)
-                    quantity=max(ZERO,quantity-steps*step)
+                if quantity*quote+fee(quantity*quote,rule)>budget:
+                    # Ceil-to-cent fees are discontinuous. Search integer lots
+                    # against the actual fee, never approximate its derivative.
+                    low,high=0,int(quantity/step)
+                    while low<high:
+                        mid=(low+high+1)//2
+                        gross_candidate=D(mid)*step*quote
+                        if gross_candidate+fee(gross_candidate,rule)<=budget:
+                            low=mid
+                        else:
+                            high=mid-1
+                    quantity=D(low)*step
             if quantity<=0: return
             gross=quantity*quote
             cost=fee(gross,rule)
             if side=='sell' and gross<=cost: return
+            if side=='buy' and gross+cost>budget:
+                raise ValueError('La simulación supera su presupuesto nativo autorizado.')
             sign=D(1) if side=='buy' else D(-1)
             cash_delta=-sign*gross-cost
             if cash[currency]+cash_delta<0: raise ValueError('La simulación intentó gastar efectivo inexistente.')

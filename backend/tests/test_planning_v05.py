@@ -312,3 +312,14 @@ def test_shared_native_cash_is_spent_once_in_explicit_priority_order():
 ])
 def test_reject_fields_that_would_be_silently_ignored(kwargs):
     with pytest.raises(ValidationError):inputs(**kwargs)
+
+
+@pytest.mark.parametrize('bps,quantity,remaining',[('1','0.99','100'),('1000','0.9','100.01')])
+def test_fee_ceiling_cannot_spend_existing_cash_without_permission(bps,quantity,remaining):
+    args=list(fixture(nav='100',position='0',cash='100',target='100',existing=False,contribution='1'))
+    args[-1]['prices'][L]['price']['value']='1'
+    args[5]=PlanningInput(**(args[5].model_dump()|dict(rules=[dict(rule(),quantity_step='0.00000001',fee_bps=bps)])))
+    value=planning.allocation(*args)['variants'][0]
+    assert value['trades'][0]['quantity']==quantity
+    assert value['cash'][0]['final']==remaining
+    assert D(value['trades'][0]['gross_native'])+D(value['trades'][0]['fee_native'])<=1
