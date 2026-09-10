@@ -4,6 +4,12 @@ Actualizado: 10 de septiembre de 2026. Este documento resume decisiones y estado
 
 ## Trabajo en curso: diez tareas autorizadas · D6 completo, D7, D8 y alcance v0.5
 
+**Cierre D7/D8 en revisión tras primer intento remoto:** PR #9 abierta. CI 34506888529 sobre `78996cd` falla en E2E 17/19: `ECONNRESET` en D3 y confirmación D7 desaparecida; resto de fases previo a E2E correcto. Corregido localmente el remontaje por auditoría y las claves duplicadas de los paneles NAV/rentabilidad, con cuatro regresiones adicionales (278 frontend). Nuevas pruebas y CI condicionan la publicación; no fusionar el intento fallido. [Registro D8](v0_4_d8.md).
+
+Tras la corrección: 278 frontend, tipos/lint/build y 19/19 E2E completos con sondas (`e2e-08ce8cbf7a7244b08809830f5119639f`, 1,2 min); integridad/base habitual/limpieza correctas. Solo cambia frontend y documentación; cálculo Python de D7 conserva su validación 709 + 91 subcasos. Se prepara segunda CI completa.
+
+Arranque habitual intermedio `bdf8fad2193b41d0b8e960742f08a187`: salud dev.6, esquema 5/integridad correctos, tres carteras y libros/respuestas EUR idénticos a la copia previa de estas diez tareas; parada global activa, gasto/reserva cero. Interfaz conectada; demo D5 sin cotizaciones muestra NAV/rentabilidad no disponibles con causa explícita, costes conocidos 10 EUR. No se guardaron previews. Detenido de nuevo antes de corregir el código; evidencia `output/validation/d8-ordinary-online.json`.
+
 El usuario ha autorizado «Vale, haz las 10», referidas a las dos listas consecutivas: [registro y orden de las diez tareas](ejecucion_diez_tareas_v0_4.md). Mantener este trabajo activo hasta completarlo; proponer siguientes pasos no sustituye esta autorización. Ensayo de 48 horas, movimientos personales, bróker, entrenamiento y servicios pagados siguen excluidos. No implementar v0.5: solo concretar su primer alcance.
 
 **D6 publicado:** PR #8 fusionada mediante squash `a308f81d31212a6d03af37076fa152109b6d83c6`; etiqueta anotada `v0.4.0-dev.5`, objeto remoto `5a294a018b77ed61f6803f9b0df7bc09ea6fd435`. CI completa [34503177151](https://github.com/Buzo500/atlas-quant/actions/runs/34503177151) correcta sobre `a3561126fbda290524a1d742aef7ad470ee78bda`, árbol integrado idéntico. Cuota antes de lanzar: 198,3/2.000 minutos, 0 USD facturables, presupuesto 0 con bloqueo. CI previa parcial 34496563421 correcta. [D6 completo](v0_4_d6_cierre.md): 677 Python + 91 subcasos, 270 frontend y 19 E2E; recuperación y carga correctas.

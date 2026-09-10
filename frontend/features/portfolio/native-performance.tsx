@@ -76,9 +76,11 @@ export function PerformanceDetails({ report }: { report: PerformanceReport }) {
     <section aria-label="Detalle de rentabilidad">
       <p className="muted">
         Cierres del {report.start_date} al {report.end_date}.{' '}
-        {report.current
-          ? 'Contexto vigente.'
-          : 'Informe histórico: el contexto ha cambiado.'}
+        {!report.saved
+          ? 'Contexto comprobado al calcular; se comprobará de nuevo al guardar.'
+          : report.current
+            ? 'Contexto vigente en la última consulta.'
+            : 'Informe histórico: el contexto ha cambiado.'}
       </p>
       <div className="stats portfolio-stats">
         <Metric
@@ -285,10 +287,12 @@ export function PerformanceDetails({ report }: { report: PerformanceReport }) {
 export function NativePerformance({
   portfolioId,
   revision,
+  auditSequence,
   active,
 }: {
   portfolioId: string;
   revision: number;
+  auditSequence?: number;
   active: boolean;
 }) {
   const today = new Date().toISOString().slice(0, 10);
@@ -300,12 +304,12 @@ export function NativePerformance({
   const path = `/v2/portfolios/${portfolioId}/performance`;
   const history = useRead<PerformanceHistory>({
     path: `${path}?offset=${offset}&limit=20`,
-    revision,
+    revision: `${revision}:${auditSequence}`,
     enabled: active,
   });
   const saved = useRead<PerformanceReport>({
     path: selected ? `${path}/${selected}` : null,
-    revision,
+    revision: `${revision}:${auditSequence}`,
     enabled: active,
   });
   const operation = useCorporateReview<PerformancePreview>(

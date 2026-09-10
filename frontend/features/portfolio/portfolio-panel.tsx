@@ -84,9 +84,10 @@ export function PortfolioPanel({
         portfolioId && (
           <>
             <NativeValuation
-              key={`${portfolioId}:${detail.portfolio.revision}:${auditSequence}`}
+              key={`nav:${portfolioId}:${detail.portfolio.revision}`}
               portfolioId={portfolioId}
               revision={detail.portfolio.revision}
+              auditSequence={auditSequence}
               active={active}
             />
             <BookSummary
@@ -95,9 +96,10 @@ export function PortfolioPanel({
               active={active}
             />
             <NativePerformance
-              key={`${portfolioId}:${detail.portfolio.revision}:${auditSequence}`}
+              key={`performance:${portfolioId}:${detail.portfolio.revision}`}
               portfolioId={portfolioId}
               revision={detail.portfolio.revision}
+              auditSequence={auditSequence}
               active={active}
             />
             <CorporateSummary
