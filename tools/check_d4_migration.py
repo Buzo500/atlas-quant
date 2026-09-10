@@ -18,7 +18,7 @@ from atlas_quant.backup import create_backup, restore_backup, validate_backup  #
 from atlas_quant.book_store import DDL  # noqa: E402
 from atlas_quant.identity_store import DDL as IDENTITY_DDL  # noqa: E402
 from atlas_quant.portfolios import PortfolioService  # noqa: E402
-from atlas_quant.store import Store, UnitOfWork  # noqa: E402
+from atlas_quant.store import Store, UnitOfWork, SCHEMA_VERSION  # noqa: E402
 from atlas_quant.worker_lock import WorkerLock  # noqa: E402
 from check_d2_migration import dump, require  # noqa: E402
 
@@ -68,14 +68,14 @@ def check(folder):
     require({p["id"]: restored_portfolios.read(p["id"]) for p in restored_portfolios.list()} == expected, "La cartera cambió al restaurar.")
     for path in (target, restored_path):
         with closing(sqlite3.connect(path)) as db:
-            require(db.execute("PRAGMA user_version").fetchone()[0] == 3, "Esquema inesperado.")
+            require(db.execute("PRAGMA user_version").fetchone()[0] == SCHEMA_VERSION, "Esquema inesperado.")
             require(db.execute("PRAGMA integrity_check").fetchall() == [("ok",)], "Integridad inválida.")
             require(not db.execute("PRAGMA foreign_key_check").fetchall(), "Referencias inválidas.")
     require(hashlib.sha256(source.read_bytes()).hexdigest() == original_hash, "La copia original cambió.")
     comparisons = [dict(portfolio_id=ident, revision=d["portfolio"]["revision"], event_count=len(d["entries"]),
                        nav=d["value"]["nav"] if d["value"] else None, exact_equal=True) for ident, d in expected.items()]
     result = dict(source=str(source), source_unchanged=True, source_sha256=original_hash, directory=str(directory),
-                  schema_before=2, schema_after=3, migration_seconds=elapsed, history_preserved=True,
+                  schema_before=2, schema_after=SCHEMA_VERSION, migration_seconds=elapsed, history_preserved=True,
                   new_tables_empty=True, reopened_unchanged=True, restored_books_and_values_equal=True,
                   integrity="ok", comparisons=comparisons)
     report = directory / "report.json"

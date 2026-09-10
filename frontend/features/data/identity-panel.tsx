@@ -19,6 +19,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { moneyEUR, date } from '@/shared/format';
 import { BookWorkspace } from './book-panel';
+import { CorporatePanel } from './corporate-panel';
 
 export function IdentityPanel({
   portfolios,
@@ -150,6 +151,16 @@ export function IdentityPanel({
           portfolio={book.data.portfolio}
           catalog={catalog.data}
           active={active}
+          refresh={refreshAll}
+          onError={onError}
+        />
+      )}
+      {catalog.data && (
+        <CorporatePanel
+          catalog={catalog.data}
+          portfolio={book.data?.portfolio}
+          active={active}
+          revision={revision}
           refresh={refreshAll}
           onError={onError}
         />

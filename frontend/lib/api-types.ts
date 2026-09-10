@@ -208,6 +208,215 @@ export type CorporateAction = {
   "applied_to_ledger": false;
 };
 
+export type CorporateApplication = {
+  "event_id": string;
+  "event_revision": number;
+  "revision": number;
+  "portfolio_revision": number;
+  "source": string;
+  "source_account": string;
+  "event_type": "dividend" | "split";
+  "effective_date": string;
+  "day_sequence": number;
+  "eligible_quantity": (string) | (null);
+  "basis_quantity": string;
+  "gross_amount": (string) | (null);
+  "movement_key": (string) | (null);
+  "movement_fingerprint": (string) | (null);
+  "basis_hash": string;
+  "cancelled": boolean;
+  "evidence": string;
+  "discrepancy_reason": string;
+  "gross_explanation": string;
+  "fraction_evidence": string;
+  "event_snapshot": CorporateEvent;
+  "current": boolean;
+  "status": "pending_payment" | "reconciled" | "applied" | "outdated" | "cancelled";
+  "receivable": string;
+  "price_status": "not_applicable" | "compatible" | "not_accredited";
+  "warnings": Array<string>;
+};
+
+export type CorporateApplicationInput = {
+  "expected_revision": number;
+  "commit"?: boolean;
+  "preview_token"?: (string) | (null);
+  "offset"?: number;
+  "limit"?: number;
+  "event_id": string;
+  "source": string;
+  "source_account": string;
+  "action"?: "review" | "cancel";
+  "review"?: (CorporateReview) | (null);
+  "movement_id"?: (string) | (null);
+  "reason"?: string;
+  "csv"?: string;
+};
+
+export type CorporateApplicationPreview = {
+  "portfolio_id": string;
+  "portfolio_revision": number;
+  "corporate_revision": number;
+  "as_of_date": string;
+  "applications": Array<CorporateApplication>;
+  "balance": BookBalance;
+  "pending_receivables": string;
+  "unlinked_payments": Array<string>;
+  "warnings": Array<string>;
+  "total": number;
+  "offset": number;
+  "limit": number;
+  "committed": boolean;
+  "preview_token": string;
+  "document_id": string;
+};
+
+export type CorporateCatalog = {
+  "revision": number;
+  "catalog_revision": number;
+  "events": Array<CorporateEvent>;
+  "sources": Array<CorporateSource>;
+  "total": number;
+  "offset": number;
+  "limit": number;
+};
+
+export type CorporateDocument = {
+  "id": string;
+  "portfolio_id": (string) | (null);
+  "kind": string;
+  "created_at": string;
+  "evidence": {
+  [key: string]: JsonValue;
+};
+  "result": {
+  [key: string]: JsonValue;
+};
+};
+
+export type CorporateDocumentSummary = {
+  "id": string;
+  "portfolio_id": (string) | (null);
+  "kind": string;
+  "created_at": string;
+};
+
+export type CorporateDocuments = {
+  "documents": Array<CorporateDocumentSummary>;
+  "total": number;
+  "offset": number;
+  "limit": number;
+};
+
+export type CorporateEvent = {
+  "id": string;
+  "revision": number;
+  "listing_id": string;
+  "event_type": "dividend" | "split";
+  "effective_date": (string) | (null);
+  "payment_date": (string) | (null);
+  "available_at": (string) | (null);
+  "gross_per_unit": (string) | (null);
+  "currency": "EUR";
+  "ratio_numerator": (number) | (null);
+  "ratio_denominator": (number) | (null);
+  "source_reference": string;
+  "verified": boolean;
+  "evidence": string;
+  "cancelled": boolean;
+  "created_at": string;
+  "reason": string;
+};
+
+export type CorporateInput = {
+  "expected_revision": number;
+  "commit"?: boolean;
+  "preview_token"?: (string) | (null);
+  "offset"?: number;
+  "limit"?: number;
+  "format_id": "atlas-corporate-events-v1";
+  "source": string;
+  "csv": string;
+  "mapping"?: {
+  [key: string]: string;
+};
+  "event_mapping"?: {
+  [key: string]: string;
+};
+  "distinct_reasons"?: {
+  [key: string]: string;
+};
+  "verified"?: boolean;
+  "evidence"?: string;
+};
+
+export type CorporatePortfolio = {
+  "portfolio_id": string;
+  "portfolio_revision": number;
+  "corporate_revision": number;
+  "as_of_date": string;
+  "applications": Array<CorporateApplication>;
+  "balance": BookBalance;
+  "pending_receivables": string;
+  "unlinked_payments": Array<string>;
+  "warnings": Array<string>;
+  "total": number;
+  "offset": number;
+  "limit": number;
+};
+
+export type CorporatePreview = {
+  "revision": number;
+  "catalog_revision": number;
+  "events": Array<CorporateEvent>;
+  "sources": Array<CorporateSource>;
+  "total": number;
+  "offset": number;
+  "limit": number;
+  "committed": boolean;
+  "preview_token": string;
+  "document_id": string;
+  "added": number;
+  "duplicates": number;
+};
+
+export type CorporateReview = {
+  "event_revision": number;
+  "day_sequence": number;
+  "evidence": string;
+  "eligible_quantity"?: (string) | (null);
+  "discrepancy_reason"?: string;
+  "gross_amount"?: (string) | (null);
+  "gross_explanation"?: string;
+  "fraction_evidence"?: string;
+};
+
+export type CorporateRevisionInput = {
+  "expected_revision": number;
+  "commit"?: boolean;
+  "preview_token"?: (string) | (null);
+  "offset"?: number;
+  "limit"?: number;
+  "event_id": string;
+  "event_revision": number;
+  "action": "replace" | "cancel";
+  "reason": string;
+  "csv"?: string;
+  "mapping"?: {
+  [key: string]: string;
+};
+  "verified"?: boolean;
+  "evidence"?: string;
+};
+
+export type CorporateSource = {
+  "source": string;
+  "external_id": string;
+  "event_id": string;
+  "source_reference": string;
+  "content_hash": string;
+};
+
 export type CorrectionInput = {
   "expected_revision": number;
   "commit"?: boolean;
@@ -222,6 +431,15 @@ export type CorrectionInput = {
   [key: string]: string;
 };
   "gross_explanations"?: {
+  [key: string]: string;
+};
+  "corporate_mapping"?: {
+  [key: string]: string;
+};
+  "corporate_reviews"?: {
+  [key: string]: CorporateReview;
+};
+  "unaccredited_payments"?: {
   [key: string]: string;
 };
 };
@@ -453,6 +671,15 @@ export type ImportInput = {
   [key: string]: string;
 };
   "gross_explanations"?: {
+  [key: string]: string;
+};
+  "corporate_mapping"?: {
+  [key: string]: string;
+};
+  "corporate_reviews"?: {
+  [key: string]: CorporateReview;
+};
+  "unaccredited_payments"?: {
   [key: string]: string;
 };
 };

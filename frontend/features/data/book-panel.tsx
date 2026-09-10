@@ -23,6 +23,11 @@ import { Choice, DataTable, Field } from '@/shared/ui';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { date } from '@/shared/format';
+import {
+  BookCorporateFields,
+  corporateBookInput,
+  emptyCorporateDraft,
+} from './book-corporate-fields';
 
 const today = () => new Date().toISOString().slice(0, 10);
 type Review = BookPreview | ReconciliationPreview;
@@ -333,6 +338,7 @@ function BookReview({
   const [eventId, setEventId] = useState('');
   const [correction, setCorrection] = useState('void');
   const [reason, setReason] = useState('');
+  const [corporate, setCorporate] = useState(emptyCorporateDraft);
   const [preview, setPreview] = useState<Review | null>(null);
   const [message, setMessage] = useState('');
   const mounted = useRef(true);
@@ -398,6 +404,7 @@ function BookReview({
         csv: voiding ? '' : csv,
         mapping: voiding ? {} : mapped,
         gross_explanations: voiding ? {} : gross,
+        ...corporateBookInput(corporate, voiding),
       };
     const common = {
       ...reviewed,
@@ -422,6 +429,7 @@ function BookReview({
       ...common,
       format_id: 'atlas-ledger-v2',
       gross_explanations: gross,
+      ...corporateBookInput(corporate, false),
     };
   }
 
@@ -502,6 +510,7 @@ function BookReview({
                   setCsv('');
                   setMapping([]);
                   setExplanations([]);
+                  setCorporate(emptyCorporateDraft());
                   setComplete(false);
                   invalidate();
                 }}
@@ -608,7 +617,7 @@ function BookReview({
               <p className="muted">
                 {mode === 'reconciliation'
                   ? 'Una fila cash EUR y todas las posiciones al mismo cierre. Una posición omitida se declara cero.'
-                  : 'Depósitos, retiradas, compras, ventas y comisiones en EUR. ID externo y secuencia por fecha obligatorios; dividendos, splits y FX tienen entregas posteriores.'}
+                  : 'Movimientos en EUR, incluidos cobros de dividendos y splits revisados. ID externo y secuencia por fecha obligatorios; FX está pendiente.'}
               </p>
               <a
                 className="text-link"
@@ -813,6 +822,16 @@ function BookReview({
               El extracto incluye el efectivo y todas las posiciones de esta
               cuenta al cierre elegido.
             </label>
+          )}
+          {native && mode !== 'reconciliation' && (
+            <BookCorporateFields
+              value={corporate}
+              voiding={voiding}
+              onChange={(value) => {
+                setCorporate(value);
+                invalidate();
+              }}
+            />
           )}
           <Button
             type="submit"

@@ -9,7 +9,8 @@ from atlas_quant.backup import create_backup, restore_backup, validate_backup
 from atlas_quant.book_store import DDL
 from atlas_quant.portfolios import PortfolioService
 from atlas_quant.service import Service
-from atlas_quant.store import Store
+from atlas_quant.store import Store, SCHEMA_VERSION
+from atlas_quant.corporate_store import DDL as CORPORATE_DDL
 from atlas_quant.worker_lock import WorkerLock
 from test_book_d4 import dump, setup, confirm, request, statement
 
@@ -19,6 +20,8 @@ def schema2(path):
     dataset = Service(store).load_demo()
     expected = Service(store).portfolio(dataset["id"])
     with closing(sqlite3.connect(path)) as db, db:
+        for table in reversed(CORPORATE_DDL):
+            db.execute(f"DROP TABLE {table}")
         for table in reversed(DDL):
             db.execute(f"DROP TABLE {table}")
         db.execute("PRAGMA user_version=2")
@@ -38,7 +41,7 @@ def test_schema2_migration_is_additive_and_repeatable(tmp_path):
     Store(path)
     assert dump(path) == after
     with closing(sqlite3.connect(path)) as db:
-        assert db.execute("PRAGMA user_version").fetchone()[0] == 3
+        assert db.execute("PRAGMA user_version").fetchone()[0] == SCHEMA_VERSION
         assert db.execute("PRAGMA foreign_key_check").fetchall() == []
 
 
@@ -76,7 +79,7 @@ def test_schema3_backup_restores_native_book_sources_and_reports(setup, tmp_path
     service.reconcile(portfolio["id"], body.model_copy(update={"commit": True, "preview_token": preview["preview_token"]}))
     before = dump(store.path)
     backup = create_backup(store.path, tmp_path / "backups")
-    assert validate_backup(backup)["schema"]["user_version"] == 3
+    assert validate_backup(backup)["schema"]["user_version"] == SCHEMA_VERSION
     target = tmp_path / "restore.sqlite3"
     restore_backup(backup, target, tmp_path / "before-restore", instance_lock=WorkerLock(str(target) + ".instance.lock"))
     Store(target)

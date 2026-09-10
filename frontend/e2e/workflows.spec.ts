@@ -644,9 +644,9 @@ test('curva real: valores originales, TWR, rango inclusivo y controles adaptable
   ).toEqual(portfolio);
 });
 
-test('precios reales: OHLCV, agregación del rango, estilos, teclado y pantallas', async ({
+test('precios reales: OHLCV, agregación del rango, estilos y teclado', async ({
   page,
-}, testInfo) => {
+}) => {
   const dataset = await ensureDemo(page);
   const symbol = 'DEMO_WORLD';
   const path = `/api/datasets/${dataset.id}/prices?version=${dataset.version}&symbol=${symbol}`;
@@ -729,47 +729,76 @@ test('precios reales: OHLCV, agregación del rango, estilos, teclado y pantallas
     `${numeric(source.bars[0].close)} EUR`,
   );
   await expect(field('change')).toHaveText('—');
+  expect(await readApi<DatasetPricesResponse>(page, path)).toEqual(source);
+});
+
+// Keep responsive interaction separate from the aggregation workflow: each
+// checks a different behavior within the same unchanged per-test time limit.
+test('precios adaptables: fichas de ambas velas, teclado y cambio de activo', async ({
+  page,
+}, testInfo) => {
+  const dataset = await ensureDemo(page);
+  const symbol = 'DEMO_WORLD';
+  const path = `/api/datasets/${dataset.id}/prices?version=${dataset.version}&symbol=${symbol}`;
+  const source = await readApi<DatasetPricesResponse>(page, path);
+  await tab(page, 'Datos');
+  await select(page, 'Activo del gráfico', symbol);
+  const plot = page.locator('.price-chart-svg');
+  const detail = page.getByRole('region', {
+    name: 'Lectura de precios',
+    exact: true,
+  });
+  const numeric = (value: number) =>
+    new Intl.NumberFormat('es-ES', { maximumFractionDigits: 20 }).format(value);
+  const field = (name: string) =>
+    detail.locator(`[data-price-field="${name}"]`);
+  await page
+    .getByRole('slider', { name: 'Desplazar precios', exact: true })
+    .focus();
+  await page.keyboard.press('Home');
   for (const [width, height] of [
     [3440, 1440],
     [1920, 1080],
     [1366, 768],
     [390, 844],
   ]) {
-    await page.setViewportSize({ width, height });
-    await expect
-      .poll(() =>
-        page.evaluate(
-          () => document.documentElement.scrollWidth <= window.innerWidth + 1,
-        ),
-      )
-      .toBe(true);
-    await page.locator('.price-chart-svg').scrollIntoViewIfNeeded();
-    await plot.focus();
-    await page.keyboard.press('Home');
-    await expect(field('close')).toHaveText(
-      `${numeric(source.bars[0].close)} EUR`,
-    );
-    for (const edge of ['first', 'last'] as const) {
-      const { tooltip, index } = await hoverCandle(page, plot, edge);
-      const observation = source.bars[index];
-      await expect(tooltip.locator('time').first()).toHaveAttribute(
-        'datetime',
-        observation.date,
+    await test.step(`Fichas y teclado a ${width} × ${height}`, async () => {
+      await page.setViewportSize({ width, height });
+      await expect
+        .poll(() =>
+          page.evaluate(
+            () => document.documentElement.scrollWidth <= window.innerWidth + 1,
+          ),
+        )
+        .toBe(true);
+      await page.locator('.price-chart-svg').scrollIntoViewIfNeeded();
+      await plot.focus();
+      await page.keyboard.press('Home');
+      await expect(field('close')).toHaveText(
+        `${numeric(source.bars[0].close)} EUR`,
       );
-      for (const name of ['open', 'high', 'low', 'close'] as const)
+      for (const edge of ['first', 'last'] as const) {
+        const { tooltip, index } = await hoverCandle(page, plot, edge);
+        const observation = source.bars[index];
+        await expect(tooltip.locator('time').first()).toHaveAttribute(
+          'datetime',
+          observation.date,
+        );
+        for (const name of ['open', 'high', 'low', 'close'] as const)
+          await expect(
+            tooltip.locator(`[data-price-field="${name}"] data`),
+          ).toHaveAttribute('value', String(observation[name]));
         await expect(
-          tooltip.locator(`[data-price-field="${name}"] data`),
-        ).toHaveAttribute('value', String(observation[name]));
-      await expect(
-        tooltip.locator('[data-price-field="volume"] data'),
-      ).toHaveAttribute('value', String(observation.volume));
-    }
-    await page.screenshot({
-      path: testInfo.outputPath(`precios-${width}.png`),
-      fullPage: true,
+          tooltip.locator('[data-price-field="volume"] data'),
+        ).toHaveAttribute('value', String(observation.volume));
+      }
+      await page.screenshot({
+        path: testInfo.outputPath(`precios-${width}.png`),
+        fullPage: true,
+      });
+      await page.mouse.move(0, 0);
+      await expect(page.getByRole('tooltip')).toHaveCount(0);
     });
-    await page.mouse.move(0, 0);
-    await expect(page.getByRole('tooltip')).toHaveCount(0);
   }
   await select(page, 'Activo del gráfico', 'DEMO_BOND');
   await expect(page.getByRole('tooltip')).toHaveCount(0);

@@ -32,6 +32,9 @@ class BookService:
         catalog = work.catalog(portfolio["catalog_revision"]) if revision is not None and portfolio["catalog_revision"] else work.catalog()
         result = dict(portfolio=portfolio, catalog=catalog, entries=work.portfolio_events(portfolio),
                       sources=work.book_sources(ident))
+        if portfolio["accounting_policy"] == POLICY:
+            result.update(corporate=work.corporate_state(),
+                          applications=work.corporate_applications(ident, revision))
         if revision is not None:
             sources = {(e["event"]["source"], e["event"]["source_account"])
                        for e in result["entries"] if "source_account" in e["event"]}
@@ -92,7 +95,7 @@ class BookService:
     def _token(kind, original, body):
         return fingerprint(dict(purpose="atlas-book-" + kind, context=original, payload=payload(body)))
 
-    def _commit(self, ident, kind, context, body, token, document, new_entries, effective, *, history):
+    def _commit(self, ident, kind, context, body, token, document, new_entries, effective, *, history, applications=None):
         if not body.preview_token or not hmac.compare_digest(token, body.preview_token):
             raise RevisionConflict("Previsualización ausente u obsoleta. Revisa el lote de nuevo.")
         original = fingerprint(context)
@@ -105,11 +108,13 @@ class BookService:
                 return current["portfolio"]["revision"]
             for item in new_entries:
                 work.insert_native_entry(ident, item)
-            if new_entries:
+            if new_entries or applications:
                 ordered = sorted(effective, key=lambda e: (e["date"], e["day_sequence"]))
                 work.write_portfolio_revision(ident, [e["event"]["id"] for e in ordered], current["portfolio"]["bindings"])
             work.bind_book_source(ident, document["source"], document["source_account"])
             revision = work.portfolio_record(ident)["revision"]
+            for application in applications or []:
+                work.save_corporate_application(ident, revision, application)
             saved = {**document, "portfolio_revision": revision}
             work.save_book_document(ident, saved)
             work.audit("book." + kind + "_confirmed", ident,
@@ -131,32 +136,19 @@ class BookService:
                     balance=result["balance"], differences=result.get("differences", []))
 
     def import_movements(self, ident, body):
+        from .corporate import movement_options, prepare_applications
         context = self.store.atomic(lambda work: self._context(work, ident, history=True))
         self._revision(context, body.expected_revision)
         self._native(context)
         self._source(context, body.source, body.source_account)
         mapping = resolve_mapping(body.mapping, context["catalog"])
-        parsed = parse_movements(body.csv, mapping, body.as_of_date, body.gross_explanations)
-        known = {}
-        for item in context["all_entries"]:
-            key = item["event"]["external_key"]
-            if key not in known or item["event"]["revision"] > known[key]["event"]["revision"]:
-                known[key] = item
-        added, duplicates = [], 0
-        for line, event in parsed:
-            item = self._entry(event, body.source, body.source_account, line)
-            key = item["event"]["external_key"]
-            if key in known:
-                if economic(known[key]) != economic(item):
-                    raise BookError("duplicate_conflict", "El ID externo ya existe con contenido distinto. Usa una corrección revisada.", line, "external_id")
-                duplicates += 1
-            else:
-                added.append(item)
-                known[key] = item
+        parsed = parse_movements(body.csv, mapping, body.as_of_date, body.gross_explanations, **movement_options(context, body))
+        added, duplicates = self.merge_entries(context, parsed, body.source, body.source_account)
         effective = context["entries"] + added
         # Validate later history too, even when the submitted cut is earlier.
         last = max([body.as_of_date] + [e["date"] for e in effective])
         balance(effective, last)
+        applications = prepare_applications(context, effective, added, body.corporate_reviews)
         result = self._detail({**context, "entries": effective}, body.as_of_date, body.offset, body.limit)
         token = self._token("import", context, body)
         document_id = fingerprint(dict(kind="import", portfolio=ident, payload=payload(body)))
@@ -165,8 +157,28 @@ class BookService:
                       historical_insertion=any((e["date"], e["day_sequence"]) < last_existing for e in added))
         document = self._document("import", ident, context, body.as_of_date, body.source, body.source_account, body, result, document_id)
         if body.commit:
-            result["context"]["portfolio_revision"] = self._commit(ident, "import", context, body, token, document, added, effective, history=True)
+            result["context"]["portfolio_revision"] = self._commit(ident, "import", context, body, token, document, added, effective, history=True, applications=applications)
         return {**result, "committed": body.commit, "preview_token": token, "document_id": document_id}
+
+    @classmethod
+    def merge_entries(cls, context, parsed, source, account):
+        known = {}
+        for item in context["all_entries"]:
+            key = item["event"]["external_key"]
+            if key not in known or item["event"]["revision"] > known[key]["event"]["revision"]:
+                known[key] = item
+        added, duplicates = [], 0
+        for line, event in parsed:
+            item = cls._entry(event, source, account, line)
+            key = item["event"]["external_key"]
+            if key in known:
+                if economic(known[key]) != economic(item):
+                    raise BookError("duplicate_conflict", "El ID externo ya existe con contenido distinto. Usa una corrección revisada.", line, "external_id")
+                duplicates += 1
+            else:
+                added.append(item)
+                known[key] = item
+        return added, duplicates
 
     def reconcile(self, ident, body):
         context = self.store.atomic(lambda work: self._context(work, ident))
@@ -189,6 +201,7 @@ class BookService:
                 "committed": body.commit, "preview_token": token, "document_id": document_id}
 
     def correct(self, ident, body):
+        from .corporate import movement_options, prepare_applications
         context = self.store.atomic(lambda work: self._context(work, ident, history=True))
         self._revision(context, body.expected_revision)
         self._native(context)
@@ -199,12 +212,12 @@ class BookService:
         source, account = original["source"], original["source_account"]
         self._source(context, source, account)
         if body.action == "void":
-            if body.csv or body.mapping or body.gross_explanations:
+            if body.csv or body.mapping or body.gross_explanations or body.corporate_mapping or body.unaccredited_payments:
                 raise BookError("incompatible_field", "Anular no admite CSV, mapeo ni explicaciones de sustitución.")
             event, line = economic(old), original["source_row"]
         else:
             mapping = resolve_mapping(body.mapping, context["catalog"])
-            parsed = parse_movements(body.csv, mapping, datetime.now(timezone.utc).date().isoformat(), body.gross_explanations)
+            parsed = parse_movements(body.csv, mapping, datetime.now(timezone.utc).date().isoformat(), body.gross_explanations, **movement_options(context, body))
             if len(parsed) != 1 or parsed[0][1]["external_id"] != original["external_id"]:
                 raise BookError("correction_target", "La sustitución requiere una fila con el mismo ID externo.")
             line, event = parsed[0]
@@ -215,12 +228,13 @@ class BookService:
             effective.append(replacement)
         day = datetime.now(timezone.utc).date().isoformat()
         result = self._detail({**context, "entries": effective}, day, body.offset, body.limit)
+        applications = prepare_applications(context, effective, [replacement], body.corporate_reviews)
         result.update(added=0, duplicates=0, historical_insertion=True)
         token = self._token("correction", context, body)
         document_id = fingerprint(dict(kind="correction", portfolio=ident, revision=context["portfolio"]["revision"], payload=payload(body)))
         document = self._document("correction", ident, context, day, source, account, body, result, document_id)
         if body.commit:
-            result["context"]["portfolio_revision"] = self._commit(ident, "correction", context, body, token, document, [replacement], effective, history=True)
+            result["context"]["portfolio_revision"] = self._commit(ident, "correction", context, body, token, document, [replacement], effective, history=True, applications=applications)
         return {**result, "committed": body.commit, "preview_token": token, "document_id": document_id}
 
     def documents(self, ident, offset=0, limit=100, document_id=None):

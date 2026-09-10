@@ -122,7 +122,7 @@ def listing(reference, mapping, row):
     return mapping[reference]
 
 
-def parse_movements(content, mapping, as_of_date, explanations):
+def parse_movements(content, mapping, as_of_date, explanations, *, corporate=None, unaccredited=None, reviews=None):
     end = cutoff(as_of_date)
     parsed, seen = [], {}
     with localcontext() as context:
@@ -138,8 +138,18 @@ def parse_movements(content, mapping, as_of_date, explanations):
             if not re.fullmatch(r"[1-9][0-9]{0,8}", raw["day_sequence"]):
                 raise BookError("event_order_ambiguous", "Secuencia positiva explícita requerida (máximo 9 cifras).", line, "day_sequence")
             kind = raw["kind"]
+            if kind in {"dividend_payment", "split"}:
+                from .corporate_movement import parse
+                event = parse(raw, line, mapping, corporate or {}, unaccredited or {}, reviews or {})
+                if external in explanations:
+                    raise BookError("incompatible_field", "El bruto corporativo se revisa en el derecho del evento.", line)
+                if external in seen and seen[external] != event:
+                    raise BookError("duplicate_conflict", "Un ID externo aparece con contenido diferente.", line, "external_id")
+                seen[external] = event
+                parsed.append((line, event))
+                continue
             if kind not in {"deposit", "withdrawal", "buy", "sell", "fee"}:
-                raise BookError("unsupported_kind", "D4 admite deposit, withdrawal, buy, sell y fee; eventos y FX llegan en D5/D6.", line, "kind")
+                raise BookError("unsupported_kind", "Tipo no soportado; FX corresponde a D6.", line, "kind")
             if raw["currency"] != "EUR" or raw["fee_currency"] != "EUR" or raw["tax_currency"] != "EUR":
                 raise BookError("unsupported_currency", "Moneda, comisión y retención deben declarar EUR.", line, "currency")
             fee = number(raw["fee_amount"], "fee_amount", 2, line)
@@ -196,7 +206,7 @@ def balance(entries, as_of_date, policy=POLICY):
             sequences.add(key)
             if item["date"] > as_of_date:
                 continue
-            gross, fee = Decimal(event["gross_amount"]), Decimal(event["fee_amount"])
+            gross, fee = Decimal(event["gross_amount"] or "0"), Decimal(event["fee_amount"] or "0")
             kind, ident = event["kind"], item["listing_id"]
             if kind == "deposit":
                 cash += gross - fee
@@ -206,6 +216,14 @@ def balance(entries, as_of_date, policy=POLICY):
                 contributions -= gross
             elif kind == "fee":
                 cash -= gross
+            elif kind == "dividend_payment":
+                cash += gross - fee - Decimal(event["tax_amount"])
+            elif kind == "split":
+                from .corporate import split_quantity
+                position = positions.setdefault(ident, [ZERO, ZERO])
+                if position[0] <= 0:
+                    raise BookError("corporate_position_empty", "El split requiere una posición anterior positiva.")
+                position[0] = split_quantity(position[0], event["ratio_numerator"], event["ratio_denominator"], event["fraction_evidence"])
             elif kind in {"buy", "sell"}:
                 quantity = Decimal(event["quantity"])
                 position = positions.setdefault(ident, [ZERO, ZERO])

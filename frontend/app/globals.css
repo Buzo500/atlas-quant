@@ -766,7 +766,9 @@ code {
   overflow: auto;
 }
 .quality-panel,
-.identity-panel {
+.identity-panel,
+.book-workspace,
+.corporate-panel {
   grid-column: 1 / -1;
   min-width: 0;
 }
@@ -1425,7 +1427,8 @@ code {
   font-weight: 600;
   margin-bottom: 0.75rem;
 }
-.book-csv {
+.book-csv,
+.csv-editor {
   width: 100%;
   min-height: 10rem;
   max-height: 24rem;
@@ -1450,4 +1453,45 @@ code {
 }
 .book-balance {
   font-variant-numeric: tabular-nums;
+}
+
+.corporate-panel,
+.corporate-form,
+.corporate-preview {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-variant-numeric: tabular-nums;
+}
+.corporate-form fieldset {
+  min-width: 0;
+  border: 0;
+  padding: 0;
+}
+.corporate-form legend,
+.corporate-form h3 {
+  font-weight: 600;
+  margin: 1rem 0 0.75rem;
+}
+.corporate-form .form-grid,
+.corporate-mapping,
+.corporate-form > form {
+  margin-bottom: 1rem;
+}
+.corporate-preview {
+  border-inline-start: 3px solid var(--border);
+  padding-inline-start: 1rem;
+  margin-top: 1rem;
+}
+.row-actions,
+.check-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.row-actions {
+  flex-wrap: wrap;
+  margin-block: 1rem;
+}
+.check-row input {
+  flex-shrink: 0;
 }

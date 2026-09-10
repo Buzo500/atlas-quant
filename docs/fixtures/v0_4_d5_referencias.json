@@ -1,0 +1,17 @@
+{
+  "status": "design_oracles_not_engine_results",
+  "currency": "EUR",
+  "rounding": "HALF_EVEN",
+  "cases": [
+    {"id": "dividend_full", "kind": "dividend", "eligible_quantity": "100", "gross_per_unit": "0.50", "tax": "9.50", "fee": "0.50", "expected": {"gross": "50.00", "cash_delta": "40.00", "charges": "10.00", "receivable_after_payment": "0.00", "contribution_delta": "0.00"}},
+    {"id": "sale_after_ex_date", "kind": "dividend", "eligible_quantity": "100", "quantity_sold_after_ex_date": "100", "quantity_at_payment": "0", "gross_per_unit": "0.50", "tax": "0.00", "fee": "0.00", "expected": {"gross": "50.00", "cash_delta": "50.00", "charges": "0.00", "receivable_after_payment": "0.00", "contribution_delta": "0.00"}},
+    {"id": "buy_after_ex_date", "kind": "dividend", "eligible_quantity": "100", "quantity_bought_after_ex_date": "20", "quantity_at_payment": "120", "gross_per_unit": "0.50", "tax": "0.00", "fee": "0.00", "expected": {"gross": "50.00", "cash_delta": "50.00", "charges": "0.00", "receivable_after_payment": "0.00", "contribution_delta": "0.00"}},
+    {"id": "dividend_half_even", "kind": "dividend", "eligible_quantity": "3", "gross_per_unit": "0.335", "tax": "0.00", "fee": "0.00", "expected": {"gross": "1.00", "cash_delta": "1.00", "charges": "0.00", "receivable_after_payment": "0.00", "contribution_delta": "0.00"}},
+    {"id": "link_existing_payment", "kind": "link", "cash_before_payment": "100.00", "gross": "20.00", "tax": "3.00", "fee": "0.00", "cash_already_recorded": "117.00", "receivable_before_link": "20.00", "expected": {"cash_after_link": "117.00", "additional_cash": "0.00", "receivable_after_link": "0.00"}},
+    {"id": "split_2_for_1", "kind": "split", "quantity": "4", "numerator": 2, "denominator": 1, "cost": "402.00", "price_before": "110.00", "price_after_compatible": "55.00", "expected": {"quantity": "8", "cost": "402.00", "unit_cost": "50.25", "reference_value": "440.00", "cash_delta": "0.00", "contribution_delta": "0.00"}},
+    {"id": "reverse_split_1_for_5", "kind": "split", "quantity": "10", "numerator": 1, "denominator": 5, "cost": "1000.00", "price_before": "120.00", "price_after_compatible": "600.00", "expected": {"quantity": "2", "cost": "1000.00", "unit_cost": "500.00", "reference_value": "1200.00", "cash_delta": "0.00", "contribution_delta": "0.00"}},
+    {"id": "fraction_confirmed_retained", "kind": "split", "quantity": "5", "numerator": 1, "denominator": 2, "cost": "100.00", "fraction_retained_evidence": true, "price_before": "30.00", "price_after_compatible": "60.00", "expected": {"quantity": "2.5", "cost": "100.00", "unit_cost": "40.00", "reference_value": "150.00", "cash_delta": "0.00", "contribution_delta": "0.00"}},
+    {"id": "nonrepresentable_fraction", "kind": "fraction_block", "quantity": "3", "numerator": 1, "denominator": 7, "maximum_decimal_places": 12, "expected": {"exact_fraction": "3/7", "representable": false, "result": "pending_without_rounding"}},
+    {"id": "split_between_ex_and_payment", "kind": "split_receivable", "eligible_quantity_at_ex": "10", "gross_per_unit_at_ex": "2.00", "split_numerator": 2, "split_denominator": 1, "expected": {"quantity_after_split": "20", "receivable_before_payment": "20.00", "gross_paid": "20.00"}}
+  ]
+}
