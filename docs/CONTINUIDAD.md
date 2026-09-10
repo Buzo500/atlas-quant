@@ -1,8 +1,20 @@
 # ATLAS Quant: continuidad entre equipos
 
-Actualizado: 9 de septiembre de 2026. Este documento resume decisiones y estado para una conversación nueva de Codex; no contiene la transcripción completa del chat original.
+Actualizado: 10 de septiembre de 2026. Este documento resume decisiones y estado para una conversación nueva de Codex; no contiene la transcripción completa del chat original.
 
-## Estado vigente: D3 publicado y D4 local
+## Estado vigente: D4 publicado y D5 especificado
+
+El usuario autorizó los cinco pasos: revisar D4, subirlo/abrir PR, ejecutar CI gratuita, fusionar/etiquetar si pasa y concretar D5. **Completados**. [PR #6](https://github.com/Buzo500/atlas-quant/pull/6) fusionada mediante squash `39d922cf63a95c4f39fbe8f35e88047d86d2807f`; [etiqueta anotada `v0.4.0-dev.3`](https://github.com/Buzo500/atlas-quant/tree/v0.4.0-dev.3) verificada en remoto (objeto `98c362a171c273099fbdd5961b9908e22159bbae`). Árbol idéntico al head validado `aa7ad176b5d851ca093f05689386e2942d2bc935`. Revisión técnica sin bloqueantes identificados; no se atribuye al usuario una prueba manual nueva.
+
+**[CI D4 34456773938](https://github.com/Buzo500/atlas-quant/actions/runs/34456773938) correcta al primer intento**, job `102804902070`: 570 Python + 91 subtests (42,42 s, dos avisos previos), 255 frontend y 14/14 E2E (1,9 min). Instalación limpia, build con manifiesto, tipos, contratos, lint, arranque/proxy y parada correctos. E2E `e2e-f6b76e352f3840ccae5fb33670d23eb1`: datos aislados, integridad `ok`, base ordinaria del runner intacta y puertos liberados. Evidencia `output/validation/d4-ci-34456773938.log`. Cuota/bloqueo comprobados antes: 105/2.000 minutos, 0/0,5 GB, 0 USD facturables y presupuesto Actions 0 USD con Stop usage Yes; después: 120/2.000 minutos, 0/0,5 GB y **0 USD facturables**. No se ejecutó otra CI al publicar la etiqueta de desarrollo.
+
+**D5 especificado localmente**, [reglas y tareas D5.1–D5.5](v0_4_d5.md), [10 oráculos](fixtures/v0_4_d5_referencias.json) comprobados con Decimal/Fraction sin importar ATLAS ni abrir su base. Dividendos EUR con derechos/cobros separados, enlace sin doble abono, splits exactos y coste conservado, eventos revisionados y previsualizaciones atómicas. Primera propuesta: pago completo único, fracción conservada solo acreditada y exactamente representable; liquidaciones de fracciones y FX fuera del alcance inicial. Evidencia incompleta limita las capacidades, y conciliar una cartera no habilita investigación global. **No se implementó D5 ni se cambió el esquema/versionado de la aplicación.** Rama documental `codex/v0.4-d5-plan`, desde `origin/master` integrado; el código sigue siendo D4 publicado. Esta documentación de cierre y plan no forma parte de la etiqueta ya publicada; queda guardada localmente para revisión/publicación posterior.
+
+**Estado operativo comprobado hoy:** `Status-Atlas.ps1` devuelve detenido, sin bloqueo, con la última ejecución registrada `312c4405e59040f1ad2669319ff5a26b`; puerto 3000 sin servicio. No se arrancó el programa ni se reconstruyó en este cierre documental. La evidencia de arranque del 09/09 siguiente es histórica. Inicio `Abrir-ATLAS.cmd`, parada `Detener-ATLAS.cmd`. Sin movimientos personales, claves nuevas, llamadas de pago ni ensayo/seguimiento reactivados. Esquema 3 y copia pre-D4 conservados; v0.2 sigue sin ser estable y la intermitencia histórica de API sigue abierta.
+
+Próximo trabajo recomendado: revisar los límites D5 y autorizar D5.1 (contratos/identidad/migración con pruebas), antes de dividendos, splits, interfaz e integración. Proponerlo no autoriza ejecutarlo.
+
+## Antecedente · 09/09/2026: cierre local D4
 
 **Cierre local D4:** implementación guardada en `0eb5523`; ATLAS arrancado en modo compilado, ejecución `312c4405e59040f1ad2669319ff5a26b`. Motor/proxy responden `0.4.0-dev.3`; interfaz normal abierta con NVIDIA y «Libro y conciliación». Esquema 3, integridad `ok`; las diez tablas previas se conservan salvo la auditoría de arranque, y las tres nuevas están vacías. Demo: seis movimientos, tres posiciones y NAV 25.118,66876 EUR. «Cartera de pruebas»: revisión 2, cero movimientos y vínculo NVIDIA v1 intacto. Los tres conjuntos mantienen v1; proveedores sin configurar, presupuesto/gasto/reserva cero y parada global activa. Evidencia `output/validation/d4-normal-after.json`. Arranque habitual `Abrir-ATLAS.cmd`; parada `Detener-ATLAS.cmd`.
 

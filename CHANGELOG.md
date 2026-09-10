@@ -1,6 +1,8 @@
 # Cambios de ATLAS Quant
 
-## 0.4.0-dev.3 · D4 · Desarrollo local, sin publicar · 2026-09-09
+## v0.4.0-dev.3 · D4 · Publicado · 2026-09-10
+
+[PR #6](https://github.com/Buzo500/atlas-quant/pull/6) fusionada mediante squash en `39d922cf63a95c4f39fbe8f35e88047d86d2807f`; etiqueta anotada verificada en remoto. [CI 34456773938](https://github.com/Buzo500/atlas-quant/actions/runs/34456773938) correcta al primer intento sobre `aa7ad176b5d851ca093f05689386e2942d2bc935`, árbol integrado idéntico: 570 Python + 91 subtests, 255 frontend y 14 E2E. Instalación, build, contratos, tipos, lint, arranque/proxy y parada correctos. La especificación posterior de D5 no forma parte del código de esta etiqueta.
 
 - Libro exacto EUR optativo al crear cartera: CSV v2 para depósitos, retiradas, compras, ventas y comisiones, costes y cantidades decimales sin precios. Carteras y resultados anteriores preservados; NAV/TWR v2 pendientes de D6/D7.
 - Extractos completos EUR: saldos de referencia, diferencias explícitas e historial consultable; guardar un informe no ajusta el libro. Reimportación por identidad externa, conflictos visibles y bruto declarado revisado.

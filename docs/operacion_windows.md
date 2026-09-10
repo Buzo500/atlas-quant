@@ -1,6 +1,6 @@
 # ATLAS Quant · Operación en Windows
 
-Guía actualizada el 9 de septiembre de 2026. Desarrollo local actual: **`0.4.0-dev.3`, D4 y esquema SQLite 3**, pendiente de publicación/CI propia. [Libro exacto y conciliación](v0_4_d4.md). Entrega publicada: `v0.4.0-dev.2`, D3 integrado en PR #5 con CI gratuita correcta. El historial de pruebas y el estado exacto del proceso están en [CONTINUIDAD](CONTINUIDAD.md). **v0.2.0-rc.2 sigue siendo candidata, no estable**: el ensayo de 48 horas permanece aplazado.
+Guía actualizada el 10 de septiembre de 2026. Entrega publicada: **`v0.4.0-dev.3`, D4 y esquema SQLite 3**, PR #6 fusionada y CI gratuita 34456773938 correcta. [Libro exacto y conciliación](v0_4_d4.md). D5 está especificado, sin implementar. El historial de pruebas y el estado exacto del proceso están en [CONTINUIDAD](CONTINUIDAD.md). **v0.2.0-rc.2 sigue siendo candidata, no estable**: el ensayo de 48 horas permanece aplazado.
 
 El recorrido usa Windows nativo, motor Python e interfaz compilada; no requiere WSL, CUDA, claves ni presupuesto de pago. La ejecución es exclusivamente simulada. Consultar `Status-Atlas.ps1` para conocer el proceso actual; los ensayos E2E usan bases aisladas.
 
