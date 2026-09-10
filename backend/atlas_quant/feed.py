@@ -9,12 +9,14 @@ from __future__ import annotations
 
 import importlib
 import math
+import os
 import queue
 import re
 import threading
 from collections.abc import Mapping
 from datetime import date, datetime, timezone
 from decimal import Decimal
+from pathlib import Path
 from typing import Any
 
 from .analytics import decimal_value, iso_date, normalize_bars
@@ -23,6 +25,9 @@ from .analytics import decimal_value, iso_date, normalize_bars
 REQUEST_TIMEOUT_SECONDS = 10
 FETCH_DEADLINE_SECONDS = 45
 _FETCH_SLOTS = threading.BoundedSemaphore(2)
+_PROVIDER_LOCK = threading.Lock()
+_PROVIDER_CACHE = None
+_PROVIDER_SESSION = None
 _SYMBOL = re.compile(r"[A-Z0-9][A-Z0-9.\-]{0,24}\Z", re.ASCII)
 _REQUIRED_COLUMNS = {"Open", "High", "Low", "Close", "Volume", "Dividends", "Stock Splits"}
 _METADATA_KEYS = ("currency", "symbol", "instrumentType", "exchangeName", "exchangeTimezoneName")
@@ -37,15 +42,31 @@ def _today_utc() -> date:
 
 
 def _load_provider():
+    global _PROVIDER_CACHE
     try:
-        return importlib.import_module("yfinance")
+        provider = importlib.import_module("yfinance")
     except ImportError as exc:
         raise FeedError("Falta la dependencia opcional yfinance. Instálala en el entorno virtual del backend para activar la descarga diaria.") from exc
+    # yfinance's default AppData SQLite cache may be inaccessible to the local
+    # launcher. Keep all three provider caches in ATLAS's writable data tree.
+    directory = (Path(os.environ.get("ATLAS_DATA_DIR", Path(__file__).resolve().parents[2] / "var" / "atlas")) / "cache" / "yfinance").resolve()
+    with _PROVIDER_LOCK:
+        if _PROVIDER_CACHE and _PROVIDER_CACHE[0] is provider:
+            if _PROVIDER_CACHE[1] != directory:
+                raise FeedError("Reinicia el motor para cambiar la carpeta de caché de Yahoo.")
+            return provider
+        try:
+            directory.mkdir(parents=True, exist_ok=True)
+            provider.set_tz_cache_location(str(directory))
+        except OSError as exc:
+            raise FeedError("No se puede preparar la caché de Yahoo en la carpeta de datos de ATLAS.") from exc
+        _PROVIDER_CACHE = provider, directory
+    return provider
 
 
 def _call_provider(symbol: str, start: str, end: str) -> tuple[Any, dict, str]:
     provider = _load_provider()
-    ticker = provider.Ticker(symbol)
+    ticker = provider.Ticker(symbol, session=_provider_session(provider))
     # Explicit choices avoid changing economics when library defaults change.
     frame = ticker.history(
         start=start, end=end, interval="1d", auto_adjust=False,
@@ -60,6 +81,22 @@ def _call_provider(symbol: str, start: str, end: str) -> tuple[Any, dict, str]:
     # base quote metadata, never iterate/copy the full lazy mapping.
     selected = {key: metadata.get(key) for key in _METADATA_KEYS}
     return frame, selected, str(getattr(provider, "__version__", "unknown"))
+
+
+def _provider_session(provider):
+    global _PROVIDER_SESSION
+    from .feed_tls import ca_bundle
+    directory = (Path(os.environ.get('ATLAS_DATA_DIR', Path(__file__).resolve().parents[2] / 'var' / 'atlas')) / 'cache' / 'yfinance').resolve()
+    with _PROVIDER_LOCK:
+        if _PROVIDER_SESSION and _PROVIDER_SESSION[:2] == (provider, directory):
+            return _PROVIDER_SESSION[2]
+        try:
+            from curl_cffi.requests import Session
+            session = Session(impersonate='chrome', verify=ca_bundle(directory))
+        except (ImportError, OSError, ValueError) as exc:
+            raise FeedError('No se pudo preparar la sesión TLS verificada de Yahoo. Revisa la instalación y la configuración de certificados.') from exc
+        _PROVIDER_SESSION = provider, directory, session
+        return session
 
 
 def _bounded_snapshot(symbol: str, start: str, end: str) -> tuple[Any, dict, str]:

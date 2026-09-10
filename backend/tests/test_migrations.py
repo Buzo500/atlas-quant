@@ -46,7 +46,7 @@ def test_v01_schema_adoption_preserves_all_records_versions_and_audit(tmp_path):
     store = Store(path)
     after = snapshot(path)
     assert after == {**before, "version": SCHEMA_VERSION}
-    assert SCHEMA_VERSION == 4
+    assert SCHEMA_VERSION == 5
     assert store.get("ledger", "portfolio") == ledger
     assert store.get("experiment", "experiment") == experiment
     assert store.get("dataset", "demo") == dataset

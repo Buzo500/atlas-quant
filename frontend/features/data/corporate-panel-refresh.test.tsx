@@ -153,8 +153,8 @@ it.each(['portfolio-first', 'rights-first', 'portfolio-only'] as const)(
           preview_token: 'a'.repeat(64),
           document_id: 'doc',
         };
-      if (path.startsWith('/corporate-events?')) return events;
-      if (path.startsWith('/corporate-events/event/versions/')) return event;
+      if (path.startsWith('/v2/corporate-events?')) return events;
+      if (path.startsWith('/v2/corporate-events/event/versions/')) return event;
       if (path.includes('/corporate-actions?')) return delayed ?? latest;
       if (path.includes('/corporate-documents'))
         return { documents: [], total: 0, offset: 0, limit: 100 };

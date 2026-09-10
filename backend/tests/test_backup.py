@@ -100,10 +100,14 @@ def test_failed_publication_leaves_no_visible_partial_backup(tmp_path, monkeypat
     assert contents(store.path) == before
 
 
-@pytest.mark.parametrize("schema_version", [0, 1, 2, 3, 4])
+@pytest.mark.parametrize("schema_version", [0, 1, 2, 3, 4, 5])
 def test_current_and_legacy_schema_backups_are_supported(tmp_path, schema_version):
     store = database(tmp_path)
     with closing(sqlite3.connect(store.path)) as db, db:
+        if schema_version < 5:
+            from atlas_quant.valuation_store import DDL as VALUATION_DDL
+            for table in reversed(VALUATION_DDL):
+                db.execute(f'DROP TABLE {table}')
         if schema_version < 4:
             from atlas_quant.corporate_store import DDL as CORPORATE_DDL
             for table in reversed(CORPORATE_DDL):

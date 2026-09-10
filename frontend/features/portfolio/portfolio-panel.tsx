@@ -19,6 +19,7 @@ import { Button } from '@/components/ui/button';
 import { qualityLabel } from '@/shared/quality';
 import { BookSummary } from '@/features/data/book-panel';
 import { CorporateSummary } from '@/features/data/corporate-panel';
+import { NativeValuation } from './native-valuation';
 
 export function PortfolioPanel({
   dataset,
@@ -74,13 +75,19 @@ export function PortfolioPanel({
           {portfolioName || 'Cartera'} · revisión{' '}
           {detail?.context.portfolio_revision ?? portfolioRevision} ·{' '}
           {nativeBook
-            ? 'Libro contable EUR v2'
+            ? 'Libro contable EUR / USD v2'
             : 'Fuentes de valoración configuradas en Datos'}
         </p>
       )}
       {detail?.portfolio.accounting_policy === 'atlas-accounting-v2' &&
         portfolioId && (
           <>
+            <NativeValuation
+              key={`${portfolioId}:${detail.portfolio.revision}:${auditSequence}`}
+              portfolioId={portfolioId}
+              revision={detail.portfolio.revision}
+              active={active}
+            />
             <BookSummary
               portfolioId={portfolioId}
               revision={portfolioRevision}

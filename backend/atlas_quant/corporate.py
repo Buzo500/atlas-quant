@@ -45,7 +45,7 @@ def optional_date(value, field, row):
         raise BookError("invalid_date", str(exc), row, field) from exc
 
 
-def parse_events(csv, mapping, verified=False, evidence=""):
+def parse_events(csv, mapping, verified=False, evidence="", *, multicurrency=False):
     if verified:
         evidence = text_field(evidence, "evidence", limit=500)
     result = []
@@ -55,7 +55,7 @@ def parse_events(csv, mapping, verified=False, evidence=""):
         if not ident:
             raise BookError("identity_unknown", "Mapea explícitamente la cotización del evento.", line, "listing_ref")
         kind = raw["event_type"]
-        if kind not in {"dividend", "split"} or raw["currency"] != "EUR":
+        if kind not in {"dividend", "split"} or raw["currency"] not in (('EUR', 'USD') if multicurrency else ('EUR',)):
             raise BookError("unsupported_corporate_event", "D5 admite dividendos ordinarios y splits EUR.", line)
         effective = optional_date(raw["effective_date"], "effective_date", line)
         payment = optional_date(raw["payment_date"], "payment_date", line)
@@ -81,7 +81,7 @@ def parse_events(csv, mapping, verified=False, evidence=""):
             n, d = ratio(raw["ratio_numerator"], raw["ratio_denominator"], line)
         reference = text_field(raw["source_reference"], "source_reference", line, 500)
         result.append((line, external, dict(listing_id=ident, event_type=kind, effective_date=effective,
-            payment_date=payment, available_at=available, gross_per_unit=gross, currency="EUR",
+            payment_date=payment, available_at=available, gross_per_unit=gross, currency=raw['currency'],
             ratio_numerator=n, ratio_denominator=d, source_reference=reference,
             verified=verified, evidence=evidence, cancelled=False)))
     return result
@@ -166,6 +166,8 @@ def application(event, review, entries, source, account, previous=None):
 
 def link_movement(app, item):
     value, event = item["event"], app["event_snapshot"]
+    if value['currency'] != event['currency']:
+        raise BookError('currency_mismatch', 'El movimiento y el evento deben usar la misma moneda.')
     if value.get("corporate_event_id") not in (None, event["id"]):
         raise BookError("corporate_movement_mismatch", "El movimiento identifica otro evento; corrige su referencia antes de enlazarlo.")
     if item["listing_id"] != event["listing_id"] or (value["source"], value["source_account"]) != (app["source"], app["source_account"]):

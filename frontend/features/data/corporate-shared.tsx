@@ -6,7 +6,10 @@ import { useAction } from '@/shared/use-action';
 import { Choice, Field } from '@/shared/ui';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import type { CorporateEvent, CatalogResponse } from '@/lib/api-types';
+import type {
+  NativeCorporateEvent as CorporateEvent,
+  CatalogResponse,
+} from '@/lib/api-types';
 
 export function eventLabel(event: CorporateEvent, catalog: CatalogResponse) {
   const listing = catalog.listings.find((l) => l.id === event.listing_id);

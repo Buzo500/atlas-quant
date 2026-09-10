@@ -20,6 +20,7 @@ import { Button } from '@/components/ui/button';
 import { moneyEUR, date } from '@/shared/format';
 import { BookWorkspace } from './book-panel';
 import { CorporatePanel } from './corporate-panel';
+import { MarketWorkspace } from './market-workspace';
 
 export function IdentityPanel({
   portfolios,
@@ -127,8 +128,8 @@ export function IdentityPanel({
             </Button>
           </form>
           <p className="muted">
-            El libro exacto permite importar y corregir movimientos EUR sin
-            precios. Su valoración y rentabilidad llegarán en D6/D7. El libro
+            El libro exacto permite importar y corregir movimientos EUR/USD, y
+            valorar su patrimonio en EUR con fuentes explícitas. El libro
             clásico conserva los gráficos y las convenciones anteriores. No se
             cambia la política de carteras existentes.
           </p>
@@ -151,6 +152,20 @@ export function IdentityPanel({
           portfolio={book.data.portfolio}
           catalog={catalog.data}
           active={active}
+          refresh={refreshAll}
+          onError={onError}
+        />
+      )}
+      {catalog.data && (
+        <MarketWorkspace
+          catalog={catalog.data}
+          portfolio={
+            book.data && book.data.portfolio.id === portfolioId
+              ? book.data.portfolio
+              : undefined
+          }
+          active={active}
+          revision={revision}
           refresh={refreshAll}
           onError={onError}
         />
@@ -302,6 +317,30 @@ function BookEditor({
         </p>
         {bindings.map((binding, index) => {
           const dataset = datasets.find((d) => d.id === binding.dataset_id);
+          if (!dataset && binding.dataset_id)
+            return (
+              <fieldset
+                className="binding-row"
+                key={index}
+                disabled={action.busy}
+              >
+                <legend>Fuente {index + 1}</legend>
+                <p>
+                  {binding.symbol} · versión {binding.dataset_version} ·{' '}
+                  <code>{binding.dataset_id.slice(0, 12)}</code>
+                </p>
+                <p className="muted">
+                  Serie nativa fijada. Consulta su evidencia o elige otra
+                  versión en Precios y tipos de cambio.
+                </p>
+                <Button
+                  variant="outline"
+                  onClick={() => set(bindings.filter((_, i) => i !== index))}
+                >
+                  Quitar fuente {index + 1}
+                </Button>
+              </fieldset>
+            );
           const versions = datasets.map((d) => ({
             value: `${d.id}:${d.version}`,
             label: `${d.name} · v${d.version}`,

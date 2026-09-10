@@ -15,6 +15,12 @@ import type {
   ReconciliationInput,
   CorrectionInput,
   PortfolioRecord,
+  NativeBalance,
+  NativeBookDetail,
+  NativeBookPreview,
+  NativeReconciliationPreview,
+  NativeBookDocument,
+  NativeReconciliationRow,
 } from '@/lib/api-types';
 import { useRead } from '@/shared/use-read';
 import { useAction } from '@/shared/use-action';
@@ -30,7 +36,11 @@ import {
 } from './book-corporate-fields';
 
 const today = () => new Date().toISOString().slice(0, 10);
-type Review = BookPreview | ReconciliationPreview;
+type Review =
+  | BookPreview
+  | ReconciliationPreview
+  | NativeBookPreview
+  | NativeReconciliationPreview;
 type Mapping = { reference: string; listing: string };
 const scalar = (v: unknown) =>
   typeof v === 'string' || typeof v === 'number' ? String(v) : '—';
@@ -49,9 +59,44 @@ export function ExactBalance({
   value,
   catalog,
 }: {
-  value: BookBalance;
+  value: BookBalance | NativeBalance;
   catalog?: CatalogResponse;
 }) {
+  if ('balances' in value)
+    return (
+      <div className="book-balance">
+        <p className="muted">Saldos nativos al {date(value.as_of_date)}</p>
+        {value.balances.map((b) => (
+          <p key={b.currency}>
+            <strong>
+              Efectivo: {b.cash} {b.currency}
+            </strong>{' '}
+            · Aportaciones netas: {b.net_contributions} {b.currency} · Realizado
+            en ventas: {b.realized_pnl ?? '—'} {b.currency}
+          </p>
+        ))}
+        <DataTable
+          heads={['Cotización', 'Moneda', 'Cantidad', 'Coste pendiente']}
+          numericColumns={[2, 3]}
+          rows={value.positions.map((p) => [
+            listingLabel(p.listing_id, catalog),
+            p.currency,
+            p.quantity,
+            p.cost_basis,
+          ])}
+          emptyMessage="Sin posiciones abiertas en este corte."
+        />
+        <p className="muted">
+          El resultado de ventas conserva su moneda y no representa la
+          rentabilidad total.
+        </p>
+        {value.warnings.map((w) => (
+          <p className="muted" key={w}>
+            {w}
+          </p>
+        ))}
+      </div>
+    );
   return (
     <div className="book-balance">
       <p>
@@ -92,21 +137,21 @@ export function BookSummary({
   revision?: number;
   active: boolean;
 }) {
-  const query = useRead<BookDetail>({
-    path: '/portfolios/' + portfolioId + '/book',
+  const query = useRead<BookDetail | NativeBookDetail>({
+    path: '/v2/portfolios/' + portfolioId + '/book',
     revision,
     enabled: active,
   });
   return (
     <section className="panel">
       <div className="panel-heading">
-        <h2>Libro contable EUR</h2>
+        <h2>Libro contable EUR / USD</h2>
       </div>
       <QueryStatus label="Saldos contables" query={query} />
       {query.data && <ExactBalance value={query.data.balance} />}
       <p className="muted">
-        Saldos y cantidades sin usar precios. La valoración y la rentabilidad
-        del libro v2 se incorporarán en las siguientes entregas contables.
+        Saldos y cantidades sin usar precios. Las conversiones registran lo
+        entregado y recibido; no convierten automáticamente el efectivo.
       </p>
     </section>
   );
@@ -116,7 +161,7 @@ function Differences({
   rows,
   catalog,
 }: {
-  rows: ReconciliationRow[];
+  rows: (ReconciliationRow | NativeReconciliationRow)[];
   catalog: CatalogResponse;
 }) {
   return (
@@ -125,7 +170,7 @@ function Differences({
       numericColumns={[1, 2, 3]}
       rows={rows.map((r) => [
         r.record_type === 'cash'
-          ? 'Efectivo EUR'
+          ? 'Efectivo ' + r.currency
           : listingLabel(r.listing_id!, catalog),
         r.book,
         r.reference,
@@ -195,8 +240,11 @@ export function BookWorkspace({
   const [offset, setOffset] = useState(0);
   const [editing, setEditing] = useState(false);
   const [documentsRevision, setDocumentsRevision] = useState(0);
-  const query = useRead<BookDetail>({
+  const prefix =
+    portfolio.accounting_policy === 'atlas-accounting-v2' ? '/v2' : '';
+  const query = useRead<BookDetail | NativeBookDetail>({
     path:
+      prefix +
       '/portfolios/' +
       portfolio.id +
       '/book?as_of_date=' +
@@ -215,7 +263,12 @@ export function BookWorkspace({
     <section className="panel book-workspace" aria-label="Libro y conciliación">
       <div className="panel-heading">
         <h2>Libro y conciliación</h2>
-        <span className="tag neutral">EUR · revisión {portfolio.revision}</span>
+        <span className="tag neutral">
+          {query.data && 'balances' in query.data.balance
+            ? query.data.balance.balances.map((b) => b.currency).join(' / ')
+            : 'EUR'}{' '}
+          · revisión {portfolio.revision}
+        </span>
       </div>
       <p className="muted">
         Comprueba efectivo y cantidades contra un extracto. Guardar diferencias
@@ -256,6 +309,7 @@ export function BookWorkspace({
                 'Cantidad',
                 'Bruto/importe',
                 'Comisión',
+                'Moneda',
               ]}
               rows={query.data.entries.map((entry) => [
                 date(entry.date),
@@ -268,6 +322,7 @@ export function BookWorkspace({
                 scalar(entry.event.quantity),
                 scalar(entry.event.gross_amount ?? entry.event.amount),
                 scalar(entry.event.fee_amount ?? entry.event.fee),
+                scalar(entry.event.currency),
               ])}
             />
             <PageButtons
@@ -355,10 +410,15 @@ function BookReview({
   };
   const voiding = mode === 'correction' && correction === 'void';
   const options = catalog.listings
-    .filter((item) => item.currency === 'EUR')
+    .filter((item) => native || item.currency === 'EUR')
     .map((item) => ({
       value: item.id,
-      label: listingLabel(item.id, catalog) + ' · ' + item.id.slice(0, 8),
+      label:
+        listingLabel(item.id, catalog) +
+        ' · ' +
+        item.currency +
+        ' · ' +
+        item.id.slice(0, 8),
     }));
 
   function body(
@@ -445,7 +505,7 @@ function BookReview({
               ? 'corrections'
               : 'reconciliations';
         const result = await api<Review>(
-          '/portfolios/' + portfolio.id + '/' + route,
+          (native ? '/v2' : '') + '/portfolios/' + portfolio.id + '/' + route,
           body(commit, offset),
         );
         if (!mounted.current) return;
@@ -616,8 +676,8 @@ function BookReview({
             <>
               <p className="muted">
                 {mode === 'reconciliation'
-                  ? 'Una fila cash EUR y todas las posiciones al mismo cierre. Una posición omitida se declara cero.'
-                  : 'Movimientos en EUR, incluidos cobros de dividendos y splits revisados. ID externo y secuencia por fecha obligatorios; FX está pendiente.'}
+                  ? 'Una fila cash por moneda y todas las posiciones al mismo cierre. Una posición omitida se declara cero.'
+                  : 'Movimientos EUR/USD, conversiones fx_exchange y eventos revisados. ID externo y secuencia por fecha obligatorios. Cada gasto requiere efectivo en su moneda.'}
               </p>
               <a
                 className="text-link"
@@ -940,6 +1000,7 @@ function BookHistory({
   const [selected, setSelected] = useState('');
   const query = useRead<BookDocuments>({
     path:
+      (portfolio.accounting_policy === 'atlas-accounting-v2' ? '/v2' : '') +
       '/portfolios/' +
       portfolio.id +
       '/book-documents?offset=' +
@@ -948,9 +1009,13 @@ function BookHistory({
     revision: portfolio.revision + ':' + revision,
     enabled: active && open,
   });
-  const detail = useRead<BookDocument>({
+  const detail = useRead<BookDocument | NativeBookDocument>({
     path: selected
-      ? '/portfolios/' + portfolio.id + '/book-documents/' + selected
+      ? (portfolio.accounting_policy === 'atlas-accounting-v2' ? '/v2' : '') +
+        '/portfolios/' +
+        portfolio.id +
+        '/book-documents/' +
+        selected
       : null,
     revision: portfolio.revision + ':' + revision,
     enabled: active && open,
@@ -1026,7 +1091,13 @@ function BookHistory({
           <a
             className="text-link"
             href={
-              '/api/portfolios/' + portfolio.id + '/book-documents/' + selected
+              (portfolio.accounting_policy === 'atlas-accounting-v2'
+                ? '/api/v2'
+                : '/api') +
+              '/portfolios/' +
+              portfolio.id +
+              '/book-documents/' +
+              selected
             }
             download
           >

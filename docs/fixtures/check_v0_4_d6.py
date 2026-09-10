@@ -64,7 +64,7 @@ def main():
         "exact_results_checked": checks,
         "semantic_cases_specified_not_executed": len(reference["semantic_cases"]),
         "application_tests_executed": 0,
-        "result": "Reference arithmetic matches; D6 is not implemented.",
+        "result": "Reference arithmetic matches; this checker does not exercise application code.",
     }, indent=2))
 
 

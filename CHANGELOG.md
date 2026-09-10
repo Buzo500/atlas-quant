@@ -1,5 +1,14 @@
 # Cambios de ATLAS Quant
 
+## 0.4.0-dev.5 · D6 completo · En revisión · 2026-09-10
+
+- Esquema 5 aditivo, API versionada para saldos y documentos EUR/USD; compatibilidad EUR conservada.
+- Conversiones con importes reales/comisión, conciliación por moneda, correcciones atómicas y dividendos/splits USD.
+- CSV de precios EUR/USD y FX versionados, evidencia/calendarios explícitos, vínculos y cortes de patrimonio EUR inmutables. Formularios multidivisa y detalle de procedencia.
+- Lecturas SQLite coherentes de solo lectura y verificación breve antes de publicar; rendimiento y recuperación dentro del objetivo D6. [Uso y evidencia](docs/v0_4_d6_cierre.md).
+- Caché Yahoo dentro de los datos ATLAS; diagnóstico TLS/429 y latencia API todavía abiertos.
+- CI inicial de D6.1/D6.2 correcta; PR #8 recibe D6 completo y requiere CI del head definitivo. TWR/MWR nativos y D8 continúan después.
+
 ## v0.4.0-dev.4 · D5 · Publicado · 2026-09-10
 
 [PR #7](https://github.com/Buzo500/atlas-quant/pull/7) fusionada mediante squash en `a91f077648f209e49dfba2c630fd2c6ccecfd1a0`; etiqueta anotada verificada en remoto. [CI 34479828915](https://github.com/Buzo500/atlas-quant/actions/runs/34479828915) correcta sobre `5c3e8a7453418d2f5b7f6eb3feddefa44c28db92`, con árbol integrado idéntico: 623 Python + 91 subtests, 266 frontend y 18 E2E. Instalación limpia, build, contratos, tipos, lint, arranque/proxy y parada correctos; 0 USD facturables. Este registro documental es posterior a la etiqueta.

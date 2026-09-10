@@ -1,4 +1,33 @@
-# Diagnóstico de API en D5 · 10/09/2026
+# Diagnóstico de API en D5/D6 · 10/09/2026
+
+## Actualización: espera original reproducida antes de ASGI
+
+Durante D6 completo, `e2e-6df81e53a5f148e1a1ba9a1f36166d5b` reproduce la espera de 10 s: GET `/api/state`, `proxy-38548-52`, 16:05:58 UTC. Creación/envío de cabeceras upstream inmediato, `bodySent` a 10008,9 ms y aborto del cliente a 10015 ms con `UND_ERR_SOCKET`. No existe entrada ASGI con esa correlación. Reutiliza el socket del POST demo anterior, terminado en ~98 ms. La evidencia acota el fallo al envío/transporte previo al motor; no identifica la causa exacta ni acredita una reparación.
+
+La siguiente suite `e2e-72c2b7425cbb4fa083222032ef47fa2a` pasa 19/19. Otro error de socket de ~5 s sigue asociado a cancelación anterior. La sonda optativa añade exclusivamente encuadre HTTP (content-length, transfer-encoding, connection, expect), cork y tamaño de cola: no cuerpos ni credenciales. No se modifican tiempos del producto ni dependencias. Incidencia abierta; una suite correcta no sustituye su diagnóstico.
+
+## Ampliación posterior: consumo de cuerpo y aborto del cliente
+
+Autorizada dentro de las cinco tareas de D6.1/D6.2. Se instrumentan las lecturas existentes (`fromWeb`, lectores y Body mixin), sin `tee`, lectura anticipada, contenido ni nuevos reintentos. El stream que entrega vinext no conserva la identidad del objeto `body` obtenido por fetch; se correlaciona mediante el contexto de petición y se declara `upstream_body_identity=false`. Se mide la entrega de ese stream, no se presupone que sea el objeto original. El contexto se guarda en WeakMap para poder observar después de un aborto sin retener peticiones finalizadas.
+
+Primero se realizaron dos capturas dirigidas sobre D5: `e2e-c07c691f1fdf48bea068509708eb1950` (18/18, 1,1 min) y `e2e-92c5c213fa0c46f3b97ef82214547d3f` (3/3 D5, 16,4 s). Confirmaron abortos pero no asociaron consumidores por identidad; esa ausencia no acredita que el cuerpo no se consumiera. Se amplió la correlación por contexto antes de la captura útil siguiente.
+
+**Validación de la aplicación D6.1/D6.2:** `e2e-aa269c16968c47c2b37c78e23289edff`, **18/18 E2E, 1,1 min**, integridad `ok`, base ordinaria intacta y puertos liberados. Registra 568 consumidores del stream de entrega y 568 finales/cierres, 1.083 entradas, 1.067 respuestas finalizadas y 16 abortos. Máximo de `/api/state` 125,620 ms (121 respuestas); precios 60,642 ms (35), calidad 45,620 ms (26). Un 502 al preparar el arranque corresponde a `ECONNREFUSED` antes de que el backend esté listo, no a la incidencia de diez segundos.
+
+| Correlación | Aborto cliente | Final del cuerpo ASGI | Error upstream |
+|---|---:|---:|---:|
+| `proxy-2212-96` | 68,295 ms | 78,682 ms | `UND_ERR_SOCKET`, 5.095,834 ms |
+| `proxy-2212-592` | 100,898 ms | 105,643 ms | `UND_ERR_SOCKET`, 5.118,093 ms |
+
+Cada columna usa el reloj relativo de su etapa; UTC/correlación permiten ordenar los eventos. Los clientes ya habían abortado antes de recibir cabeceras. La primera versión del registro de entrega liberaba su contexto al cerrar el cliente: por ello no se interpreta la ausencia de consumidor en estas dos correlaciones como prueba de cuerpo abandonado. Se sustituyó por referencia débil, sin cambiar el producto.
+
+**Comprobación final de la sonda:** `e2e-268f9c4f9e6d4e779a24fd1a1ee53252`, **3/3 D5, 16,3 s** y limpieza/integridad correctas. 232 respuestas fetch y 232 consumidores asociados; 224 finales y 225 cierres de cuerpo, ocho abortos. `proxy-29368-103` muestra cabeceras → consumidor → aborto → cierre del cliente → `ERR_STREAM_PREMATURE_CLOSE` (12,650 ms) → error/cierre del cuerpo. No se observó error tardío de cinco segundos ni espera visible de diez en este recorrido. No se infiere de la diferencia entre contadores un origen concreto de las cancelaciones restantes.
+
+**Conclusión:** la sonda ahora distingue entrega completa y cuerpo interrumpido de un cliente que ya canceló. La causa de la demora original **continúa abierta**. No hay base para cambiar el proxy, sus dependencias o los tiempos de espera con esta evidencia. El arranque habitual no activa las sondas. El siguiente dato útil es una captura de la acción que vuelva a mostrar la espera, con su hora/correlación; no repetir suites indefinidamente.
+
+Evidencia local: logs de los cuatro runs citados, `output/validation/d6-api-body-summary.json`, `d6-e2e-traced.log` y `d6-api-final-traced.log`. No contienen datos personales de cartera. La sonda de Yahoo se documenta por separado en [D6.1/D6.2](v0_4_d6_implementacion.md).
+
+## Antecedente: primera captura D5
 
 **La espera original de unos 10 segundos no se ha reproducido en esta captura y sigue abierta.** La nueva evidencia permite separar dos errores de socket asociados a lecturas abandonadas de una respuesta lenta del motor. No se ha corregido la aplicación, cambiado dependencias, ampliado tiempos ni añadido reintentos.
 

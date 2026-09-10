@@ -1495,3 +1495,15 @@ code {
 .check-row input {
   flex-shrink: 0;
 }
+.native-hash {
+  overflow-wrap: anywhere;
+}
+.technical-data {
+  max-height: 24rem;
+  overflow: auto;
+  max-width: 100%;
+  font-size: 0.75rem;
+}
+.native-valuation > section {
+  min-width: 0;
+}

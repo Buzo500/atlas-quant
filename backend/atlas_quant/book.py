@@ -1,4 +1,4 @@
-"""Price-independent EUR book and strict, versioned statement interchange."""
+"""Price-independent book; EUR compatibility and explicit EUR/USD balances."""
 from __future__ import annotations
 
 import csv
@@ -103,7 +103,7 @@ def rows(content, columns):
         raise BookError("invalid_csv", "CSV mal formado o campo demasiado largo.") from exc
 
 
-def resolve_mapping(mapping, catalog):
+def resolve_mapping(mapping, catalog, *, multicurrency=False):
     listings = {item["id"]: item for item in catalog["listings"]}
     if len(mapping) > 100:
         raise BookError("input_limit", "Máximo 100 referencias por lote.")
@@ -111,9 +111,18 @@ def resolve_mapping(mapping, catalog):
         text_field(reference, "listing_ref")
         if reference != reference.strip() or ident not in listings:
             raise BookError("identity_unknown", "Referencia o cotización no encontrada.", field="mapping")
-        if listings[ident]["currency"] != "EUR":
+        if listings[ident]["currency"] not in (("EUR", "USD") if multicurrency else ("EUR",)):
             raise BookError("unsupported_currency", "D4 solo admite cotizaciones EUR.", field="mapping")
     return mapping
+
+
+def validate_currencies(parsed, catalog):
+    currencies = {item['id']: item['currency'] for item in catalog['listings']}
+    for row in parsed:
+        line, event = row[0], row[-1]
+        ident = event.get('listing_id')
+        if ident is not None and currencies.get(ident) != event['currency']:
+            raise BookError('currency_mismatch', 'La moneda no coincide con la cotización mapeada.', line, 'currency')
 
 
 def listing(reference, mapping, row):
@@ -122,7 +131,7 @@ def listing(reference, mapping, row):
     return mapping[reference]
 
 
-def parse_movements(content, mapping, as_of_date, explanations, *, corporate=None, unaccredited=None, reviews=None):
+def parse_movements(content, mapping, as_of_date, explanations, *, corporate=None, unaccredited=None, reviews=None, multicurrency=False):
     end = cutoff(as_of_date)
     parsed, seen = [], {}
     with localcontext() as context:
@@ -140,7 +149,7 @@ def parse_movements(content, mapping, as_of_date, explanations, *, corporate=Non
             kind = raw["kind"]
             if kind in {"dividend_payment", "split"}:
                 from .corporate_movement import parse
-                event = parse(raw, line, mapping, corporate or {}, unaccredited or {}, reviews or {})
+                event = parse(raw, line, mapping, corporate or {}, unaccredited or {}, reviews or {}, multicurrency=multicurrency)
                 if external in explanations:
                     raise BookError("incompatible_field", "El bruto corporativo se revisa en el derecho del evento.", line)
                 if external in seen and seen[external] != event:
@@ -148,10 +157,20 @@ def parse_movements(content, mapping, as_of_date, explanations, *, corporate=Non
                 seen[external] = event
                 parsed.append((line, event))
                 continue
+            if kind == 'fx_exchange' and multicurrency:
+                event = parse_exchange(raw, line)
+                if external in explanations:
+                    raise BookError('incompatible_field', 'La conversión usa importes reales, sin explicación de precio.', line)
+                if external in seen and seen[external] != event:
+                    raise BookError('duplicate_conflict', 'Un ID externo aparece con contenido diferente.', line)
+                seen[external] = event
+                parsed.append((line, event))
+                continue
             if kind not in {"deposit", "withdrawal", "buy", "sell", "fee"}:
                 raise BookError("unsupported_kind", "Tipo no soportado; FX corresponde a D6.", line, "kind")
-            if raw["currency"] != "EUR" or raw["fee_currency"] != "EUR" or raw["tax_currency"] != "EUR":
-                raise BookError("unsupported_currency", "Moneda, comisión y retención deben declarar EUR.", line, "currency")
+            currency = raw['currency']
+            if currency not in (("EUR", "USD") if multicurrency else ("EUR",)) or raw['fee_currency'] != currency or raw['tax_currency'] != currency:
+                raise BookError("unsupported_currency", "Moneda admitida y cargos en la misma moneda requeridos.", line, "currency")
             fee = number(raw["fee_amount"], "fee_amount", 2, line)
             tax = number(raw["tax_amount"], "tax_amount", 2, line)
             gross = number(raw["gross_amount"], "gross_amount", 2, line, positive=kind not in {"buy", "sell"})
@@ -174,7 +193,7 @@ def parse_movements(content, mapping, as_of_date, explanations, *, corporate=Non
                 if gross != calculated:
                     explanation = text_field(explanations.get(external, ""), "gross_explanation", line, 500)
             event = dict(external_id=external, date=day, day_sequence=int(raw["day_sequence"]), kind=kind,
-                         listing_id=listing_id, currency="EUR",
+                         listing_id=listing_id, currency=currency,
                          quantity=decimal_text(quantity) if quantity is not None else None,
                          unit_price=decimal_text(price) if price is not None else None,
                          gross_amount=decimal_text(gross, money=True), fee_amount=decimal_text(fee, money=True),
@@ -188,13 +207,35 @@ def parse_movements(content, mapping, as_of_date, explanations, *, corporate=Non
     return parsed
 
 
-def balance(entries, as_of_date, policy=POLICY):
+def parse_exchange(raw, line):
+    currency, target = raw['currency'], raw['fx_to_currency']
+    if {currency, target} != {'EUR', 'USD'} or raw['fee_currency'] not in {'EUR', 'USD'}:
+        raise BookError('unsupported_currency', 'Conversión explícita EUR/USD y comisión en una de sus monedas.', line)
+    for field in ('listing_ref', 'quantity', 'unit_price', 'tax_amount', 'tax_currency', 'ratio_numerator', 'ratio_denominator', 'corporate_event_ref'):
+        if raw[field]:
+            raise BookError('incompatible_field', f'{field} debe estar vacío en fx_exchange.', line, field)
+    gross = number(raw['gross_amount'], 'gross_amount', 2, line, positive=True)
+    received = number(raw['fx_to_amount'], 'fx_to_amount', 2, line, positive=True)
+    fee = number(raw['fee_amount'], 'fee_amount', 2, line)
+    return dict(external_id=raw['external_id'], date=raw['date'], day_sequence=int(raw['day_sequence']),
+                kind='fx_exchange', listing_id=None, currency=currency, quantity=None, unit_price=None,
+                gross_amount=decimal_text(gross, money=True), fee_amount=decimal_text(fee, money=True),
+                fee_currency=raw['fee_currency'], tax_amount=None, gross_explanation=None,
+                fx_to_amount=decimal_text(received, money=True), fx_to_currency=target)
+
+
+def balance(entries, as_of_date, policy=POLICY, *, multicurrency=False):
     """Return exact book balances, never marks/NAV or invented prices."""
     if policy == "legacy-eur-v1":
-        return legacy_balance(entries, as_of_date)
+        value = legacy_balance(entries, as_of_date)
+        return multi_from_eur(value) if multicurrency else value
     if policy != POLICY:
         raise BookError("unsupported_accounting_policy", "Política contable no soportada.")
-    cash = contributions = realized = ZERO
+    currencies = {'EUR'} | {e['event'].get('currency', 'EUR') for e in entries if e['date'] <= as_of_date}
+    currencies |= {e['event']['fx_to_currency'] for e in entries if e['date'] <= as_of_date and e['event']['kind'] == 'fx_exchange'}
+    if not currencies <= {'EUR', 'USD'} or (not multicurrency and currencies != {'EUR'}):
+        raise BookError('unsupported_currency', 'Este corte requiere la API multidivisa /api/v2; no se convierte ni omite USD.')
+    amounts = {c: [ZERO, ZERO, ZERO] for c in currencies}
     positions, sequences = {}, set()
     with localcontext() as context:
         context.prec, context.rounding = 64, ROUND_HALF_EVEN
@@ -208,6 +249,8 @@ def balance(entries, as_of_date, policy=POLICY):
                 continue
             gross, fee = Decimal(event["gross_amount"] or "0"), Decimal(event["fee_amount"] or "0")
             kind, ident = event["kind"], item["listing_id"]
+            currency = event['currency']
+            cash, contributions, realized = amounts[currency]
             if kind == "deposit":
                 cash += gross - fee
                 contributions += gross
@@ -220,13 +263,17 @@ def balance(entries, as_of_date, policy=POLICY):
                 cash += gross - fee - Decimal(event["tax_amount"])
             elif kind == "split":
                 from .corporate import split_quantity
-                position = positions.setdefault(ident, [ZERO, ZERO])
+                position = positions.setdefault(ident, [ZERO, ZERO, currency])
+                if position[2] != currency:
+                    raise BookError('currency_mismatch', 'La posición cambia de moneda.')
                 if position[0] <= 0:
                     raise BookError("corporate_position_empty", "El split requiere una posición anterior positiva.")
                 position[0] = split_quantity(position[0], event["ratio_numerator"], event["ratio_denominator"], event["fraction_evidence"])
             elif kind in {"buy", "sell"}:
                 quantity = Decimal(event["quantity"])
-                position = positions.setdefault(ident, [ZERO, ZERO])
+                position = positions.setdefault(ident, [ZERO, ZERO, currency])
+                if position[2] != currency:
+                    raise BookError('currency_mismatch', 'La posición cambia de moneda.')
                 if kind == "buy":
                     cash -= gross + fee
                     position[0] += quantity
@@ -241,16 +288,42 @@ def balance(entries, as_of_date, policy=POLICY):
                     realized += gross - fee - assigned
                 bounded(position[0], "quantity")
                 bounded(position[1], "cost_basis")
+            elif kind == 'fx_exchange':
+                cash -= gross
+                amounts[event['fx_to_currency']][0] += Decimal(event['fx_to_amount'])
+                if event['fee_currency'] == currency:
+                    cash -= fee
+                else:
+                    amounts[event['fee_currency']][0] -= fee
             else:
                 raise BookError("unsupported_kind", "Movimiento nativo no soportado.")
-            if cash < 0:
-                raise BookError("insufficient_cash", "Efectivo insuficiente después del movimiento.", event.get("source_row"), "gross_amount")
-            for name, value in (("cash", cash), ("net_contributions", contributions), ("realized_pnl", realized)):
-                bounded(value, name, event.get("source_row"))
-    return dict(as_of_date=as_of_date, currency="EUR", cash=decimal_text(cash, money=True),
-                net_contributions=decimal_text(contributions, money=True), realized_pnl=decimal_text(realized),
-                positions=[dict(listing_id=k, quantity=decimal_text(v[0]), cost_basis=decimal_text(v[1]))
-                           for k, v in sorted(positions.items()) if v[0]], warnings=[])
+            amounts[currency] = [cash, contributions, realized]
+            for code, values in amounts.items():
+                if values[0] < 0:
+                    raise BookError('insufficient_cash', f'Efectivo insuficiente en {code} después del movimiento.', event.get('source_row'), 'gross_amount')
+                for name, value in zip(('cash', 'net_contributions', 'realized_pnl'), values):
+                    bounded(value, name, event.get('source_row'))
+    result = dict(as_of_date=as_of_date, balances=[dict(currency=c, cash=decimal_text(v[0], money=True),
+                  net_contributions=decimal_text(v[1], money=True), realized_pnl=decimal_text(v[2])) for c, v in sorted(amounts.items())],
+                  positions=[dict(listing_id=k, currency=v[2], quantity=decimal_text(v[0]), cost_basis=decimal_text(v[1]))
+                             for k, v in sorted(positions.items()) if v[0]], warnings=[])
+    return result if multicurrency else eur_from_multi(result)
+
+
+def multi_from_eur(value):
+    if 'balances' in value:
+        return value
+    return dict(as_of_date=value['as_of_date'], balances=[{k: value[k] for k in ('currency', 'cash', 'net_contributions', 'realized_pnl')}],
+                positions=[{**p, 'currency': 'EUR'} for p in value['positions']], warnings=value['warnings'])
+
+
+def eur_from_multi(value):
+    if 'balances' not in value:
+        return value
+    if any(b['currency'] != 'EUR' for b in value['balances']) or any(p['currency'] != 'EUR' for p in value['positions']):
+        raise BookError('unsupported_currency', 'Consulta este documento/corte con la API multidivisa /api/v2.')
+    return dict(as_of_date=value['as_of_date'], **value['balances'][0],
+                positions=[{k: v for k, v in p.items() if k != 'currency'} for p in value['positions']], warnings=value['warnings'])
 
 
 def legacy_balance(entries, as_of_date):
@@ -271,34 +344,39 @@ def legacy_balance(entries, as_of_date):
                            for k, v in sorted(state["quantities"].items()) if v], warnings=warnings)
 
 
-def parse_statement(content, mapping, as_of_date):
+def parse_statement(content, mapping, as_of_date, *, multicurrency=False, catalog=None):
     end = cutoff(as_of_date)
     values = {}
     for line, raw in rows(content, STATEMENT_COLUMNS):
         if raw["as_of_date"] != end:
             raise BookError("cut_mismatch", "Todas las filas deben tener la fecha de corte declarada.", line, "as_of_date")
-        if raw["currency"] != "EUR":
+        currency = raw['currency']
+        if currency not in (('EUR', 'USD') if multicurrency else ('EUR',)):
             raise BookError("unsupported_currency", "D4 concilia exclusivamente EUR.", line, "currency")
         if raw["record_type"] == "cash":
             if raw["listing_ref"] or raw["quantity"]:
                 raise BookError("incompatible_field", "Efectivo no lleva cotización ni cantidad.", line)
-            key, value = ("cash", None), number(raw["amount"], "amount", 2, line)
+            key, value = ("cash", currency if multicurrency else None), number(raw["amount"], "amount", 2, line)
         elif raw["record_type"] == "position":
             if raw["amount"]:
                 raise BookError("incompatible_field", "Una posición no lleva importe de efectivo.", line, "amount")
             key = "position", listing(raw["listing_ref"], mapping, line)
+            if catalog:
+                validate_currencies([(line, dict(listing_id=key[1], currency=currency))], catalog)
             value = number(raw["quantity"], "quantity", 12, line)
         else:
             raise BookError("invalid_record_type", "Se requiere cash o position.", line, "record_type")
         if key in values:
             raise BookError("duplicate_conflict", "Clave duplicada en el extracto.", line)
         values[key] = value
-    if ("cash", None) not in values:
+    if ("cash", 'EUR' if multicurrency else None) not in values:
         raise BookError("incomplete_statement", "Falta la fila de efectivo EUR del extracto completo.")
     return values
 
 
-def reconcile(book, reference):
+def reconcile(book, reference, catalog=None):
+    if 'balances' in book:
+        return reconcile_multi(book, reference, catalog)
     actual = {("cash", None): Decimal(book["cash"])}
     actual.update({("position", p["listing_id"]): Decimal(p["quantity"]) for p in book["positions"]})
     differences = []
@@ -311,3 +389,24 @@ def reconcile(book, reference):
                 book=decimal_text(recorded), reference=decimal_text(expected),
                 difference=decimal_text(delta), matched=delta == 0))
     return differences
+
+
+def reconcile_multi(book, reference, catalog):
+    currencies = {p['id']: p['currency'] for p in (catalog or {}).get('listings', [])}
+    currencies.update({p['listing_id']: p['currency'] for p in book['positions']})
+    for b in book['balances']:
+        if ('cash', b['currency']) not in reference:
+            raise BookError('incomplete_statement', f"Falta efectivo {b['currency']} en el extracto completo.")
+    actual = {('cash', b['currency']): Decimal(b['cash']) for b in book['balances']}
+    actual.update({('position', p['listing_id']): Decimal(p['quantity']) for p in book['positions']})
+    rows = []
+    with localcontext() as ctx:
+        ctx.prec, ctx.rounding = 64, ROUND_HALF_EVEN
+        for key in sorted(actual.keys() | reference.keys()):
+            kind, ident = key
+            recorded, expected = actual.get(key, ZERO), reference.get(key, ZERO)
+            delta = bounded(expected - recorded, 'difference')
+            rows.append(dict(record_type=kind, listing_id=ident if kind == 'position' else None,
+                currency=ident if kind == 'cash' else currencies.get(ident), book=decimal_text(recorded),
+                reference=decimal_text(expected), difference=decimal_text(delta), matched=delta == 0))
+    return rows

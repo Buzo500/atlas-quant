@@ -4,7 +4,7 @@ import hashlib
 import hmac
 
 from .book import (POLICY, BookError, balance, cutoff, parse_movements, parse_statement,
-                   reconcile, resolve_mapping, text_field)
+                   reconcile, resolve_mapping, text_field, validate_currencies, multi_from_eur, eur_from_multi)
 from .catalog import IdentityNotFound, RevisionConflict
 from .portfolios import fingerprint
 
@@ -20,8 +20,22 @@ def economic(item):
 
 
 class BookService:
-    def __init__(self, store):
+    def __init__(self, store, *, multicurrency=False):
         self.store = store
+        self.multicurrency = multicurrency
+
+    def _balance(self, entries, day, policy=POLICY):
+        return balance(entries, day, policy, multicurrency=self.multicurrency)
+
+    def _mapping(self, mapping, catalog):
+        return resolve_mapping(mapping, catalog, multicurrency=self.multicurrency)
+
+    def _parse(self, context, body, mapping, day):
+        from .corporate import movement_options
+        parsed = parse_movements(body.csv, mapping, day, body.gross_explanations,
+                                 multicurrency=self.multicurrency, **movement_options(context, body))
+        validate_currencies(parsed, context['catalog'])
+        return parsed
 
     @staticmethod
     def _context(work, ident, revision=None, *, history=False):
@@ -54,7 +68,7 @@ class BookService:
         entries = sorted((e for e in context["entries"] if e["date"] <= day),
                          key=lambda e: (e["date"], e["day_sequence"]))
         return dict(context=self._cut(context, day),
-                    balance=balance(entries, day, context["portfolio"]["accounting_policy"]),
+                    balance=self._balance(entries, day, context["portfolio"]["accounting_policy"]),
                     entries=entries[offset:offset+limit], total=len(entries), offset=offset, limit=limit,
                     sources=context["sources"])
 
@@ -141,13 +155,13 @@ class BookService:
         self._revision(context, body.expected_revision)
         self._native(context)
         self._source(context, body.source, body.source_account)
-        mapping = resolve_mapping(body.mapping, context["catalog"])
-        parsed = parse_movements(body.csv, mapping, body.as_of_date, body.gross_explanations, **movement_options(context, body))
+        mapping = self._mapping(body.mapping, context["catalog"])
+        parsed = self._parse(context, body, mapping, body.as_of_date)
         added, duplicates = self.merge_entries(context, parsed, body.source, body.source_account)
         effective = context["entries"] + added
         # Validate later history too, even when the submitted cut is earlier.
         last = max([body.as_of_date] + [e["date"] for e in effective])
-        balance(effective, last)
+        self._balance(effective, last)
         applications = prepare_applications(context, effective, added, body.corporate_reviews)
         result = self._detail({**context, "entries": effective}, body.as_of_date, body.offset, body.limit)
         token = self._token("import", context, body)
@@ -184,10 +198,13 @@ class BookService:
         context = self.store.atomic(lambda work: self._context(work, ident))
         self._revision(context, body.expected_revision)
         self._source(context, body.source, body.source_account)
-        mapping = resolve_mapping(body.mapping, context["catalog"])
-        reference = parse_statement(body.csv, mapping, body.as_of_date)
-        book = balance(context["entries"], body.as_of_date, context["portfolio"]["accounting_policy"])
-        differences = reconcile(book, reference)
+        native = context['portfolio']['accounting_policy'] != 'legacy-eur-v1'
+        mapping = resolve_mapping(body.mapping, context['catalog'], multicurrency=self.multicurrency and native)
+        reference = parse_statement(body.csv, mapping, body.as_of_date, multicurrency=self.multicurrency, catalog=context['catalog'])
+        book = self._balance(context["entries"], body.as_of_date, context["portfolio"]["accounting_policy"])
+        if context['portfolio']['accounting_policy'] == 'legacy-eur-v1' and ('cash', 'USD') in reference:
+            raise BookError('unsupported_currency', 'El libro heredado mantiene conciliación EUR.')
+        differences = reconcile(book, reference, context['catalog'])
         status = "matched" if all(row["matched"] for row in differences) else "differences"
         token = self._token("reconciliation", context, body)
         document_id = fingerprint(dict(kind="reconciliation", portfolio=ident, revision=context["portfolio"]["revision"],
@@ -216,8 +233,8 @@ class BookService:
                 raise BookError("incompatible_field", "Anular no admite CSV, mapeo ni explicaciones de sustitución.")
             event, line = economic(old), original["source_row"]
         else:
-            mapping = resolve_mapping(body.mapping, context["catalog"])
-            parsed = parse_movements(body.csv, mapping, datetime.now(timezone.utc).date().isoformat(), body.gross_explanations, **movement_options(context, body))
+            mapping = self._mapping(body.mapping, context["catalog"])
+            parsed = self._parse(context, body, mapping, datetime.now(timezone.utc).date().isoformat())
             if len(parsed) != 1 or parsed[0][1]["external_id"] != original["external_id"]:
                 raise BookError("correction_target", "La sustitución requiere una fila con el mismo ID externo.")
             line, event = parsed[0]
@@ -244,6 +261,9 @@ class BookService:
                 document = work.book_document(ident, document_id)
                 if document is None:
                     raise IdentityNotFound("Documento no encontrado en esta cartera.")
+                if not self.multicurrency and any(row['currency'] != 'EUR' for row in document['differences']):
+                    raise BookError('unsupported_currency', 'El extracto contiene USD; consulta su documento mediante /api/v2.')
+                document['balance'] = (multi_from_eur if self.multicurrency else eur_from_multi)(document['balance'])
                 document["current"] = (document["portfolio_revision"] == context["portfolio"]["revision"]
                                        and document["catalog_revision"] == context["catalog"]["revision"])
                 return document

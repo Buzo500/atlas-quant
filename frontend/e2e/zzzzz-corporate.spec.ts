@@ -35,7 +35,7 @@ async function createBook(page: Page, name: string) {
   const instrument = catalog.instruments.find(
     (i) => i.id === listing.instrument_id,
   )!;
-  const option = `${instrument.name} · ${listing.market || 'local'} · ${listing.id.slice(0, 8)}`;
+  const option = `${instrument.name} · ${listing.market || 'local'} · ${listing.currency} · ${listing.id.slice(0, 8)}`;
   await tab(page, 'Datos');
   await page.getByText('Crear una cartera', { exact: true }).click();
   await page.getByLabel('Nombre de cartera', { exact: true }).fill(name);
@@ -454,7 +454,7 @@ test('D5: enlazar cobro existente, rechazar contexto concurrente y corrección i
   await expect(
     book.getByText('EUR · revisión 3', { exact: true }),
   ).toBeVisible();
-  const route = `/api/portfolios/${fixture.id}/corporate-actions`;
+  const route = `/api/v2/portfolios/${fixture.id}/corporate-actions`;
   const before = await readApi<CorporatePortfolio>(page, route);
   expect(before.unlinked_payments).toHaveLength(1);
   await select(page, 'Acción en la cartera', 'Enlazar movimiento existente');
@@ -536,7 +536,7 @@ test('D5: enlazar cobro existente, rechazar contexto concurrente y corrección i
     .getByLabel('Motivo de corrección', { exact: true })
     .fill('Anulación incompatible con el derecho ya confirmado');
   const correction = page.waitForResponse((r) =>
-    r.url().endsWith(`/api/portfolios/${fixture.id}/corrections`),
+    r.url().endsWith(`/api/v2/portfolios/${fixture.id}/corrections`),
   );
   await book
     .getByRole('button', { name: 'Previsualizar revisión', exact: true })

@@ -76,7 +76,7 @@ test('D4: libro exacto, revisión del extracto y corrección conservando histori
   const instrument = catalog.instruments.find(
     (item) => item.id === listing.instrument_id,
   )!;
-  const listingOption = `${instrument.name} · ${listing.market || 'local'} · ${listing.id.slice(0, 8)}`;
+  const listingOption = `${instrument.name} · ${listing.market || 'local'} · ${listing.currency} · ${listing.id.slice(0, 8)}`;
   await tab(page, 'Datos');
   await page.getByText('Crear una cartera', { exact: true }).click();
   await page
@@ -244,7 +244,7 @@ test('D4: libro exacto, revisión del extracto y corrección conservando histori
   ).toBeVisible();
   await tab(page, 'Cartera');
   await expect(
-    page.getByRole('heading', { name: 'Libro contable EUR', exact: true }),
+    page.getByRole('heading', { name: 'Libro contable EUR / USD', exact: true }),
   ).toBeVisible();
   await expect(
     page.getByText('Efectivo: 598.00 EUR', { exact: true }),

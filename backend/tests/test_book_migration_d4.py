@@ -11,6 +11,7 @@ from atlas_quant.portfolios import PortfolioService
 from atlas_quant.service import Service
 from atlas_quant.store import Store, SCHEMA_VERSION
 from atlas_quant.corporate_store import DDL as CORPORATE_DDL
+from atlas_quant.valuation_store import DDL as VALUATION_DDL
 from atlas_quant.worker_lock import WorkerLock
 from test_book_d4 import dump, setup, confirm, request, statement
 
@@ -20,6 +21,8 @@ def schema2(path):
     dataset = Service(store).load_demo()
     expected = Service(store).portfolio(dataset["id"])
     with closing(sqlite3.connect(path)) as db, db:
+        for table in reversed(VALUATION_DDL):
+            db.execute(f"DROP TABLE {table}")
         for table in reversed(CORPORATE_DDL):
             db.execute(f"DROP TABLE {table}")
         for table in reversed(DDL):
