@@ -24,6 +24,12 @@ El ensayo de 48 horas y el monitor permanecen aplazados. No introducir movimient
 
 El estado final y las fuentes verificadas se incorporarán a CONTINUIDAD y a los documentos de cada bloque.
 
-## Estado posterior
+## Estado final: las diez tareas atendidas
 
-Puntos 1–6 completados: D6 publicado en PR #8 y `v0.4.0-dev.5`, CI 34503177151 correcta. Punto 7 especificado con referencias y punto 8 implementado: D7 con 32 casos nuevos y vista por fechas. Punto 9 validado localmente, pendiente de CI/publicación: 709 Python + 91 subcasos, 274 frontend, 19 E2E, carga y recuperación. Punto 10 definido en `v0_5_alcance_inicial.md`, sin implementación. Mantener trabajo activo hasta cerrar la publicación D7/D8 y registrar el estado operativo.
+Puntos 1–6: D6 completo publicado en PR #8 / `v0.4.0-dev.5`, CI 34503177151 correcta. Punto 5 continúa y documenta el diagnóstico: caché/TLS corregidos; Yahoo 429 y transporte intermitente pendientes de resolución.
+
+Punto 7: D7 especificado con referencias independientes. Punto 8: D7 implementado, incluidas cuatro regresiones posteriores de interfaz. Punto 9: D8 validado y publicado en PR #9 / `v0.4.0-dev.6`, CI 34509155203 correcta, 709 Python + 91 subcasos, 278 frontend y 19 E2E; carga, concurrencia, migración y recuperación documentadas. Primer intento remoto fallido conservado; no se fusionó ese resultado. Coste cero y cuota suficiente verificados.
+
+Punto 10: `v0_5_alcance_inicial.md` define objetivos, bandas y diagnóstico de desviaciones, sin implementar v0.5. Requiere nueva autorización para su código.
+
+Master actualizado y ATLAS compilado/arrancado, con las tres carteras habituales y sus libros intactos, parada global activa y gasto/reserva cero. Inicio `Abrir-ATLAS.cmd`, parada `Detener-ATLAS.cmd`. [Continuidad](CONTINUIDAD.md) registra commits, etiqueta, CI, copias y ejecución final. Ensayo, monitor y movimientos personales siguen aplazados; no se declara estable.

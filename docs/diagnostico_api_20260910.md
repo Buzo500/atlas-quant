@@ -82,3 +82,9 @@ No hay hallazgo que permita cerrar la causa original. Tampoco hay evidencia de c
 - `output/validation/d5-api-diagnostic-summary-20260910.json`: percentiles por rango más las cuatro correlaciones completas.
 
 Logs e identificadores de fixtures son locales y quedan fuera de Git. Este documento conserva la conclusión verificable para otro equipo. La [comprobación posterior en uso normal](comprobacion_d5_20260910.md) usa otra ejecución; no confundirla con la base E2E ni atribuir una nueva validación física del escalado.
+
+## Cierre de D7/D8: transporte todavía abierto
+
+La primera CI D7/D8 (34506888529) falló una lectura real de precios D3 mediante proxy con `ECONNRESET`. El fallo D7 separado era un remontaje del panel por auditoría y claves duplicadas; está corregido. La segunda CI 34509155203 pasa 19/19 E2E sin cambios de transporte, reintentos o ampliación de tiempos. No permite declarar reparada la incidencia de red.
+
+Nueva captura local `e2e-08ce8cbf7a7244b08809830f5119639f`: 19/19, respuestas proxy finalizadas máximo 170,18 ms. `proxy-32412-104` y `proxy-32412-609`: cliente aborta en 74,07/80,51 ms; ASGI termina cuerpo en 94,63/110,51 ms; error upstream después de 5101,48/5137,30 ms. Son cancelaciones anteriores al error, no clientes esperando cinco segundos. Evidencia `output/validation/d8-proxy-ci-fix.json`. Falta capturar el `ECONNRESET` visible con trazas equivalentes y probar su causa; no atribuirlo sin evidencia al cálculo contable.

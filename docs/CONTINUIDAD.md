@@ -2,7 +2,19 @@
 
 Actualizado: 10 de septiembre de 2026. Este documento resume decisiones y estado para una conversación nueva de Codex; no contiene la transcripción completa del chat original.
 
-## Trabajo en curso: diez tareas autorizadas · D6 completo, D7, D8 y alcance v0.5
+## Cierre: diez tareas completadas · v0.4.0-dev.6 publicada
+
+D6 completo publicado en PR #8 / `v0.4.0-dev.5`; D7 y D8 publicados como desarrollo. PR #9 fusionada mediante squash `53cca20654c6c8a9bfc665e2b22f219f3ea85607`, etiqueta anotada `v0.4.0-dev.6` (objeto remoto `3ec9d901829afbcb284c6fe1ff34996d31d81086`). CI gratuita [34509155203](https://github.com/Buzo500/atlas-quant/actions/runs/34509155203) correcta sobre `211ca49f4427e2730dc326178fce7b845c9d2ca1`; árbol integrado idéntico. **709 Python + 91 subcasos, 278 frontend y 19/19 E2E**, instalación limpia, build, tipos, contratos, lint, arranque/proxy y parada correctos. E2E remoto `e2e-d99b1e9a5e4e4903bc7b1cc65e38cc3c`, 3,1 min; integridad/base ordinaria/limpieza correctas. Primer intento fallido y corrección por auditoría conservados más abajo. No se ha declarado estable.
+
+Los diez puntos de [ejecución](ejecucion_diez_tareas_v0_4.md) están atendidos: D6.1–D6.6, diagnóstico, D7 especificado/implementado, D8 validado/publicado y primer alcance v0.5 definido. **v0.5 no está implementada ni autorizada todavía**; leer [alcance inicial](v0_5_alcance_inicial.md). Las incidencias de transporte/API y descarga Yahoo 429 siguen abiertas: continuar su diagnóstico no equivale a resolverlas.
+
+**Coste:** antes de la segunda CI 231,7/2.000 minutos; después 248,3/2.000, 0/0,5 GB y 0 USD facturables. Presupuesto Actions 0 USD con Stop usage Yes. Sin nuevas ejecuciones por fusión o etiqueta de desarrollo; sin llamadas pagadas.
+
+**Estado del sobremesa:** `master` actualizado a la entrega integrada, ATLAS compilado y arrancado, run `776831839dc2420bab76d7abc2265c5a`, salud `0.4.0-dev.6`, esquema 5, integridad `ok`. Tres carteras y libros/respuestas EUR idénticos a la copia previa; precios y resultados históricos conservados. Parada global activa, gasto/reserva cero, experimento previo completado. No se han importado movimientos personales ni datos USD en las carteras habituales. Evidencia `output/validation/d8-ordinary-online.json`. Compilación regenerada después del cambio a master con manifiesto verificado. Inicio `Abrir-ATLAS.cmd`; parada `Detener-ATLAS.cmd`.
+
+**Operación:** copia previa de estas tareas `backups/atlas-20260910T152641167910Z-d35a888b` (esquema 5). Volver a D5 exige copia de esquema 4 y fuentes/build D5; copia `backups/atlas-20260910T142414461441Z-bc5cf98f`. Ensayo de 48 horas, monitor y movimientos personales siguen aplazados. No se inicia bróker, aprendizaje, móvil, remoto o LaTeX.
+
+## Antecedente: ejecución de las diez tareas y cierre remoto
 
 **Cierre D7/D8 en revisión tras primer intento remoto:** PR #9 abierta. CI 34506888529 sobre `78996cd` falla en E2E 17/19: `ECONNRESET` en D3 y confirmación D7 desaparecida; resto de fases previo a E2E correcto. Corregido localmente el remontaje por auditoría y las claves duplicadas de los paneles NAV/rentabilidad, con cuatro regresiones adicionales (278 frontend). Nuevas pruebas y CI condicionan la publicación; no fusionar el intento fallido. [Registro D8](v0_4_d8.md).
 

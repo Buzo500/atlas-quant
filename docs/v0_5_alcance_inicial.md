@@ -27,6 +27,6 @@ Sobre una cartera v2 y un corte EUR identificado, guardar una distribución obje
 
 Aceptación: ejemplo 60/20/20 contra 50/30/20 exacto; mismo instrumento con dos cotizaciones sin doble objetivo; saldo USD valorado con su FX; patrimonio cero/incompleto; bandas imposibles; dos activaciones simultáneas; cambio de precio/FX/libro tras previsualizar; recuperación exacta; políticas legacy intactas. No aprobar una propuesta que viole un límite aunque coincida con pesos deseados.
 
-Depende de cerrar y publicar D7/D8 como desarrollo. La incidencia del proxy sigue siendo un trabajo de fiabilidad separado antes de ampliar recorridos pesados. Ensayo de 48 horas y estabilidad no se dan por aceptados ni se reactivan.
+D7/D8 ya están publicados como desarrollo (`v0.4.0-dev.6`, PR #9); iniciar el código de esta primera entrega requiere nueva autorización. La incidencia del proxy sigue siendo un trabajo de fiabilidad separado antes de ampliar recorridos pesados. Ensayo de 48 horas y estabilidad no se dan por aceptados ni se reactivan.
 
 Quedan para entregas siguientes de v0.5: reparto de aportaciones, cantidades y costes estimados, ventas/rebalanceo, redondeos/lotes, recursos comprometidos y objetivos de varias estrategias; luego benchmarks y escenarios. DSL y validación ampliada v0.6; bróker y paper externo v0.7; móvil, remoto, LaTeX y aprendizaje mantienen su ubicación vigente. Sin compras automáticas, IA de pago o microservicios.

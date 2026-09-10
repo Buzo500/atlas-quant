@@ -1,6 +1,6 @@
 # ATLAS Quant · Plan de v0.4: datos y contabilidad trazables
 
-10/09/2026. **D6 completo publicado** como `v0.4.0-dev.5`, esquema 5, PR #8 y CI gratuita 34503177151 correcta. [Uso D6](v0_4_d6_cierre.md). [D7](v0_4_d7.md) y [D8](v0_4_d8.md) implementados/validados localmente en `0.4.0-dev.6`, pendientes de su publicación. [Continuidad](CONTINUIDAD.md) registra el cierre. El ensayo sigue aplazado.
+10/09/2026. **D6 completo publicado** como `v0.4.0-dev.5`, esquema 5, PR #8 y CI gratuita 34503177151 correcta. [Uso D6](v0_4_d6_cierre.md). [D7](v0_4_d7.md) y [D8](v0_4_d8.md) publicados en `v0.4.0-dev.6`, PR #9 / squash `53cca20`, CI gratuita 34509155203 correcta. D1–D8 integrados como desarrollo; v0.5 solo definida. [Continuidad](CONTINUIDAD.md) registra el cierre. El ensayo sigue aplazado.
 
 [D1: contratos y convenciones](v0_4_d1.md) fija orden, precisión, monedas, fechas, CSV, errores, capacidades, métricas y migración inicial. Incluye [12 casos numéricos](fixtures/v0_4_d1_referencias.json) comprobados mediante aritmética independiente; no son pruebas ejecutadas contra el motor nuevo.
 

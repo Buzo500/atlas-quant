@@ -1,11 +1,13 @@
 # Cambios de ATLAS Quant
 
-## 0.4.0-dev.6 · D7/D8 · En publicación · 2026-09-10
+## v0.4.0-dev.6 · D7/D8 · Publicado · 2026-09-10
+
+PR #9 fusionada mediante squash `53cca20654c6c8a9bfc665e2b22f219f3ea85607`, etiqueta anotada `v0.4.0-dev.6` (objeto remoto `3ec9d901829afbcb284c6fe1ff34996d31d81086`). CI gratuita [34509155203](https://github.com/Buzo500/atlas-quant/actions/runs/34509155203) correcta sobre `211ca49f4427e2730dc326178fce7b845c9d2ca1`; árbol integrado idéntico. Coste final 0 USD facturables. Registro documental posterior a la etiqueta.
 
 - P&L, flujos/costes, TWR diario por tramos y MWR/XIRR anual por periodo, con calidad, convenciones y motivos de indisponibilidad.
 - Informes inmutables, revisión/confirmación y contexto versionado; historial, curva existente y tablas paginadas en Cartera.
 - Reductor único del libro con avance incremental, máximo dos cálculos pesados y controles disponibles; esquema 5 conservado.
-- 709 Python + 91 subcasos, 274 frontend y 19 E2E; migración, recuperación y carga de 100.000 barras/10.000 movimientos correctas. [Evidencia D8](docs/v0_4_d8.md).
+- 709 Python + 91 subcasos, 278 frontend y 19 E2E; migración, recuperación y carga de 100.000 barras/10.000 movimientos correctas. [Evidencia D8](docs/v0_4_d8.md).
 - Primer alcance v0.5 definido, sin implementar. API intermitente y descarga Yahoo siguen con límites documentados; ensayo y datos personales aplazados.
 
 ## v0.4.0-dev.5 · D6 completo · Publicado · 2026-09-10
