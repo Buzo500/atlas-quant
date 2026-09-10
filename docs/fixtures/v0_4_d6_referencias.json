@@ -1,0 +1,175 @@
+{
+  "format": "atlas-d6-reference-cases-v1",
+  "date": "2026-09-10",
+  "scope": "Datos completamente sintéticos. Referencias para D6 futuro, no CSV importable ni resultados del motor. Cálculos de NAV y flujos; no tasas de rentabilidad D7.",
+  "arithmetic": "Decimal, precision 64, ROUND_HALF_EVEN. money: 2 decimales; cost: 12 decimales. Fórmulas explícitas, sin importar ATLAS.",
+  "numeric_cases": [
+    {
+      "id": "D6-N01",
+      "description": "Conservación EUR: depósito 1000, compra 4 a 100, comisión 2, cierre 110.",
+      "calculations": [
+        {"name":"cash_eur", "formula":"1000 - 4 * 100 - 2", "expected":"598"},
+        {"name":"basis_eur", "formula":"4 * 100 + 2", "expected":"402"},
+        {"name":"nav_eur", "formula":"money(cash_eur + 4 * 110)", "expected":"1038.00"}
+      ]
+    },
+    {
+      "id": "D6-N02",
+      "description": "1000 EUR; entregar 400 EUR, recibir 440 USD y comisión 2 EUR; FX de valoración 0.90 EUR/USD.",
+      "calculations": [
+        {"name":"cash_eur", "formula":"1000 - 400 - 2", "expected":"598"},
+        {"name":"cash_usd", "formula":"440", "expected":"440"},
+        {"name":"external_flow_eur", "formula":"0", "expected":"0"},
+        {"name":"nav_eur", "formula":"money(cash_eur + cash_usd * 0.90)", "expected":"994.00"},
+        {"name":"conversion_mark_difference_eur", "formula":"440 * 0.90 - 400", "expected":"-4"}
+      ]
+    },
+    {
+      "id": "D6-N03",
+      "description": "Misma conversión con comisión 2 USD en la moneda recibida.",
+      "calculations": [
+        {"name":"cash_eur", "formula":"1000 - 400", "expected":"600"},
+        {"name":"cash_usd", "formula":"440 - 2", "expected":"438"},
+        {"name":"nav_eur", "formula":"money(cash_eur + cash_usd * 0.90)", "expected":"994.20"}
+      ]
+    },
+    {
+      "id": "D6-N04",
+      "description": "Desde N02: compra 3 a 100 USD, comisión 1 USD; cierre 110 USD, FX 0.90.",
+      "calculations": [
+        {"name":"cash_usd", "formula":"440 - 3 * 100 - 1", "expected":"139"},
+        {"name":"basis_usd", "formula":"3 * 100 + 1", "expected":"301"},
+        {"name":"position_eur", "formula":"3 * 110 * 0.90", "expected":"297"},
+        {"name":"nav_eur", "formula":"money(598 + cash_usd * 0.90 + position_eur)", "expected":"1020.10"}
+      ]
+    },
+    {
+      "id": "D6-N05",
+      "description": "Desde N04: venta parcial de 2 a 120 USD, comisión 1 USD; coste a 12 decimales y último título a cierre 110.",
+      "calculations": [
+        {"name":"assigned_basis_usd", "formula":"cost(301 * 2 / 3)", "expected":"200.666666666667"},
+        {"name":"remaining_basis_usd", "formula":"301 - assigned_basis_usd", "expected":"100.333333333333"},
+        {"name":"realized_usd", "formula":"2 * 120 - 1 - assigned_basis_usd", "expected":"38.333333333333"},
+        {"name":"cash_usd", "formula":"139 + 2 * 120 - 1", "expected":"378"},
+        {"name":"nav_eur", "formula":"money(598 + (cash_usd + 110) * 0.90)", "expected":"1037.20"},
+        {"name":"final_sale_basis_residue", "formula":"remaining_basis_usd - remaining_basis_usd", "expected":"0"}
+      ]
+    },
+    {
+      "id": "D6-N06",
+      "description": "Conversión inversa: 110 USD iniciales, entregar 110 USD, recibir 100 EUR y comisión 1 EUR. FX 0.90.",
+      "calculations": [
+        {"name":"nav_before_eur", "formula":"110 * 0.90", "expected":"99"},
+        {"name":"cash_usd", "formula":"110 - 110", "expected":"0"},
+        {"name":"cash_eur", "formula":"100 - 1", "expected":"99"},
+        {"name":"external_flow_eur", "formula":"0", "expected":"0"}
+      ]
+    },
+    {
+      "id": "D6-N07",
+      "description": "Aportación externa de 100 USD con FX histórico 0.90 y marca actual 0.95. Separar flujo de marca actual.",
+      "calculations": [
+        {"name":"external_contribution_eur", "formula":"100 * 0.90", "expected":"90"},
+        {"name":"nav_eur", "formula":"money(100 * 0.95)", "expected":"95.00"},
+        {"name":"wealth_less_contributions_eur", "formula":"nav_eur - external_contribution_eur", "expected":"5"}
+      ]
+    },
+    {
+      "id": "D6-N08",
+      "description": "Retirada externa de 50 USD, comisión 1 USD, efectivo previo 100 USD; FX del día 0.90. Flujo cartera negativo, gasto separado.",
+      "calculations": [
+        {"name":"cash_usd", "formula":"100 - 50 - 1", "expected":"49"},
+        {"name":"external_flow_eur", "formula":"-50 * 0.90", "expected":"-45"},
+        {"name":"fee_eur", "formula":"1 * 0.90", "expected":"0.9"},
+        {"name":"nav_eur", "formula":"money(cash_usd * 0.90)", "expected":"44.10"}
+      ]
+    },
+    {
+      "id": "D6-N09",
+      "description": "Dividendo USD confirmado antes del pago: efectivo 100 USD, 100 títulos a cierre 10 USD, derecho bruto 0.50 por título, FX 0.90.",
+      "calculations": [
+        {"name":"receivable_usd", "formula":"100 * 0.50", "expected":"50"},
+        {"name":"nav_eur", "formula":"money((100 + 100 * 10 + receivable_usd) * 0.90)", "expected":"1035.00"}
+      ]
+    },
+    {
+      "id": "D6-N10",
+      "description": "Pago de N09: bruto 50 USD, retención 9.50, comisión 0.50, mismo precio/FX. Derecho cancelado y neto 40.",
+      "calculations": [
+        {"name":"net_payment_usd", "formula":"50 - 9.50 - 0.50", "expected":"40"},
+        {"name":"cash_usd", "formula":"100 + net_payment_usd", "expected":"140"},
+        {"name":"receivable_usd", "formula":"50 - 50", "expected":"0"},
+        {"name":"nav_eur", "formula":"money((cash_usd + 100 * 10 + receivable_usd) * 0.90)", "expected":"1026.00"},
+        {"name":"payment_effect_eur", "formula":"nav_eur - 1035", "expected":"-9"},
+        {"name":"external_flow_eur", "formula":"0", "expected":"0"}
+      ]
+    },
+    {
+      "id": "D6-N11",
+      "description": "Split USD 2:1: 4 títulos, coste 402 USD y cierre bruto 110; después 8 títulos y cierre bruto compatible 55; FX 0.90.",
+      "calculations": [
+        {"name":"new_quantity", "formula":"4 * 2 / 1", "expected":"8"},
+        {"name":"basis_usd", "formula":"402", "expected":"402"},
+        {"name":"value_before_eur", "formula":"4 * 110 * 0.90", "expected":"396"},
+        {"name":"value_after_eur", "formula":"new_quantity * 55 * 0.90", "expected":"396"}
+      ]
+    },
+    {
+      "id": "D6-N12",
+      "description": "Dos componentes de 0.01 USD, FX 0.5: HALF_EVEN muestra 0.00 en cada fila, pero el agregado vale 0.01 EUR.",
+      "calculations": [
+        {"name":"first_display_eur", "formula":"money(0.01 * 0.5)", "expected":"0.00"},
+        {"name":"second_display_eur", "formula":"money(0.01 * 0.5)", "expected":"0.00"},
+        {"name":"nav_eur", "formula":"money(0.01 * 0.5 + 0.01 * 0.5)", "expected":"0.01"},
+        {"name":"presentation_delta_eur", "formula":"nav_eur - first_display_eur - second_display_eur", "expected":"0.01"}
+      ]
+    },
+    {
+      "id": "D6-N13",
+      "description": "Revisión FX: 100 USD. Corte A usa versión 1, 0.90; corte B usa versión 2, 0.92. Los dos cortes siguen consultables.",
+      "calculations": [
+        {"name":"cut_a_nav_eur", "formula":"money(100 * 0.90)", "expected":"90.00"},
+        {"name":"cut_b_nav_eur", "formula":"money(100 * 0.92)", "expected":"92.00"},
+        {"name":"revision_difference_eur", "formula":"cut_b_nav_eur - cut_a_nav_eur", "expected":"2"}
+      ]
+    },
+    {
+      "id": "D6-N14",
+      "description": "Efectivo EUR/USD más posición EUR/USD y derecho USD: suma componentes heterogéneos tras convertirlos.",
+      "calculations": [
+        {"name":"cash_eur", "formula":"200", "expected":"200"},
+        {"name":"usd_cash_in_eur", "formula":"50 * 0.90", "expected":"45"},
+        {"name":"eur_position", "formula":"2 * 40", "expected":"80"},
+        {"name":"usd_position_in_eur", "formula":"3 * 100 * 0.90", "expected":"270"},
+        {"name":"usd_right_in_eur", "formula":"5 * 0.90", "expected":"4.5"},
+        {"name":"nav_eur", "formula":"money(cash_eur + usd_cash_in_eur + eur_position + usd_position_in_eur + usd_right_in_eur)", "expected":"599.50"}
+      ]
+    },
+    {
+      "id": "D6-N15",
+      "description": "Precisión FX de 18 decimales: preservar el literal y redondear el NAV solo al final.",
+      "calculations": [
+        {"name":"raw_eur", "formula":"123.45 * 0.912345678901234567", "expected":"112.62907406035740729615"},
+        {"name":"nav_eur", "formula":"money(raw_eur)", "expected":"112.63"}
+      ]
+    }
+  ],
+  "semantic_cases": [
+    {"id":"D6-S01", "given":{"eur_cash":"100","usd_cash":"100","fx":null}, "expected":{"native_book":"available","nav_status":"incomplete","nav_eur":null,"known_subtotal_eur":"100.00","reason":"missing_fx"}},
+    {"id":"D6-S02", "given":{"eur_cash":"100","usd_cash":"0","positions":[],"receivables":[],"fx":null}, "expected":{"nav_status":"complete","nav_eur":"100.00","note":"No exposición USD al corte; revisar aparte flujos históricos."}},
+    {"id":"D6-S03", "given":{"cut":"2026-01-05","usd_cash":"100","observations":[{"date":"2026-01-05","rate":"0.90"},{"date":"2026-01-06","rate":"0.95"}],"calendar":"verified; Jan 5 last expected publication"}, "expected":{"selected_date":"2026-01-05","nav_eur":"90.00","future_observation_used":false}},
+    {"id":"D6-S04", "given":{"cut":"2026-01-12","last_observation":"2026-01-05","rate":"0.90","usd_cash":"100","calendar":"unknown"}, "expected":{"age_days":7,"nav_status":"provisional","nav_eur":"90.00","reason":"calendar_unknown"}},
+    {"id":"D6-S05", "given":{"cut":"2026-01-13","last_observation":"2026-01-05","rate":"0.90","usd_cash":"100","calendar":"unknown"}, "expected":{"age_days":8,"nav_status":"incomplete","nav_eur":null,"reason":"stale_mark"}},
+    {"id":"D6-S06", "given":{"cut":"2026-01-11","last_observation":"2026-01-09","rate":"0.90","usd_cash":"100","calendar":"verified synthetic: Jan 10 and 11 closed; Jan 9 last expected publication"}, "expected":{"nav_status":"complete","nav_eur":"90.00","selected_date":"2026-01-09"}},
+    {"id":"D6-S07", "given":{"cut":"2026-01-12","last_observation":"2026-01-09","rate":"0.90","usd_cash":"100","calendar":"verified synthetic: Jan 12 expected, missing"}, "expected":{"nav_status":"provisional","nav_eur":"90.00","reason":"missing_expected_observation"}},
+    {"id":"D6-S08", "given":{"effective_date":"2026-01-05","available_at":"2026-01-06T08:00:00Z","decision_at":"2026-01-05T22:00:00Z","usd_cash":"100","rate":"0.90","calendar":"verified with effective-date coverage"}, "expected":{"reconstructed_nav_eur":"90.00","known_at_decision":false,"reason":"not_available_at_decision"}},
+    {"id":"D6-S09", "given":{"effective_date":"2026-01-05","available_at":null,"usd_cash":"100","rate":"0.90","calendar":"verified with effective-date coverage"}, "expected":{"reconstructed_nav_eur":"90.00","known_at_decision":false,"reason":"availability_unknown"}},
+    {"id":"D6-S10", "given":{"usd_cash":"100","current_fx":"0.95","current_marks":"complete","old_usd_deposit_fx":null}, "expected":{"nav_status":"complete","nav_eur":"95.00","historical_contribution_eur":null,"period_eur_pnl":null,"period_mwr":null}},
+    {"id":"D6-S11", "given":{"eur_cash":"400.00","usd_cash":"0.00","exchange":{"give_eur":"400.00","receive_usd":"440.00","fee_eur":"1.00"}}, "expected":{"commit":"rejected","reason":"insufficient_cash","currency":"EUR","eur_cash":"400.00","usd_cash":"0.00","new_movements":0,"success_audit_rows":0}},
+    {"id":"D6-S12", "given":{"eur_cash":"10000.00","usd_cash":"0.00","buy":{"quantity":"1","price_usd":"100.00","fee_usd":"0.00"}}, "expected":{"commit":"rejected","reason":"insufficient_cash","currency":"USD","eur_cash":"10000.00","usd_cash":"0.00","new_movements":0}},
+    {"id":"D6-S13", "given":{"split":"2:1 applied","price_basis":"adjusted or unknown","post_split_raw_mark":null}, "expected":{"native_book":"available","nav_status":"incomplete","nav_eur":null,"reason":"price_basis_incompatible"}},
+    {"id":"D6-S14", "given":{"saved_cut":"A: book r2; FX v1 0.90","new_cut":"B: book r2; FX v2 0.92","usd_cash":"100"}, "expected":{"read_A_eur":"90.00","read_B_eur":"92.00","old_cut_mutated":false,"note":"La aritmética se comprueba en N13; la persistencia requiere futura prueba del motor."}},
+    {"id":"D6-S15", "given":{"reviewed_portfolio_revision":2,"current_portfolio_revision":3,"commit_token":"bound to revision 2"}, "expected":{"http_status":409,"new_movements":0,"new_valuation_as_current":false}},
+    {"id":"D6-S16", "given":{"usd_cash":"100","open_usd_position_quantity":"2","position_price":null,"fx":"0.90"}, "expected":{"nav_status":"incomplete","nav_eur":null,"known_subtotal_eur":"90.00","reason":"missing_price"}}
+  ]
+}

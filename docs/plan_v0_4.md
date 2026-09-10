@@ -46,7 +46,7 @@ Los códigos D1–D8 son bloques de trabajo, no ocho versiones comerciales. Cada
 | **D7 · Rentabilidad y explicación contable** | MWR/XIRR por periodo y desglose coherente de flujos, costes y patrimonio; TWR con convención identificada. | D5–D6 | Casos con fechas irregulares, flujos intermedios, patrimonio inicial, raíz ausente/ambigua y datos insuficientes; no convertir fallos en 0 %. |
 | **D8 · Integración y entrega** | Migración/recuperación, contratos, pruebas de navegador, rendimiento, documentación y CI gratuita. | D1–D7 | Todos los casos aceptados; una lectura identifica el mismo corte de libro/precios/FX/eventos; datos habituales conservados; límites publicados y sin regresiones de v0.3. |
 
-**Secuencia actual: concretar D6 tras publicar D5.** D2–D5 están integrados. La publicación no inicia D6: antes hay que acordar efectivo por moneda, FX y valoración, y sus casos de referencia. El estado remoto y la evidencia están en continuidad.
+**Secuencia actual: [D6 concretado, pendiente de implementar](v0_4_d6.md).** D2–D5 están integrados. El usuario autoriza especificación y referencias, dejando fuera la implementación: D6.1–D6.6 ordenan contratos/migración, saldos/conversiones, precios USD/FX, valoración, interfaz y entrega. Hay 15 casos numéricos (59 resultados comprobados independientemente) y 16 escenarios semánticos para futuras pruebas. La siguiente decisión es iniciar D6.1. El estado remoto y la evidencia están en continuidad.
 
 ## Decisiones de arquitectura propuestas
 

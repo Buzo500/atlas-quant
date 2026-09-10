@@ -1,6 +1,6 @@
 # ATLAS Quant · Hoja de ruta
 
-Actualizado: 10 de septiembre de 2026. **La secuencia de versiones se conserva.** La [arquitectura objetivo](arquitectura_objetivo.md) concreta los dos recorridos, módulos, contratos y condiciones de promoción/recuperación por autorización del usuario. Se desarrolla como monolito modular; las entregas futuras se acotan antes de implementarlas. Los últimos cinco pasos autorizados implementan D5.1–D5.5; D6–D8 permanecen pendientes.
+Actualizado: 10 de septiembre de 2026. **La secuencia de versiones se conserva.** La [arquitectura objetivo](arquitectura_objetivo.md) concreta los dos recorridos, módulos, contratos y condiciones de promoción/recuperación por autorización del usuario. Se desarrolla como monolito modular; las entregas futuras se acotan antes de implementarlas. D5 publicado. El último alcance autoriza diagnosticar API, comprobar D5 habitual y preparar [D6 con referencias independientes](v0_4_d6.md); **no implementar D6**. D6–D8 siguen sin desarrollar.
 
 ## Estado vigente
 

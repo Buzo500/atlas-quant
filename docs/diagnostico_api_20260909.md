@@ -2,6 +2,8 @@
 
 **Resultado: no reproducida; causa todavía sin determinar.** Se ha seguido la petición entre cliente, proxy y motor sobre bases sintéticas nuevas. No se ha aplicado una corrección a la aplicación, aumentado tiempos de espera ni añadido reintentos. La CI correcta y los ensayos de este documento no convierten en resuelto el fallo local anterior de `/api/state`.
 
+**[Nueva captura autorizada en D5, 10/09/2026](diagnostico_api_20260910.md):** 18/18 E2E instrumentados, sin reproducir la espera original. Dos errores de socket se correlacionan con lecturas ya abandonadas y envíos ASGI menores de 90 ms; no se atribuye a esos errores la causa de los 10 s. La incidencia sigue abierta.
+
 ## Decisión de seguimiento tras revisar la CI final
 
 **Aceptación expresa del usuario · 09/09/2026:** se acepta esta incidencia conocida para la entrega de desarrollo `0.3.0-dev.1` y se autoriza el cierre de G6. Se mantienen la incidencia abierta, los límites y el procedimiento de captura si reaparece. Esta decisión sustituye las referencias inferiores a una aceptación pendiente; no demuestra una corrección.

@@ -8,7 +8,9 @@ Las carteras anteriores conservan `legacy-eur-v1`, sus gráficos y CSV v1. Las n
 
 **Entrega de desarrollo aceptada: `v0.3.0-dev.1`.** G1–G6 cerradas por el usuario el 09/09/2026, con pantalla completa comprobada manualmente en precios y cartera y CI completa correcta. Se acepta una incidencia conocida de espera intermitente en `/api/state`, todavía sin causa determinada. [Cierre y evidencia](docs/revision_final_v0_3.md). El ensayo de 48 horas sigue aplazado; esta aceptación no declara una versión estable.
 
-Alcance aprobado de [v0.4 · Datos y contabilidad trazables](docs/plan_v0_4.md): ocho entregas, CSV propio y EUR/USD. [D1](docs/v0_4_d1.md) concreta contratos y convenciones; D2–D4 publicados. [D5: dividendos y splits conciliados](docs/v0_4_d5.md) implementado por autorización del usuario; D6–D8 pendientes. El estado de validación y publicación se recoge en [continuidad](docs/CONTINUIDAD.md).
+Alcance aprobado de [v0.4 · Datos y contabilidad trazables](docs/plan_v0_4.md): ocho entregas, CSV propio y EUR/USD. [D1](docs/v0_4_d1.md) concreta contratos y convenciones; D2–D5 publicados. [D6: saldos EUR/USD, FX y valoración](docs/v0_4_d6.md) está especificado con referencias independientes, **sin implementar**; D7–D8 pendientes. El estado de validación y publicación se recoge en [continuidad](docs/CONTINUIDAD.md).
+
+[Comprobación habitual D5 del 10/09](docs/comprobacion_d5_20260910.md): migración 3→4, saldos/dividendos/split sintéticos y carteras anteriores conservados. El refresco automático Yahoo falló en ese arranque y conserva precios anteriores; no se da la descarga diaria por validada. [Diagnóstico API actualizado](docs/diagnostico_api_20260910.md): 18 recorridos instrumentados correctos, espera original aún sin reproducir ni resolver.
 
 [Arquitectura objetivo y contratos entre módulos](docs/arquitectura_objetivo.md): recorridos de investigación y ejecución, estrategia compartida, construcción de cartera, riesgo continuo, mandatos y conciliación. Es planificación autorizada; concreta v0.5–v0.7 sin renumerar versiones ni añadir bloques a v0.4. El paper externo automático se prevé en v0.7 y la automatización real en v1.3.
 

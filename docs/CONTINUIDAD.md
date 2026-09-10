@@ -2,7 +2,21 @@
 
 Actualizado: 10 de septiembre de 2026. Este documento resume decisiones y estado para una conversación nueva de Codex; no contiene la transcripción completa del chat original.
 
-## Estado vigente: D5 publicado · cinco pasos de cierre completados
+## Estado vigente: diagnóstico, uso normal D5 y plan D6 · puntos 1–4
+
+**Último alcance autorizado:** diagnosticar la API, comprobar D5 en la instalación habitual con demostración, concretar D6 y preparar referencias independientes. El usuario limita expresamente a «hasta el 4 incluido»: **no implementar D6**. Trabajo local en `codex/v0.4-d6-plan`, desde `a93bf8d` de `master`, sin nueva CI remota, subida, PR, fusión o etiqueta. La aplicación sigue en D5 publicado `0.4.0-dev.4`.
+
+**[Diagnóstico API del 10/09](diagnostico_api_20260910.md):** 18/18 E2E con trazas, 1,1 min, `e2e-2df628fc57124fa1a4b6a9f8d09f92a7`, integridad `ok`, base habitual intacta y puertos liberados al cerrar el harness. ASGI completo máximo 127,273 ms; `/api/state` en proxy máximo 134,168 ms. Se correlacionan dos `UND_ERR_SOCKET` de ~5 s con lecturas cuyo cliente ya había cerrado en ~65/71 ms y ASGI terminó en ~68/87 ms; otros dos cierres de stream duran ~10 ms. **No reproduce ni resuelve la espera original de 10 s**; no se cambian aplicación, dependencias o tiempos. Incidencia abierta con siguiente captura dirigida documentada.
+
+**[D5 habitual comprobado](comprobacion_d5_20260910.md):** ATLAS encendido en modo compilado, run `2c84f4b6c35c418dbb47905bead929ec`, base migrada **3→4** e integridad `ok`. Copia previa `backups/atlas-20260910T134952170690Z-55207169`; copia automática de arranque conservada. Dos carteras anteriores, libros, versiones de precios, vínculos y experimento preservados. El worker intentó refrescar Yahoo: ambas fuentes devolvieron `OperationalError`, cambiando solo `feed.last_attempt/error`; no actualizó cotizaciones. NVIDIA continúa hasta 08/09. Es una incidencia separada por diagnosticar, no una actualización diaria validada.
+
+Demo nueva **«Demostración D5 · dividendos y split»**, cartera `72a9e51058004702a0ba44f352267aa7`, revisión 5, activo ficticio independiente. API ordinaria con previsualización/confirmación y revisión en navegador: depósito 10.000, compra 100 títulos por 100 EUR, derecho 50, cobro neto 40, split 2:1 → efectivo **9.940 EUR**, **200 títulos**, coste **100 EUR**, derecho cero. Corte 15/01: efectivo 9.900 y derecho 50. Sin precios vinculados, advertencia de base posterior sin acreditar correcta; no NAV nuevo. Datos de ejemplo explícitos, sin evidencia inventada para NVIDIA. Parada global activa, proveedores sin configurar, gasto/reserva cero y experimento anterior completado; sin nuevas investigaciones, importación personal, monitor o ensayo.
+
+**[D6 especificado](v0_4_d6.md):** D6.1–D6.6 cubren contratos/migración, saldos/conversiones, CSV de precios USD y FX, NAV por corte, interfaz y validación. Comisiones explícitas, exposición por moneda, derecho/cobro USD con límites D5, temporalidad/calendarios, cortes inmutables y suma antes de redondear. TWR/XIRR siguen en D7; no se habilitan backtests/paper USD. [Referencias](fixtures/v0_4_d6_referencias.json): **15/15 casos aritméticos, 59 resultados exactos**, comprobador independiente `docs/fixtures/check_v0_4_d6.py`; **16 escenarios semánticos especificados**, sin pruebas contra un motor D6 que aún no existe. No cambio de versión, contratos físicos, esquema de aplicación ni build en este trabajo documental.
+
+Inicio habitual `Abrir-ATLAS.cmd`; parada `Detener-ATLAS.cmd`. El estado «detenido/sin migrar» de los antecedentes inferiores es histórico. Volver a D4 exige copia de esquema 3 y fuentes/build compatibles. Próximas decisiones: incidencia de Yahoo/API, publicación del plan e inicio de D6.1; proponerlas no las autoriza. D7–D8, movimientos personales y ensayo de 48 horas siguen pendientes.
+
+## Antecedente: D5 publicado · cinco pasos de cierre completados
 
 **[PR #7](https://github.com/Buzo500/atlas-quant/pull/7) fusionada** mediante squash en `a91f077648f209e49dfba2c630fd2c6ccecfd1a0`. **[Etiqueta anotada `v0.4.0-dev.4`](https://github.com/Buzo500/atlas-quant/tree/v0.4.0-dev.4) publicada y verificada en remoto**, objeto `2161b14e3ddf088608c3e0688b65f14974c8fa20`. El árbol integrado coincide exactamente con la cabeza validada `5c3e8a7453418d2f5b7f6eb3feddefa44c28db92`. Copia local actualizada a `master`; el registro de cierre se publica después de la etiqueta mediante un cambio exclusivamente documental.
 
