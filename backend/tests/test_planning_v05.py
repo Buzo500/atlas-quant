@@ -312,4 +312,3 @@ def test_shared_native_cash_is_spent_once_in_explicit_priority_order():
 ])
 def test_reject_fields_that_would_be_silently_ignored(kwargs):
     with pytest.raises(ValidationError):inputs(**kwargs)
-
