@@ -6,6 +6,8 @@ import type {
   MarketCatalog,
   ValuationHistory,
   PerformanceHistory,
+  TargetHistory,
+  TargetReports,
 } from '../lib/api-types';
 
 const headers = { 'X-Atlas-Client': 'local-v1' };
@@ -15,7 +17,7 @@ async function post<T>(page: Page, path: string, data: unknown): Promise<T> {
   return response.json();
 }
 
-test('D6: CSV USD y FX, vínculo explícito y patrimonio completo en tres anchos', async ({
+test('D6/D7/v0.5: CSV USD y FX, patrimonio, rentabilidad y objetivos en tres anchos', async ({
   page,
 }, info) => {
   await page.goto('/');
@@ -314,5 +316,166 @@ test('D6: CSV USD y FX, vínculo explícito y patrimonio completo en tres anchos
     performance
       .getByRole('region', { name: 'Detalle de rentabilidad', exact: true })
       .getByText('87,90 €', { exact: true }),
+  ).toBeVisible();
+
+  const objectives = page.getByRole('region', {
+    name: 'Objetivos y desviaciones',
+    exact: true,
+  });
+  await objectives
+    .getByText('Consultar y editar objetivos', { exact: true })
+    .click();
+  await objectives
+    .getByText('Crear o editar un borrador de objetivos', { exact: true })
+    .click();
+  await objectives
+    .getByLabel('Nombre de los objetivos', { exact: true })
+    .fill('Distribución ficticia v0.5');
+  for (const [label, value] of [
+    ['Objetivo', '60'],
+    ['Mínimo', '50'],
+    ['Máximo', '100'],
+    ['Límite', '100'],
+  ])
+    await objectives
+      .getByLabel(`${label} % · Efectivo`, { exact: true })
+      .fill(value);
+  await select(page, 'Instrumento para objetivos', instrument.name);
+  await objectives
+    .getByRole('button', { name: 'Añadir instrumento', exact: true })
+    .click();
+  for (const [label, value] of [
+    ['Objetivo', '40'],
+    ['Mínimo', '0'],
+    ['Máximo', '50'],
+    ['Límite', '60'],
+  ])
+    await objectives
+      .getByLabel(`${label} % · ${instrument.name}`, { exact: true })
+      .fill(value);
+  for (const width of [3440, 1280, 390]) {
+    await page.setViewportSize({ width, height: 1000 });
+    await objectives
+      .getByLabel('Nombre de los objetivos', { exact: true })
+      .scrollIntoViewIfNeeded();
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+    ).toBe(true);
+    await objectives.screenshot({
+      path: info.outputPath(`v05-editor-${width}.png`),
+    });
+  }
+  await objectives
+    .getByRole('button', { name: 'Revisar borrador', exact: true })
+    .click();
+  await objectives
+    .getByRole('button', { name: 'Guardar borrador', exact: true })
+    .click();
+  await expect
+    .poll(
+      async () =>
+        (
+          await readApi<TargetHistory>(
+            page,
+            `/api/v2/portfolios/${portfolio.id}/targets`,
+          )
+        ).revision,
+    )
+    .toBe(1);
+  expect(
+    (
+      await readApi<TargetHistory>(
+        page,
+        `/api/v2/portfolios/${portfolio.id}/targets`,
+      )
+    ).active,
+  ).toBeNull();
+  await objectives.getByText('Versiones y activación', { exact: true }).click();
+  await objectives
+    .getByRole('button', { name: 'Revisar activación v1', exact: true })
+    .click();
+  await objectives
+    .getByRole('button', {
+      name: 'Confirmar activación de objetivos',
+      exact: true,
+    })
+    .click();
+  await expect(
+    objectives.getByRole('heading', {
+      name: 'Activo: Distribución ficticia v0.5 · v1',
+      exact: true,
+    }),
+  ).toBeVisible();
+  const cutSummary = (
+    await readApi<ValuationHistory>(
+      page,
+      `/api/v2/portfolios/${portfolio.id}/valuations`,
+    )
+  ).cuts[0];
+  await select(
+    page,
+    'Corte para diagnóstico',
+    `2026-01-06 · r${cutSummary.portfolio_revision} · 986.10 EUR · ${cutSummary.id.slice(0, 6)}`,
+  );
+  await objectives
+    .getByRole('button', { name: 'Calcular desviaciones', exact: true })
+    .click();
+  const diagnosis = objectives.getByRole('region', {
+    name: 'Diagnóstico de objetivos',
+    exact: true,
+  });
+  await expect(diagnosis.locator('data[value="23.56"]')).toBeVisible();
+  await expect(diagnosis.locator('data[value="-23.56"]')).toBeVisible();
+  await objectives
+    .getByText('Crear o editar un borrador de objetivos', { exact: true })
+    .click();
+  await objectives.getByText('Versiones y activación', { exact: true }).click();
+  for (const width of [3440, 1280, 390]) {
+    await page.setViewportSize({ width, height: 1000 });
+    await objectives
+      .getByRole('heading', { name: 'Objetivos y desviaciones', exact: true })
+      .click();
+    await diagnosis.scrollIntoViewIfNeeded();
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+    ).toBe(true);
+    await objectives.screenshot({
+      path: info.outputPath(`v05-objectives-${width}.png`),
+    });
+  }
+  await objectives
+    .getByRole('button', { name: 'Guardar diagnóstico', exact: true })
+    .click();
+  await expect
+    .poll(
+      async () =>
+        (
+          await readApi<TargetReports>(
+            page,
+            `/api/v2/portfolios/${portfolio.id}/target-reports`,
+          )
+        ).reports.length,
+    )
+    .toBe(1);
+  await page.reload();
+  await objectives
+    .getByText('Consultar y editar objetivos', { exact: true })
+    .click();
+  await objectives.getByText('Diagnósticos guardados', { exact: true }).click();
+  await objectives
+    .getByRole('button', {
+      name: 'Consultar diagnóstico 2026-01-06',
+      exact: true,
+    })
+    .click();
+  await expect(diagnosis.locator('data[value="23.56"]')).toBeVisible();
+  await expect(
+    diagnosis.getByText(
+      /^Cierre 2026-01-06.*Contexto vigente en la última consulta/,
+    ),
   ).toBeVisible();
 });

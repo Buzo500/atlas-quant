@@ -1,0 +1,11 @@
+{
+  "source": "Casos sintéticos independientes; importes EUR, porcentajes 0..100",
+  "cases": [
+    {"name":"60/20/20 contra 50/30/20", "nav":"10000", "actual":["6000","2000","2000"], "targets":["50","30","20"], "weights":["60","20","20"], "differences":["1000","-1000","0"]},
+    {"name":"Dos cotizaciones del mismo instrumento", "nav":"10000", "listings":["3500","2500"], "instrument_value":"6000", "target":"50", "weight":"60", "difference":"1000"},
+    {"name":"Efectivo USD con FX explícito", "usd":"1000", "eur_per_usd":"0.9", "eur_cash":"100", "cash_total":"1000", "nav":"10000", "target":"20", "weight":"10", "difference":"-1000"},
+    {"name":"Derecho aún no cobrado", "position":"950", "receivable":"50", "cash":"1000", "nav":"2000", "instrument_weight":"50", "cash_weight":"50"}
+  ],
+  "unavailable": ["patrimonio cero", "patrimonio negativo", "precio ausente", "FX ausente"],
+  "reject": ["suma distinta de 100", "instrumento duplicado", "mínimo mayor que objetivo", "objetivo mayor que máximo", "máximo mayor que límite", "confirmación con libro/FX/precio/objetivo cambiado"]
+}

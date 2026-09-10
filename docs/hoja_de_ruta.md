@@ -1,6 +1,6 @@
 # ATLAS Quant · Hoja de ruta
 
-Actualizado: 10 de septiembre de 2026. **La secuencia de versiones se conserva.** La [arquitectura objetivo](arquitectura_objetivo.md) concreta recorridos, módulos y condiciones de promoción/recuperación. Monolito modular. D1–D8 integrados como desarrollo: D6 publicado en `v0.4.0-dev.5`; D7/D8 en `v0.4.0-dev.6` (PR #9, CI gratuita 34509155203 correcta). El [primer alcance v0.5](v0_5_alcance_inicial.md) queda definido, sin implementación autorizada.
+Actualizado: 10 de septiembre de 2026. **La secuencia de versiones se conserva.** La [arquitectura objetivo](arquitectura_objetivo.md) concreta recorridos, módulos y condiciones de promoción/recuperación. Monolito modular. D1–D8 integrados como desarrollo: D6 publicado en `v0.4.0-dev.5`; D7/D8 en `v0.4.0-dev.6` (PR #9, CI gratuita 34509155203 correcta). El [primer alcance v0.5](v0_5_alcance_inicial.md) está autorizado e implementado en `0.5.0-dev.1`, pendiente del cierre de revisión/CI.
 
 ## Estado vigente
 
@@ -33,7 +33,7 @@ El historial de fuentes, pruebas y decisiones se conserva en [CONTINUIDAD](CONTI
 
 ## Ajuste de arquitectura sin renumerar versiones
 
-[Primer alcance pequeño de v0.5](v0_5_alcance_inicial.md): objetivos manuales, bandas y diagnóstico de desviaciones sobre cortes de v0.4. Solo definido, sin implementación autorizada por este documento; propuestas de operaciones y agregación completa vendrán después.
+[Primer alcance pequeño de v0.5](v0_5_alcance_inicial.md): objetivos manuales, bandas y diagnóstico de desviaciones sobre cortes de v0.4. Autorizado posteriormente e implementado en la primera entrega de desarrollo; [uso y validación](v0_5_objetivos.md). Propuestas de operaciones y agregación completa vendrán después.
 
 El recorrido de investigación es **idea → especificación → backtest → validación → candidata congelada → autorización**. El recorrido operativo es **datos → estrategia activa → posiciones objetivo → riesgo → OMS/adaptador → ejecuciones → libro/conciliación**, con estado de vuelta hacia cartera y riesgo. Datos, operación y auditoría sirven a ambos; el LLM participa en investigación y análisis.
 

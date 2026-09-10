@@ -1,5 +1,7 @@
 # ATLAS Quant
 
+**En revisión: v0.5.0-dev.1 · objetivos manuales, bandas y desviaciones.** En Cartera v2 puedes guardar/activar versiones de objetivos y comparar su distribución con un patrimonio guardado. Diagnósticos trazables, sin propuestas de operaciones ni envíos. [Guía y límites](docs/v0_5_objetivos.md). Esquema 5 y libros anteriores conservados. Proxy local con conexiones y cancelaciones controladas; [evidencia](docs/diagnostico_api_20260910.md).
+
 **Entrega publicada: [v0.4.0-dev.6](https://github.com/Buzo500/atlas-quant/tree/v0.4.0-dev.6) · D7/D8, esquema SQLite 5.** Rentabilidad por fechas en cartera v2: P&L, TWR y MWR/XIRR, costes y flujos, calidad y guardado de informes inmutables. Reutiliza libro y fuentes D6. [Uso D7](docs/v0_4_d7.md) y [evidencia D8](docs/v0_4_d8.md). [PR #9](https://github.com/Buzo500/atlas-quant/pull/9), squash `53cca20`, [CI gratuita correcta](https://github.com/Buzo500/atlas-quant/actions/runs/34509155203): 709 Python + 91 subcasos, 278 frontend y 19 E2E. Motor/interfaz habituales comprobados; [continuidad](docs/CONTINUIDAD.md). Entrega de desarrollo, no estable.
 
 **Entrega anterior: [v0.4.0-dev.5](https://github.com/Buzo500/atlas-quant/tree/v0.4.0-dev.5)**, D6 completo integrado en [PR #8](https://github.com/Buzo500/atlas-quant/pull/8), CI gratuita [34503177151](https://github.com/Buzo500/atlas-quant/actions/runs/34503177151) correcta sobre `a356112`, squash `a308f81`. Libro/formularios EUR/USD, CSV de precios y FX, vínculos y patrimonio trazable. 677 Python + 91 subcasos, 270 frontend y 19 E2E. [Guía D6](docs/v0_4_d6_cierre.md). Desarrollo, no estable.
@@ -8,7 +10,7 @@ Las carteras anteriores conservan `legacy-eur-v1`, sus gráficos y CSV v1. Las n
 
 **Entrega de desarrollo aceptada: `v0.3.0-dev.1`.** G1–G6 cerradas por el usuario el 09/09/2026, con pantalla completa comprobada manualmente en precios y cartera y CI completa correcta. Se acepta una incidencia conocida de espera intermitente en `/api/state`, todavía sin causa determinada. [Cierre y evidencia](docs/revision_final_v0_3.md). El ensayo de 48 horas sigue aplazado; esta aceptación no declara una versión estable.
 
-Alcance aprobado de [v0.4 · Datos y contabilidad trazables](docs/plan_v0_4.md): D1–D8, CSV propio y EUR/USD. D1 especificado y D2–D8 integrados/publicados como desarrollo. El [primer alcance v0.5](docs/v0_5_alcance_inicial.md) solo está definido. El estado de validación y publicación se recoge en [continuidad](docs/CONTINUIDAD.md).
+Alcance aprobado de [v0.4 · Datos y contabilidad trazables](docs/plan_v0_4.md): D1–D8, CSV propio y EUR/USD. D1 especificado y D2–D8 integrados/publicados como desarrollo. El [primer alcance v0.5](docs/v0_5_alcance_inicial.md) está autorizado e implementado en la rama de revisión. El estado de validación y publicación se recoge en [continuidad](docs/CONTINUIDAD.md).
 
 [Comprobación habitual D5 del 10/09](docs/comprobacion_d5_20260910.md): migración 3→4, saldos/dividendos/split sintéticos y carteras anteriores conservados. El refresco automático Yahoo falló en ese arranque y conserva precios anteriores; no se da la descarga diaria por validada. [Diagnóstico API actualizado](docs/diagnostico_api_20260910.md): espera original reproducida antes de ASGI, causa todavía sin resolver.
 

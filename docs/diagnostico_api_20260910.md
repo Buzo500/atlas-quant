@@ -1,5 +1,24 @@
 # Diagnóstico de API en D5/D6 · 10/09/2026
 
+## Corrección del transporte local · v0.5.0-dev.1
+
+La autorización de cinco tareas permite corregir la API. Se sustituye el proxy de producción por transporte Node mantenido, con propietario único de los streams y destino fijo 127.0.0.1:8000. Se conservan rutas, cuerpos, controles y plazos del cliente, sin actualizar dependencias ni reintentar operaciones. El arranque usa el bucle Python original; el cambio experimental a Selector se descartó.
+
+**Hallazgos reproducidos:**
+
+1. El proxy anterior deja abierto upstream cuando el cliente cancela antes de cabeceras. Reproducción contra las funciones de vinext instaladas en `output/validation/proxy-cancellation-before.mjs`: el cliente cierra y upstream continúa abierto a 300 ms. Las regresiones nuevas cubren cancelación antes de cabeceras y durante el cuerpo.
+2. Una primera corrección con `agent:false` también reproduce esperas. `e2e-b3cb45bbe5684474b3e2ad5e61606ed6`, correlación `proxy-41604-38`: ASGI finaliza en 15 ms; Node recibe cabeceras de 120.536 bytes pero solo 65.516 bytes de socket, sin pausa ni buffer pendiente, hasta el aborto a 10,3 s. Forzar cierre en el navegador tampoco lo corrige.
+3. Transferencia TCP de 2 MiB sin ATLAS ni HTTP: 11/24 incompletas al cerrar inmediatamente el emisor; 24/24 completas cuando el receptor confirma antes del cierre. El caso también falla con Selector y fuera del aislamiento de Codex. No demuestra un defecto concreto de Python o de Windows; no se cambian ajustes del sistema.
+4. Comparación Uvicorn → proxy → cliente con 40 respuestas de 2,1 MB: el transporte que pide `Connection: close` se atasca en la primera tanda de ocho (`output/validation/v05-proxy-before-large.log`); el transporte final recibe las 40 completas. Regresión permanente `backend/tests/test_proxy_transport.py`. Un prototipo previo con `http.server` tuvo una espera y posteriores tandas correctas; se conserva su registro y se valida finalmente contra Uvicorn, que es el servidor real.
+
+**Implementación final:** un agente HTTP por petición pide mantener upstream abierto mientras se recibe el cuerpo completo. Se destruye al finalizar o cancelar; ninguna conexión se reutiliza en otra petición. Conserva el flujo nativo, las longitudes/codificaciones, errores y cookies. El plazo incluye el cuerpo; una respuesta truncada falla, nunca se presenta como completa. La conexión del navegador mantiene su comportamiento normal. [Ciclo de vida del agente en Node](https://nodejs.org/docs/latest-v24.x/api/http.html#agentdestroy).
+
+**Evidencia local:** ocho pruebas Node (cancelaciones, 60 POST/GET, 24 respuestas de 2 MiB, errores, plazo y rutas); prueba Python/Uvicorn de 40 × 2,1 MB; suite completa `e2e-77fe4731a54d495d8249ed0b323f5189`, **19/19 en 1,3 min**, integridad/base ordinaria/limpieza correctas. Sondas: 727 respuestas API finalizadas, máximo 134,674 ms y cero cuerpos pendientes más de un segundo. El recorrido ampliado del editor pasa también en `e2e-fe9b6e29f6e84d838c821dcb865be3f2`. 739 Python + 91 subcasos en conjunto.
+
+Esto acredita las correcciones y los recorridos citados; no equivale a haber realizado el ensayo de 48 horas ni a identificar retrospectivamente la causa de cada error histórico. CI y operación final se registran en continuidad. Sondas solo optativas sobre base aislada, sin cuerpos, consultas ni credenciales.
+
+## Antecedentes anteriores a la corrección
+
 ## Actualización: espera original reproducida antes de ASGI
 
 Durante D6 completo, `e2e-6df81e53a5f148e1a1ba9a1f36166d5b` reproduce la espera de 10 s: GET `/api/state`, `proxy-38548-52`, 16:05:58 UTC. Creación/envío de cabeceras upstream inmediato, `bodySent` a 10008,9 ms y aborto del cliente a 10015 ms con `UND_ERR_SOCKET`. No existe entrada ASGI con esa correlación. Reutiliza el socket del POST demo anterior, terminado en ~98 ms. La evidencia acota el fallo al envío/transporte previo al motor; no identifica la causa exacta ni acredita una reparación.

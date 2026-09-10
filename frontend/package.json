@@ -1,6 +1,6 @@
 {
   "name": "sites-project",
-  "version": "0.4.0-dev.6",
+  "version": "0.5.0-dev.1",
   "private": true,
   "engines": {
     "node": ">=22.13.0"
@@ -9,11 +9,12 @@
     "dev": "vinext dev",
     "build": "vinext build",
     "start": "node local-server.mjs",
-    "lint": "oxlint app lib components/atlas features shared test e2e next.config.ts local-server.mjs vitest.config.ts playwright.config.ts",
+    "lint": "oxlint app lib components/atlas features shared test e2e next.config.ts local-server.mjs api-proxy.mjs api-proxy.test.mjs vitest.config.ts playwright.config.ts",
     "lint:all": "oxlint",
     "format": "oxfmt",
     "test": "vitest --config vitest.config.ts",
     "test:run": "vitest run --config vitest.config.ts",
+    "test:transport": "node --test api-proxy.test.mjs",
     "test:e2e": "playwright test --config playwright.config.ts",
     "test:e2e:install": "playwright install chromium"
   },
