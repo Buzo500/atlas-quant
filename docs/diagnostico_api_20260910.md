@@ -1,5 +1,9 @@
 # Diagnóstico de API en D5/D6 · 10/09/2026
 
+## Actualización posterior · descarga Yahoo validada
+
+En el arranque habitual de `v0.5.0-dev.2`, a las 19:55:01 UTC del 10/09, el adaptador existente descarga y publica los dos históricos NVD.DE hasta el 09/09, con TLS verificado. Ambos avanzan a versión 2, añaden una sesión y conservan exactamente las versiones/barras anteriores. Carteras, libro y respuestas EUR siguen iguales a la copia previa. [Evidencia e identificadores](v0_5_planificacion.md). La sonda directa de las 19:27 recibió 429; es un antecedente distinto, no el resultado del adaptador. La validación acredita esta descarga, no disponibilidad futura o estabilidad prolongada.
+
 ## Corrección del transporte local · v0.5.0-dev.1
 
 La autorización de cinco tareas permite corregir la API. Se sustituye el proxy de producción por transporte Node mantenido, con propietario único de los streams y destino fijo 127.0.0.1:8000. Se conservan rutas, cuerpos, controles y plazos del cliente, sin actualizar dependencias ni reintentar operaciones. El arranque usa el bucle Python original; el cambio experimental a Selector se descartó.

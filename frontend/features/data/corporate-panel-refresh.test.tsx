@@ -226,7 +226,7 @@ it.each(['portfolio-first', 'rights-first', 'portfolio-only'] as const)(
       screen.getByRole('combobox', { name: 'Acción en la cartera' }),
     );
     await user.click(
-      screen.getByRole('option', { name: 'Crear cobro revisado' }),
+      await screen.findByRole('option', { name: 'Crear cobro revisado' }),
     );
     for (const [label, value] of Object.entries({
       'Evidencia de elegibilidad y orden': 'Evidencia nueva',

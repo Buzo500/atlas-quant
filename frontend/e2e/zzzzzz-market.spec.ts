@@ -8,6 +8,9 @@ import type {
   PerformanceHistory,
   TargetHistory,
   TargetReports,
+  PlanningHistory,
+  PlanningReport,
+  TargetPreview,
 } from '../lib/api-types';
 
 const headers = { 'X-Atlas-Client': 'local-v1' };
@@ -20,6 +23,10 @@ async function post<T>(page: Page, path: string, data: unknown): Promise<T> {
 test('D6/D7/v0.5: CSV USD y FX, patrimonio, rentabilidad y objetivos en tres anchos', async ({
   page,
 }, info) => {
+  // This full journey now covers D6, D7, targets and four planning analyses,
+  // with eighteen screenshots. Keep each action/assertion's existing 10 s limit;
+  // allow the complete sequence to finish on the slower Windows CI runner.
+  test.setTimeout(120_000);
   await page.goto('/');
   await expect(
     page.getByText('Motor conectado', { exact: true }),
@@ -478,4 +485,217 @@ test('D6/D7/v0.5: CSV USD y FX, patrimonio, rentabilidad y objetivos en tres anc
       /^Cierre 2026-01-06.*Contexto vigente en la última consulta/,
     ),
   ).toBeVisible();
+
+  const planning = page.getByRole('region', {
+    name: 'Planificación y escenarios',
+    exact: true,
+  });
+  await planning
+    .getByText('Abrir análisis de cartera', { exact: true })
+    .click();
+  await select(
+    page,
+    'Patrimonio de partida',
+    '2026-01-06 · 986.10 EUR · complete',
+  );
+  await planning
+    .getByLabel('Aportación hipotética USD', { exact: true })
+    .fill('250');
+  await select(page, 'Cotización para simular', `${instrument.name} ·  · USD`);
+  await planning
+    .getByRole('button', { name: 'Añadir cotización al plan', exact: true })
+    .click();
+  await planning.getByLabel('Lote mínimo · 1', { exact: true }).fill('0.1');
+  await planning
+    .getByLabel('Comisión fija nativa · 1', { exact: true })
+    .fill('1');
+  await planning
+    .getByLabel('Comisión proporcional (pb) · 1', { exact: true })
+    .fill('0');
+  await planning
+    .getByRole('button', { name: 'Calcular análisis', exact: true })
+    .click();
+  const result = planning.getByRole('region', {
+    name: 'Resultado de planificación',
+    exact: true,
+  });
+  await expect(
+    result.getByText('Compra simulada', { exact: true }).first(),
+  ).toBeVisible();
+  async function saveAnalysis(count: number) {
+    await planning
+      .getByRole('button', { name: 'Guardar análisis', exact: true })
+      .click();
+    await expect
+      .poll(
+        async () =>
+          (
+            await readApi<PlanningHistory>(
+              page,
+              `/api/v2/portfolios/${portfolio.id}/planning-reports`,
+            )
+          ).reports.length,
+      )
+      .toBe(count);
+  }
+  for (const width of [3440, 1280, 390]) {
+    await page.setViewportSize({ width, height: 1000 });
+    await result.scrollIntoViewIfNeeded();
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+    ).toBe(true);
+    await planning.screenshot({
+      path: info.outputPath(`v05-planning-${width}.png`),
+    });
+  }
+  await saveAnalysis(1);
+  await select(page, 'Tipo de análisis', 'Escenarios de cartera');
+  await planning
+    .getByLabel('Variación de EUR por USD (%)', { exact: true })
+    .fill('5');
+  await select(page, 'Instrumento del escenario', instrument.name);
+  await planning
+    .getByRole('button', { name: 'Añadir cambio de precio', exact: true })
+    .click();
+  await planning.getByLabel('Cambio de precio 1', { exact: true }).fill('-10');
+  await planning
+    .getByRole('button', { name: 'Calcular análisis', exact: true })
+    .click();
+  await expect(result.getByText('991,515 EUR', { exact: true })).toBeVisible();
+  await saveAnalysis(2);
+  await select(page, 'Tipo de análisis', 'Comparar referencia');
+  await select(
+    page,
+    'Rentabilidad de cartera para comparar',
+    '2026-01-05 a 2026-01-06 · complete',
+  );
+  await planning
+    .getByLabel('Nombre de referencia', { exact: true })
+    .fill('Referencia ficticia E2E');
+  await planning
+    .getByLabel('Fuente de referencia', { exact: true })
+    .fill('Serie sintética total return EUR');
+  await planning
+    .getByLabel('CSV de referencia', { exact: true })
+    .fill('date,value\n2026-01-05,100\n2026-01-06,110\n');
+  await planning
+    .getByRole('checkbox', {
+      name: 'Confirmo que la referencia representa rentabilidad total en EUR',
+      exact: true,
+    })
+    .check();
+  await planning
+    .getByRole('button', { name: 'Calcular análisis', exact: true })
+    .click();
+  await expect(
+    result.getByRole('heading', { name: /Referencia ficticia E2E/ }),
+  ).toBeVisible();
+  await saveAnalysis(3);
+
+  const targetHead = await readApi<TargetHistory>(
+    page,
+    `/api/v2/portfolios/${portfolio.id}/targets`,
+  );
+  const draftBody = {
+    expected_revision: cutSummary.portfolio_revision,
+    expected_targets_revision: targetHead.revision,
+    spec: {
+      name: 'Segunda estrategia ficticia',
+      rows: targetHead.active!.spec.rows.map((r) => ({
+        ...r,
+        weight: r.instrument_id ? '20' : '80',
+      })),
+    },
+  };
+  const draftPreview = await post<TargetPreview>(
+    page,
+    `/v2/portfolios/${portfolio.id}/targets`,
+    draftBody,
+  );
+  await post(page, `/v2/portfolios/${portfolio.id}/targets`, {
+    ...draftBody,
+    commit: true,
+    preview_token: draftPreview.preview_token,
+  });
+  await page.reload();
+  await planning
+    .getByText('Abrir análisis de cartera', { exact: true })
+    .click();
+  await select(page, 'Tipo de análisis', 'Combinar estrategias');
+  for (const label of [
+    'Distribución ficticia v0.5 · v1',
+    'Segunda estrategia ficticia · v2',
+  ]) {
+    await select(page, 'Objetivos de estrategia', label);
+    await planning
+      .getByRole('button', {
+        name: 'Añadir estrategia al presupuesto',
+        exact: true,
+      })
+      .click();
+  }
+  await planning
+    .getByLabel('Presupuesto de estrategia 1', { exact: true })
+    .fill('50');
+  await planning
+    .getByLabel('Presupuesto de estrategia 2', { exact: true })
+    .fill('50');
+  await planning
+    .getByRole('button', { name: 'Calcular análisis', exact: true })
+    .click();
+  await expect(result.getByText('30', { exact: true })).toBeVisible();
+  await expect(result.getByText('70', { exact: true })).toBeVisible();
+  await saveAnalysis(4);
+  const analyses = (
+    await readApi<PlanningHistory>(
+      page,
+      `/api/v2/portfolios/${portfolio.id}/planning-reports`,
+    )
+  ).reports;
+  for (const item of analyses) {
+    const saved = await readApi<PlanningReport>(
+      page,
+      `/api/v2/portfolios/${portfolio.id}/planning-reports/${item.id}`,
+    );
+    expect(saved.current).toBe(true);
+    if (saved.result.kind === 'allocation')
+      expect(saved.result.variants[0].trades[0].quantity).toBe('0.6');
+    if (saved.result.kind === 'scenario')
+      expect(saved.result.nav_after).toBe('991.515');
+    if (saved.result.kind === 'aggregate')
+      expect(
+        saved.result.combined.spec.rows.find((r) => r.instrument_id)?.weight,
+      ).toBe('30');
+  }
+  await page.reload();
+  await planning
+    .getByText('Abrir análisis de cartera', { exact: true })
+    .click();
+  await planning.getByText('Análisis guardados', { exact: true }).click();
+  await planning
+    .getByRole('button', {
+      name: `Consultar análisis ${analyses[0].created_at}`,
+      exact: true,
+    })
+    .click();
+  await expect(
+    result.getByText(
+      'Informe guardado · contexto vigente en la última consulta.',
+      { exact: true },
+    ),
+  ).toBeVisible();
+  for (const width of [3440, 1280, 390]) {
+    await page.setViewportSize({ width, height: 1000 });
+    await result.scrollIntoViewIfNeeded();
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+    ).toBe(true);
+    await planning.screenshot({
+      path: info.outputPath(`v05-aggregate-${width}.png`),
+    });
+  }
 });

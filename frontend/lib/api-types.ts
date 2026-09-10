@@ -2,6 +2,11 @@
 // Regenerate: python tools/export_contracts.py
 // Verify: python tools/export_contracts.py --check
 
+export type AggregateResult = {
+  "kind": "aggregate";
+  "combined": CombinedTargets;
+};
+
 export type AliasInput = {
   "expected_revision": number;
   "listing_id": string;
@@ -20,6 +25,28 @@ export type AliasResponse = {
   "valid_from": (string) | (null);
   "valid_to": (string) | (null);
   "source": string;
+};
+
+export type AllocationResult = {
+  "kind": "allocation";
+  "cut": ValuationCut;
+  "target": TargetSet;
+  "combined": (CombinedTargets) | (null);
+  "variants": Array<AllocationVariant>;
+  "reservation_status": "not_implemented";
+  "sale_proceeds": "hypothetical_settled";
+};
+
+export type AllocationVariant = {
+  "mode": "contributions" | "rebalance";
+  "status": "feasible" | "conflicts" | "unavailable";
+  "provisional": boolean;
+  "reasons": Array<string>;
+  "trades": Array<SimulatedTrade>;
+  "cash": Array<SimulatedCash>;
+  "costs_eur": string;
+  "nav_after": (string) | (null);
+  "rows": Array<TargetExposure>;
 };
 
 export type AuditEntry = {
@@ -47,6 +74,29 @@ export type BacktestResponse = {
   "final_quantity": number;
   "strategy": Strategy;
   "max_position_weight": number;
+};
+
+export type BenchmarkPoint = {
+  "date": string;
+  "portfolio_index": string;
+  "benchmark_index": string;
+};
+
+export type BenchmarkResult = {
+  "kind": "benchmark";
+  "performance_id": string;
+  "name": string;
+  "source": string;
+  "csv_sha256": string;
+  "basis": "total-return-EUR";
+  "evidence": "user_declared";
+  "start_date": string;
+  "end_date": string;
+  "status": "complete" | "provisional";
+  "portfolio_return": string;
+  "benchmark_return": string;
+  "excess_pp": string;
+  "points": Array<BenchmarkPoint>;
 };
 
 export type BindingPreview = {
@@ -193,6 +243,17 @@ export type CatalogResponse = {
   "instruments": Array<InstrumentResponse>;
   "listings": Array<ListingResponse>;
   "aliases": Array<AliasResponse>;
+};
+
+export type CombinedTargets = {
+  "spec": TargetSpec;
+  "labels": {
+  [key: string]: string;
+};
+  "contributors": Array<StrategyContribution>;
+  "unassigned_budget": string;
+  "rounding_cash_pp": string;
+  "reasons": Array<string>;
 };
 
 export type ControlInput = {
@@ -1319,6 +1380,59 @@ export type Plan = {
   "horizon_hours"?: (number) | (null);
 };
 
+export type PlanningHistory = {
+  "reports": Array<PlanningSummary>;
+  "offset": number;
+  "limit": number;
+};
+
+export type PlanningInput = {
+  "kind": "allocation" | "aggregate" | "scenario" | "benchmark";
+  "expected_revision": number;
+  "expected_targets_revision": number;
+  "cut_id"?: (string) | (null);
+  "contribution_eur"?: string;
+  "contribution_usd"?: string;
+  "use_existing_cash"?: boolean;
+  "rules"?: Array<TradeRule>;
+  "strategies"?: Array<StrategyBudget>;
+  "price_shocks"?: Array<PriceShock>;
+  "usd_eur_change_percent"?: string;
+  "performance_id"?: (string) | (null);
+  "benchmark_name"?: string;
+  "benchmark_source"?: string;
+  "benchmark_csv"?: string;
+  "benchmark_basis"?: "total-return-EUR";
+  "benchmark_basis_confirmed"?: boolean;
+  "commit"?: boolean;
+  "preview_token"?: (string) | (null);
+};
+
+export type PlanningPreview = {
+  "report": PlanningReport;
+  "preview_token": string;
+  "committed": boolean;
+};
+
+export type PlanningReport = {
+  "id": string;
+  "portfolio_id": string;
+  "created_at": string;
+  "policy": "atlas-planning-v1";
+  "context_hash": string;
+  "current": boolean;
+  "saved": boolean;
+  "inputs": PlanningInput;
+  "result": (AllocationResult) | (AggregateResult) | (ScenarioResult) | (BenchmarkResult);
+};
+
+export type PlanningSummary = {
+  "id": string;
+  "portfolio_id": string;
+  "created_at": string;
+  "kind": "allocation" | "aggregate" | "scenario" | "benchmark";
+};
+
 export type PnlMetric = {
   "value": (string) | (null);
   "status": "complete" | "provisional" | "incomplete" | "unavailable";
@@ -1446,6 +1560,11 @@ export type PriceBinding = {
 export type PriceHead = {
   "series_id": string;
   "version": (number) | (null);
+};
+
+export type PriceShock = {
+  "instrument_id": string;
+  "change_percent": string;
 };
 
 export type PricesInput = {
@@ -1637,6 +1756,18 @@ export type RiskLimits = {
   "minimum_fee": number;
 };
 
+export type ScenarioResult = {
+  "kind": "scenario";
+  "cut": ValuationCut;
+  "target": TargetSet;
+  "nav_before": (string) | (null);
+  "nav_after": (string) | (null);
+  "change_eur": (string) | (null);
+  "status": "complete" | "provisional" | "unavailable";
+  "reasons": Array<string>;
+  "rows": Array<TargetExposure>;
+};
+
 export type SensitivityResult = {
   "cost_multiplier": number;
   "period": "test";
@@ -1654,6 +1785,29 @@ export type SettingsResponse = {
   "max_position_weight": number;
   "mode": "paper";
   "live_available": false;
+};
+
+export type SimulatedCash = {
+  "currency": "EUR" | "USD";
+  "initial": string;
+  "contribution": string;
+  "final": string;
+};
+
+export type SimulatedTrade = {
+  "instrument_id": string;
+  "listing_id": string;
+  "label": string;
+  "side": "buy" | "sell";
+  "currency": "EUR" | "USD";
+  "quantity": string;
+  "price": string;
+  "gross_native": string;
+  "fee_native": string;
+  "gross_eur": string;
+  "fee_eur": string;
+  "price_mark": Mark;
+  "fx_mark": (Mark) | (null);
 };
 
 export type SourceMetadata = {
@@ -1707,6 +1861,16 @@ export type Strategy = {
   "lookback"?: (number) | (null);
   "top_k"?: (number) | (null);
   "rationale"?: (string) | (null);
+};
+
+export type StrategyBudget = {
+  "target_id": string;
+  "budget": string;
+};
+
+export type StrategyContribution = {
+  "target": TargetSet;
+  "budget": string;
 };
 
 export type Summary = {
@@ -1861,6 +2025,14 @@ export type Trade = {
   "quantity": number;
   "price": number;
   "fee": number;
+};
+
+export type TradeRule = {
+  "listing_id": string;
+  "quantity_step": string;
+  "fixed_fee": string;
+  "fee_bps": string;
+  "priority": number;
 };
 
 export type Usage = {
