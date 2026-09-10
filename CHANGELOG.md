@@ -1,13 +1,23 @@
 # Cambios de ATLAS Quant
 
-## 0.4.0-dev.5 · D6 completo · En revisión · 2026-09-10
+## 0.4.0-dev.6 · D7/D8 · En publicación · 2026-09-10
+
+- P&L, flujos/costes, TWR diario por tramos y MWR/XIRR anual por periodo, con calidad, convenciones y motivos de indisponibilidad.
+- Informes inmutables, revisión/confirmación y contexto versionado; historial, curva existente y tablas paginadas en Cartera.
+- Reductor único del libro con avance incremental, máximo dos cálculos pesados y controles disponibles; esquema 5 conservado.
+- 709 Python + 91 subcasos, 274 frontend y 19 E2E; migración, recuperación y carga de 100.000 barras/10.000 movimientos correctas. [Evidencia D8](docs/v0_4_d8.md).
+- Primer alcance v0.5 definido, sin implementar. API intermitente y descarga Yahoo siguen con límites documentados; ensayo y datos personales aplazados.
+
+## v0.4.0-dev.5 · D6 completo · Publicado · 2026-09-10
+
+PR #8, squash `a308f81`, CI gratuita 34503177151 correcta sobre `a356112`; árboles iguales y etiqueta anotada publicada.
 
 - Esquema 5 aditivo, API versionada para saldos y documentos EUR/USD; compatibilidad EUR conservada.
 - Conversiones con importes reales/comisión, conciliación por moneda, correcciones atómicas y dividendos/splits USD.
 - CSV de precios EUR/USD y FX versionados, evidencia/calendarios explícitos, vínculos y cortes de patrimonio EUR inmutables. Formularios multidivisa y detalle de procedencia.
 - Lecturas SQLite coherentes de solo lectura y verificación breve antes de publicar; rendimiento y recuperación dentro del objetivo D6. [Uso y evidencia](docs/v0_4_d6_cierre.md).
 - Caché Yahoo dentro de los datos ATLAS; diagnóstico TLS/429 y latencia API todavía abiertos.
-- CI inicial de D6.1/D6.2 correcta; PR #8 recibe D6 completo y requiere CI del head definitivo. TWR/MWR nativos y D8 continúan después.
+- 677 Python + 91 subcasos, 270 frontend y 19 E2E correctos.
 
 ## v0.4.0-dev.4 · D5 · Publicado · 2026-09-10
 

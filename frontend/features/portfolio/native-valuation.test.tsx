@@ -5,8 +5,16 @@ import type { ValuationCut, MarketSeries } from '@/lib/api-types';
 import { NativeValuation, ValuationDetails } from './native-valuation';
 import { ExactBalance } from '@/features/data/book-panel';
 import { MarketWorkspace } from '@/features/data/market-workspace';
+import { PortfolioPanel } from './portfolio-panel';
 
 vi.mock('@/lib/api', () => ({ api: vi.fn() }));
+vi.mock('@/features/data/book-panel', async (original) => ({
+  ...(await original<typeof import('@/features/data/book-panel')>()),
+  BookSummary: () => null,
+}));
+vi.mock('@/features/data/corporate-panel', () => ({
+  CorporateSummary: () => null,
+}));
 const request = vi.mocked(api);
 const cut: ValuationCut = {
   id: 'cut',
@@ -73,6 +81,60 @@ const series: MarketSeries = {
 };
 
 beforeEach(() => request.mockReset());
+
+it('el sondeo de auditoría conserva la fecha y la previsualización de patrimonio', async () => {
+  request.mockImplementation(async (path, body) => {
+    if (path === '/portfolios/p')
+      return {
+        portfolio: { accounting_policy: 'atlas-accounting-v2', revision: 1 },
+        context: { portfolio_revision: 1 },
+        value: null,
+        status: 'unavailable',
+        warnings: [],
+      };
+    if (body) return { cut, preview_token: 'token', committed: false };
+    return String(path).includes('/valuations')
+      ? { cuts: [] }
+      : { reports: [] };
+  });
+  const props = {
+    dataset: undefined,
+    portfolioId: 'p',
+    portfolioRevision: 1,
+    active: true,
+    connected: true,
+    stateLoaded: true,
+    busy: false,
+    onImport: vi.fn(),
+    onDemo: vi.fn(async () => {}),
+  };
+  const view = render(<PortfolioPanel {...props} auditSequence={10} />);
+  fireEvent.change(await screen.findByLabelText('Fecha de valoración'), {
+    target: { value: '2026-01-05' },
+  });
+  fireEvent.click(screen.getByRole('button', { name: 'Calcular patrimonio' }));
+  await screen.findByRole('button', { name: 'Guardar corte de patrimonio' });
+  view.rerender(<PortfolioPanel {...props} auditSequence={11} />);
+  await waitFor(() =>
+    expect(
+      request.mock.calls.filter(([p]) => p === '/portfolios/p'),
+    ).toHaveLength(2),
+  );
+  expect(
+    (screen.getByLabelText('Fecha de valoración') as HTMLInputElement).value,
+  ).toBe('2026-01-05');
+  fireEvent.click(
+    screen.getByRole('button', { name: 'Guardar corte de patrimonio' }),
+  );
+  await waitFor(() =>
+    expect(request).toHaveBeenCalledWith('/v2/portfolios/p/valuations', {
+      as_of_date: '2026-01-05',
+      expected_revision: 1,
+      commit: true,
+      preview_token: 'token',
+    }),
+  );
+});
 
 it('distingue patrimonio incompleto de su subtotal conocido sin inventar cero', () => {
   render(<ValuationDetails cut={cut} />);

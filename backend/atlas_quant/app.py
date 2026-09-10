@@ -30,6 +30,8 @@ from .book_service import BookService
 from .corporate_routes import register_corporate_routes
 from .multicurrency_routes import register_multicurrency_routes
 from .market_routes import register_market_routes
+from .performance_routes import register_performance_routes
+from .computation import ComputationBusy
 from .book_contracts import (ImportInput, ReconciliationInput, CorrectionInput, BookDetail,
                             BookPreview, ReconciliationPreview, BookDocuments, BookDocument, BookErrorResponse)
 from .worker_lock import WorkerLock
@@ -156,6 +158,7 @@ def create_app(data_dir=None, run_worker=True):
     register_corporate_routes(app, store)
     register_multicurrency_routes(app, store)
     register_market_routes(app, store)
+    register_performance_routes(app, store)
     app.state.service = service
     app.add_middleware(TrustedHostMiddleware,allowed_hosts=["localhost","127.0.0.1","testserver"])
 
@@ -183,6 +186,10 @@ def create_app(data_dir=None, run_worker=True):
     @app.exception_handler(BookError)
     async def book_error(request, exc):
         return JSONResponse({"detail": exc.detail()}, status_code=422)
+
+    @app.exception_handler(ComputationBusy)
+    async def computation_busy(request, exc):
+        return JSONResponse({'detail': str(exc)}, status_code=503)
 
     @app.exception_handler(ValueError)
     async def invalid(request, exc):

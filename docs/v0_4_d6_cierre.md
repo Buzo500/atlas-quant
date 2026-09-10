@@ -1,6 +1,6 @@
 # D6 completo: libro multidivisa y patrimonio trazable
 
-10/09/2026. Implementación `0.4.0-dev.5`, esquema 5, PR #8. La autorización posterior de las diez tareas amplía D6.1/D6.2 a D6.3–D6.6. Esta es una entrega de desarrollo; D7 y D8 continúan después. El ensayo de 48 horas permanece aplazado.
+10/09/2026. Publicado `v0.4.0-dev.5`, esquema 5, PR #8 fusionada, squash `a308f81`; CI gratuita 34503177151 correcta sobre `a356112`, árbol idéntico. La autorización posterior de las diez tareas amplía D6.1/D6.2 a D6.3–D6.6. Esta es una entrega de desarrollo; D7 y D8 continúan después. El ensayo de 48 horas permanece aplazado.
 
 ## Uso
 

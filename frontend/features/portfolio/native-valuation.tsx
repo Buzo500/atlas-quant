@@ -55,9 +55,11 @@ export function ValuationDetails({ cut }: { cut: ValuationCut }) {
       </div>
       <p className="muted">
         Reconstrucción contable con las versiones elegidas.{' '}
-        {cut.current
-          ? 'El contexto no ha cambiado.'
-          : 'El contexto ha cambiado: se conserva este corte histórico.'}{' '}
+        {!cut.saved
+          ? 'Contexto comprobado al calcular; se comprobará de nuevo al guardar.'
+          : cut.current
+            ? 'Contexto vigente en la última consulta.'
+            : 'El contexto ha cambiado: se conserva este corte histórico.'}{' '}
         {cut.status === 'incomplete'
           ? 'El subtotal conocido no es el patrimonio total.'
           : ''}
@@ -153,10 +155,12 @@ export function ValuationDetails({ cut }: { cut: ValuationCut }) {
 export function NativeValuation({
   portfolioId,
   revision,
+  auditSequence,
   active,
 }: {
   portfolioId: string;
   revision: number;
+  auditSequence?: number;
   active: boolean;
 }) {
   const [day, setDay] = useState(() => new Date().toISOString().slice(0, 10));
@@ -165,14 +169,14 @@ export function NativeValuation({
   const [offset, setOffset] = useState(0);
   const history = useRead<ValuationHistory>({
     path: `/v2/portfolios/${portfolioId}/valuations?offset=${offset}&limit=20`,
-    revision,
+    revision: `${revision}:${auditSequence}`,
     enabled: active,
   });
   const saved = useRead<ValuationCut>({
     path: selected
       ? `/v2/portfolios/${portfolioId}/valuations/${selected}`
       : null,
-    revision,
+    revision: `${revision}:${auditSequence}`,
     enabled: active,
   });
   const operation = useCorporateReview<ValuationPreview>(

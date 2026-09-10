@@ -1,6 +1,6 @@
 # ATLAS Quant · Plan de v0.4: datos y contabilidad trazables
 
-10/09/2026. **Estado actualizado: D6 completo en revisión local**, `0.4.0-dev.5`, esquema 5 y PR #8. [Uso y cierre D6](v0_4_d6_cierre.md). D7 y D8 están autorizados como parte de las diez tareas; todavía pendientes. Este documento conserva los criterios acordados; [continuidad](CONTINUIDAD.md) registra validaciones y publicación. Ensayo de 48 horas y datos personales siguen aplazados.
+10/09/2026. **D6 completo publicado** como `v0.4.0-dev.5`, esquema 5, PR #8 y CI gratuita 34503177151 correcta. [Uso D6](v0_4_d6_cierre.md). [D7](v0_4_d7.md) y [D8](v0_4_d8.md) implementados/validados localmente en `0.4.0-dev.6`, pendientes de su publicación. [Continuidad](CONTINUIDAD.md) registra el cierre. El ensayo sigue aplazado.
 
 [D1: contratos y convenciones](v0_4_d1.md) fija orden, precisión, monedas, fechas, CSV, errores, capacidades, métricas y migración inicial. Incluye [12 casos numéricos](fixtures/v0_4_d1_referencias.json) comprobados mediante aritmética independiente; no son pruebas ejecutadas contra el motor nuevo.
 
@@ -46,7 +46,7 @@ Los códigos D1–D8 son bloques de trabajo, no ocho versiones comerciales. Cada
 | **D7 · Rentabilidad y explicación contable** | MWR/XIRR por periodo y desglose coherente de flujos, costes y patrimonio; TWR con convención identificada. | D5–D6 | Casos con fechas irregulares, flujos intermedios, patrimonio inicial, raíz ausente/ambigua y datos insuficientes; no convertir fallos en 0 %. |
 | **D8 · Integración y entrega** | Migración/recuperación, contratos, pruebas de navegador, rendimiento, documentación y CI gratuita. | D1–D7 | Todos los casos aceptados; una lectura identifica el mismo corte de libro/precios/FX/eventos; datos habituales conservados; límites publicados y sin regresiones de v0.3. |
 
-**Secuencia actual:** D6.1–D6.6 implementados y en revisión para publicar desarrollo. Después, D7 rentabilidad y D8 integración; alcance D1–D8, CSV propio y EUR/USD sin renumerar. Las diez tareas están autorizadas; v0.5 solo se especificará.
+**Secuencia actual:** publicar D7/D8 tras CI gratuita. D1–D8 conservan alcance y numeración; v0.5 solo queda definida en su primer bloque.
 
 ## Decisiones de arquitectura propuestas
 

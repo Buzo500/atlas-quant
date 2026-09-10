@@ -23,3 +23,7 @@ El ensayo de 48 horas y el monitor permanecen aplazados. No introducir movimient
 - D6.3/D6.4 en desarrollo: importación exacta, evidencia/calendarios, versiones de precios y FX, vínculo FX por revisión de cartera, selección de marcas y NAV inmutable. Reutiliza versiones de datasets, libro nativo y tablas vacías de esquema 5; no crea otro motor ni altera datasets EUR anteriores. Verificación enfocada en curso, sin declarar cierre.
 
 El estado final y las fuentes verificadas se incorporarán a CONTINUIDAD y a los documentos de cada bloque.
+
+## Estado posterior
+
+Puntos 1–6 completados: D6 publicado en PR #8 y `v0.4.0-dev.5`, CI 34503177151 correcta. Punto 7 especificado con referencias y punto 8 implementado: D7 con 32 casos nuevos y vista por fechas. Punto 9 validado localmente, pendiente de CI/publicación: 709 Python + 91 subcasos, 274 frontend, 19 E2E, carga y recuperación. Punto 10 definido en `v0_5_alcance_inicial.md`, sin implementación. Mantener trabajo activo hasta cerrar la publicación D7/D8 y registrar el estado operativo.

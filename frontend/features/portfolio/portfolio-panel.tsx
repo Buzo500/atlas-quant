@@ -20,6 +20,7 @@ import { qualityLabel } from '@/shared/quality';
 import { BookSummary } from '@/features/data/book-panel';
 import { CorporateSummary } from '@/features/data/corporate-panel';
 import { NativeValuation } from './native-valuation';
+import { NativePerformance } from './native-performance';
 
 export function PortfolioPanel({
   dataset,
@@ -83,14 +84,22 @@ export function PortfolioPanel({
         portfolioId && (
           <>
             <NativeValuation
-              key={`${portfolioId}:${detail.portfolio.revision}:${auditSequence}`}
+              key={`nav:${portfolioId}:${detail.portfolio.revision}`}
               portfolioId={portfolioId}
               revision={detail.portfolio.revision}
+              auditSequence={auditSequence}
               active={active}
             />
             <BookSummary
               portfolioId={portfolioId}
               revision={portfolioRevision}
+              active={active}
+            />
+            <NativePerformance
+              key={`performance:${portfolioId}:${detail.portfolio.revision}`}
+              portfolioId={portfolioId}
+              revision={detail.portfolio.revision}
+              auditSequence={auditSequence}
               active={active}
             />
             <CorporateSummary
