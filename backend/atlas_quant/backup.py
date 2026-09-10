@@ -22,10 +22,11 @@ from typing import Protocol
 from . import __version__
 from .worker_lock import WorkerLock
 from .identity_store import DDL, validate_schema
+from .book_store import DDL as BOOK_DDL, validate_schema as validate_book_schema
 
 
 FORMAT_VERSION = 1
-SCHEMA_VERSIONS = {0, 1, 2}
+SCHEMA_VERSIONS = {0, 1, 2, 3}
 DATABASE_NAME = "atlas.sqlite3"
 MANIFEST_NAME = "manifest.json"
 _SCHEMA = {
@@ -90,7 +91,7 @@ def _validate_database(path: Path) -> dict:
             objects = db.execute(
                 "SELECT type,name FROM sqlite_master WHERE name NOT LIKE 'sqlite_%'"
             ).fetchall()
-            tables = set(_SCHEMA) | (set(DDL) if version == 2 else set())
+            tables = set(_SCHEMA) | (set(DDL) if version >= 2 else set()) | (set(BOOK_DDL) if version >= 3 else set())
             if set(objects) != {("table", name) for name in tables}:
                 raise BackupError("La base no tiene las tablas de ATLAS esperadas.")
             for table, expected in _SCHEMA.items():
@@ -99,12 +100,18 @@ def _validate_database(path: Path) -> dict:
                 if columns != expected:
                     raise BackupError("Las columnas de la base no corresponden al esquema de ATLAS.")
             counts = {}
-            if version == 2:
+            if version >= 2:
                 validate_schema(db)
                 for table in DDL:
                     if table != "listing_aliases":
                         for (payload,) in db.execute(f"SELECT body FROM {table}"):
                             _object(payload)
+                    counts[table] = db.execute(f"SELECT COUNT(*) FROM {table}").fetchone()[0]
+            if version >= 3:
+                validate_book_schema(db)
+                for table in BOOK_DDL:
+                    for (payload,) in db.execute(f"SELECT body FROM {table}"):
+                        _object(payload)
                     counts[table] = db.execute(f"SELECT COUNT(*) FROM {table}").fetchone()[0]
             for table, column in (("records", "body"), ("versions", "body"), ("audit", "details")):
                 count = 0

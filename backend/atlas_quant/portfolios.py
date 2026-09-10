@@ -25,12 +25,12 @@ class PortfolioService:
     def list(self):
         return self.store.atomic(lambda work: work.portfolio_list())
 
-    def create(self, name):
+    def create(self, name, accounting_policy="legacy-eur-v1"):
         name = name.strip()
         if not name or len(name) > 100:
             raise ValueError("Nombre de cartera requerido, máximo 100 caracteres.")
         def save(work):
-            value = work.create_portfolio(name)
+            value = work.create_portfolio(name, accounting_policy=accounting_policy)
             work.audit("portfolio.created", value["id"])
             return value
         return self.store.atomic(save)
@@ -73,6 +73,13 @@ class PortfolioService:
     @staticmethod
     def _value(context):
         portfolio = context["portfolio"]
+        if portfolio["accounting_policy"] == "atlas-accounting-v2":
+            return dict(portfolio=portfolio, entries=context["entries"], value=None,
+                context=dict(portfolio_id=portfolio["id"], portfolio_revision=portfolio["revision"],
+                    catalog_revision=context["catalog"]["revision"], accounting_policy=portfolio["accounting_policy"],
+                    bindings=context["bindings"], data_hash=fingerprint(context["datasets"])),
+                status="unavailable", quality=[],
+                warnings=["Libro v2: efectivo, cantidades y coste disponibles sin precios. Valoración y rentabilidad v2 pendientes de D6/D7."])
         datasets = {(d["id"], d["version"]): d for d in context["datasets"]}
         labels, bars = {}, []
         for binding in context["bindings"]:
@@ -149,6 +156,8 @@ class PortfolioService:
         if any(event["date"] > datetime.now(timezone.utc).date().isoformat() for event in imported):
             raise ValueError("No se admiten movimientos con fechas futuras.")
         context = self.store.atomic(lambda work: self._context(work, ident))
+        if context["portfolio"]["accounting_policy"] != "legacy-eur-v1":
+            raise ValueError("Esta cartera requiere el formulario de movimientos CSV v2.")
         original = fingerprint(context)
         token = fingerprint(dict(purpose="atlas-portfolio-ledger-v1", context=original, csv=csv))
         symbols = {}

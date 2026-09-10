@@ -1,8 +1,16 @@
 # ATLAS Quant · Operación en Windows
 
-Guía actualizada el 9 de septiembre de 2026. Desarrollo local actual: **`0.4.0-dev.2`, D3 y esquema SQLite 2**, validado en este sobremesa y pendiente de publicación/CI propia. [Calidad, calendarios y revisiones](v0_4_d3.md). Entrega publicada: `v0.4.0-dev.1`, D2 integrado en PR #4; [migración y límites](v0_4_d2.md). El historial de CI y el estado exacto del proceso están en [CONTINUIDAD](CONTINUIDAD.md). **v0.2.0-rc.2 sigue siendo candidata, no estable**: el ensayo de 48 horas permanece aplazado.
+Guía actualizada el 9 de septiembre de 2026. Desarrollo local actual: **`0.4.0-dev.3`, D4 y esquema SQLite 3**, pendiente de publicación/CI propia. [Libro exacto y conciliación](v0_4_d4.md). Entrega publicada: `v0.4.0-dev.2`, D3 integrado en PR #5 con CI gratuita correcta. El historial de pruebas y el estado exacto del proceso están en [CONTINUIDAD](CONTINUIDAD.md). **v0.2.0-rc.2 sigue siendo candidata, no estable**: el ensayo de 48 horas permanece aplazado.
 
-ATLAS normal está arrancado; los entornos E2E están cerrados y la base habitual conserva su contenido. El recorrido usa Windows nativo, motor Python e interfaz compilada; no requiere WSL, CUDA, claves ni presupuesto de pago. La ejecución es exclusivamente simulada.
+El recorrido usa Windows nativo, motor Python e interfaz compilada; no requiere WSL, CUDA, claves ni presupuesto de pago. La ejecución es exclusivamente simulada. Consultar `Status-Atlas.ps1` para conocer el proceso actual; los ensayos E2E usan bases aisladas.
+
+D4 añade «Libro y conciliación» en Datos. Para CSV v2 se crea una cartera con «Libro exacto»; las carteras anteriores conservan CSV v1 y sus gráficos. Revisar extractos no registra ajustes. Antes de migrar se conserva la copia de esquema 2 `backups/atlas-20260909T162440667503Z-1d55fabf`. D3 no abre esquema 3: para retroceder, detener ATLAS, restaurar esa copia y recuperar fuentes/build D3. Los datos posteriores al backup no se incorporan al retroceso.
+
+Comprobación repetible de migración/restauración sobre copias aisladas, sin escribir en la base habitual:
+
+```powershell
+.\.venv\Scripts\python.exe tools\check_d4_migration.py backups\atlas-20260909T162440667503Z-1d55fabf
+```
 
 D3 añade «Calidad de precios» en Datos. Calendarios y correcciones históricas requieren previsualizar y confirmar; crean una versión, no cambian automáticamente el vínculo de una cartera. Una revisión del histórico pausa su fuente automática y obliga a revisar la evidencia afectada; los experimentos congelados no continúan sobre historia corregida. No rellenar campos con supuestos para eliminar advertencias. La importación de movimientos de «Cartera de pruebas» sigue pendiente.
 

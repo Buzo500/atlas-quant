@@ -1,12 +1,13 @@
 # ATLAS Quant · Hoja de ruta
 
-Actualizado: 9 de septiembre de 2026. **La secuencia de versiones se conserva.** La [arquitectura objetivo](arquitectura_objetivo.md) concreta los dos recorridos, módulos, contratos y condiciones de promoción/recuperación por autorización del usuario. Se desarrolla como monolito modular; las entregas futuras se acotan antes de implementarlas. No se cambia el programa por esta revisión documental.
+Actualizado: 9 de septiembre de 2026. **La secuencia de versiones se conserva.** La [arquitectura objetivo](arquitectura_objetivo.md) concreta los dos recorridos, módulos, contratos y condiciones de promoción/recuperación por autorización del usuario. Se desarrolla como monolito modular; las entregas futuras se acotan antes de implementarlas. D4 se implementa por la autorización posterior de sus cinco siguientes pasos.
 
 ## Estado vigente
 
 - **D2 publicado:** [v0.4.0-dev.1](https://github.com/Buzo500/atlas-quant/tree/v0.4.0-dev.1), [PR #4](https://github.com/Buzo500/atlas-quant/pull/4) fusionada en `77f8fa0`. [CI D2](https://github.com/Buzo500/atlas-quant/actions/runs/34365374994): 497 Python + 91 subtests, 246 frontend y 12 E2E.
-- **D3 local:** `0.4.0-dev.2`, `codex/v0.4-d3`, implementación `93c7f7d`, esquema 2; 523 Python + 91 subtests, 249 frontend y 13 E2E. [Calidad, calendario y revisiones](v0_4_d3.md). Sin publicación ni CI remota propias; las ediciones documentales posteriores no constituyen otra implementación.
-- **v0.4:** [D1–D8 aprobados](plan_v0_4.md), CSV propio y EUR/USD. D1 especificado, D2 integrado, D3 implementado localmente, D4–D8 pendientes. No se añaden bloques a v0.4 por revisar la arquitectura.
+- **D3 publicado:** [v0.4.0-dev.2](https://github.com/Buzo500/atlas-quant/tree/v0.4.0-dev.2), PR #5 fusionada en `cdb59b1`; [CI gratuita](https://github.com/Buzo500/atlas-quant/actions/runs/34376199945): 523 Python + 91 subtests, 249 frontend y 13 E2E. [Calidad, calendario y revisiones](v0_4_d3.md).
+- **D4 local:** `0.4.0-dev.3`, `codex/v0.4-d4`, esquema 3. [Libro exacto, CSV EUR y conciliación](v0_4_d4.md); importaciones y correcciones revisables sin alterar carteras antiguas. Aún sin publicación ni CI remota propias.
+- **v0.4:** [D1–D8 aprobados](plan_v0_4.md), CSV propio y EUR/USD. D1 especificado, D2/D3 integrados, D4 implementado localmente, D5–D8 pendientes. No se añaden bloques por revisar la arquitectura.
 - **v0.3:** [v0.3.0-dev.1 aceptada y publicada](revision_final_v0_3.md), con incidencia conocida de espera intermitente de API todavía abierta.
 - **v0.2:** rc.2 continúa como candidata, con CI y escalado físico comprobados. El ensayo de 48 horas y su seguimiento siguen aplazados; no se declara estable.
 

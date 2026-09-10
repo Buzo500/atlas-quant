@@ -152,9 +152,12 @@ def database_snapshot(path, *, full_integrity=False, audit_prefix_count=None):
         audit = list(db.execute("SELECT seq,at,event,entity,details FROM audit ORDER BY seq"))
         schema = db.execute("PRAGMA user_version").fetchone()[0]
         identities = {}
-        if schema == 2:
+        if schema >= 2:
             from atlas_quant.identity_store import DDL
             identities = {table: db.execute(f"SELECT * FROM {table} ORDER BY rowid").fetchall() for table in DDL}
+        if schema >= 3:
+            from atlas_quant.book_store import DDL as BOOK_DDL
+            identities.update({table: db.execute(f"SELECT * FROM {table} ORDER BY rowid").fetchall() for table in BOOK_DDL})
     issues = []
     stable = []
     experiments, datasets = {}, []

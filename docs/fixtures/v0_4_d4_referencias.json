@@ -1,0 +1,11 @@
+{
+  "description": "Oráculos económicos sintéticos declarados antes de implementar D4. Importes exactos; no datos personales.",
+  "cases": [
+    {"id": "buy", "events": [{"kind":"deposit","gross_amount":"1000.00"},{"kind":"buy","quantity":"4","unit_price":"100","gross_amount":"400.00","fee_amount":"2.00"}], "expected":{"cash":"598.00","quantity":"4","cost":"402","contributions":"1000.00","realized_pnl":"0.00"}},
+    {"id": "partial_sell", "events": [{"kind":"deposit","gross_amount":"1000.00"},{"kind":"buy","quantity":"4","unit_price":"100","gross_amount":"400.00","fee_amount":"2.00"},{"kind":"sell","quantity":"1","unit_price":"110","gross_amount":"110.00","fee_amount":"1.00"}], "expected":{"cash":"707.00","quantity":"3","cost":"301.5","contributions":"1000.00","realized_pnl":"8.5"}},
+    {"id": "half_even", "events": [{"kind":"deposit","gross_amount":"10.00"},{"kind":"buy","quantity":"3","unit_price":"0.335","gross_amount":"1.00"}], "expected":{"cash":"9.00","quantity":"3","cost":"1","contributions":"10.00","realized_pnl":"0.00"}},
+    {"id": "declared_gross", "events": [{"kind":"deposit","gross_amount":"10.00"},{"kind":"buy","quantity":"3","unit_price":"0.335","gross_amount":"1.01","explanation":"Bruto del extracto confirmado"}], "expected":{"cash":"8.99","quantity":"3","cost":"1.01","contributions":"10.00","realized_pnl":"0.00"}},
+    {"id": "full_exit", "events": [{"kind":"deposit","gross_amount":"10.00"},{"kind":"buy","quantity":"3","unit_price":"0.335","gross_amount":"1.00"},{"kind":"sell","quantity":"1","unit_price":"1","gross_amount":"1.00"},{"kind":"sell","quantity":"2","unit_price":"1","gross_amount":"2.00"}], "expected":{"cash":"12.00","quantity":"0","cost":"0","contributions":"10.00","realized_pnl":"2"}},
+    {"id": "fees_and_withdrawal", "events": [{"kind":"deposit","gross_amount":"100.00","fee_amount":"1.00"},{"kind":"fee","gross_amount":"2.00"},{"kind":"withdrawal","gross_amount":"10.00","fee_amount":"1.00"}], "expected":{"cash":"86.00","quantity":"0","cost":"0","contributions":"90.00","realized_pnl":"0.00"}}
+  ]
+}

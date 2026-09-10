@@ -12,9 +12,10 @@ from pathlib import Path
 
 from .data import build_provenance_manifest
 from .identity_store import IdentityWork, migrate_v2, validate_schema
+from .book_store import BookWork, migrate_v3, validate_schema as validate_book_schema
 from .worker_lock import WorkerLock
 
-SCHEMA_VERSION = 2
+SCHEMA_VERSION = 3
 
 
 def migrate(db):
@@ -47,6 +48,10 @@ def migrate(db):
         migrate_v2(UnitOfWork(db))
     else:
         validate_schema(db)
+    if version < 3:
+        migrate_v3(db)
+    else:
+        validate_book_schema(db)
 
 
 def now() -> str:
@@ -57,7 +62,7 @@ def encode(value):
     return json.dumps(value, ensure_ascii=False, allow_nan=False, separators=(",", ":"))
 
 
-class UnitOfWork(IdentityWork):
+class UnitOfWork(IdentityWork, BookWork):
     """Record operations sharing one short SQLite transaction.
 
     Callbacks must be synchronous and must not open another Store transaction,

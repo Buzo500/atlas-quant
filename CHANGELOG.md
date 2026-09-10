@@ -1,6 +1,15 @@
 # Cambios de ATLAS Quant
 
-## 0.4.0-dev.2 · D3 · Desarrollo local, sin publicar · 2026-09-09
+## 0.4.0-dev.3 · D4 · Desarrollo local, sin publicar · 2026-09-09
+
+- Libro exacto EUR optativo al crear cartera: CSV v2 para depósitos, retiradas, compras, ventas y comisiones, costes y cantidades decimales sin precios. Carteras y resultados anteriores preservados; NAV/TWR v2 pendientes de D6/D7.
+- Extractos completos EUR: saldos de referencia, diferencias explícitas e historial consultable; guardar un informe no ajusta el libro. Reimportación por identidad externa, conflictos visibles y bruto declarado revisado.
+- Anulación/sustitución con motivo y versiones enlazadas, previsualización, validación de historia posterior y confirmación atómica con auditoría. Consultas por corte/revisión y respuestas paginadas.
+- Migración aditiva 2→3 y backup/restauración; diagnóstico de persistencia ampliado. Interfaz en Datos/Cartera, plantillas y evidencia JSON. [Contrato, uso y pruebas](docs/v0_4_d4.md).
+
+## v0.4.0-dev.2 · D3 · Publicado · 2026-09-09
+
+PR #5 fusionada mediante squash en `cdb59b1461d3d26ff88d6f7de90bdf4534ca5fe3`; etiqueta anotada publicada. CI [34376199945](https://github.com/Buzo500/atlas-quant/actions/runs/34376199945) correcta sobre `864097448b8200c8d9c8b0295598c84ba465fcf9`; árbol integrado idéntico. Incluye arquitectura documental y hoja de ruta, sin implementar sus módulos futuros.
 
 - Calidad por serie/fecha: calendario explícito versionado, cobertura, antigüedad y disponibilidad histórica. Estados separados para dibujo, valoración de precios, investigación exploratoria, investigación acreditada al cierre y promoción paper.
 - Calendario y evidencia CSV previsualizados; confirmación protegida frente a cambios concurrentes. No deduce festivos ni disponibilidad desde descargas. Informes paginados fuera de `/api/state`.

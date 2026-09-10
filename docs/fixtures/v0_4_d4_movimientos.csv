@@ -1,0 +1,4 @@
+external_id,date,day_sequence,kind,listing_ref,quantity,unit_price,gross_amount,currency,fee_amount,fee_currency,tax_amount,tax_currency,fx_to_amount,fx_to_currency,ratio_numerator,ratio_denominator,corporate_event_ref
+event-1,2026-01-05,1,deposit,,,,1000.00,EUR,0.00,EUR,0.00,EUR,,,,,
+event-2,2026-01-05,2,buy,ASSET,4,100,400.00,EUR,2.00,EUR,0.00,EUR,,,,,
+event-3,2026-01-05,3,sell,ASSET,1,110,110.00,EUR,1.00,EUR,0.00,EUR,,,,,

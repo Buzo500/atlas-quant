@@ -10,7 +10,7 @@ from types import SimpleNamespace
 import pytest
 
 from atlas_quant.backup import create_backup
-from atlas_quant.store import Store
+from atlas_quant.store import Store, SCHEMA_VERSION
 from atlas_runtime import atomic_json, read_json
 import soak_atlas as soak
 
@@ -64,7 +64,7 @@ def test_readonly_snapshot_preserves_data_and_allows_only_expected_lifecycle_cha
     store, path = demo
     baseline = soak.database_snapshot(path, full_integrity=True)
     assert baseline["issues"] == []
-    assert baseline["schema"] == 2
+    assert baseline["schema"] == SCHEMA_VERSION
     job = store.get("experiment", "job")
     job.update(status="completed", observation={"elapsed_hours": 49}, phase="finished",
                finished_at="2026-09-08T22:00:00Z", completion_note="Plazo finalizado.")

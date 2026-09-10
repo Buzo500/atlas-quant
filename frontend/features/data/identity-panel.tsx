@@ -18,6 +18,7 @@ import { Field, Choice, DataTable } from '@/shared/ui';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { moneyEUR, date } from '@/shared/format';
+import { BookWorkspace } from './book-panel';
 
 export function IdentityPanel({
   portfolios,
@@ -49,6 +50,9 @@ export function IdentityPanel({
     revision,
   });
   const [name, setName] = useState('');
+  const [bookPolicy, setBookPolicy] = useState<
+    PortfolioRecord['accounting_policy']
+  >('atlas-accounting-v2');
   const action = useAction(onError);
   const refreshAll = async () => {
     await refresh();
@@ -82,6 +86,7 @@ export function IdentityPanel({
               void action.run(async () => {
                 const created = await api<PortfolioRecord>('/portfolios', {
                   name,
+                  accounting_policy: bookPolicy,
                 });
                 await refresh();
                 selectPortfolio(created.id);
@@ -97,13 +102,34 @@ export function IdentityPanel({
                 onChange={(e) => setName(e.target.value)}
               />
             </Field>
+            <Field label="Formato del libro">
+              <Choice
+                label="Formato del libro"
+                value={bookPolicy}
+                onChange={(value) =>
+                  setBookPolicy(value as PortfolioRecord['accounting_policy'])
+                }
+                options={[
+                  {
+                    value: 'atlas-accounting-v2',
+                    label: 'Libro exacto · CSV v2 y conciliación',
+                  },
+                  {
+                    value: 'legacy-eur-v1',
+                    label: 'Libro clásico · CSV v1 y gráficos de cartera',
+                  },
+                ]}
+              />
+            </Field>
             <Button disabled={action.busy || !name.trim()} type="submit">
               Crear cartera EUR
             </Button>
           </form>
           <p className="muted">
-            Contabilidad EUR con las convenciones actuales. La contabilidad USD
-            se incorporará en D6.
+            El libro exacto permite importar y corregir movimientos EUR sin
+            precios. Su valoración y rentabilidad llegarán en D6/D7. El libro
+            clásico conserva los gráficos y las convenciones anteriores. No se
+            cambia la política de carteras existentes.
           </p>
         </details>
         {portfolioId && <QueryStatus label="Libro" query={book} />}
@@ -118,6 +144,16 @@ export function IdentityPanel({
           />
         )}
       </section>
+      {book.data && catalog.data && (
+        <BookWorkspace
+          key={book.data.portfolio.id + ':' + book.data.portfolio.revision}
+          portfolio={book.data.portfolio}
+          catalog={catalog.data}
+          active={active}
+          refresh={refreshAll}
+          onError={onError}
+        />
+      )}
       <section className="panel identity-panel">
         <div className="panel-heading">
           <h2>Instrumentos y cotizaciones</h2>
