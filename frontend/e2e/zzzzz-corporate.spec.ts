@@ -306,12 +306,22 @@ test('D5: derecho separado, cobro neto, corte histórico y evidencia sin duplica
   await page.setViewportSize({ width: 1440, height: 1000 });
   await panel.screenshot({ path: info.outputPath('dividendos.png') });
   await page.reload();
-  await tab(page, 'Cartera');
   await expect(
-    page.getByRole('heading', { name: 'Derechos y eventos', exact: true }),
+    panel.getByText('Derechos pendientes: 0.00 EUR', { exact: true }),
+  ).toBeVisible();
+  await tab(page, 'Cartera');
+  const portfolioTab = page.getByRole('tabpanel', {
+    name: 'Cartera',
+    exact: true,
+  });
+  await expect(
+    portfolioTab.getByRole('heading', {
+      name: 'Derechos y eventos',
+      exact: true,
+    }),
   ).toBeVisible();
   await expect(
-    page.getByText('Derechos pendientes: 0.00 EUR', { exact: true }),
+    portfolioTab.getByText('Derechos pendientes: 0.00 EUR', { exact: true }),
   ).toBeVisible();
   expect(
     (

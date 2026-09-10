@@ -22,7 +22,11 @@ Se separa el recorrido extenso en datos/agregación y adaptación visual, conser
 
 **Validación tras el ajuste de E2E:** 18/18 recorridos completos en 1,1 min, `e2e-76ac4e298b984ecf8d3725d805908756`, evidencia `output/validation/d5-e2e-ci-ready.log`. Contratos de aplicación sin cambios; tipos, lint y build con manifiesto verificados. Integridad `ok`, base habitual intacta y procesos cerrados.
 
-GitHub comprobado antes de preparar CI: 120/2.000 minutos, 0/0,5 GB, 0 USD facturables; presupuesto Actions 0 USD y Stop usage Yes. Tras el primer intento: 138,3/2.000 minutos, 0/0,5 GB y 0 USD facturables; bloqueo mantenido. Cierre remoto pendiente en este punto del registro.
+**Segundo intento remoto:** [CI 34467501259](https://github.com/Buzo500/atlas-quant/actions/runs/34467501259), head `02c53c77a02c88060243cb6c0b29ad04bc426f7c`, job `102839409924`. Pasan todas las fases previas a E2E y 17/18 recorridos en 1,7 min, incluidos ambos recorridos de precios separados. Falla un selector ambiguo del test D5 después de recargar y cambiar a Cartera: el saldo cero existe también en el panel Datos conservado en el DOM. Se acota al `tabpanel` Cartera y se comprueba antes el saldo recargado en Datos; sin cambiar el producto ni sus cálculos. Tres D5 locales pasan con el selector acotado (`e2e-d7a84c65a4b241b9888c0809fd06fcfe`, 16,2 s). Evidencia del intento remoto `output/validation/d5-ci-34467501259.log`; integridad `ok`, base habitual del runner intacta y puertos liberados. Publicación aún condicionada a CI completa correcta.
+
+El recorrido final de dividendo comprueba ambos paneles tras recargar y pasa en 7,4 s (`e2e-1b95b42e3a3b4588aea62d092afc961f`, `output/validation/d5-e2e-ci-selector2.log`). Tipos/lint/build correctos. No se alteran timeouts, reintentos ni lógica del producto.
+
+GitHub comprobado antes de preparar CI: 120/2.000 minutos, 0/0,5 GB, 0 USD facturables; presupuesto Actions 0 USD y Stop usage Yes. Tras el primer intento: 138,3/2.000 minutos; tras el segundo: 150/2.000 minutos, 0/0,5 GB y 0 USD facturables; bloqueo mantenido. Cierre remoto pendiente en este punto del registro.
 
 ## Antecedente: D4 publicado y D5 especificado
 
