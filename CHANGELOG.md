@@ -1,8 +1,17 @@
 # Cambios de ATLAS Quant
 
-## v0.5.0-dev.1 · En revisión · 2026-09-10
+## v0.5.0-dev.2 · En validación · 2026-09-10
 
-[PR #10](https://github.com/Buzo500/atlas-quant/pull/10), [CI gratuita 34517010948](https://github.com/Buzo500/atlas-quant/actions/runs/34517010948) correcta sobre `1992eb5442dbed8e1abb33846901271114884e91`: 739 Python + 91 subcasos, 283 frontend, ocho pruebas Node y 19 E2E; arranque/parada correctos. 0 USD facturables. Cierre documental posterior, sin fusión ni etiqueta nueva.
+- Simulador de aportaciones y rebalanceo: lotes, comisiones, prioridad determinista, caja EUR/USD separada, remanentes y límites posteriores. Sin órdenes ni escrituras contables.
+- Objetivos combinados por presupuestos de estrategias manuales, sin doble asignación ni relajación de los límites globales.
+- Referencia total-return en EUR por CSV, fechas exactas y TWR acumulado; escenarios de precio/FX con efecto sobre cartera, efectivo y derechos.
+- Informes inmutables, entradas/fuentes y contexto, previsualización/confirmación, historial y restauración. Esquema 5.
+- Nuevo panel analítico en Cartera; regresiones, carga y recorrido aislado. Un test previo de cobros ahora espera a que aparezca la opción del selector, evitando una carrera en la propia prueba.
+- [Guía y límites](docs/v0_5_planificacion.md). Yahoo permanece en 429 con TLS verificado; ensayo y movimientos personales aplazados.
+
+## v0.5.0-dev.1 · Publicado · 2026-09-10
+
+[PR #10](https://github.com/Buzo500/atlas-quant/pull/10), [CI gratuita 34517010948](https://github.com/Buzo500/atlas-quant/actions/runs/34517010948) correcta sobre `1992eb5442dbed8e1abb33846901271114884e91`: 739 Python + 91 subcasos, 283 frontend, ocho pruebas Node y 19 E2E; arranque/parada correctos. 0 USD facturables. Cierre documental posterior. PR #10 fusionada en e23f79f y etiqueta v0.5.0-dev.1 publicada.
 
 - Objetivos manuales por instrumento/efectivo, bandas y límites; borradores inmutables y activación explícita con revisión concurrente.
 - Diagnóstico de pesos y desviaciones EUR sobre cortes D6; cotizaciones/derechos agregados, calidad y contexto históricos. Sin cálculos de compras, órdenes ni reservas ficticias.

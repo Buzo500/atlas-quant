@@ -2,7 +2,17 @@
 
 Actualizado: 10 de septiembre de 2026. Este documento resume decisiones y estado para una conversación nueva de Codex; no contiene la transcripción completa del chat original.
 
-## Cierre de las cinco tareas · v0.5.0-dev.1 en revisión
+## Diez tareas autorizadas · ampliación v0.5.0-dev.2
+
+«Vale, pues a por las 10» autoriza revisión/publicación de dev.1, comprobación Yahoo, reglas y simulador de aportaciones, rebalanceo, agregación de estrategias, benchmark, escenarios y validación/publicación del bloque ampliado. Registro, reglas y límites en [v0_5_planificacion.md](v0_5_planificacion.md). No reactiva ensayo de 48 horas, movimientos personales, IA de pago ni bróker.
+
+PR #10 fusionada por squash `e23f79fe390942abbb8366173aa11d840e55df30`; etiqueta anotada `v0.5.0-dev.1` publicada y árbol igual al de la PR con CI 34517010948 correcta. Revisión del agente en navegador: edición/previsualización sin guardar registros en la base habitual; no se atribuye aceptación manual al usuario.
+
+Rama `codex/v0.5-planificacion`, identificada `0.5.0-dev.2`, esquema 5. Copia previa `backups/atlas-20260910T191907486422Z-568bddf8`; ATLAS habitual detenido antes de editar. Nuevos módulos `planning*`: propuestas analíticas con lotes/costes, recursos nativos compartidos, presupuestos de objetivos, referencia total-return EUR por CSV y escenarios precio/FX. Reutilizan valoración/TWR/riesgo; informes con revisión y auditoría atómicas, sin escribir libro ni activar objetivos. Validación completa y publicación de esta ampliación en curso; no confundir la CI anterior con estas fuentes.
+
+Yahoo: una consulta nueva el 10/09 a las 19:27:27 UTC recibe HTTP 429 con TLS verificado, sin Retry-After. Evidencia `var/validation/yahoo-v05-expanded-6f178e5bee374334b987e37fd72bfce9/probe.json`. Descarga real pendiente externamente; no insistir, inventar barras ni desactivar TLS.
+
+## Cierre anterior de las cinco tareas · v0.5.0-dev.1
 
 El usuario autoriza «Vale, haz esas 5 tareas»: corregir transporte API, comprobar actualización Yahoo, revisar recorrido EUR/USD, aceptar el alcance inicial y **implementar objetivos/bandas/desviaciones v0.5**. Rama `codex/v0.5-objetivos`, desde `c7b22bf`. ATLAS detenido antes de editar; copia previa esquema 5 `backups/atlas-20260910T175658520867Z-0c63eb33`. Esta autorización sustituye las restricciones históricas de «v0.5 solo definida» que aparecen más abajo. No reactiva ensayo, monitor, movimientos personales ni bróker.
 

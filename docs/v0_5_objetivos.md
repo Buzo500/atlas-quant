@@ -2,6 +2,8 @@
 
 Primera entrega autorizada de v0.5. Monolito modular, esquema SQLite 5 y libro contable v2 de v0.4 conservados. No es una versión estable. Estado de publicación y operación en [continuidad](CONTINUIDAD.md).
 
+Publicada en PR #10, squash `e23f79f`, etiqueta `v0.5.0-dev.1`. La ampliación posterior de propuestas, agregación, referencia y escenarios se documenta aparte en [v0_5_planificacion.md](v0_5_planificacion.md); los límites «sin propuestas» de esta guía describen exclusivamente dev.1.
+
 ## Uso
 
 1. En **Cartera**, selecciona una cartera nativa v2. En **Patrimonio en EUR**, calcula una fecha de cierre y guarda el corte tras revisar sus fuentes y calidad.

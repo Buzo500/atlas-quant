@@ -1,0 +1,60 @@
+# v0.5 · Planificación, comparación y escenarios
+
+10/09/2026. Implementación autorizada por «Vale, pues a por las 10». Esta ampliación reemplaza el límite de la primera entrega que aplazaba propuestas y agregación. Conserva el monolito, los cortes D6, TWR D7, los objetivos versionados y esquema 5. Identificación prevista: `0.5.0-dev.2`; no declara v0.5 completa ni v0.2 estable.
+
+## Trabajo y estado
+
+1. Revisión del panel actual: realizada por el agente en navegador, con edición y previsualización sin guardar en la base habitual; activación/diagnóstico cubiertos por el recorrido aislado anterior. No se atribuye al usuario una aceptación manual nueva.
+2. PR #10 fusionada (`e23f79f`) y etiqueta `v0.5.0-dev.1` publicada; fuentes iguales a la revisión con CI gratuita 34517010948.
+3. Yahoo: comprobado a las 19:27:27 UTC, HTTP 429 con TLS verificado y sin Retry-After. La descarga real sigue pendiente externamente; CSV continúa disponible.
+4. Reglas de aportaciones: especificadas abajo.
+5. Simulador de aportaciones: implementado y probado.
+6. Rebalanceo con ventas y comparación: implementado y probado.
+7. Agregación de objetivos de varias estrategias: implementada y probada.
+8. Comparador de referencia: implementado y probado.
+9. Escenarios de precios y divisa: implementados y probados.
+10. Pruebas integradas, recuperación, carga, CI gratuita y publicación: pendientes.
+
+Copia anterior al bloque: `backups/atlas-20260910T191907486422Z-568bddf8`. ATLAS detenido antes de modificar fuentes. Movimientos personales y ensayo de 48 horas siguen aplazados.
+
+## Reglas de esta entrega
+
+- Simulación sobre un corte guardado y vigente, con patrimonio positivo. Datos incompletos impiden calcular una propuesta; datos provisionales se identifican. No hay órdenes, reservas reales, movimientos ni cambios de objetivos por simular o guardar un informe.
+- Aportaciones hipotéticas separadas EUR/USD. Por defecto solo se distribuye el dinero aportado; reutilizar efectivo anterior exige seleccionarlo. Nunca se convierte moneda de forma implícita. Los derechos de dividendos son exposición pero no efectivo ni cantidades vendibles.
+- El usuario elige cotización, lote mínimo, comisión fija en la moneda de cotización, comisión proporcional en puntos básicos y prioridad. Se usan las marcas y FX del mismo cierre, con procedencia. Una selección ambigua o sin precio no se rellena con precios inventados.
+- Objetivos monetarios calculados sobre NAV más aportaciones, antes de costes. En rebalanceo se simulan primero ventas de excedentes y luego compras de déficits. El dinero de ventas es condicional a su ejecución y liquidación hipotéticas, nunca efectivo disponible real. Sin cortos ni préstamos.
+- Compras ordenadas por prioridad ascendente, déficit EUR descendente e identidad estable. Se limita cada compra al déficit, efectivo nativo y suelo de efectivo global; redondeo de cantidad hacia abajo al lote, comisión al céntimo hacia arriba. El remanente permanece en efectivo. Es una regla reproducible, no una optimización de rentabilidad ni de costes.
+- Se recalculan NAV neto de costes, pesos y límites al final. Los conflictos permanecen visibles y bloquean calificar la simulación como factible; no se suavizan bandas en silencio. Los impuestos de ventas y el diferencial de ejecución no están estimados: son supuestos explícitos de esta simulación inicial, no una previsión de ejecuciones.
+- Varias estrategias se representan por conjuntos de objetivos inmutables y presupuestos porcentuales explícitos sobre una única cartera. Presupuestos suman como máximo 100; resto a efectivo. Se agregan exposiciones del mismo instrumento y se aplican las bandas/límites del conjunto activo global. No se prioriza una estrategia sobre otra fuera de su presupuesto; prioridad de compras se configura aparte. Es planificación manual, no conexión con un evaluador DSL todavía inexistente.
+- Benchmark elegido por el usuario mediante CSV de un índice de rentabilidad total en EUR (`date,value`), incluidos dividendos/reinversión y conversión declarados por su fuente. Se exige cobertura exacta de las fechas del informe TWR; no se compara precio bruto contra rentabilidad total, no se interpola ni se atribuye verificación externa a la declaración del CSV. Cualquier índice, ETF o cartera puede representarse si satisface ese contrato.
+- Escenarios: variación porcentual de precios por instrumento y de EUR por USD. Se aplica FX a posiciones, efectivo y derechos USD, y precio solo a posiciones. Sin alterar cantidades, dividendos devengados o libro. Valores hipotéticos, no probabilidades ni pronósticos.
+- Informes inmutables con entradas, política, contexto y fuentes; previsualización y guardado atómico con auditoría. Cambios de libro, objetivos o fuentes rechazan confirmaciones obsoletas. Consultas y cálculos fuera de transacciones escritoras; cálculo pesado acotado.
+
+## Aceptación
+
+Casos numéricos independientes: aportación con coste/lote y remanente; ventas que no superan posición; efectivo EUR no financia USD; dos estrategias sobre el mismo instrumento sin doble presupuesto; precio −10 % y FX +5 % aplicado multiplicativamente al activo USD; benchmark idéntico al TWR da exceso cero. Rechazar CSV duplicado/incompleto, contexto obsoleto, cantidades/precios desconocidos y presupuesto superior a 100. Probar rollback, confirmaciones concurrentes, recuperación y ausencia de cambios en libros ordinarios. Interfaz a 390/1280/3440 y recorrido completo aislado.
+
+## Uso en Cartera
+
+Abre **Planificación y escenarios → Abrir análisis de cartera** en una cartera v2. Para aportaciones, agregación o escenarios debe existir un conjunto de objetivos globales activo. Para simular precios necesitas un corte de patrimonio guardado y vigente; para comparar rentabilidad, un informe D7 guardado y vigente. Puedes consultar informes históricos aunque sus fuentes hayan cambiado.
+
+- **Aportaciones y rebalanceo:** selecciona patrimonio, importes hipotéticos EUR/USD y si permites reutilizar el efectivo inicial. Añade una cotización por instrumento con su lote, comisión fija nativa, comisión proporcional en puntos básicos y prioridad. Usa `0` cuando hayas decidido simular sin esa comisión. Debe existir vínculo de precios en Datos también para instrumentos todavía no comprados. Al calcular, compara las dos alternativas y consulta costes, cantidades, remanentes, desviaciones y fuentes. Guardar solo conserva el análisis.
+- **Combinar estrategias:** crea previamente un borrador de objetivos por estrategia en la misma cartera; no hace falta activarlos individualmente. Añade las versiones exactas y asigna sus presupuestos. El resultado suma exposiciones por instrumento y conserva los límites del conjunto activo global. Los mismos presupuestos pueden introducirse en el simulador de aportaciones. La combinación no se activa automáticamente ni ejecuta estrategias.
+- **Comparar referencia:** elige el informe de rentabilidad y aporta nombre, fuente y CSV `date,value`. Confirma que su índice representa rentabilidad total en EUR. Se requieren todas las fechas diarias de ese informe, sin huecos ni filas adicionales. La tabla normaliza ambos índices a 100 y muestra rentabilidades y diferencia en puntos porcentuales. La confirmación de la base es una declaración del usuario, no certificación del proveedor. Un precio ajustado de origen desconocido no acredita por sí solo una referencia comparable.
+- **Escenarios de cartera:** indica cambios porcentuales por instrumento y de EUR por USD. Ejemplo puramente sintético: posición de 418 EUR en USD con precio −10 %, efectivo USD equivalente a 568,10 EUR y FX +5 % producen patrimonio hipotético **991,515 EUR**, variación **+5,415 EUR**. Cambiar precio y FX es multiplicativo. Sin probabilidades, órdenes o modificación del libro.
+
+**Calcular análisis** obtiene una previsualización; editar cualquier hipótesis la invalida. **Guardar análisis** confirma ese contenido y contexto, y escribe informe más auditoría en una transacción. **Análisis guardados** permite consultar 20 registros por página; entradas y fuentes se conservan. Selectores de cortes, informes D7 y objetivos limitados a los 100 más recientes. Cálculos de benchmark hasta 3.661 fechas; máximo 199 reglas/cambios de precio y 20 estrategias. Se rechazan campos incompatibles con el tipo de análisis, porcentajes fuera de rango y presupuestos superiores a 100.
+
+## Validación local
+
+- 781 pruebas Python y 91 subcasos correctos; 42 pruebas nuevas de planificación. Incluyen conservación de efectivo, prioridad compartida, lotes, comisiones, derechos, FX, compuesto TWR, entradas inválidas, contexto obsoleto, rollback, concurrencia idempotente y restauración exacta de los cuatro tipos de informe.
+- 287 pruebas frontend correctas. En la primera ejecución conjunta falló una prueba previa de cobros por consultar una opción antes de que apareciera; se cambió la propia prueba a espera de aparición y la batería completa pasa. El flujo de cobros del producto no se cambió.
+- Ocho pruebas Node de transporte correctas; TypeScript, lint, contratos, dependencias y build con manifiesto comprobados. Recorrido nuevo aislado `e2e-66b7c4aed54d47baba5d760911d49f23` correcto, con imágenes de editor/resultados a 390/1280/3440 y guardado/recuperación de los cuatro análisis. No es una aceptación física de DPI nueva.
+- Carga `var/validation/v05-planning-load-ba265654b7f6458fb5165cce9f0ec848/report.json`: 100.000 precios, 10.000 FX y 10.000 movimientos, diez cotizaciones. Cálculo y serialización máximo **0,558 s**, pico adicional Python **119,36 MiB**, controles p95 **0,0021 s** a través de servicios de aplicación. Presupuesto previo 5 s / 256 MiB / controles <1 s. No mide latencia de red ni confirma estabilidad de 48 horas.
+- CI gratuita y cierre habitual de esta entrega: pendientes de completar. Presupuesto Actions 0 USD con bloqueo y 266,7/2.000 minutos consumidos comprobados antes de la ejecución.
+
+## Qué falta para cerrar toda v0.5
+
+Este bloque entrega las funcionalidades autorizadas en forma analítica inicial; no cierra automáticamente toda la versión. Quedan las fichas/comparaciones ampliadas entre activos y correlaciones, ampliar la comparación a fuentes nativas contrastadas cuando se acuerde su política y revisar el alcance completo frente a sus criterios. El modelo de propuestas usa costes simples, una cotización por instrumento y ventas hipotéticamente liquidadas; no optimiza rotación, impuestos, diferenciales ni conversiones. Cualquier ampliación necesita alcance y casos de aceptación propios.
+
+Recursos comprometidos por órdenes, reservas reales, atribución de fills y ejecución de estrategias pertenecen al OMS/mandatos de v0.7 y al evaluador de v0.6. No se presentan como implementados por guardar presupuestos analíticos. La simulación puede estar dentro de límites con desviaciones residuales: no afirma haber alcanzado exactamente todos los pesos ni ser una propuesta autorizada para enviar. Yahoo, movimientos personales y ensayo mantienen sus estados aplazados o externos.

@@ -1541,6 +1541,36 @@ code {
 .native-targets h3 {
   margin-block: 1rem 0.5rem;
 }
+.native-planning,
+.native-planning section,
+.native-planning .field,
+.planning-rule {
+  min-width: 0;
+}
+.planning-rule {
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  margin-block: 1rem;
+}
+.planning-rule legend,
+.native-planning code {
+  overflow-wrap: anywhere;
+}
+.native-planning .check-field {
+  display: flex;
+  gap: 0.5rem;
+  align-items: baseline;
+  margin-block: 1rem;
+}
+.native-planning .csv-editor {
+  max-width: 100%;
+  overflow: auto;
+}
+.native-planning h3,
+.native-planning h4 {
+  margin-block: 1rem 0.5rem;
+}
 @media (max-width: 640px) {
   .target-edit-row {
     grid-template-columns: repeat(2, minmax(0, 1fr));
