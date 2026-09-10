@@ -83,9 +83,16 @@ export function CorporatePanel({
     path: portfolio
       ? `/portfolios/${portfolio.id}/corporate-actions?offset=${appOffset}${cut ? `&as_of_date=${cut}` : ''}`
       : null,
-    revision,
+    revision: `${revision ?? ''}:${portfolio?.revision ?? ''}`,
     enabled: active && native,
   });
+  // Portfolio and rights refresh independently. Initialize the keyed form only
+  // from the matching revision; useRead retains older data while refreshing.
+  const currentApplications =
+    applications.data?.portfolio_id === portfolio?.id &&
+    applications.data?.portfolio_revision === portfolio?.revision
+      ? applications.data
+      : null;
   const selected = events.data?.events.find((event) => event.id === selectedId);
   const refreshAll = async () => {
     await refresh();
@@ -162,16 +169,24 @@ export function CorporatePanel({
             refresh={refreshAll}
             onError={onError}
           />
-          {selected && native && portfolio && (
-            <CorporateApplicationForm
-              key={`${portfolio.id}:${portfolio.revision}:${events.data.revision}:${selected.id}`}
-              portfolio={portfolio}
-              event={selected}
-              current={applications.data ?? undefined}
-              refresh={refreshAll}
-              onError={onError}
-            />
-          )}
+          {selected &&
+            native &&
+            portfolio &&
+            (currentApplications ? (
+              <CorporateApplicationForm
+                key={`${portfolio.id}:${portfolio.revision}:${events.data.revision}:${selected.id}`}
+                portfolio={portfolio}
+                event={selected}
+                current={currentApplications}
+                refresh={refreshAll}
+                onError={onError}
+              />
+            ) : (
+              <output>
+                Esperando los derechos actualizados de la cartera para preparar
+                la aplicación.
+              </output>
+            ))}
           {selected && !native && (
             <p>
               Para aplicar eventos D5, selecciona una cartera con libro exacto.
