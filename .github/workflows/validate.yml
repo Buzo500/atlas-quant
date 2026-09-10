@@ -43,6 +43,8 @@ jobs:
       - name: Pruebas de comportamiento del frontend
         working-directory: frontend
         run: pnpm.cmd run test:run
+      - name: Transporte HTTP local y cancelaciones
+        run: node --test frontend/api-proxy.test.mjs
       - name: Instalar dependencias y compilar
         run: ./Install-Atlas.ps1
       - name: Pruebas Python con datos aislados
@@ -53,7 +55,7 @@ jobs:
         run: ./.venv/Scripts/python.exe tools/export_contracts.py --check
       - name: Lint de la aplicación mantenida
         working-directory: frontend
-        run: node node_modules/oxlint/bin/oxlint app lib components/atlas features shared test e2e next.config.ts local-server.mjs vitest.config.ts playwright.config.ts
+        run: node node_modules/oxlint/bin/oxlint app lib components/atlas features shared test e2e next.config.ts local-server.mjs api-proxy.mjs api-proxy.test.mjs vitest.config.ts playwright.config.ts
       - name: Instalar Chromium fijado para los recorridos E2E
         run: node frontend/node_modules/@playwright/test/cli.js install chromium
       - name: Recorridos de navegador con interfaz compilada y base aislada

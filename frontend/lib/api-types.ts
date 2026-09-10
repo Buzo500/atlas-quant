@@ -1718,6 +1718,132 @@ export type Summary = {
   "usage"?: (Usage) | (null);
 };
 
+export type TargetActivateInput = {
+  "expected_revision": number;
+  "expected_targets_revision": number;
+  "commit"?: boolean;
+  "preview_token"?: (string) | (null);
+  "target_id": string;
+};
+
+export type TargetCashResource = {
+  "currency": "EUR" | "USD";
+  "native_amount": (string) | (null);
+  "eur_value": (string) | (null);
+};
+
+export type TargetDraftInput = {
+  "expected_revision": number;
+  "expected_targets_revision": number;
+  "commit"?: boolean;
+  "preview_token"?: (string) | (null);
+  "spec": TargetSpec;
+};
+
+export type TargetEvaluationInput = {
+  "expected_revision": number;
+  "expected_targets_revision": number;
+  "commit"?: boolean;
+  "preview_token"?: (string) | (null);
+  "cut_id": string;
+};
+
+export type TargetExposure = {
+  "instrument_id": (string) | (null);
+  "label": string;
+  "value_eur": (string) | (null);
+  "receivable_eur": (string) | (null);
+  "weight": (string) | (null);
+  "target_weight": string;
+  "minimum": (string) | (null);
+  "maximum": (string) | (null);
+  "concentration_limit": (string) | (null);
+  "deviation_pp": (string) | (null);
+  "deviation_eur": (string) | (null);
+  "reasons": Array<string>;
+};
+
+export type TargetHistory = {
+  "revision": number;
+  "active": (TargetSet) | (null);
+  "targets": Array<TargetSet>;
+  "offset": number;
+  "limit": number;
+};
+
+export type TargetPreview = {
+  "target": TargetSet;
+  "action": "draft" | "activate";
+  "preview_token": string;
+  "committed": boolean;
+};
+
+export type TargetReport = {
+  "id": string;
+  "portfolio_id": string;
+  "created_at": string;
+  "policy": "atlas-targets-v1";
+  "context_hash": string;
+  "current": boolean;
+  "saved": boolean;
+  "target": TargetSet;
+  "cut": ValuationCut;
+  "status": "complete" | "provisional" | "unavailable";
+  "reasons": Array<string>;
+  "rows": Array<TargetExposure>;
+  "resources": TargetResources;
+};
+
+export type TargetReportPreview = {
+  "report": TargetReport;
+  "preview_token": string;
+  "committed": boolean;
+};
+
+export type TargetReportSummary = {
+  "id": string;
+  "portfolio_id": string;
+  "created_at": string;
+  "as_of_date": string;
+  "target_version": number;
+  "status": "complete" | "provisional" | "unavailable";
+};
+
+export type TargetReports = {
+  "reports": Array<TargetReportSummary>;
+  "offset": number;
+  "limit": number;
+};
+
+export type TargetResources = {
+  "cash": Array<TargetCashResource>;
+  "committed": null;
+  "reservation_status": "not_implemented";
+};
+
+export type TargetRow = {
+  "instrument_id"?: (string) | (null);
+  "weight": string;
+  "minimum": string;
+  "maximum": string;
+  "concentration_limit": string;
+};
+
+export type TargetSet = {
+  "id": string;
+  "portfolio_id": string;
+  "version": number;
+  "portfolio_revision": number;
+  "catalog_revision": number;
+  "created_at": string;
+  "spec": TargetSpec;
+};
+
+export type TargetSpec = {
+  "name": string;
+  "rows": Array<TargetRow>;
+};
+
 export type TimeWeighted = {
   "value": (string) | (null);
   "status": "complete" | "provisional" | "incomplete" | "unavailable";

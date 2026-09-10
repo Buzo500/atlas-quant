@@ -21,6 +21,7 @@ import { BookSummary } from '@/features/data/book-panel';
 import { CorporateSummary } from '@/features/data/corporate-panel';
 import { NativeValuation } from './native-valuation';
 import { NativePerformance } from './native-performance';
+import { NativeTargets } from './native-targets';
 
 export function PortfolioPanel({
   dataset,
@@ -106,6 +107,13 @@ export function PortfolioPanel({
               key={portfolioId}
               portfolioId={portfolioId}
               revision={portfolioRevision}
+              active={active}
+            />
+            <NativeTargets
+              key={`targets:${portfolioId}:${detail.portfolio.revision}`}
+              portfolioId={portfolioId}
+              revision={detail.portfolio.revision}
+              auditSequence={auditSequence}
               active={active}
             />
           </>

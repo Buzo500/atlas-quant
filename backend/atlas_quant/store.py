@@ -16,6 +16,7 @@ from .book_store import BookWork, migrate_v3, validate_schema as validate_book_s
 from .corporate_store import CorporateWork, migrate_v4, validate_schema as validate_corporate_schema
 from .valuation_store import ValuationWork, migrate_v5, validate_schema as validate_valuation_schema
 from .performance_store import PerformanceWork
+from .targets_store import TargetsWork
 from .worker_lock import WorkerLock
 
 SCHEMA_VERSION = 5
@@ -73,7 +74,7 @@ def encode(value):
     return json.dumps(value, ensure_ascii=False, allow_nan=False, separators=(",", ":"))
 
 
-class UnitOfWork(IdentityWork, BookWork, CorporateWork, ValuationWork, PerformanceWork):
+class UnitOfWork(IdentityWork, BookWork, CorporateWork, ValuationWork, PerformanceWork, TargetsWork):
     """Record operations sharing one short SQLite transaction.
 
     Callbacks must be synchronous and must not open another Store transaction,

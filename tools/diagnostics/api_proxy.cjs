@@ -40,6 +40,37 @@ http.Server.prototype.emit = function(event, ...args) {
   return scope.run(info, () => originalEmit.call(this, event, ...args));
 };
 const originalFetch = globalThis.fetch;
+// Observe the maintained Node HTTP proxy without consuming either stream.
+const originalRequest = http.request;
+http.request = function(options, ...args) {
+  if (options?.hostname !== '127.0.0.1' || options?.port !== 8000 || !scope.getStore()) {
+    return originalRequest.call(this, options, ...args);
+  }
+  const info = scope.getStore();
+  const start = performance.now();
+  const req = originalRequest.call(this, { ...options, headers: { ...options.headers, 'x-atlas-diag': info.correlation } }, ...args);
+  const log = (event, values = {}) => emit('node_' + event, { ...info, ms: performance.now() - start, ...values });
+  let response;
+  req.once('finish', () => log('sent'));
+  req.once('error', err => log('error', {code:err.code}));
+  req.once('socket', socket => {
+    socket.once('connect', () => log('connected', {port:socket.localPort}));
+  });
+  req.once('response', res => {
+    response = res;
+    log('headers', {status:res.statusCode, length:res.headers['content-length']});
+    res.once('end', () => log('body_end', {complete:res.complete}));
+    res.once('close', () => log('body_close', {complete:res.complete, destroyed:res.destroyed}));
+  });
+  const timer = setInterval(() => log('pending', {
+    sent:req.writableFinished, socket_written:req.socket?.bytesWritten, socket_read:req.socket?.bytesRead,
+    response_complete:response?.complete, buffered:response?.readableLength,
+    paused:response?.isPaused(), destroyed:response?.destroyed,
+  }),1000).unref();
+  req.once('close', () => { clearInterval(timer); log('closed'); });
+  return req;
+};
+require('node:module').syncBuiltinESMExports();
 globalThis.fetch = function(input, init) {
   if (String(input).startsWith('http://127.0.0.1:8000/') && scope.getStore()) {
     const headers = new Headers(init?.headers);

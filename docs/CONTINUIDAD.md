@@ -2,7 +2,23 @@
 
 Actualizado: 10 de septiembre de 2026. Este documento resume decisiones y estado para una conversación nueva de Codex; no contiene la transcripción completa del chat original.
 
-## Cierre: diez tareas completadas · v0.4.0-dev.6 publicada
+## Cierre de las cinco tareas · v0.5.0-dev.1 en revisión
+
+El usuario autoriza «Vale, haz esas 5 tareas»: corregir transporte API, comprobar actualización Yahoo, revisar recorrido EUR/USD, aceptar el alcance inicial y **implementar objetivos/bandas/desviaciones v0.5**. Rama `codex/v0.5-objetivos`, desde `c7b22bf`. ATLAS detenido antes de editar; copia previa esquema 5 `backups/atlas-20260910T175658520867Z-0c63eb33`. Esta autorización sustituye las restricciones históricas de «v0.5 solo definida» que aparecen más abajo. No reactiva ensayo, monitor, movimientos personales ni bróker.
+
+**Implementado localmente:** objetivos manuales/bandas/límites, versiones y activación revisadas, diagnóstico sobre cortes D6 guardados, agregado por instrumento/efectivo y derechos identificados; informes inmutables con vigencia, sin propuestas de operaciones. [Guía](v0_5_objetivos.md). Esquema 5 conservado. 739 Python + 91 subcasos, 283 frontend, ocho pruebas Node, tipos/lint/contratos/build correctos. Carga 200 objetivos sobre 100.000 barras/10.000 movimientos: 0,210 s y 3,19 MiB adicionales, controles ASGI p95 0,0043 s. Restauración de objetivos/diagnóstico exacta.
+
+**Transporte corregido y validado localmente:** proxy Node con agente propio por petición, mantener upstream hasta consumir el cuerpo, cancelar y destruir al finalizar; sin reuso entre peticiones ni reenvío. Con `agent:false` se reprodujeron respuestas incompletas; no reintroducir cierre prematuro. Se conserva Proactor original. [Evidencia, hipótesis descartadas y límites](diagnostico_api_20260910.md). 19/19 E2E completos (`e2e-77fe4731a54d495d8249ed0b323f5189`), 727 respuestas API finalizadas máximo 134,674 ms, ninguna pendiente más de un segundo; integridad/base ordinaria/limpieza correctas. Recorrido CSV EUR/USD → patrimonio 986,10 EUR → periodo P&L 87,90 EUR → objetivos con desviaciones +23,56/−23,56 EUR, guardado/reapertura y anchos 390/1280/3440. Editor ampliado: `e2e-fe9b6e29f6e84d838c821dcb865be3f2`, 1/1. No equivale a escala física nueva o ensayo prolongado.
+
+[PR #10](https://github.com/Buzo500/atlas-quant/pull/10) abierta sobre `1992eb5442dbed8e1abb33846901271114884e91`. [CI gratuita 34517010948](https://github.com/Buzo500/atlas-quant/actions/runs/34517010948) **correcta sobre ese commit**: instalación limpia, 739 Python + 91 subcasos, 283 frontend, ocho pruebas Node, contratos/tipos/lint/build, 19/19 E2E (3,2 min) y arranque/parada correctos. E2E remoto `e2e-770b95d971cc4cc9ba1d609635ab00af`, integridad/base ordinaria/limpieza correctas. PR lista para revisión; sin fusión ni etiqueta nueva. El cierre documental posterior solo cambia Markdown, no las fuentes validadas.
+
+**Coste:** presupuesto Actions 0 USD con Stop usage Yes comprobado antes de ejecutar. Cuota previa 248,3/2.000 minutos; después 266,7/2.000, 0/0,5 GB y **0 USD facturables**. No hay ejecuciones automáticas por push ordinario ni se reactiva el ensayo.
+
+**Operación habitual:** arranque, parada cooperativa (ambos procesos código 0) y nuevo arranque correctos. Run activo `f3bafd2d89e646eda41fe4193184aac2`, salud `0.5.0-dev.1`, esquema 5/integridad `ok`. Tres carteras y todos sus libros/respuestas EUR iguales a la copia previa; cero registros analíticos ficticios añadidos. Parada global activa, gasto/reserva cero y experimento previo completado. Interfaz conectada y panel nuevo visible en la demo nativa, sin objetivos activos ni corte de precios válido todavía. Evidencia `output/validation/v05-ordinary-online.json`. Inicio `Abrir-ATLAS.cmd`; parada `Detener-ATLAS.cmd`.
+
+Yahoo: una consulta el 10/09 a las 18:01:53 UTC supera TLS y recibe HTTP 429, sin Retry-After. Evidencia `var/validation/yahoo-v05-1e562d3a12bf4c0c9edf7a663bc9eaba/probe.json`. No insistir ni desactivar certificados; actualización real todavía bloqueada externamente, precios habituales conservados.
+
+## Cierre anterior: diez tareas completadas · v0.4.0-dev.6 publicada
 
 D6 completo publicado en PR #8 / `v0.4.0-dev.5`; D7 y D8 publicados como desarrollo. PR #9 fusionada mediante squash `53cca20654c6c8a9bfc665e2b22f219f3ea85607`, etiqueta anotada `v0.4.0-dev.6` (objeto remoto `3ec9d901829afbcb284c6fe1ff34996d31d81086`). CI gratuita [34509155203](https://github.com/Buzo500/atlas-quant/actions/runs/34509155203) correcta sobre `211ca49f4427e2730dc326178fce7b845c9d2ca1`; árbol integrado idéntico. **709 Python + 91 subcasos, 278 frontend y 19/19 E2E**, instalación limpia, build, tipos, contratos, lint, arranque/proxy y parada correctos. E2E remoto `e2e-d99b1e9a5e4e4903bc7b1cc65e38cc3c`, 3,1 min; integridad/base ordinaria/limpieza correctas. Primer intento fallido y corrección por auditoría conservados más abajo. No se ha declarado estable.
 

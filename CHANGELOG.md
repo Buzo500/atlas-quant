@@ -1,5 +1,15 @@
 # Cambios de ATLAS Quant
 
+## v0.5.0-dev.1 · En revisión · 2026-09-10
+
+[PR #10](https://github.com/Buzo500/atlas-quant/pull/10), [CI gratuita 34517010948](https://github.com/Buzo500/atlas-quant/actions/runs/34517010948) correcta sobre `1992eb5442dbed8e1abb33846901271114884e91`: 739 Python + 91 subcasos, 283 frontend, ocho pruebas Node y 19 E2E; arranque/parada correctos. 0 USD facturables. Cierre documental posterior, sin fusión ni etiqueta nueva.
+
+- Objetivos manuales por instrumento/efectivo, bandas y límites; borradores inmutables y activación explícita con revisión concurrente.
+- Diagnóstico de pesos y desviaciones EUR sobre cortes D6; cotizaciones/derechos agregados, calidad y contexto históricos. Sin cálculos de compras, órdenes ni reservas ficticias.
+- Tabla y editor en Cartera, anchos 390/1280/3440; API tipada, auditoría atómica y restauración sobre esquema 5.
+- Transporte Node mantenido: conexión upstream propia hasta recibir el cuerpo, cierre/cancelación explícitos, bytes conservados y operaciones sin reenvío automático. Se conserva el bucle Python original.
+- [Guía, pruebas y rendimiento](docs/v0_5_objetivos.md), [diagnóstico del transporte](docs/diagnostico_api_20260910.md). Yahoo 429 sigue pendiente externamente; ensayo y movimientos personales aplazados.
+
 ## v0.4.0-dev.6 · D7/D8 · Publicado · 2026-09-10
 
 PR #9 fusionada mediante squash `53cca20654c6c8a9bfc665e2b22f219f3ea85607`, etiqueta anotada `v0.4.0-dev.6` (objeto remoto `3ec9d901829afbcb284c6fe1ff34996d31d81086`). CI gratuita [34509155203](https://github.com/Buzo500/atlas-quant/actions/runs/34509155203) correcta sobre `211ca49f4427e2730dc326178fce7b845c9d2ca1`; árbol integrado idéntico. Coste final 0 USD facturables. Registro documental posterior a la etiqueta.

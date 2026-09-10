@@ -1,6 +1,6 @@
 # v0.5 · Primer alcance propuesto: objetivos y diagnóstico de desviaciones
 
-10/09/2026. Definición autorizada como punto 10; **no implementada**. No cambia la secuencia de la hoja de ruta ni autoriza iniciar v0.5. La versión completa conserva análisis, benchmarks, escenarios, agregación y propuestas; esta primera entrega es deliberadamente pequeña.
+10/09/2026. **Implementación autorizada posteriormente por «Vale, haz esas 5 tareas»**, junto con fiabilidad del transporte, comprobación Yahoo y recorrido EUR/USD. La versión completa conserva análisis, benchmarks, escenarios, agregación y propuestas; esta primera entrega se limita a objetivos y diagnóstico.
 
 ## Resultado visible
 
@@ -17,7 +17,7 @@ Sobre una cartera v2 y un corte EUR identificado, guardar una distribución obje
 - Resultado inmutable enlazado con revisión de cartera, objetivos, políticas y fuentes; cambios lo marcan obsoleto. Guardado con previsualización, comprobación de contexto y auditoría atómica. Lectura/cálculo fuera de transacción escritora.
 - Evaluación de límites como función pura reutilizable, separada de presentación y guardado. Define recurso disponible/comprometido como contrato para pasos posteriores; no crea reservas reales ficticias ni afirma que exista un OMS.
 
-## Orden de trabajo cuando se autorice
+## Orden de trabajo autorizado
 
 1. Congelar contratos de objetivo/banda, instrumento frente a cotización y efectivo, con casos numéricos independientes.
 2. Persistencia versionada y revisión/activación, aprovechando las transacciones del monolito modular.
@@ -27,6 +27,15 @@ Sobre una cartera v2 y un corte EUR identificado, guardar una distribución obje
 
 Aceptación: ejemplo 60/20/20 contra 50/30/20 exacto; mismo instrumento con dos cotizaciones sin doble objetivo; saldo USD valorado con su FX; patrimonio cero/incompleto; bandas imposibles; dos activaciones simultáneas; cambio de precio/FX/libro tras previsualizar; recuperación exacta; políticas legacy intactas. No aprobar una propuesta que viole un límite aunque coincida con pesos deseados.
 
-D7/D8 ya están publicados como desarrollo (`v0.4.0-dev.6`, PR #9); iniciar el código de esta primera entrega requiere nueva autorización. La incidencia del proxy sigue siendo un trabajo de fiabilidad separado antes de ampliar recorridos pesados. Ensayo de 48 horas y estabilidad no se dan por aceptados ni se reactivan.
+D7/D8 ya están publicados como desarrollo (`v0.4.0-dev.6`, PR #9). La autorización de las cinco tareas permite iniciar esta entrega. La incidencia del proxy se atiende primero. Ensayo de 48 horas y estabilidad no se dan por aceptados ni se reactivan.
+
+## Contratos de la primera entrega
+
+- Porcentaje decimal de 0 a 100, hasta seis decimales; mínimo ≤ objetivo ≤ máximo ≤ límite de concentración. Efectivo obligatorio; un instrumento aparece una sola vez aunque tenga varias cotizaciones. La suma de objetivos es exactamente 100.
+- Borradores inmutables numerados, revisión del conjunto y una activación vigente por cartera. Guardar borrador y activar son confirmaciones distintas, ambas previsualizadas. Un cambio concurrente rechaza la confirmación obsoleta; nunca activa parcialmente.
+- Evaluar consume un **corte D6 guardado y vigente**, sin construir otro libro. Posiciones de distintas cotizaciones y derechos de dividendos se agregan por instrumento. Los derechos conservan identificación y no cuentan como efectivo disponible. Instrumentos sin objetivo se muestran, con objetivo cero y aviso explícito.
+- El efectivo mantiene desglose EUR/USD del corte. Recursos comprometidos quedan **no disponibles**, porque todavía no existe OMS; no se inventan reservas cero ni autorizaciones de envío.
+- Corte incompleto o patrimonio no positivo: sin pesos globales ni desviaciones EUR. Corte provisional: escenario provisional. Se conservan causas y subtotales. La disponibilidad histórica de las fuentes se muestra por separado de la calidad contable.
+- Informes y borradores son registros analíticos nuevos sobre el almacén versionado existente; la clave primaria garantiza un estado de objetivos por cartera, y la comparación de revisión se ejecuta en la transacción escritora junto con auditoría. No cambia la semántica contable ni el esquema 5. El código anterior ignora estos registros; cualquier cambio de contexto invalida su vigencia al volver a esta entrega.
 
 Quedan para entregas siguientes de v0.5: reparto de aportaciones, cantidades y costes estimados, ventas/rebalanceo, redondeos/lotes, recursos comprometidos y objetivos de varias estrategias; luego benchmarks y escenarios. DSL y validación ampliada v0.6; bróker y paper externo v0.7; móvil, remoto, LaTeX y aprendizaje mantienen su ubicación vigente. Sin compras automáticas, IA de pago o microservicios.

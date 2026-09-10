@@ -60,6 +60,8 @@ class Trace:
 
 
 async def main():
+    loop = asyncio.get_running_loop()
+    emit('loop', implementation=type(loop).__name__)
     stop = Path(os.environ['ATLAS_STOP_FILE'])
     server = uvicorn.Server(uvicorn.Config(Trace(app), host='127.0.0.1', port=8000,
                                           timeout_graceful_shutdown=15))

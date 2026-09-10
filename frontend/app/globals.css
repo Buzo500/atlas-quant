@@ -1507,3 +1507,42 @@ code {
 .native-valuation > section {
   min-width: 0;
 }
+.native-targets,
+.native-targets section,
+.targets-editor {
+  min-width: 0;
+}
+.targets-editor {
+  display: grid;
+  gap: 1rem;
+  margin-block: 1rem;
+}
+.target-edit-row {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.75rem;
+  min-width: 0;
+  border: 1px solid var(--border);
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+}
+.target-edit-row legend {
+  padding-inline: 0.35rem;
+  overflow-wrap: anywhere;
+}
+.target-edit-row .field {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.target-edit-row button {
+  grid-column: 1 / -1;
+  justify-self: start;
+}
+.native-targets h3 {
+  margin-block: 1rem 0.5rem;
+}
+@media (max-width: 640px) {
+  .target-edit-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
