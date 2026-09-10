@@ -7,7 +7,7 @@
 - Referencia total-return en EUR por CSV, fechas exactas y TWR acumulado; escenarios de precio/FX con efecto sobre cartera, efectivo y derechos.
 - Informes inmutables, entradas/fuentes y contexto, previsualización/confirmación, historial y restauración. Esquema 5.
 - Nuevo panel analítico en Cartera; regresiones, carga y recorrido aislado. Un test previo de cobros ahora espera a que aparezca la opción del selector, evitando una carrera en la propia prueba.
-- [Guía y límites](docs/v0_5_planificacion.md). Yahoo permanece en 429 con TLS verificado; ensayo y movimientos personales aplazados.
+- [Guía y límites](docs/v0_5_planificacion.md). Descarga Yahoo real validada: dos históricos NVD.DE actualizados hasta el 09/09, versiones anteriores intactas y TLS verificado. Ensayo y movimientos personales aplazados.
 
 ## v0.5.0-dev.1 · Publicado · 2026-09-10
 

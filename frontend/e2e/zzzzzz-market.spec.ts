@@ -23,6 +23,10 @@ async function post<T>(page: Page, path: string, data: unknown): Promise<T> {
 test('D6/D7/v0.5: CSV USD y FX, patrimonio, rentabilidad y objetivos en tres anchos', async ({
   page,
 }, info) => {
+  // This full journey now covers D6, D7, targets and four planning analyses,
+  // with eighteen screenshots. Keep each action/assertion's existing 10 s limit;
+  // allow the complete sequence to finish on the slower Windows CI runner.
+  test.setTimeout(120_000);
   await page.goto('/');
   await expect(
     page.getByText('Motor conectado', { exact: true }),
