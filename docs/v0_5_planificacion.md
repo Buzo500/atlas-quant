@@ -13,7 +13,7 @@
 7. Agregación de objetivos de varias estrategias: implementada y probada.
 8. Comparador de referencia: implementado y probado.
 9. Escenarios de precios y divisa: implementados y probados.
-10. Pruebas integradas, recuperación, carga, CI gratuita y publicación: pendientes.
+10. Pruebas integradas, recuperación y carga correctas; CI gratuita 34525527095 aprobada. Fusión/publicación preparadas en PR #11; ver cierre en continuidad.
 
 Copia anterior al bloque: `backups/atlas-20260910T191907486422Z-568bddf8`. ATLAS detenido antes de modificar fuentes. Movimientos personales y ensayo de 48 horas siguen aplazados.
 
@@ -59,6 +59,12 @@ Abre **Planificación y escenarios → Abrir análisis de cartera** en una carte
 La descarga habitual Yahoo publica NVD.DE `4fc6914f5b944719a4901d8613d9968b`, 427→428 barras, SHA-256 `845873727226c3a59edcb26413733350f69859b41c30c8a68c8cb605bcad51b3`, y `689ac9b5170445649605a0abd743b142`, 1.193→1.194 barras, SHA-256 `618a995003361b57af2fab01af54110c7743aac0a35b3482a1f8b7a0a97d15e6`. Ambas añaden exclusivamente 09/09/2026, cierre 192,97999572753906 EUR; el adaptador excluye el día UTC en curso. Moneda EUR verificada, sin error de fuente; versiones antiguas comparadas íntegramente, auditoría y actualización de cabezas coherentes. No se modificó el proveedor ni se desactivaron certificados para obtener el resultado. La sonda directa de las 19:27:27 UTC queda como evidencia histórica de 429, no como bloqueo vigente de esta comprobación.
 
 Revisión final: el ajuste inicial de lotes asumía coste lineal; al redondear comisiones a céntimos podía consumir una fracción de efectivo inicial no permitida. Dos regresiones fallan antes del arreglo (presupuesto nuevo 1 EUR, lote 0,00000001, comisiones 1/1.000 pb) y pasan después. Se busca ahora el mayor número entero de lotes cuyo **bruto más comisión realmente redondeada** cabe en el presupuesto, con búsqueda binaria acotada y comprobación final de la desigualdad. Las 44 pruebas específicas de planificación pasan; no se ha enviado ni registrado ninguna operación. ATLAS habitual se detuvo antes de corregirlo.
+
+## CI de la entrega final
+
+[34525527095](https://github.com/Buzo500/atlas-quant/actions/runs/34525527095), revisión exacta `e6f462568ee02614e756809e7fa2971fdfeb1caf`, **correcta**: instalación limpia en Windows, 783 Python + 91 subcasos, 287 frontend, ocho Node, contratos/tipos/lint/build y 19/19 E2E en 4,0 min. Recorrido ampliado 38,5 s, sin reintentos; límites individuales intactos. E2E remoto `e2e-3bdfd91935c747618d3a7379ff4d394d`, integridad/base ordinaria/limpieza correctas. Arranque, recorrido sintético a través del proxy y parada correctos; gasto IA cero. El registro documental posterior solo cambia Markdown, no las fuentes validadas.
+
+Coste comprobado al terminar: **0 USD facturables**, 310/2.000 minutos incluidos y 0/0,5 GB. Consumo bruto 1,86 USD cubierto íntegramente por descuento; presupuesto Actions 0 USD con bloqueo conservado. No se activa CI automática al publicar esta etiqueta de desarrollo.
 
 ## Qué falta para cerrar toda v0.5
 
