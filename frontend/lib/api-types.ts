@@ -49,6 +49,152 @@ export type AllocationVariant = {
   "rows": Array<TargetExposure>;
 };
 
+export type AnalysisFxRef = {
+  "id": string;
+  "version": number;
+};
+
+export type AnalysisFxSource = {
+  "ref": AnalysisFxRef;
+  "name": string;
+  "source": string;
+  "sha256": string;
+  "date_min": string;
+  "date_max": string;
+};
+
+export type AssetAnalysisHistory = {
+  "reports": Array<AssetAnalysisSummary>;
+  "offset": number;
+  "limit": number;
+};
+
+export type AssetAnalysisInput = {
+  "sources": Array<AssetSourceRef>;
+  "start_date": string;
+  "end_date": string;
+  "fx"?: (AnalysisFxRef) | (null);
+  "commit"?: boolean;
+  "preview_token"?: (string) | (null);
+};
+
+export type AssetAnalysisPreview = {
+  "report": AssetAnalysisReport;
+  "preview_token": string;
+  "committed": boolean;
+};
+
+export type AssetAnalysisReport = {
+  "id": string;
+  "created_at": string;
+  "policy": "atlas-asset-analysis-v1";
+  "context_hash": string;
+  "catalog_revision": number;
+  "corporate_revision": number;
+  "inputs": AssetAnalysisInput;
+  "result": AssetAnalysisResult;
+  "current": boolean;
+  "saved": boolean;
+};
+
+export type AssetAnalysisResult = {
+  "profiles": Array<AssetProfile>;
+  "comparison": AssetComparison;
+  "correlations": AssetCorrelations;
+  "fx": (AnalysisFxSource) | (null);
+  "currency": "EUR";
+  "basis": "raw-price-excluding-dividends";
+  "annualization_sessions": number;
+  "warnings": Array<string>;
+};
+
+export type AssetAnalysisSummary = {
+  "id": string;
+  "created_at": string;
+  "start_date": string;
+  "end_date": string;
+  "names": Array<string>;
+};
+
+export type AssetComparison = {
+  "start_date": (string) | (null);
+  "end_date": (string) | (null);
+  "rows": Array<AssetComparisonRow>;
+  "points": Array<AssetComparisonPoint>;
+  "reasons": Array<string>;
+};
+
+export type AssetComparisonPoint = {
+  "date": string;
+  "indices": Array<string>;
+};
+
+export type AssetComparisonRow = {
+  "source_key": string;
+  "start_eur": string;
+  "end_eur": string;
+  "price_change_pct": string;
+};
+
+export type AssetCorrelations = {
+  "method": "pearson-simple-returns";
+  "minimum_observations": number;
+  "observations": number;
+  "intervals": Array<CorrelationInterval>;
+  "cells": Array<CorrelationCell>;
+  "reasons": Array<string>;
+};
+
+export type AssetProfile = {
+  "source": AssetSource;
+  "status": "complete" | "partial" | "unavailable";
+  "reasons": Array<string>;
+  "expected_sessions": number;
+  "observed_sessions": number;
+  "valid_sessions": number;
+  "valid_intervals": number;
+  "first_date": (string) | (null);
+  "last_date": (string) | (null);
+  "last_close_native": (string) | (null);
+  "last_close_eur": (string) | (null);
+  "price_change_pct": (string) | (null);
+  "session_volatility_pct": (string) | (null);
+  "annualized_volatility_pct": (string) | (null);
+  "max_drawdown_pct": (string) | (null);
+  "historical_known": boolean;
+  "known_dividends": number;
+};
+
+export type AssetSource = {
+  "key": string;
+  "ref": AssetSourceRef;
+  "name": string;
+  "dataset_name": string;
+  "source": string;
+  "instrument_id": string;
+  "instrument_type": string;
+  "listing_id": string;
+  "market": (string) | (null);
+  "currency": "EUR" | "USD";
+  "sha256": string;
+  "date_min": string;
+  "date_max": string;
+  "row_count": number;
+};
+
+export type AssetSourceCatalog = {
+  "sources": Array<AssetSource>;
+  "fx": Array<AnalysisFxSource>;
+  "limit": number;
+};
+
+export type AssetSourceRef = {
+  "kind": "native" | "legacy";
+  "id": string;
+  "version": number;
+  "symbol": string;
+};
+
 export type AuditEntry = {
   "seq": number;
   "at": string;
@@ -503,6 +649,18 @@ export type CorrectionInput = {
   "unaccredited_payments"?: {
   [key: string]: string;
 };
+};
+
+export type CorrelationCell = {
+  "left": string;
+  "right": string;
+  "value": (string) | (null);
+  "reason": (string) | (null);
+};
+
+export type CorrelationInterval = {
+  "start_date": string;
+  "end_date": string;
 };
 
 export type CostItem = {

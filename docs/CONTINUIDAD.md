@@ -1,6 +1,42 @@
 # ATLAS Quant: continuidad entre equipos
 
-Actualizado: 10 de septiembre de 2026. Este documento resume decisiones y estado para una conversación nueva de Codex; no contiene la transcripción completa del chat original.
+Actualizado: 11 de septiembre de 2026. Este documento resume decisiones y estado para una conversación nueva de Codex; no contiene la transcripción completa del chat original.
+
+## Cinco pasos posteriores · revisión/CI de dev.3 e inicio SMA
+
+Autorización: «Vale, a por las 5 cosas» incluye revisión manual de v0.5/portátil, PR/CI gratuita, fusión/etiqueta dev.3 tras revisión, diagnóstico de NVIDIA y comenzar el primer evaluador SMA20/50. [Registro de entrega](v0_5_dev3_entrega.md). **Sustituye la restricción anterior de v0.6 solo definida**, sin ampliar a simulador económico, UI, bróker o IA de pago.
+
+**PR #12 reutilizada y actualizada. CI gratuita [34578070191](https://github.com/Buzo500/atlas-quant/actions/runs/34578070191) correcta sobre `ccb4b4ad0883c09fc217307b2ffb8d46e79f8bd4`:** 808 Python + 91 subcasos, 294 frontend, ocho Node, instalación/build, tipos/lint/contratos, 20/20 E2E en 3,9 min y arranque/parada. Run remoto `e2e-f8a66515258a45df8a7d9bb8c48aac03`, base ordinaria intacta, integridad/limpieza correctas. Cierre posterior solo documental. Coste antes 310 y después 330/2.000 minutos, 0/0,5 GB y 0 USD facturables; presupuesto Actions 0 con bloqueo verificado. Logs `output/validation/v05-dev3-ci.log`.
+
+**Revisión manual pendiente:** se ha pedido al usuario su resultado de arranque/parada del portátil y aceptación del alcance inicial/caso guiado. No atribuirle una aceptación no recibida. Fusión y etiqueta están autorizadas tras la revisión; la CI ya está correcta. No se ha declarado estable ni completado el ensayo de 48 horas.
+
+**NVIDIA diagnosticada:** sonda aislada 08:12 UTC, TLS correcto, salida yfinance anterior al validador sin cierre para el 10/09. Rechazo correcto; no identifica si el origen interno es Yahoo o yfinance. Dos NVD.DE siguen en v2 hasta 09/09, 428 y 1.194 barras, versiones 1/2 conservadas. Calendario sin verificar, base desconocida y eventos pendientes; ver [diagnóstico y evidencia requerida](diagnostico_nvidia_20260911.md). Sin modificar el feed, precios ni libros.
+
+**Primer bloque v0.6 local y separado:** `codex/v0.6-evaluador`, commit `2dbeb41`, sobre la cabeza de dev.3. `sma-cross-evaluator-v1`: contratos estrictos, comparación de medias exacta, reloj/datos explícitos, objetivo por presupuesto, replay e incremental compartidos, huecos/eventos, expiración de apertura y checkpoint. 53 pruebas nuevas; **861 Python y 91 subcasos** en 84,49 s, dos avisos previos; `output/validation/v06-python.log`. Referencia `tools/run_sma_reference.py` produce dos intenciones y paridad con recuperación en cada paso. Código/guía del evaluador viven en esa rama; no están incluidos en la PR/CI de dev.3. No modifica HTTP, UI, esquema 5 ni identificación de aplicación dev.3; la integración y simulación económica quedan pendientes.
+
+ATLAS se detuvo cooperativamente antes de editar. Copia previa `backups/atlas-20260911T081309290792Z-36ef7a06`. Ensayo/monitor de 48 horas, movimientos personales, gasto API, bróker, móvil/remoto y LaTeX siguen aplazados. Estado final de arranque/base y publicación se registra al terminar.
+
+## Antecedente · rama subida para instalar en el portátil
+
+Autorización posterior: «sube la rama y dime pasos para instalar el software en mi portátil». **`codex/v0.5-comparador` subida y verificada en GitHub sobre `5482e3f19302bd871be700c1ad5abb97cbb4f369`**, con seguimiento `origin/codex/v0.5-comparador`. Se añade la [guía actual del portátil](instalacion_portatil.md) en un commit documental posterior de la misma rama. Código sin cambios; no se ha abierto PR, lanzado CI, fusionado ni etiquetado dev.3. El workflow no se dispara con este push de rama. No se ha instalado nada en el portátil ni transferido su base; las comprobaciones siguientes pertenecen al sobremesa. Para obtener dev.3 clonar esta rama, no `master`.
+
+## Cinco tareas posteriores · v0.5.0-dev.3 local
+
+«Vale, haz esas 5 cosas» autoriza caso guiado de planificación, fichas/comparador de activos, correlaciones, evaluar el cierre v0.5 y concretar la primera estrategia v0.6. Rama **`codex/v0.5-comparador`**, desde `524feac`, identificación `0.5.0-dev.3`, esquema 5. Copia previa `backups/atlas-20260911T063013799897Z-4089e6f6`. La publicación vigente continúa siendo dev.2/PR #11; no se ha ejecutado CI ni publicado/fusionado/etiquetado dev.3.
+
+Implementados módulos `asset_analysis*` y panel en **Datos → Fichas y comparador de activos**. Una a doce fuentes con identidad/versión, bruto EUR y FX de la misma fecha, volatilidad muestral, drawdown, base 100 y Pearson con intervalos idénticos y mínimo 20 observaciones. Sin completar huecos ni tratar cifras ausentes como cero. Política `atlas-asset-analysis-v1`; precios brutos excluyen dividendos/costes. Informe inmutable, contexto coherente, límite compartido de cálculos, auditoría atómica e idempotencia; no escribe el libro ni activa objetivos. [Uso, reglas y evidencia](v0_5_comparador.md).
+
+Validación: **808 Python + 91 subcasos**, **294 frontend**, ocho Node, contratos/tipos/lint/build correctos. E2E completo `e2e-fb3c520ba00b4cf489147f1c2b7c799a`, **20/20** en 1,4 min, integridad, base habitual y limpieza correctas. Carga `v05-asset-analysis-load-b1e8b6b3659e424cb1276f907594327b`: 10 fuentes, 100.000 precios, 10.000 FX y 10.000 movimientos; 3.660 sesiones, máximo 1,063 s, 136,22 MiB adicionales, controles por servicios p95 0,00197 s. No prueba nueva de escalado físico ni ensayo prolongado. Revisión ordinaria detecta dos fuentes NVD con etiquetas iguales: se distinguen por ID breve y se añade una regresión; recorrido específico repetido sobre el ajuste final, registrado en la guía.
+
+[Caso guiado](v0_5_ejemplo_guiado.md) comprobado en base aislada: patrimonio 986,10 EUR, aportación hipotética 250 USD, compra simulada 0,6 unidades, comisión 1 USD, efectivo final 781 USD y patrimonio 1.222,65 EUR; libro intacto al guardar el informe. [Matriz de cierre v0.5](v0_5_cierre.md): candidata al cierre del alcance analítico inicial, **aceptación del usuario pendiente**. Se le ha presentado el caso y consultado sobre límites: costes simples, referencia por CSV y ausencia de OMS/reservas. No atribuir aceptación manual por las pruebas del agente.
+
+[Primer alcance v0.6](v0_6_alcance_inicial.md) definido, sin implementar. SMA 20/50 propuesta provisional: 50 cierres de calentamiento, primera detección de cruce con 51, objetivo largo/efectivo por presupuesto, siguiente apertura y paridad replay/incremental. Se ha consultado SMA frente a McClellan; sin respuesta, no afirmar que haya elegido. McClellan mantiene sus datos de amplitud pendientes. Nueva autorización antes de implementar DSL/evaluador.
+
+Operación: copia comparada antes de arrancar, todos los registros iguales. Primer run `33c16ce17b5346f1b824d2f4d71c0700`, salud dev.3, tres carteras/libros/respuestas EUR y todas las tablas históricas intactas, parada global activa y gasto/reserva cero. Parada cooperativa antes del ajuste final de etiquetas. Verificación final de arranque en la guía. Solo cambian metadatos operativos del feed: **Yahoo devuelve para el 10/09 una fila parcial sin cierre**, que ATLAS rechaza; ambos NVD permanecen en v2 hasta el 09/09. Esto no invalida la descarga correcta del día anterior ni acredita disponibilidad actual. No se rellena ni se elimina una fila parcial para continuar.
+
+Ensayo/monitor de 48 horas, movimientos personales, gasto en API, bróker, móvil/remoto y LaTeX siguen aplazados. No se ha sembrado el caso nuevo en la base habitual. Inicio `Abrir-ATLAS.cmd`; parada `Detener-ATLAS.cmd`.
+
+**Arranque final verificado:** run `a613d9c6f25e4a2ead2b4d0ea0c47063`, motor e interfaz conectados en dev.3, manifiesto correcto y tres carteras/libros intactos. Evidencia `output/validation/v05-comparator-ordinary-online.json`. Etiquetas de fuentes homónimas comprobadas en navegador; E2E final específico `e2e-c0a5b47cbf9742c197e53b2c9909b215` 1/1. ATLAS queda abierto en Datos con el comparador disponible. Trabajo conservado localmente; publicación/CI nuevas pendientes de decisión.
 
 ## Diez tareas autorizadas · ampliación v0.5.0-dev.2
 

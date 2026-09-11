@@ -2,6 +2,13 @@
 @import 'tw-animate-css';
 @import 'shadcn/tailwind.css';
 @custom-variant dark (&:is(.dark *));
+.asset-analysis { grid-column: 1 / -1; min-width: 0; }
+.asset-analysis-fields { display: flex; flex-wrap: wrap; gap: 1rem; align-items: end; margin-block: 1rem; }
+.asset-analysis-fields > * { flex: 1 1 15rem; min-width: 0; }
+.asset-analysis-results { min-width: 0; margin-block: 1.5rem; }
+.asset-analysis-results h3 { margin-block: 1.5rem .75rem; }
+.asset-analysis-results details { margin-block: 1rem; }
+.asset-analysis-trace { max-width: 100%; max-height: 24rem; overflow: auto; font-size: .8rem; }
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
