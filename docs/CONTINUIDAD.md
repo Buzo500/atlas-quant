@@ -2,7 +2,44 @@
 
 Actualizado: 11 de septiembre de 2026. Este documento resume decisiones y estado para una conversación nueva de Codex; no contiene la transcripción completa del chat original.
 
-## Cinco tareas posteriores · prevalidación y consulta v0.6 dev.4
+## Publicación de dev.4 · CI remota fallida
+
+El usuario autoriza **solo el punto 1: subir dev.4 y ejecutar CI gratuita**.
+Rama `codex/v0.6-evaluador` subida y verificada contra origin sobre
+`8dadb74de5ff65036a2d6d7236a3b694064036e6`, versión 0.6.0-dev.4 y esquema 5.
+[CI 34610747174](https://github.com/Buzo500/atlas-quant/actions/runs/34610747174),
+job 103300338249, `workflow_dispatch` sobre ese commit: **fallida**, sin reintento.
+
+Pasan **1.004 Python + 91 subcasos, 322 frontend y ocho Node**, instalación/build,
+TypeScript, contratos y lint. E2E `e2e-af41d2b021384cde87a63647412c930a` registra
+14 recorridos correctos de 23 previstos y después aborta con «El puerto 3000 no
+pertenece al proceso E2E frontend». No existe resultado completo de los nueve
+restantes. Los pasos posteriores de arranque/recorrido sintético y parada se omiten.
+El cierre del entorno aislado verifica integridad, puertos liberados y base habitual
+del runner sin cambios; no es una comprobación de la base de este PC.
+
+[Diagnóstico y límites](diagnostico_api_20260911.md): 740 peticiones correlacionadas,
+12 grupos (nueve de error/cancelación y tres de al menos 1 s), sin truncamiento.
+El log retenido no contiene la causa de la pérdida del servidor; no se identifica
+con el timeout histórico ni se cambia el programa por conjetura. Siguiente paso
+propuesto: conservar código de salida y cola acotada de logs de los servidores,
+y reproducir el fallo antes de corregir/repetir CI. No está ejecutado por esta petición.
+
+Facturación comprobada en la sesión de GitHub: antes 386,7/2.000 minutos y después
+**405/2.000**, almacenamiento 0/0,5 GB; 2,43 USD brutos cubiertos por 2,43 USD de
+descuentos, **0 USD facturables**. Presupuesto Actions 0 USD con `Stop usage: Yes`;
+no se cambia la facturación. Log local excluido de Git:
+`output/validation/dev4-ci-34610747174.log`; resumen `dev4-ci-publication.json`.
+
+En este turno la lectura de salud de `127.0.0.1:8000` devuelve conexión rechazada.
+No se ha arrancado/parado ATLAS ni modificado código o datos locales; la causa no
+se ha diagnosticado. La comprobación correcta de salud/tablas de la entrada
+siguiente pertenece al turno de implementación anterior. Cierre posterior solo
+documental subido en la misma rama: la CI corresponde al código `8dadb74`, no al
+commit documental posterior. Sin nueva PR, fusión o etiqueta; portátil, PR #12,
+ensayo, movimientos personales y demás tareas mantienen sus aplazamientos.
+
+## Antecedente local · cinco tareas de prevalidación y consulta v0.6 dev.4
 
 Autorización «Vale, haz las 5»: buscar datos observados acreditados, prevalidar CSV
 visualmente, capturar la próxima recurrencia API, buscar/comparar candidatas y

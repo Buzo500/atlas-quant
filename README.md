@@ -1,14 +1,17 @@
 # ATLAS Quant
 
-**Desarrollo local 0.6.0-dev.4:** prevalidación de CSV antes de configurar una
+**Desarrollo 0.6.0-dev.4, rama subida:** prevalidación de CSV antes de configurar una
 simulación, búsqueda de hipótesis/descartes históricos y comparación de revisiones
 con evidencia y costes. [Guía de uso y límites](docs/v0_6_prevalidacion_consulta.md).
 El [diseño estadístico](docs/v0_6_robustez_estadistica.md) está definido, sin implementar;
-dataset observado acreditado e incidencia API siguen pendientes. La siguiente CI
-queda preparada para capturar trazas; esta entrega todavía no se ha subido ni tiene
-CI remota propia. [Estado actual](docs/CONTINUIDAD.md).
+dataset observado acreditado e incidencia API siguen pendientes.
+[CI gratuita 34610747174 fallida](https://github.com/Buzo500/atlas-quant/actions/runs/34610747174)
+sobre `8dadb74`: pasan 1.004 Python + 91 subcasos, 322 frontend, ocho Node y
+build/contratos/TypeScript/lint; E2E aborta después de 14 recorridos al perder la
+comprobación del servidor del puerto 3000. Gasto facturable 0 USD. Sin nueva PR,
+fusión o etiqueta. [Estado y diagnóstico pendientes](docs/CONTINUIDAD.md).
 
-**Desarrollo actual: `0.6.0-dev.3`, rama `codex/v0.6-evaluador`, esquema 5.** El Laboratorio añade [sensibilidad y registro de candidatas](docs/v0_6_sensibilidad_candidatas.md): variaciones de medias/costes declaradas antes del cálculo, informes reproducibles e hipótesis con revisiones y descartes conservados. Incluye [walk-forward fijo](docs/v0_6_walk_forward.md), CSV nativo EUR, benchmarks y reserva final protegida. Ver [auditoría del CSV observado NVIDIA](docs/v0_6_csv_observado.md) y [diagnóstico API](docs/diagnostico_api_20260911.md): la evidencia de mercado es insuficiente y la espera intermitente sigue abierta. Rama subida y [CI gratuita correcta](https://github.com/Buzo500/atlas-quant/actions/runs/34600509327): 990 Python + 91 subcasos, 317 frontend, ocho Node y 23 E2E, arranque/parada y gasto 0 USD. [Continuidad](docs/CONTINUIDAD.md). PR #12 mantiene su revisión manual pendiente; no hay nueva etiqueta ni órdenes externas.
+**Desarrollo anterior: `0.6.0-dev.3`, rama `codex/v0.6-evaluador`, esquema 5.** El Laboratorio añade [sensibilidad y registro de candidatas](docs/v0_6_sensibilidad_candidatas.md): variaciones de medias/costes declaradas antes del cálculo, informes reproducibles e hipótesis con revisiones y descartes conservados. Incluye [walk-forward fijo](docs/v0_6_walk_forward.md), CSV nativo EUR, benchmarks y reserva final protegida. Ver [auditoría del CSV observado NVIDIA](docs/v0_6_csv_observado.md) y [diagnóstico API](docs/diagnostico_api_20260911.md): la evidencia de mercado es insuficiente y la espera intermitente sigue abierta. Rama subida y [CI gratuita correcta](https://github.com/Buzo500/atlas-quant/actions/runs/34600509327): 990 Python + 91 subcasos, 317 frontend, ocho Node y 23 E2E, arranque/parada y gasto 0 USD. [Continuidad](docs/CONTINUIDAD.md). PR #12 mantiene su revisión manual pendiente; no hay nueva etiqueta ni órdenes externas.
 
 **v0.5.0-dev.3: CI gratuita correcta y PR #12 preparada.** [Revisión/publicación y coste](docs/v0_5_dev3_entrega.md), [instalación en el portátil](docs/instalacion_portatil.md). Rama `codex/v0.5-comparador`, esquema 5; fusión/etiqueta autorizadas tras la revisión manual pendiente. El comienzo del evaluador SMA de v0.6 se conserva en una rama independiente y no forma parte de esta PR.
 

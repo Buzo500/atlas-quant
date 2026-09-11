@@ -6,11 +6,15 @@
   calendario, cobertura, disponibilidad y eventos; lectura sin acreditar ni simular.
 - Búsqueda literal Unicode en revisiones de candidatas, incluidos motivos antiguos;
   comparación de dos a cuatro revisiones con contexto económico y evidencia capturada.
-- Captura optativa cliente/proxy/ASGI integrada en el siguiente workflow autorizado,
+- Captura optativa cliente/proxy/ASGI integrada en el workflow de validación,
   informe acotado de etapas/errores sin atribuir causa raíz ni cambiar timeouts.
 - Diseño de robustez estadística concretado, todavía sin código. Fuente observada
   suficiente aún pendiente; datos/carteras intactos, esquema 5 y ninguna llamada pagada.
-- Desarrollo local; no nueva CI remota, PR, fusión o etiqueta.
+- Rama subida sobre `8dadb74`; [CI gratuita 34610747174 fallida](https://github.com/Buzo500/atlas-quant/actions/runs/34610747174):
+  pasan 1.004 Python + 91 subcasos, 322 frontend, ocho Node y build/contratos/TypeScript/lint.
+  E2E aborta tras 14 recorridos correctos al perder la comprobación del propietario
+  del puerto 3000; sin causa confirmada ni validación de arranque/parada posterior.
+  Gasto facturable 0 USD. Cierre documental; sin nueva PR, fusión o etiqueta.
   [Guía y límites](docs/v0_6_prevalidacion_consulta.md).
 
 ## 0.6.0-dev.3 · Sensibilidad y candidatas · 2026-09-11

@@ -3,7 +3,8 @@
 El usuario autoriza «Vale, haz las 5»: buscar un dataset observado acreditado,
 prevalidación visual del CSV, capturar la próxima recurrencia API, búsqueda y
 comparación de candidatas y concretar las pruebas estadísticas antes de programarlas.
-Entrega local **0.6.0-dev.4**, rama `codex/v0.6-evaluador`, esquema 5.
+Entrega **0.6.0-dev.4**, rama `codex/v0.6-evaluador` subida, esquema 5.
+La CI remota posterior falla en E2E; ver publicación y límites al final.
 
 ## Prevalidación antes de configurar
 
@@ -74,9 +75,9 @@ de al menos un segundo, señala la última etapa observada y límites de la capt
 No convierte una etapa incompleta en una causa raíz. Un rechazo al arrancar o
 una cancelación deliberada del test no equivale al timeout histórico de diez segundos.
 
-El workflow local queda preparado para usar este wrapper en **la próxima CI que
-se autorice**. No cambia el tiempo límite, runner, costes, política de reintentos
-ni dispara un workflow. No es un monitor de la instalación habitual ni un ensayo
+El workflow usa este wrapper; se ejecutó por autorización posterior en la CI
+34610747174. No cambia el tiempo límite, runner, costes o política de reintentos.
+No es un monitor de la instalación habitual ni un ensayo
 de 48 horas. Ejemplo con ATLAS detenido:
 
 ```powershell
@@ -123,5 +124,18 @@ textos finales de prevalidación pasaron otras diez pruebas backend y cinco de
 componente; compilación posterior. Capturas locales `output/validation/dev4-*.png`.
 Estos anchos CSS no sustituyen una validación física nueva del portátil.
 
-No publica nueva CI, PR, fusión o etiqueta. Portátil, ensayo de 48 horas, movimientos
-personales, llamadas pagadas y operaciones externas mantienen sus aplazamientos.
+## Publicación posterior autorizada
+
+El usuario autoriza solo subir y ejecutar CI gratuita. Código `8dadb74` subido:
+[CI 34610747174 fallida](https://github.com/Buzo500/atlas-quant/actions/runs/34610747174).
+Pasan las 1.004 + 91 pruebas Python, 322 frontend y ocho Node, build, contratos,
+TypeScript y lint. E2E termina anticipadamente tras 14 recorridos correctos de 23:
+el harness pierde la comprobación del propietario del puerto 3000. Arranque/parada
+posteriores omitidos. No equivale al pase completo local registrado arriba.
+
+[Captura y siguiente diagnóstico](diagnostico_api_20260911.md), sin causa confirmada;
+no se repite la CI ni se cambia código por esta petición. Cuota posterior 405/2.000
+minutos, 0/0,5 GB y 0 USD facturables, con bloqueo de gasto de pago conservado.
+Continuidad/documentación posteriores subidas sin nueva PR, fusión o etiqueta.
+En este turno el motor habitual no respondía en 8000; no se arranca ni se altera
+la base. Portátil, ensayo, movimientos personales y operaciones externas aplazados.

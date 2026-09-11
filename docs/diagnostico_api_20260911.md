@@ -1,5 +1,38 @@
 # API intermitente · comprobación del 11/09/2026
 
+## CI dev.4: servidor E2E sin propietario comprobable, causa pendiente
+
+[CI 34610747174](https://github.com/Buzo500/atlas-quant/actions/runs/34610747174),
+código `8dadb74`, job 103300338249. **Fallida**, sin reintento. El entorno aislado
+`e2e-af41d2b021384cde87a63647412c930a` registra 14 recorridos correctos de 23
+antes de abortar con «El puerto 3000 no pertenece al proceso E2E frontend».
+El mismo control impide la cancelación por API durante la limpieza. El cierre
+final confirma integridad, puertos liberados y base habitual del runner sin cambios;
+los pasos posteriores del workflow de arranque/recorrido y parada se omiten.
+
+La condición de `assert_owned` admite proceso terminado, listener ausente o PID
+fuera del grupo. El mensaje por sí solo no distingue esas causas. El log retenido
+imprime Playwright y el informe correlacionado, pero no el código de salida ni la
+cola del log del servidor: **no se puede atribuir el fallo a una excepción concreta**.
+No se modifican comprobaciones de propiedad, timeouts ni reintentos.
+
+Captura: 740 peticiones correlacionadas, 12 grupos sin truncamiento; nueve de
+error/cancelación y tres con duración de al menos un segundo. Las tres lentas
+completan el cuerpo HTTP 200; máximo observado 1.345 ms. Una última lectura de
+`/api/state`, `client-5416-287`, falla a los 343,6 ms: consta entrada en proxy,
+sin envío upstream ni recepción ASGI correlacionada. No reproduce la espera de
+diez segundos y no confirma su causa. Las cancelaciones de pruebas/navegación
+tampoco deben clasificarse automáticamente como el fallo histórico.
+
+Siguiente diagnóstico propuesto: retener código de salida y cola acotada de
+`frontend.log`/`backend.log`, junto a PID/listener observado, y reproducir en base
+aislada antes de corregir. Estos cambios y otra CI no se han ejecutado por la
+petición limitada a subir/ejecutar. Evidencia local excluida de Git:
+`output/validation/dev4-ci-34610747174.log` y `dev4-ci-publication.json`.
+
+La sonda de salud del PC habitual también obtuvo conexión rechazada en 8000 en
+este turno; es una observación local separada, no evidencia del fallo del runner.
+
 ## Ampliación dev.4: captura preparada, causa todavía abierta
 
 El nuevo wrapper correlaciona navegador y helper E2E `readApi` con proxy/ASGI,
