@@ -5,6 +5,7 @@ from .contracts import ResponseModel
 from .book import cutoff
 from .simulation_contracts import SimulationConfig
 from .walk_forward_contracts import WalkForwardConfig, WalkForwardSummary
+from .sensitivity_contracts import SensitivityConfig, SensitivitySummary
 
 POLICY = 'atlas-lab-temporal-v1'
 
@@ -25,6 +26,7 @@ class LabInput(BaseModel):
     evidence_reviewed: bool
     config: SimulationConfig
     walk_forward: WalkForwardConfig | None = None
+    sensitivity: SensitivityConfig | None = None
 
     @field_validator('start_date', 'holdout_date', 'end_date')
     @classmethod
@@ -126,6 +128,25 @@ class LabSummary(ResponseModel):
     slow: int
 
 
+class SensitivityCase(ResponseModel):
+    label: str
+    fast: int
+    slow: int
+    config: SimulationConfig
+    result: LabPeriod
+    evaluable: bool
+    reasons: list[str]
+
+
+class SensitivityReport(ResponseModel):
+    policy: Literal['atlas-sensitivity-oat-v1']
+    config: SensitivityConfig
+    cases: list[SensitivityCase]
+    summary: SensitivitySummary
+    warnings: list[str]
+    report_hash: str
+
+
 class LabHistory(ResponseModel):
     items: list[LabSummary]
     offset: int
@@ -140,6 +161,7 @@ class LabReport(ResponseModel):
     warnings: list[str]
     evidence_hash: str
     walk_forward: WalkForwardReport | None = None
+    sensitivity: SensitivityReport | None = None
 
 
 class LabReproduction(ResponseModel):
@@ -147,3 +169,4 @@ class LabReproduction(ResponseModel):
     development_matches: bool
     holdout_matches: bool | None
     walk_forward_matches: bool | None = None
+    sensitivity_matches: bool | None = None

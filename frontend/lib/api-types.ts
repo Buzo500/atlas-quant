@@ -379,9 +379,73 @@ export type BookSource = {
   "source_account": string;
 };
 
+export type CandidateEvidence = {
+  "protocol": LabSummary;
+  "captured_at": string;
+  "development_hash": string;
+  "development_metrics": Array<LabMetric>;
+  "walk_forward_hash": (string) | (null);
+  "sensitivity_hash": (string) | (null);
+  "holdout_hash": (string) | (null);
+  "holdout_metrics": (Array<LabMetric>) | (null);
+};
+
+export type CandidateHistory = {
+  "items": Array<CandidateSummary>;
+  "offset": number;
+  "limit": number;
+};
+
+export type CandidateInput = {
+  "name": string;
+  "hypothesis": string;
+  "reason": string;
+  "status"?: "researching" | "watchlist" | "discarded";
+  "protocol_ids"?: Array<string>;
+};
+
 export type CandidateResult = {
   "strategy": Strategy;
   "validation_metrics": Metrics;
+};
+
+export type CandidateRevision = {
+  "id": string;
+  "candidate_id": string;
+  "revision": number;
+  "name": string;
+  "hypothesis": string;
+  "reason": string;
+  "status": "researching" | "watchlist" | "discarded";
+  "created_at": string;
+  "policy": "atlas-candidate-research-v1";
+  "protocol_ids": Array<string>;
+  "evidence": Array<CandidateEvidence>;
+  "revision_hash": string;
+};
+
+export type CandidateRevisionInput = {
+  "name": string;
+  "hypothesis": string;
+  "reason": string;
+  "status"?: "researching" | "watchlist" | "discarded";
+  "protocol_ids"?: Array<string>;
+  "expected_revision": number;
+};
+
+export type CandidateRevisions = {
+  "items": Array<CandidateRevision>;
+  "offset": number;
+  "limit": number;
+};
+
+export type CandidateSummary = {
+  "id": string;
+  "name": string;
+  "revision": number;
+  "status": "researching" | "watchlist" | "discarded";
+  "updated_at": string;
+  "protocols": number;
 };
 
 export type CatalogResponse = {
@@ -1004,6 +1068,7 @@ export type LabInput = {
   "evidence_reviewed": boolean;
   "config": SimulationConfig;
   "walk_forward"?: (WalkForwardConfig) | (null);
+  "sensitivity"?: (SensitivityConfig) | (null);
 };
 
 export type LabMetric = {
@@ -1047,6 +1112,7 @@ export type LabReport = {
   "warnings": Array<string>;
   "evidence_hash": string;
   "walk_forward"?: (WalkForwardReport) | (null);
+  "sensitivity"?: (SensitivityReport) | (null);
 };
 
 export type LabReproduction = {
@@ -1054,6 +1120,7 @@ export type LabReproduction = {
   "development_matches": boolean;
   "holdout_matches": (boolean) | (null);
   "walk_forward_matches"?: (boolean) | (null);
+  "sensitivity_matches"?: (boolean) | (null);
 };
 
 export type LabSummary = {
@@ -2026,10 +2093,47 @@ export type ScenarioResult = {
   "rows": Array<TargetExposure>;
 };
 
+export type SensitivityCase = {
+  "label": string;
+  "fast": number;
+  "slow": number;
+  "config": SimulationConfig;
+  "result": LabPeriod;
+  "evaluable": boolean;
+  "reasons": Array<string>;
+};
+
+export type SensitivityConfig = {
+  "policy"?: "atlas-sensitivity-oat-v1";
+  "fast_windows"?: Array<number>;
+  "slow_windows"?: Array<number>;
+  "cost_multipliers"?: Array<string>;
+};
+
+export type SensitivityReport = {
+  "policy": "atlas-sensitivity-oat-v1";
+  "config": SensitivityConfig;
+  "cases": Array<SensitivityCase>;
+  "summary": SensitivitySummary;
+  "warnings": Array<string>;
+  "report_hash": string;
+};
+
 export type SensitivityResult = {
   "cost_multiplier": number;
   "period": "test";
   "metrics": Metrics;
+};
+
+export type SensitivitySummary = {
+  "cases": number;
+  "evaluable_cases": number;
+  "min_return_pct": (string) | (null);
+  "max_return_pct": (string) | (null);
+  "return_spread_pp": (string) | (null);
+  "worst_drawdown_pct": (string) | (null);
+  "nonnegative_cases": number;
+  "reasons": Array<string>;
 };
 
 export type SettingsInput = {

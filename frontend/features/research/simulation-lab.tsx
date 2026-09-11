@@ -19,6 +19,12 @@ import { date } from '@/shared/format';
 
 import { PeriodResult } from './simulation-result';
 import {
+  SensitivityEditor,
+  SensitivityResult,
+  initialSensitivity,
+  sensitivityInput,
+} from './sensitivity';
+import {
   WalkForwardEditor,
   WalkForwardResult,
   initialWalkForward,
@@ -66,6 +72,8 @@ export function SimulationLab({
   const [config, setConfig] = useState(initialConfig);
   const [walkForward, setWalkForward] = useState(initialWalkForward);
   const [withWalkForward, setWithWalkForward] = useState(false);
+  const [sensitivity, setSensitivity] = useState(initialSensitivity);
+  const [withSensitivity, setWithSensitivity] = useState(false);
   const [reproduction, setReproduction] = useState('');
   const { busy, run } = useAction(onError);
   const available =
@@ -110,6 +118,9 @@ export function SimulationLab({
       evidence_reviewed: reviewed,
       config,
       ...(withWalkForward ? { walk_forward: walkForward } : {}),
+      ...(withSensitivity
+        ? { sensitivity: sensitivityInput(sensitivity) }
+        : {}),
     });
     setSelected(result.protocol.id);
     setPublished(result);
@@ -339,6 +350,12 @@ export function SimulationLab({
               value={walkForward}
               onChange={setWalkForward}
             />
+            <SensitivityEditor
+              enabled={withSensitivity}
+              onEnabled={setWithSensitivity}
+              value={sensitivity}
+              onChange={setSensitivity}
+            />
             <Button type="submit" disabled={!ready || !reviewed || busy}>
               {busy ? 'Procesando…' : 'Congelar y simular desarrollo'}
             </Button>
@@ -450,7 +467,9 @@ export function SimulationLab({
                     result.development_matches &&
                       result.holdout_matches !== false &&
                       (!report.walk_forward ||
-                        result.walk_forward_matches === true)
+                        result.walk_forward_matches === true) &&
+                      (!report.sensitivity ||
+                        result.sensitivity_matches === true)
                       ? 'Reproducción correcta: coincide con el informe guardado.'
                       : 'La reproducción no coincide. Conserva el informe y revisa la versión del motor.',
                   );
@@ -467,6 +486,9 @@ export function SimulationLab({
           />
           {report.walk_forward && (
             <WalkForwardResult result={report.walk_forward} />
+          )}
+          {report.sensitivity && (
+            <SensitivityResult result={report.sensitivity} />
           )}
           {report.holdout ? (
             <PeriodResult

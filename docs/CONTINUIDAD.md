@@ -2,6 +2,34 @@
 
 Actualizado: 11 de septiembre de 2026. Este documento resume decisiones y estado para una conversación nueva de Codex; no contiene la transcripción completa del chat original.
 
+## Cinco tareas autorizadas · sensibilidad y candidatas v0.6
+
+El usuario acepta «Venga, a hacer todos»: diagnóstico API, subir/CI gratuita,
+contrastar CSV observado, sensibilidad y registro de candidatas. Esta autorización
+sustituye el alcance anterior de solo walk-forward. **0.6.0-dev.3**, rama
+`codex/v0.6-evaluador`, esquema 5; [guía y pruebas](v0_6_sensibilidad_candidatas.md).
+
+Implementados escenarios de un factor cada vez declarados antes del cálculo,
+reserva final intacta, informes reproducibles; candidatas con hipótesis, motivos,
+estados de investigación/seguimiento/descarte y evidencia inmutable por revisión.
+No existe promoción automática ni envío de órdenes. La [auditoría del CSV NVD](v0_6_csv_observado.md)
+encuentra 175 filas válidas pero evidencia insuficiente y falta de sesión 07/09;
+no importado ni acreditado como apto. El [diagnóstico API](diagnostico_api_20260911.md)
+no reproduce la espera: 2 recorridos y 301 lecturas correctos, sin cerrar la incidencia.
+
+Validación local: **990 Python + 91 subcasos, 317 frontend, ocho Node y 23 E2E**,
+contratos/TypeScript/lint/build correctos. Tras la revisión visual se corrigió el
+formato de fecha/hora de candidatas, con regresión dirigida y nueva compilación.
+Capturas finales aisladas a 960/1366/3440 px, formulario y curvas revisadas.
+La guía conserva fallos iniciales y sus límites. **Subida/CI remota final en curso**;
+CI 34590252591 solo valida dev.1. Cuota previa 366,7/2.000 minutos, almacenamiento
+0/0,5 GB, 0 USD facturables y presupuesto Actions 0 con bloqueo comprobados.
+
+ATLAS detenido antes de editar, copia `backups/atlas-20260911T121035724463Z-d6011740`.
+Los entornos aislados cerraron con integridad y base habitual intactas; el arranque
+habitual y la publicación se registrarán al cerrar. PR #12 y revisión del portátil,
+ensayo 48 h, datos personales, pago, bróker, móvil/remoto y LaTeX siguen aplazados.
+
 ## Primera tarea autorizada · Walk-forward fijo v0.6
 
 El usuario indica «Vale, haz la primera»: implementar walk-forward, no los otros

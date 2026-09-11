@@ -10,6 +10,7 @@ import { useAction } from '@/shared/use-action';
 import { useDatasetSymbol } from '@/shared/use-dataset-symbol';
 import { ResearchResult } from './research-result';
 import { SimulationLab } from './simulation-lab';
+import { Candidates } from './candidates';
 
 export function Lab({
   dataset,
@@ -19,6 +20,7 @@ export function Lab({
   onError: (s: string) => void;
 }) {
   const [simulationOpen, setSimulationOpen] = useState(false);
+  const [candidatesOpen, setCandidatesOpen] = useState(false);
   type SubmittedContext = Pick<
     ResearchResponse['execution'],
     | 'dataset_id'
@@ -72,6 +74,13 @@ export function Lab({
       >
         <summary>Simulación SMA con protocolo temporal</summary>
         {simulationOpen && <SimulationLab onError={onError} />}
+      </details>
+      <details
+        className="panel details"
+        onToggle={(event) => setCandidatesOpen(event.currentTarget.open)}
+      >
+        <summary>Hipótesis y candidatas de investigación</summary>
+        {candidatesOpen && <Candidates onError={onError} />}
       </details>
       <div className="lab-layout">
         <section className="panel lab-config">

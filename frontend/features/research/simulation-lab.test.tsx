@@ -7,7 +7,7 @@ import {
 } from '@testing-library/react';
 import { beforeEach, expect, it, vi } from 'vitest';
 import { api } from '@/lib/api';
-import type { LabReport, LabSummary } from '@/lib/api-types';
+import type { LabReport, LabSummary, SensitivityReport } from '@/lib/api-types';
 import { deferred } from '@/test/fixtures';
 import { SimulationLab } from './simulation-lab';
 
@@ -192,3 +192,48 @@ it('no confirma reproducción si el walk-forward guardado falta o diverge', asyn
     0,
   );
 });
+
+it.each([false, undefined, null])(
+  'rechaza reproducción incompleta de sensibilidad (%s)',
+  async (matches) => {
+    const sensitivity: SensitivityReport = {
+      policy: 'atlas-sensitivity-oat-v1',
+      config: {},
+      cases: [],
+      warnings: [],
+      report_hash: 'sensitivity-hash',
+      summary: {
+        cases: 0,
+        evaluable_cases: 0,
+        nonnegative_cases: 0,
+        min_return_pct: null,
+        max_return_pct: null,
+        return_spread_pp: null,
+        worst_drawdown_pct: null,
+        reasons: [],
+      },
+    };
+    call.mockImplementation(async (path) =>
+      path.endsWith('/reproduce')
+        ? {
+            development_matches: true,
+            holdout_matches: null,
+            sensitivity_matches: matches,
+          }
+        : path === '/lab/protocols/a'
+          ? { ...report('a'), sensitivity }
+          : defaults(path),
+    );
+    render(<SimulationLab onError={vi.fn()} />);
+    fireEvent.click(
+      await screen.findByRole('button', { name: 'Ver Protocolo a' }),
+    );
+    fireEvent.click(
+      await screen.findByRole('button', { name: 'Comprobar reproducción' }),
+    );
+    expect(await screen.findByText(/La reproducción no coincide/)).toBeTruthy();
+    expect(
+      call.mock.calls.filter(([p]) => p.endsWith('/holdout')),
+    ).toHaveLength(0);
+  },
+);

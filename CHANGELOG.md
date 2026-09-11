@@ -1,5 +1,14 @@
 # Cambios de ATLAS Quant
 
+## 0.6.0-dev.3 · Sensibilidad y candidatas · 2026-09-11
+
+- Sensibilidad opcional congelada con el protocolo: una media o los costes cada vez, máximo ocho casos; mismo motor, cuentas independientes y prueba final cerrada.
+- Métricas, curvas, motivos, huellas y reproducción; no optimiza parámetros ni aprueba estrategias. Límites combinados de cálculo con walk-forward.
+- Registro de hipótesis, seguimiento y descartes, hasta 20 protocolos y 100 revisiones. Evidencia capturada por revisión, vínculos acumulativos, control optimista y auditoría atómica.
+- API local y contratos TypeScript regenerados; interfaz con protección de borradores/concurrencia y fechas con zona. Esquema 5, libros e identidades previas conservados.
+- [Guía y validación](docs/v0_6_sensibilidad_candidatas.md): 990 Python + 91 subcasos, 317 frontend, ocho Node y 23 E2E locales. Publicación/CI final según continuidad.
+- [CSV observado](docs/v0_6_csv_observado.md) auditado y no apto por falta de evidencia. [API](docs/diagnostico_api_20260911.md) no reproduce la espera en 301 lecturas; incidencia abierta, sin cambios especulativos de transporte.
+
 ## 0.6.0-dev.2 · Walk-forward con parámetros fijos · 2026-09-11
 
 - Ventanas móviles de contexto/evaluación dentro del desarrollo, con configuración y criterios congelados antes del cálculo; reserva final intacta.

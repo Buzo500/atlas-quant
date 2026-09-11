@@ -5,6 +5,7 @@ from .lab_contracts import LabInput, POLICY
 from .lab_sources import freeze_source
 from .lab_economics import period
 from .walk_forward import evaluate as walk_forward, plan as plan_walk_forward
+from .sensitivity import evaluate as sensitivity, plan as plan_sensitivity
 from .quality import digest
 from .store import now
 
@@ -35,8 +36,9 @@ class LabService:
     @staticmethod
     def _public(value):
         result = {k: value[k] for k in ('protocol', 'config', 'development', 'holdout', 'warnings', 'evidence_hash')}
-        if 'walk_forward' in value:
-            result['walk_forward'] = value['walk_forward']
+        for name in ('walk_forward', 'sensitivity'):
+            if name in value:
+                result[name] = value[name]
         return result
 
     def read(self, ident):
@@ -72,7 +74,7 @@ class LabService:
     def create(self, body):
         snapshot = self.store.read(lambda w: self._snapshot(w, body))
         frozen = freeze_source(*snapshot, body)
-        inputs = body.model_dump(mode='json', exclude={'walk_forward'} if body.walk_forward is None else set())
+        inputs = body.model_dump(mode='json', exclude={name for name in ('walk_forward', 'sensitivity') if getattr(body, name) is None})
         ident = digest(dict(policy=POLICY, inputs=inputs, frozen=frozen))
         prior = self.store.read(lambda w: w.get('lab_protocol', ident))
         if prior:
@@ -86,6 +88,8 @@ class LabService:
         self.store.read(lambda w: self._guard(w, guard))
         if body.walk_forward is not None:
             plan_walk_forward(frozen['calendar']['sessions'], body)
+        if body.sensitivity is not None:
+            plan_sensitivity(body, frozen['calendar']['sessions'])
         development = period(frozen, body, False)
         value = dict(id=ident, protocol=summary, inputs=inputs, frozen=frozen,
             config=body.config.model_dump(mode='json'), development=development, holdout=None,
@@ -93,6 +97,9 @@ class LabService:
         if body.walk_forward is not None:
             value['walk_forward'] = walk_forward(frozen, body)
             value['warnings'] = [*WARNINGS[:-1], 'Incluye walk-forward con parámetros fijos; faltan sensibilidad y pruebas de sobreajuste.']
+        if body.sensitivity is not None:
+            value['sensitivity'] = sensitivity(frozen, body, development)
+            value['warnings'] = [*value['warnings'][:-1], 'Incluye sensibilidad de un factor cada vez; no es validación estadística ni prueba completa de sobreajuste.']
         signature = digest(snapshot)
         def save(work):
             old = work.get('lab_protocol', ident)
@@ -108,8 +115,9 @@ class LabService:
             work.lab_insert('lab_exposure', dict(id=ident + '-development', instrument_id=source['instrument_id'],
                 start_date=body.start_date, end_date=guard['development_end']))
             detail = dict(policy=POLICY, source_hash=source['sha256'])
-            if 'walk_forward' in value:
-                detail['walk_forward_hash'] = value['walk_forward']['report_hash']
+            for name in ('walk_forward', 'sensitivity'):
+                if name in value:
+                    detail[name + '_hash'] = value[name]['report_hash']
             work.audit('lab.development_saved', ident, detail)
             return value
         return self._public(self.store.atomic(save))
@@ -149,4 +157,6 @@ class LabService:
             holdout_matches=holdout == value['holdout'] if holdout else None)
         if 'walk_forward' in value:
             result['walk_forward_matches'] = walk_forward(value['frozen'], body) == value['walk_forward']
+        if 'sensitivity' in value:
+            result['sensitivity_matches'] = sensitivity(value['frozen'], body, development) == value['sensitivity']
         return result

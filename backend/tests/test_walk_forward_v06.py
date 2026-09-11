@@ -58,7 +58,7 @@ def wf(tmp_path):
 def test_old_protocol_identity_and_payload_unchanged(lab):
     store, service, body = lab
     frozen = freeze_source(*store.read(lambda w: service._snapshot(w, body)), body)
-    old_inputs = body.model_dump(mode='json', exclude={'walk_forward'})
+    old_inputs = body.model_dump(mode='json', exclude={'walk_forward', 'sensitivity'})
     expected = digest(dict(policy=POLICY, inputs=old_inputs, frozen=frozen))
     result = service.create(body)
     assert result['protocol']['id'] == expected

@@ -3,6 +3,15 @@ import json
 
 
 class LabWork:
+    def candidate_history(self, offset, limit):
+        return [json.loads(r[0]) for r in self.db.execute(
+            "SELECT body FROM records WHERE kind='candidate_summary' ORDER BY json_extract(body,'$.updated_at') DESC,id LIMIT ? OFFSET ?", (limit, offset))]
+
+    def candidate_revisions(self, ident, offset, limit):
+        return [json.loads(r[0]) for r in self.db.execute(
+            "SELECT body FROM records WHERE kind='candidate_revision' AND json_extract(body,'$.candidate_id')=? ORDER BY json_extract(body,'$.revision') DESC LIMIT ? OFFSET ?",
+            (ident, limit, offset))]
+
     def lab_insert(self, kind, value):
         self.db.execute('INSERT INTO records VALUES(?,?,?)', (kind, value['id'], json.dumps(value, ensure_ascii=False, allow_nan=False)))
 
