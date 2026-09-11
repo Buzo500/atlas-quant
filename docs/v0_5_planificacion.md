@@ -70,6 +70,8 @@ Coste comprobado al terminar: **0 USD facturables**, 310/2.000 minutos incluidos
 
 ## Qué falta para cerrar toda v0.5
 
+Actualización 11/09: las fichas/comparador y correlaciones del párrafo siguiente ya tienen implementación local en dev.3. [Guía y pruebas](v0_5_comparador.md), [ejemplo revisable](v0_5_ejemplo_guiado.md) y [matriz de cierre](v0_5_cierre.md). El usuario tiene pendiente aceptar los límites del alcance analítico inicial; no se ha publicado dev.3 ni se declara estable. El texto siguiente conserva los pendientes registrados al publicar dev.2.
+
 Este bloque entrega las funcionalidades autorizadas en forma analítica inicial; no cierra automáticamente toda la versión. Quedan las fichas/comparaciones ampliadas entre activos y correlaciones, ampliar la comparación a fuentes nativas contrastadas cuando se acuerde su política y revisar el alcance completo frente a sus criterios. El modelo de propuestas usa costes simples, una cotización por instrumento y ventas hipotéticamente liquidadas; no optimiza rotación, impuestos, diferenciales ni conversiones. Cualquier ampliación necesita alcance y casos de aceptación propios.
 
 Recursos comprometidos por órdenes, reservas reales, atribución de fills y ejecución de estrategias pertenecen al OMS/mandatos de v0.7 y al evaluador de v0.6. No se presentan como implementados por guardar presupuestos analíticos. La simulación puede estar dentro de límites con desviaciones residuales: no afirma haber alcanzado exactamente todos los pesos ni ser una propuesta autorizada para enviar. Movimientos personales y ensayo siguen aplazados; la descarga Yahoo sí ha quedado validada en esta ejecución.

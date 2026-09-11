@@ -14,6 +14,7 @@ import { useAction } from '@/shared/use-action';
 import { LedgerImport } from './ledger-import';
 import { date, dateTime, number } from '@/shared/format';
 import { PricesPanel } from '@/features/prices/prices-panel';
+import { AssetAnalysisPanel } from './asset-analysis-panel';
 
 export function DataPanel({
   dataset,
@@ -111,6 +112,7 @@ export function DataPanel({
   return (
     <div className="data-layout">
       <PricesPanel dataset={dataset} active={active} />
+      <AssetAnalysisPanel active={active} revision={auditSequence} refresh={refresh} onError={onError} />
       <section className="panel data-import">
         <div className="panel-heading">
           <h2>Importar CSV</h2>
