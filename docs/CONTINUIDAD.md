@@ -2,6 +2,12 @@
 
 Actualizado: 11 de septiembre de 2026. Este documento resume decisiones y estado para una conversación nueva de Codex; no contiene la transcripción completa del chat original.
 
+## Revisión manual en el portátil · comprobación operativa confirmada
+
+El usuario indica que está en el portátil y confirma «Sí, funciona la comprobación» tras el recorrido guiado: abrir ATLAS, comprobar conexión/versión dev.3 y acceso al comparador, detener mediante `Detener-ATLAS.cmd` y volver a iniciar. **Arranque/parada/segundo arranque aceptados por comprobación manual del usuario en el portátil.** Es evidencia comunicada por el usuario; no una instalación o prueba remota ejecutada por el agente. No volver a pedir esta misma comprobación.
+
+Continúan pendientes la revisión de resultados del comparador, el caso guiado de planificación/guardado y la aceptación de los límites del alcance funcional. Esta respuesta no declara esos pasos completados ni autoriza atribuir una aceptación global. Fusión y etiqueta dev.3 mantienen su autorización previa condicionada a cerrar esa revisión. La rama local, CI y estado del sobremesa del bloque siguiente no cambian; no se ha accedido a la base del portátil.
+
 ## Cinco pasos posteriores · revisión/CI de dev.3 e inicio SMA
 
 **Estado final de esta tarea:** documentación de la PR #12 subida y verificada en `c3ec20c4e1c80c2fad4663121234d08f0b3ef4a4`; solo Markdown después de `ccb4b4a`, que pasó la CI. PR abierta, sin fusión ni etiqueta dev.3 porque la respuesta de revisión manual sigue pendiente. No repetir una petición genérica de permiso: esas acciones ya están autorizadas tras la aceptación. Portátil sin validación confirmada.
