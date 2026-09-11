@@ -1,5 +1,7 @@
 # Llevar ATLAS al sobremesa y continuar con Codex
 
+**Actualización 11/09/2026:** para instalar ahora en el portátil, seguir [instalacion_portatil.md](instalacion_portatil.md): rama `codex/v0.5-comparador` subida, dev.3, Windows nativo, esquema 5 y comandos actuales. Las instrucciones siguientes conservan el traslado histórico; `master` todavía no contiene dev.3.
+
 Guía preparada el 6 de septiembre de 2026 para Windows. No es necesario usar WSL2 para esta versión.
 
 Para los lanzadores y copias de **v0.2 en desarrollo**, seguir también la [guía de operación en Windows](operacion_windows.md). La instalación actual compila la interfaz, verifica el arranque y admite los accesos `Abrir-ATLAS.cmd` y `Detener-ATLAS.cmd`. La hoja de ruta vigente está en [hoja_de_ruta.md](hoja_de_ruta.md).

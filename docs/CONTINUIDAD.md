@@ -2,6 +2,10 @@
 
 Actualizado: 11 de septiembre de 2026. Este documento resume decisiones y estado para una conversación nueva de Codex; no contiene la transcripción completa del chat original.
 
+## Rama subida para instalar en el portátil
+
+Autorización posterior: «sube la rama y dime pasos para instalar el software en mi portátil». **`codex/v0.5-comparador` subida y verificada en GitHub sobre `5482e3f19302bd871be700c1ad5abb97cbb4f369`**, con seguimiento `origin/codex/v0.5-comparador`. Se añade la [guía actual del portátil](instalacion_portatil.md) en un commit documental posterior de la misma rama. Código sin cambios; no se ha abierto PR, lanzado CI, fusionado ni etiquetado dev.3. El workflow no se dispara con este push de rama. No se ha instalado nada en el portátil ni transferido su base; las comprobaciones siguientes pertenecen al sobremesa. Para obtener dev.3 clonar esta rama, no `master`.
+
 ## Cinco tareas posteriores · v0.5.0-dev.3 local
 
 «Vale, haz esas 5 cosas» autoriza caso guiado de planificación, fichas/comparador de activos, correlaciones, evaluar el cierre v0.5 y concretar la primera estrategia v0.6. Rama **`codex/v0.5-comparador`**, desde `524feac`, identificación `0.5.0-dev.3`, esquema 5. Copia previa `backups/atlas-20260911T063013799897Z-4089e6f6`. La publicación vigente continúa siendo dev.2/PR #11; no se ha ejecutado CI ni publicado/fusionado/etiquetado dev.3.
