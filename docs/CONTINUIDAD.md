@@ -21,13 +21,19 @@ Validación local: **990 Python + 91 subcasos, 317 frontend, ocho Node y 23 E2E*
 contratos/TypeScript/lint/build correctos. Tras la revisión visual se corrigió el
 formato de fecha/hora de candidatas, con regresión dirigida y nueva compilación.
 Capturas finales aisladas a 960/1366/3440 px, formulario y curvas revisadas.
-La guía conserva fallos iniciales y sus límites. **Subida/CI remota final en curso**;
-CI 34590252591 solo valida dev.1. Cuota previa 366,7/2.000 minutos, almacenamiento
+La guía conserva fallos iniciales y sus límites. **Rama subida sobre `8e4d087dadc241ca9b79c56005f057e369ca5ce1`**;
+[CI gratuita 34600509327](https://github.com/Buzo500/atlas-quant/actions/runs/34600509327) **correcta sobre ese commit**: 990 Python + 91 subcasos, 317 frontend, ocho Node, 23 E2E y arranque/parada. Todos los pasos correctos, 11 min 51 s en total; log `output/validation/v06-five-ci.log`. CI 34590252591 solo valida dev.1. Cuota previa 366,7/2.000 minutos, almacenamiento
 0/0,5 GB, 0 USD facturables y presupuesto Actions 0 con bloqueo comprobados.
+Tras CI: **386,7/2.000 minutos**, 0/0,5 GB; 2,32 USD brutos cubiertos íntegramente
+por 2,32 USD de descuentos, **0 USD facturables**. No se cambió la facturación.
 
 ATLAS detenido antes de editar, copia `backups/atlas-20260911T121035724463Z-d6011740`.
-Los entornos aislados cerraron con integridad y base habitual intactas; el arranque
-habitual y la publicación se registrarán al cerrar. PR #12 y revisión del portátil,
+Los entornos aislados cerraron con integridad y base habitual intactas. ATLAS
+habitual arrancado con run `a5975463f5ab4e7fbe2617595eddd5e1`: salud directa/proxy
+0.6.0-dev.3, HTML 200, parada global activa, sin proveedores configurados. Tres
+carteras y todas las tablas coinciden con la copia previa, esquema 5 e integridad
+correctos. Evidencia `output/validation/v06-five-health.json` y
+`v06-five-data-online.json`. Cierre posterior solo documental; rama subida, sin fusión ni etiqueta nuevas. PR #12 y revisión del portátil,
 ensayo 48 h, datos personales, pago, bróker, móvil/remoto y LaTeX siguen aplazados.
 
 ## Primera tarea autorizada · Walk-forward fijo v0.6

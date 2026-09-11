@@ -97,3 +97,34 @@ API: sensibilidad opcional en `POST /api/lab/protocols`; consulta/reproducción
 por los endpoints existentes. Registro en `GET/POST /api/lab/candidates`,
 `GET /api/lab/candidates/{id}` y `GET/POST .../{id}/revisions`; escrituras con
 control local y `expected_revision` al revisar. Las revisiones no se eliminan.
+
+## Comprobación habitual en el sobremesa
+
+ATLAS `0.6.0-dev.3` arrancado con run `a5975463f5ab4e7fbe2617595eddd5e1`.
+Salud directa/proxy correcta y HTML 200; tres carteras, esquema 5 y todas las
+filas de todas las tablas iguales a la copia previa. Parada global activa y
+ningún proveedor configurado. CUA comprobó el Laboratorio conectado, sensibilidad
+y registro accesibles, historiales vacíos y cálculo bloqueado sin serie elegible.
+No se cargó una demo ni se guardó una candidata en la base habitual.
+
+Para usarlo en este PC: `Abrir-ATLAS.cmd`; para detenerlo: `Detener-ATLAS.cmd`.
+La compilación vigente se generó con `tools/build_frontend.py`. El resultado de
+la CI remota se añade al cierre, sin confundir estos controles con el ensayo
+aplazado de 48 horas o la revisión del portátil.
+
+## Cierre de publicación y CI
+
+Rama `codex/v0.6-evaluador` subida; código
+`8e4d087dadc241ca9b79c56005f057e369ca5ce1`, incluido walk-forward `be87f97`.
+[CI gratuita 34600509327](https://github.com/Buzo500/atlas-quant/actions/runs/34600509327)
+correcta en el primer intento sobre ese commit: **990 Python + 91 subcasos,
+317 frontend, ocho Node, 23 E2E**, instalación/build, tipos/lint/contratos y
+arranque/parada. Python 75,59 s, E2E 4,8 min; duración total 11 min 51 s.
+Run aislado remoto `e2e-90310c9a6a8f412fb078bc08969386dd`, base de control
+intacta e integridad/limpieza correctas. Log `output/validation/v06-five-ci.log`.
+
+Cuota previa 366,7/2.000 minutos; posterior 386,7/2.000 y 0/0,5 GB. GitHub muestra
+2,32 USD brutos cubiertos por 2,32 USD de descuentos, **0 USD facturables**;
+presupuesto Actions 0 y bloqueo de pago verificados. No se cambió la configuración.
+El cierre posterior únicamente actualiza Markdown. Sin fusión PR #12, nueva PR,
+etiqueta ni reactivación de los trabajos aplazados.

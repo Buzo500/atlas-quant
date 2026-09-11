@@ -7,6 +7,7 @@
 - Registro de hipótesis, seguimiento y descartes, hasta 20 protocolos y 100 revisiones. Evidencia capturada por revisión, vínculos acumulativos, control optimista y auditoría atómica.
 - API local y contratos TypeScript regenerados; interfaz con protección de borradores/concurrencia y fechas con zona. Esquema 5, libros e identidades previas conservados.
 - [Guía y validación](docs/v0_6_sensibilidad_candidatas.md): 990 Python + 91 subcasos, 317 frontend, ocho Node y 23 E2E locales. Publicación/CI final según continuidad.
+- Rama subida sobre `8e4d087`, [CI gratuita 34600509327 correcta](https://github.com/Buzo500/atlas-quant/actions/runs/34600509327) con las mismas 990+91/317/8/23 pruebas y arranque/parada; 0 USD facturables. ATLAS habitual arrancado y todas las tablas conservadas. Cierre posterior solo documental; sin fusión/etiqueta.
 - [CSV observado](docs/v0_6_csv_observado.md) auditado y no apto por falta de evidencia. [API](docs/diagnostico_api_20260911.md) no reproduce la espera en 301 lecturas; incidencia abierta, sin cambios especulativos de transporte.
 
 ## 0.6.0-dev.2 · Walk-forward con parámetros fijos · 2026-09-11

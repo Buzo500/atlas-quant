@@ -1,5 +1,7 @@
 # v0.6 · Walk-forward con parámetros fijos
 
+Actualización posterior: este bloque se ha subido junto a [sensibilidad y candidatas](v0_6_sensibilidad_candidatas.md) en dev.3. La validación/publicación vigente está en [continuidad](CONTINUIDAD.md); el cierre de abajo conserva lo comprobado al terminar la tarea original.
+
 El usuario autoriza el primer siguiente paso: concretar e implementar la validación
 walk-forward. Desarrollo local `0.6.0-dev.2`, misma rama `codex/v0.6-evaluador` y
 esquema 5. No amplía la autorización a sensibilidad, registro de candidatas,
