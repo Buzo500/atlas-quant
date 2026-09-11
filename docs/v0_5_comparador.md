@@ -35,7 +35,7 @@ Rutas tipadas `/api/v2/asset-analysis/sources` y `/api/v2/asset-analysis/reports
 
 E2E completo `e2e-fb3c520ba00b4cf489147f1c2b7c799a`: **20/20**, 1,4 min, sin reintentos, integridad y limpieza correctas, base habitual exactamente intacta. El recorrido nuevo añade EUR/USD, 24 intervalos comunes, guardado y reapertura; capturas revisadas a 390/1280/3440. Recorrido individual previo `e2e-603df8f091494742afbd188753a44099`: 1/1. No equivale a una nueva validación de escala física de Windows ni al ensayo aplazado.
 
-CI/publicación de dev.3 todavía no ejecutadas. La entrega publicada sigue siendo dev.2; sus cifras de CI no certifican estos cambios locales.
+CI posterior de dev.3 **correcta** sobre `ccb4b4a`: 808 Python + 91 subcasos, 294 frontend, ocho Node y 20 E2E; [ejecución 34578070191](https://github.com/Buzo500/atlas-quant/actions/runs/34578070191). [PR #12, coste y revisión/publicación](v0_5_dev3_entrega.md). La CI de dev.2 se mantiene como evidencia de aquella entrega, no de esta.
 
 Carga con `tools/benchmarks/benchmark_v05_asset_analysis.py`: 10 fuentes, 100.000 precios, 10.000 cambios FX y 10.000 movimientos; análisis de 3.660 sesiones en 1,010–1,063 s, pico adicional 136,22 MiB. Controles por servicios con Store independiente, p95 0,00197 s mientras se calculaba. Límites de aceptación (<5 s, <256 MiB, controles <1 s) cumplidos; no es una medición de latencia de red ni de equipos distintos.
 
@@ -45,4 +45,4 @@ Operación final: run `a613d9c6f25e4a2ead2b4d0ea0c47063`, salud `0.5.0-dev.3`, e
 
 La consulta automática Yahoo al arrancar recibió una fila parcial del 10/09 sin cierre. Se rechazó conservando ambos históricos en v2 hasta el 09/09; solo cambian metadatos operativos del feed. No se relajó la validación. El éxito de la descarga del 10/09 a las 19:55 UTC, descrito en dev.2, sigue siendo antecedente válido, no una garantía de datos completos hoy.
 
-Arrancar en este equipo: `Abrir-ATLAS.cmd`. Detener: `Detener-ATLAS.cmd`. ATLAS queda iniciado con la compilación final; para editar/reconstruir, detenerlo antes. El caso guiado y el cierre funcional siguen pendientes de la respuesta del usuario; no se ejecutó CI remota ni se publicó una nueva etiqueta.
+Arrancar en este equipo: `Abrir-ATLAS.cmd`. Detener: `Detener-ATLAS.cmd`. El arranque descrito arriba es el cierre de implementación anterior; consultar continuidad para el estado actual. El caso guiado y el cierre funcional siguen pendientes de la respuesta del usuario. La CI posterior ya está correcta; estado de etiqueta y fusión en el registro de entrega.
