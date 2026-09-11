@@ -59,7 +59,7 @@ jobs:
       - name: Instalar Chromium fijado para los recorridos E2E
         run: node frontend/node_modules/@playwright/test/cli.js install chromium
       - name: Recorridos de navegador con interfaz compilada y base aislada
-        run: ./.venv/Scripts/python.exe tools/run_e2e.py
+        run: ./.venv/Scripts/python.exe tools/diagnostics/run_api_diagnostic.py
       - name: Arranque y recorrido sintético mediante el proxy
         id: runtime
         run: |

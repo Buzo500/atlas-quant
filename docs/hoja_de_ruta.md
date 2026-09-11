@@ -4,6 +4,13 @@ Actualizado: 11 de septiembre de 2026. **La secuencia de versiones se conserva.*
 
 ## Estado vigente
 
+- **Actualización local v0.6 dev.4:** [prevalidación y consulta](v0_6_prevalidacion_consulta.md)
+  implementadas, captura API preparada y [contrato estadístico](v0_6_robustez_estadistica.md)
+  concretado sin implementarlo. Búsqueda en revisiones históricas y comparación con
+  condiciones/evidencia explícitas, sin selección automática. Dataset observado
+  acreditado aún no conseguido; API intermitente sin causa confirmada. Publicación
+  y CI nuevas pendientes. No renumera versiones ni reactiva los trabajos aplazados.
+
 - **Actualización vigente v0.6:** [sensibilidad y registro de candidatas](v0_6_sensibilidad_candidatas.md) implementados en `0.6.0-dev.3`, junto al walk-forward fijo de dev.2. Variaciones predeclaradas, evidencia y descartes versionados, sin optimizador ni permisos de ejecución. Publicación/CI según continuidad. [Datos observados](v0_6_csv_observado.md) auditados pero aún no aptos; memoria automática, remuestreo/validación estadística y LaTeX pendientes. Los estados siguientes son antecedentes.
 
 - **Ampliación posterior v0.6:** el usuario pide continuar el desarrollo mientras no puede usar el portátil. [Simulación económica EUR offline implementada](v0_6_simulacion.md), con el mismo evaluador y el libro nativo; 909 Python + 91 subcasos locales. API/UI siguen en dev.3; adaptador de datos reales, protocolo temporal y registro de candidatas pendientes. Las referencias anteriores al simulador pendiente se conservan como antecedentes. Revisión manual/publicación de v0.5 aplazadas, sin declarar aceptación.

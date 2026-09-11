@@ -19,6 +19,37 @@ class CandidateService:
     def history(self, offset=0, limit=20):
         return dict(items=self.store.read(lambda w: w.candidate_history(offset, limit)), offset=offset, limit=limit)
 
+    def search(self, query='', status='', offset=0, limit=20):
+        return dict(items=self.store.read(lambda w: w.candidate_search(query, status, offset, limit)), offset=offset, limit=limit)
+
+    def compare(self, body):
+        def read(work):
+            items, contexts = [], []
+            for ref in body.items:
+                value = work.get('candidate_revision', f'{ref.candidate_id}:{ref.revision}')
+                if value is None:
+                    raise IdentityNotFound('Revisión de candidata no encontrada.')
+                items.append(value)
+                for evidence in value['evidence']:
+                    protocol = work.get('lab_protocol', evidence['protocol']['id'])
+                    if protocol is None or protocol['development']['report_hash'] != evidence['development_hash']:
+                        raise RevisionConflict('La evidencia de desarrollo no coincide con la revisión capturada.')
+                    # Parameters may differ; source, period, execution and costs must match.
+                    summary = protocol['protocol']
+                    context = {k: v for k, v in summary.items() if k in (
+                        'series_id', 'series_version', 'source_hash', 'instrument_id', 'listing_id', 'start_date', 'holdout_date', 'end_date', 'policy')}
+                    context.update(config=protocol['config'], evidence_hash=protocol['evidence_hash'])
+                    contexts.append(dict(revision_id=value['id'], protocol_id=summary['id'], context_hash=digest(context), config=protocol['config']))
+            comparable = all(v['evidence'] for v in items) and len({c['context_hash'] for c in contexts}) == 1
+            result = dict(items=items, contexts=contexts, same_context=comparable, warnings=[
+                'Comparación descriptiva de revisiones explícitas; no elige una ganadora ni autoriza operaciones.',
+                'Solo se muestra la evidencia capturada en cada revisión, aunque después se abra la prueba final.',
+                'Mismo contexto de desarrollo no equivale a validación estadística; walk-forward y sensibilidad pueden tener configuraciones distintas.',
+                *([] if comparable else ['Fuentes, periodos o condiciones distintos, o evidencia insuficiente: no ordenar por rentabilidad ni agregar estos informes.']),
+            ])
+            return dict(**result, comparison_hash=digest(result))
+        return self.store.read(read)
+
     def read(self, ident):
         return self.store.read(lambda w: self._current(w, ident))
 

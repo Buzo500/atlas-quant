@@ -1,4 +1,5 @@
 'use client';
+import { SourcePrevalidation } from './source-preflight';
 import { useState } from 'react';
 import { api } from '@/lib/api';
 import type {
@@ -202,6 +203,13 @@ export function SimulationLab({
                 {date(source.date_min)} → {date(source.date_max)} ·{' '}
                 {source.row_count} barras · {source.source}
               </p>
+            )}
+            {source && (
+              <SourcePrevalidation
+                key={`${source.id}:${source.version}`}
+                id={source.id}
+                version={source.version}
+              />
             )}
             <div className="form-grid">
               <Field label="Inicio del desarrollo">

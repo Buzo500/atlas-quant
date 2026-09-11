@@ -1,5 +1,18 @@
 # Cambios de ATLAS Quant
 
+## 0.6.0-dev.4 · Prevalidación y consulta de investigación · 2026-09-11
+
+- Prevalidación visual de versiones CSV antes de configurar: identidad, base,
+  calendario, cobertura, disponibilidad y eventos; lectura sin acreditar ni simular.
+- Búsqueda literal Unicode en revisiones de candidatas, incluidos motivos antiguos;
+  comparación de dos a cuatro revisiones con contexto económico y evidencia capturada.
+- Captura optativa cliente/proxy/ASGI integrada en el siguiente workflow autorizado,
+  informe acotado de etapas/errores sin atribuir causa raíz ni cambiar timeouts.
+- Diseño de robustez estadística concretado, todavía sin código. Fuente observada
+  suficiente aún pendiente; datos/carteras intactos, esquema 5 y ninguna llamada pagada.
+- Desarrollo local; no nueva CI remota, PR, fusión o etiqueta.
+  [Guía y límites](docs/v0_6_prevalidacion_consulta.md).
+
 ## 0.6.0-dev.3 · Sensibilidad y candidatas · 2026-09-11
 
 - Sensibilidad opcional congelada con el protocolo: una media o los costes cada vez, máximo ocho casos; mismo motor, cuentas independientes y prueba final cerrada.

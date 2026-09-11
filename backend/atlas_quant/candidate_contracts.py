@@ -3,6 +3,7 @@ from typing import Annotated, Literal
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 from .contracts import ResponseModel
 from .lab_contracts import LabSummary, LabMetric
+from .simulation_contracts import SimulationConfig
 
 CANDIDATE_POLICY = 'atlas-candidate-research-v1'
 Status = Literal['researching', 'watchlist', 'discarded']
@@ -74,3 +75,36 @@ class CandidateRevisions(ResponseModel):
     items: list[CandidateRevision]
     offset: int
     limit: int
+
+
+class CandidateRef(BaseModel):
+    model_config = ConfigDict(extra='forbid', strict=True)
+    candidate_id: Hash
+    revision: int = Field(ge=1, le=100)
+
+
+class CandidateComparisonInput(BaseModel):
+    model_config = ConfigDict(extra='forbid', strict=True)
+    items: list[CandidateRef] = Field(min_length=2, max_length=4)
+
+    @field_validator('items')
+    @classmethod
+    def distinct(cls, value):
+        if len({(r.candidate_id, r.revision) for r in value}) != len(value):
+            raise ValueError('No repitas la misma revisión.')
+        return value
+
+
+class CandidateComparisonContext(ResponseModel):
+    revision_id: str
+    protocol_id: str
+    context_hash: str
+    config: SimulationConfig
+
+
+class CandidateComparison(ResponseModel):
+    items: list[CandidateRevision]
+    contexts: list[CandidateComparisonContext]
+    same_context: bool
+    warnings: list[str]
+    comparison_hash: str

@@ -16,6 +16,7 @@ import { useRead } from '@/shared/use-read';
 import { useAction } from '@/shared/use-action';
 import { QueryStatus } from '@/shared/query-status';
 import { dateTime, number } from '@/shared/format';
+import { CandidateBrowser } from './candidate-browser';
 
 const statuses = [
   { value: 'researching', label: 'En investigación' },
@@ -248,6 +249,7 @@ export function Candidates({
   onError: (message: string) => void;
 }) {
   const [offset, setOffset] = useState(0);
+  const [browse, setBrowse] = useState(false);
   const history = useRead<CandidateHistory>({
     path: `/lab/candidates?offset=${offset}&limit=20`,
   });
@@ -326,6 +328,13 @@ export function Candidates({
         </Button>
       </div>
       <QueryStatus label="Historial de candidatas" query={history} />
+      <details
+        className="details"
+        onToggle={(e) => setBrowse(e.currentTarget.open)}
+      >
+        <summary>Buscar hipótesis, descartes y comparar revisiones</summary>
+        {browse && <CandidateBrowser onError={onError} />}
+      </details>
       <DataTable
         heads={['Candidata', 'Estado', 'Revisión', 'Informes', 'Detalle']}
         rows={(history.data?.items ?? []).map((c) => [

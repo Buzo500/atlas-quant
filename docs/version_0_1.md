@@ -1,5 +1,13 @@
 # ATLAS Quant v0.1 · Entrega del 5 de septiembre de 2026
 
+Actualización local vigente: **0.6.0-dev.4** añade [prevalidación del CSV y consulta
+de candidatas](v0_6_prevalidacion_consulta.md): diagnóstico de la versión antes de
+configurar, búsqueda en hipótesis/descartes históricos y comparación de revisiones
+con evidencia y condiciones económicas. Captura API preparada para la próxima CI;
+dataset observado apto e incidencia intermitente siguen pendientes. Diseño de
+[robustez estadística](v0_6_robustez_estadistica.md) definido, sin implementar.
+Esquema 5, libros intactos y ninguna orden externa. [Estado actual](CONTINUIDAD.md).
+
 Actualización vigente: **0.6.0-dev.3** añade [sensibilidad de un factor cada vez y registro de candidatas](v0_6_sensibilidad_candidatas.md). Variantes congeladas antes del cálculo, resultados reproducibles sobre desarrollo e hipótesis con motivos y evidencia inmutable por revisión. No selecciona ganadores ni activa estrategias. Esquema 5 conservado; [validación/publicación](CONTINUIDAD.md). El [CSV observado auditado](v0_6_csv_observado.md) aún carece de evidencia para el Laboratorio; no confundir el ejemplo sintético con validación de mercado.
 
 Actualización posterior: **0.6.0-dev.2** añade [walk-forward fijo](v0_6_walk_forward.md) al [Laboratorio temporal](v0_6_laboratorio.md): configuración previa, ventanas móviles, calentamiento sin operaciones, cuentas independientes, criterios e informe reproducible. Conserva CSV nativo EUR, benchmarks, reserva final, comparador anterior, esquema 5 y libros. Ampliación local, sin nueva CI remota: no completa v0.6 ni habilita un bróker.

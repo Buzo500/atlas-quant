@@ -3,6 +3,7 @@ from datetime import datetime, timezone
 from .data import _rows
 from .quality import digest, timestamp
 from .strategy_spec import FrozenCalendar, FrozenPriceSource, TradingSession
+from .lab_preflight import identity_checks
 
 
 def freeze_source(data, listing, corporate, body):
@@ -10,14 +11,11 @@ def freeze_source(data, listing, corporate, body):
         raise ValueError('Revisa y confirma la procedencia de aperturas y ausencia de eventos.')
     if not body.start_date < body.holdout_date <= body.end_date < datetime.now(timezone.utc).date().isoformat():
         raise ValueError('Orden requerido: inicio < prueba final <= fin, todos anteriores a hoy.')
-    if listing['currency'] != 'EUR' or not listing.get('market'):
-        raise ValueError('Esta simulación requiere una cotización EUR con mercado explícito.')
+    for check in identity_checks(data, listing):
+        if check['status'] == 'block':
+            raise ValueError(check['message'])
     evidence = data['quality_evidence'][data['symbol']]
     calendar = evidence.get('calendar') or {}
-    if evidence.get('price_basis') != 'raw' or not evidence.get('basis_verified') or not calendar.get('verified'):
-        raise ValueError('Importa primero un CSV nativo con base raw y calendario verificados en Datos.')
-    if calendar['market'] != listing['market']:
-        raise ValueError('El mercado del calendario no coincide con la cotización.')
     if calendar['start'] > body.start_date or calendar['end'] < body.end_date:
         raise ValueError('El calendario acreditado no cubre el periodo solicitado.')
     expected = {d: r for d, r in calendar['days'].items()

@@ -379,6 +379,25 @@ export type BookSource = {
   "source_account": string;
 };
 
+export type CandidateComparison = {
+  "items": Array<CandidateRevision>;
+  "contexts": Array<CandidateComparisonContext>;
+  "same_context": boolean;
+  "warnings": Array<string>;
+  "comparison_hash": string;
+};
+
+export type CandidateComparisonContext = {
+  "revision_id": string;
+  "protocol_id": string;
+  "context_hash": string;
+  "config": SimulationConfig;
+};
+
+export type CandidateComparisonInput = {
+  "items": Array<CandidateRef>;
+};
+
 export type CandidateEvidence = {
   "protocol": LabSummary;
   "captured_at": string;
@@ -402,6 +421,11 @@ export type CandidateInput = {
   "reason": string;
   "status"?: "researching" | "watchlist" | "discarded";
   "protocol_ids"?: Array<string>;
+};
+
+export type CandidateRef = {
+  "candidate_id": string;
+  "revision": number;
 };
 
 export type CandidateResult = {
@@ -2184,6 +2208,12 @@ export type SimulationConfig = {
   "purchases_enabled"?: boolean;
 };
 
+export type SourceCheck = {
+  "code": string;
+  "status": "ok" | "block" | "review";
+  "message": string;
+};
+
 export type SourceMetadata = {
   "provider": string;
   "adapter": string;
@@ -2215,6 +2245,18 @@ export type SourceMetadata = {
   "documentation": string;
   "request_timeout_seconds": number;
   "fetch_deadline_seconds": number;
+};
+
+export type SourcePreflight = {
+  "series_id": string;
+  "series_version": number;
+  "source_hash": string;
+  "corporate_revision": number;
+  "rows": number;
+  "start": string;
+  "end": string;
+  "checks": Array<SourceCheck>;
+  "context_hash": string;
 };
 
 export type StateResponse = {

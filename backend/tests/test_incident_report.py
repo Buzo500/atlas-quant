@@ -1,0 +1,41 @@
+import importlib.util
+import json
+from pathlib import Path
+
+path = Path(__file__).resolve().parents[2] / 'tools/diagnostics/incident_report.py'
+spec = importlib.util.spec_from_file_location('incident_report', path)
+report = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(report)
+
+
+def event(layer, name, **extra):
+    return dict(diag=layer, event=name, correlation='client-1', **extra)
+
+
+def test_success_is_not_an_incident():
+    result = report.summarize([event('client', 'start'), event('client', 'body_end', ms=20)])
+    assert result['correlated_requests'] == 1 and result['incidents'] == []
+    assert result['root_cause_confirmed'] is False
+
+
+def test_timeout_correlates_stages_without_claiming_root_cause_or_copying_secrets():
+    result = report.summarize([event('client', 'start', body='private'), event('backend', 'body_end', ms=2),
+        event('proxy', 'finish', ms=3, cookie='private'), event('client', 'failed', ms=10001)])
+    value = result['incidents'][0]
+    assert value['failed'] and value['slow']
+    assert value['observation'].startswith('Proxy finalizado')
+    assert 'private' not in json.dumps(result)
+    assert not result['root_cause_confirmed']
+
+
+def test_backend_incomplete_is_only_a_stage_observation():
+    result = report.summarize([event('backend', 'start'), event('proxy', 'node_pending', ms=1200)])
+    assert result['incidents'][0]['observation'].startswith('Petición recibida por ASGI')
+
+
+def test_reader_extracts_only_trace_json_and_is_bounded(tmp_path):
+    (tmp_path/'frontend.log').write_text('unstructured secret\n' + json.dumps(event('proxy', 'node_error', code='ECONNRESET'))+'\n', encoding='utf-8')
+    result = report.write_report(tmp_path)
+    assert len(result['incidents']) == 1
+    assert 'secret' not in (tmp_path/'diagnostic-report.json').read_text(encoding='utf-8')
+    assert result['logs_truncated'] is False

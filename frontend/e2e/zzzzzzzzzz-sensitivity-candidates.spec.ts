@@ -65,6 +65,17 @@ test('v0.6 sensibilidad y candidatas: costes, descarte, evidencia e historial', 
     'Versión CSV nativa EUR',
     'Sensibilidad ficticia EUR · v1',
   );
+  await page
+    .getByRole('button', { name: 'Prevalidar CSV antes de configurar' })
+    .click();
+  await expect(
+    page.getByRole('heading', { name: 'Revisión del protocolo pendiente' }),
+  ).toBeVisible();
+  await expect(
+    page.getByText('Base raw y calendario declarados como verificados.', {
+      exact: true,
+    }),
+  ).toBeVisible();
   const p = {
     ...reference.protocol,
     name: 'Sensibilidad y registro ficticios',
@@ -247,6 +258,78 @@ test('v0.6 sensibilidad y candidatas: costes, descarte, evidencia e historial', 
     'discarded',
     'researching',
   ]);
+  await registry
+    .getByText('Buscar hipótesis, descartes y comparar revisiones', {
+      exact: true,
+    })
+    .click();
+  const browser = registry.getByRole('region', {
+    name: 'Buscar y comparar revisiones',
+    exact: true,
+  });
+  await browser
+    .getByLabel('Texto de búsqueda')
+    .fill('Hipótesis sintética de tendencia');
+  await select(page, 'Estado de la revisión', 'Descartada');
+  await browser
+    .getByRole('button', { name: 'Buscar revisiones', exact: true })
+    .click();
+  await browser
+    .getByLabel('Comparar Hipótesis sintética de tendencia revisión 2', {
+      exact: true,
+    })
+    .check();
+  await expect(
+    browser.getByLabel('Comparar Hipótesis sintética de tendencia revisión 1', {
+      exact: true,
+    }),
+  ).toHaveCount(0);
+  await select(page, 'Estado de la revisión', 'Todos los estados');
+  await browser
+    .getByRole('button', { name: 'Buscar revisiones', exact: true })
+    .click();
+  await browser
+    .getByLabel('Comparar Hipótesis sintética de tendencia revisión 1', {
+      exact: true,
+    })
+    .check();
+  await browser
+    .getByRole('button', {
+      name: 'Comparar revisiones seleccionadas',
+      exact: true,
+    })
+    .click();
+  const comparison = browser.getByRole('region', {
+    name: 'Comparación de revisiones',
+    exact: true,
+  });
+  await expect(
+    comparison.getByRole('heading', {
+      name: 'Mismo contexto de desarrollo',
+      exact: true,
+    }),
+  ).toBeVisible();
+  await expect(
+    comparison.getByText('No incluida', { exact: true }),
+  ).toHaveCount(2);
+  for (const width of [960, 1366, 3440]) {
+    await page.setViewportSize({ width, height: width === 3440 ? 1440 : 900 });
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= window.innerWidth + 1,
+      ),
+    ).toBe(true);
+    await expect(comparison).toBeVisible();
+  }
+  expect(
+    await readApi<CandidateRevisions>(
+      page,
+      `/api/lab/candidates/${candidateId}/revisions`,
+    ),
+  ).toEqual(revisions);
+  expect(
+    (await readApi<LabReport>(page, `/api/lab/protocols/${id}`)).holdout,
+  ).toBeNull();
   await page.reload();
   await page
     .getByText('Hipótesis y candidatas de investigación', { exact: true })

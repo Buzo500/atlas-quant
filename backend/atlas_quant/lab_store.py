@@ -3,6 +3,16 @@ import json
 
 
 class LabWork:
+    def candidate_search(self, query, status, offset, limit):
+        # Literal Unicode case-insensitive search, including previous decisions.
+        self.db.create_function('atlas_casefold', 1, lambda s: (s or '').casefold(), deterministic=True)
+        return [json.loads(r[0]) for r in self.db.execute("""SELECT body FROM records
+            WHERE kind='candidate_revision' AND (?='' OR json_extract(body,'$.status')=?)
+            AND instr(atlas_casefold(json_extract(body,'$.name') || char(10) ||
+                json_extract(body,'$.hypothesis') || char(10) || json_extract(body,'$.reason')), ?) > 0
+            ORDER BY json_extract(body,'$.created_at') DESC,id LIMIT ? OFFSET ?""",
+            (status, status, query.casefold(), limit, offset))]
+
     def candidate_history(self, offset, limit):
         return [json.loads(r[0]) for r in self.db.execute(
             "SELECT body FROM records WHERE kind='candidate_summary' ORDER BY json_extract(body,'$.updated_at') DESC,id LIMIT ? OFFSET ?", (limit, offset))]

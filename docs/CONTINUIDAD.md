@@ -2,6 +2,49 @@
 
 Actualizado: 11 de septiembre de 2026. Este documento resume decisiones y estado para una conversación nueva de Codex; no contiene la transcripción completa del chat original.
 
+## Cinco tareas posteriores · prevalidación y consulta v0.6 dev.4
+
+Autorización «Vale, haz las 5»: buscar datos observados acreditados, prevalidar CSV
+visualmente, capturar la próxima recurrencia API, buscar/comparar candidatas y
+concretar el método estadístico antes de implementarlo. **0.6.0-dev.4**, rama
+`codex/v0.6-evaluador`, esquema 5. [Guía de uso y verificación](v0_6_prevalidacion_consulta.md).
+
+Implementado: prevalidación de versión nativa de solo lectura (sin acreditar ni
+calcular), búsqueda literal Unicode en revisiones históricas y comparación de
+dos a cuatro referencias inmutables. Mantener controles compartidos de identidad,
+contexto económico explícito, evidencia capturada, libros/reserva intactos y ninguna
+promoción automática. [Estadística](v0_6_robustez_estadistica.md) definida, **sin código**.
+
+Puntos condicionados: **no se consiguió un dataset observado apto**, con fuentes
+consultadas y límites en la [auditoría](v0_6_csv_observado.md); no completar
+artificialmente `available_at` ni acreditar precios/eventos. La espera API original
+no reapareció: [captura nueva](diagnostico_api_20260911.md), sin causa raíz confirmada.
+El workflow local ahora usa `run_api_diagnostic.py` para retener trazas correlacionadas
+en la próxima CI autorizada. No se ha lanzado CI remota ni un monitor/ensayo.
+
+Validación: **1.004 Python + 91 subcasos, 322 frontend, ocho Node, 23/23 E2E**,
+contratos, TypeScript, lint y build canónico correctos. E2E completo con diagnóstico
+`e2e-48ea8fb5ecc84a728994ca1c2758ac45`, 1,7 min; 1.769 peticiones correlacionadas,
+sin ninguna agrupación de al menos 1 s, base habitual intacta y limpieza correcta.
+Regresiones dirigidas posteriores para los textos finales y captura visual en
+`e2e-4932c0c8308141a0bfe0a92221ca82c6`, cerrado limpiamente. Anchos CSS 960/1366/3440;
+no atribuir una nueva validación física al portátil. Las dos incidencias de UI
+encontradas durante E2E y su corrección están registradas en la guía.
+
+Copia previa `backups/atlas-20260911T130808392926Z-e4eca471`. ATLAS habitual
+recompilado y arrancado como dev.4, run `94f976d38cc343e390bcfcb3343f2e6f`.
+Comprobación de solo lectura: salud directa/proxy y HTML correctos, esquema 5,
+tres carteras, todas las tablas iguales a la copia previa, parada global activa,
+sin proveedores configurados ni protocolos ficticios añadidos a la base habitual.
+Artefactos `output/validation/dev4-health.json`, `dev4-data-online.json` y capturas
+`dev4-*.png`, todos locales y excluidos de Git.
+
+**Entrega solo local, sin subir ni CI remota nueva, fusión o etiqueta.** La última
+CI publicada 34600509327 pertenece a dev.3; no atribuirla a estos cambios. Portátil,
+PR #12, ensayo de 48 horas, movimientos personales, llamadas pagadas y operaciones
+externas conservan sus aplazamientos. No hay gasto nuevo ni dependencias instaladas.
+Las siguientes entradas son antecedentes.
+
 ## Cinco tareas autorizadas · sensibilidad y candidatas v0.6
 
 El usuario acepta «Venga, a hacer todos»: diagnóstico API, subir/CI gratuita,

@@ -1,6 +1,13 @@
 import { test as base, expect, type Page } from '@playwright/test';
 import type { DatasetResponse, StateResponse } from '../lib/api-types';
 import { environment } from './environment';
+import {
+  diagnostic,
+  trace,
+  correlation,
+  browserStart,
+  browserEvent,
+} from './diagnostic';
 
 const isolated = environment();
 
@@ -9,6 +16,17 @@ export const test = base.extend<{ networkGuard: void }>({
     async ({ context }, use) => {
       const violations: string[] = [];
       const browserErrors: string[] = [];
+      if (diagnostic) {
+        context.on('response', (response) =>
+          browserEvent(response.request(), 'headers', response.status()),
+        );
+        context.on('requestfinished', (request) =>
+          browserEvent(request, 'body_end'),
+        );
+        context.on('requestfailed', (request) =>
+          browserEvent(request, 'failed'),
+        );
+      }
       await context.route('**/*', async (route) => {
         const request = route.request();
         const url = new URL(request.url());
@@ -32,7 +50,12 @@ export const test = base.extend<{ networkGuard: void }>({
           await route.abort('blockedbyclient');
         } else {
           // Real HTTP, including failures; no API response is mocked or replaced.
-          await route.continue();
+          const id = browserStart(request);
+          await route.continue(
+            id
+              ? { headers: { ...request.headers(), 'x-atlas-diag': id } }
+              : undefined,
+          );
         }
       });
       await context.routeWebSocket('**/*', async (socket) => {
@@ -86,9 +109,33 @@ export { expect };
 export async function readApi<T>(page: Page, route: string): Promise<T> {
   if (!route.startsWith('/api/') || route.includes('..'))
     throw new Error('Ruta E2E ajena.');
-  const response = await page.request.get(isolated.baseURL + route);
-  expect(response.ok()).toBe(true);
-  return response.json();
+  const id = correlation(),
+    start = performance.now();
+  trace('start', {
+    correlation: id,
+    transport: 'APIRequestContext',
+    method: 'GET',
+    path: route.split('?')[0],
+  });
+  try {
+    const response = await page.request.get(
+      isolated.baseURL + route,
+      diagnostic ? { headers: { 'x-atlas-diag': id } } : undefined,
+    );
+    // APIRequestContext settles after buffering the response; this is not wire arrival.
+    trace('buffered_response', {
+      correlation: id,
+      ms: performance.now() - start,
+      status: response.status(),
+    });
+    expect(response.ok()).toBe(true);
+    const result = await response.json();
+    trace('body_end', { correlation: id, ms: performance.now() - start });
+    return result;
+  } catch (error) {
+    trace('failed', { correlation: id, ms: performance.now() - start });
+    throw error;
+  }
 }
 
 export async function ensureDemo(page: Page): Promise<DatasetResponse> {

@@ -7,6 +7,42 @@ Es una comprobación del 11/09/2026 sobre datos anteriores, no una descarga nuev
 
 ## Fuente y transformación explícita
 
+### Búsqueda adicional de fuente gratuita · 11/09/2026
+
+Se buscó una alternativa primaria para completar OHLC, disponibilidad y eventos.
+El registro oficial de AWS marca el antiguo dataset público Deutsche Börse como
+retirado y sin mantenimiento. El enlace a su repositorio oficial devuelve 404
+en la consulta web. [Registro oficial](https://github.com/awslabs/open-data-registry/blob/main/datasets/deutsche-boerse-pds.yaml).
+
+El servicio actual de Deutsche Börse ofrece datos con 15 minutos de retraso,
+actualización por minuto y conservación hasta la medianoche del siguiente día
+hábil. Sirve para observaciones recientes, pero esa ventana no recupera el
+histórico requerido. La hora de una operación o la de un agregado no acredita
+cuándo estaba disponible el dato en un sistema histórico.
+[Descripción oficial](https://www.mds.deutsche-boerse.com/mds-en/real-time-data/Delayed-data).
+
+Las sondas HTTPS locales al antiguo repositorio y al bucket público fallan en la
+validación del certificado de este entorno (Python: CA sin Basic Constraints
+critical; PowerShell: fallo SSL). No se desactiva TLS ni se deduce de ello que el
+bucket responde 404. Artefactos locales `output/validation/source-availability-dev4.json`
+y `source-bucket-dev4.json`. La página de ficheros diferidos pudo consultarse por
+la herramienta web; no se contrató ni descargó un producto comercial.
+
+**Resultado del punto de adquisición: pendiente, no acreditado.** Tener OHLC
+descargados no satisface por sí solo `available_at`, aperturas, calendario y ausencia
+de eventos. Un periodo sin dividendos conocidos tampoco prueba su ausencia. La
+fuente gratuita revisada no resuelve todos esos requisitos; esto no afirma que
+ninguna fuente gratuita pueda hacerlo. Los datos NVD anteriores siguen intactos.
+
+Ruta concreta para desbloquearlo: exportación histórica autorizada que conserve
+identidad, precios brutos y disponibilidad documentada, contrastada con calendario
+y avisos corporativos del mercado/emisor. Si solo hay OHLC retrospectivos, valorar
+por separado una política futura de supuestos explícitos de ejecución; **no
+reclasificar esos supuestos como evidencia** ni relajar la política actual de forma
+silenciosa. Comprar datos no garantiza que contengan estos campos.
+
+### CSV ya auditado
+
 Dataset `4fc6914f5b944719a4901d8613d9968b`, versión 2, en EUR; tramo
 01/01/2026–09/09/2026. La identidad de NVIDIA (ISIN US67066G1040, símbolo NVD)
 se contrastó con la [ficha oficial de Deutsche Börse](https://live.deutsche-boerse.com/equity/nvidia-corp/price-history/tick-data).

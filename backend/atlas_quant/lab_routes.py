@@ -3,11 +3,27 @@ from .lab_contracts import LabInput, LabOpenInput, LabHistory, LabReport, LabRep
 from .lab_service import LabService
 from .candidate_contracts import CandidateInput, CandidateRevisionInput, CandidateRevision, CandidateHistory, CandidateRevisions
 from .candidate_service import CandidateService
+from .candidate_contracts import CandidateComparisonInput, CandidateComparison, Status
+from .lab_preflight import SourcePreflight, inspect_source
+from types import SimpleNamespace
 
 
 def register_lab_routes(app, store):
     service = LabService(store)
     candidates = CandidateService(store)
+
+    @app.get('/api/lab/sources/preflight', response_model=SourcePreflight)
+    def source_preflight(series_id: str = Query(min_length=1, max_length=100), series_version: int = Query(ge=1)):
+        return store.read(lambda w: inspect_source(*service._snapshot(w, SimpleNamespace(series_id=series_id, series_version=series_version))))
+
+    @app.get('/api/lab/candidates/search', response_model=CandidateRevisions)
+    def candidate_search(q: str = Query('', max_length=200), status: Status | None = None,
+                         offset: int = Query(0, ge=0, le=100_000), limit: int = Query(20, ge=1, le=50)):
+        return candidates.search(q.strip(), status or '', offset, limit)
+
+    @app.post('/api/lab/candidates/compare', response_model=CandidateComparison)
+    def candidate_compare(body: CandidateComparisonInput):
+        return candidates.compare(body)
 
     @app.get('/api/lab/candidates', response_model=CandidateHistory)
     def candidate_history(offset: int = Query(0, ge=0, le=100_000), limit: int = Query(20, ge=1, le=50)):
