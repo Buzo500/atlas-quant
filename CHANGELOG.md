@@ -1,12 +1,12 @@
 # Cambios de ATLAS Quant
 
-## v0.5.0-dev.3 · Desarrollo local · 2026-09-11
+## v0.5.0-dev.3 · PR y CI correctas · 2026-09-11
 
 - Fichas y comparador de activos en Datos: identidad/versiones, precio EUR, cobertura, volatilidad y caída máxima, comparación normalizada sobre fechas comunes.
 - Pearson de variaciones simples EUR con la misma muestra de intervalos para todas las celdas; ausencia/constancia explícitas, sin interpolación.
 - Informes revisados e inmutables, historial y recuperación, sin escribir libros ni activar objetivos. Política `atlas-asset-analysis-v1`, esquema 5.
 - Caso guiado de planificación, matriz de cierre funcional v0.5 y primer contrato SMA 20/50 de v0.6, todavía sin implementar.
-- 808 Python + 91 subcasos, 294 frontend, ocho Node y 20 E2E locales; tipos/lint/contratos/build correctos. CI/publicación pendientes. [Guía y límites](docs/v0_5_comparador.md).
+- 808 Python + 91 subcasos, 294 frontend, ocho Node y 20 E2E, también en CI gratuita 34578070191 sobre `ccb4b4a`; tipos/lint/contratos/build y arranque/parada correctos. PR #12; revisión manual/fusión/etiqueta según [registro de entrega](docs/v0_5_dev3_entrega.md). Gasto facturable 0 USD.
 
 ## v0.5.0-dev.2 · Publicado · 2026-09-10
 

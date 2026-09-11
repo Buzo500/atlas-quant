@@ -1,6 +1,6 @@
 # ATLAS Quant v0.1 · Entrega del 5 de septiembre de 2026
 
-Actualización de alcance local 11/09/2026: `0.5.0-dev.3` añade **fichas/comparador de activos y correlaciones** en Datos, con fuentes EUR/USD versionadas, calidad, métricas de precio y guardado de informes. [Guía y pruebas](v0_5_comparador.md). [Ejemplo de planificación](v0_5_ejemplo_guiado.md) y [revisión del cierre v0.5](v0_5_cierre.md). Rama `codex/v0.5-comparador`, esquema 5; publicación vigente dev.2 y CI nueva pendiente. [V0.6 solo definida](v0_6_alcance_inicial.md); no se implementa aún DSL ni ejecución de estrategias.
+Actualización de alcance 11/09/2026: `0.5.0-dev.3` añade **fichas/comparador de activos y correlaciones** en Datos, con fuentes EUR/USD versionadas, calidad, métricas de precio y guardado de informes. [Guía y pruebas](v0_5_comparador.md). [Ejemplo de planificación](v0_5_ejemplo_guiado.md) y [revisión del cierre v0.5](v0_5_cierre.md). Rama `codex/v0.5-comparador`, esquema 5; PR #12 y CI gratuita correcta. [Publicación y revisión manual](v0_5_dev3_entrega.md). El núcleo SMA v0.6 se implementa posteriormente en otra rama, sin cambiar la UI, API o ejecución de esta entrega.
 
 ## Alcance real
 

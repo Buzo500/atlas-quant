@@ -2,7 +2,21 @@
 
 Actualizado: 11 de septiembre de 2026. Este documento resume decisiones y estado para una conversación nueva de Codex; no contiene la transcripción completa del chat original.
 
-## Rama subida para instalar en el portátil
+## Cinco pasos posteriores · revisión/CI de dev.3 e inicio SMA
+
+Autorización: «Vale, a por las 5 cosas» incluye revisión manual de v0.5/portátil, PR/CI gratuita, fusión/etiqueta dev.3 tras revisión, diagnóstico de NVIDIA y comenzar el primer evaluador SMA20/50. [Registro de entrega](v0_5_dev3_entrega.md). **Sustituye la restricción anterior de v0.6 solo definida**, sin ampliar a simulador económico, UI, bróker o IA de pago.
+
+**PR #12 reutilizada y actualizada. CI gratuita [34578070191](https://github.com/Buzo500/atlas-quant/actions/runs/34578070191) correcta sobre `ccb4b4ad0883c09fc217307b2ffb8d46e79f8bd4`:** 808 Python + 91 subcasos, 294 frontend, ocho Node, instalación/build, tipos/lint/contratos, 20/20 E2E en 3,9 min y arranque/parada. Run remoto `e2e-f8a66515258a45df8a7d9bb8c48aac03`, base ordinaria intacta, integridad/limpieza correctas. Cierre posterior solo documental. Coste antes 310 y después 330/2.000 minutos, 0/0,5 GB y 0 USD facturables; presupuesto Actions 0 con bloqueo verificado. Logs `output/validation/v05-dev3-ci.log`.
+
+**Revisión manual pendiente:** se ha pedido al usuario su resultado de arranque/parada del portátil y aceptación del alcance inicial/caso guiado. No atribuirle una aceptación no recibida. Fusión y etiqueta están autorizadas tras la revisión; la CI ya está correcta. No se ha declarado estable ni completado el ensayo de 48 horas.
+
+**NVIDIA diagnosticada:** sonda aislada 08:12 UTC, TLS correcto, salida yfinance anterior al validador sin cierre para el 10/09. Rechazo correcto; no identifica si el origen interno es Yahoo o yfinance. Dos NVD.DE siguen en v2 hasta 09/09, 428 y 1.194 barras, versiones 1/2 conservadas. Calendario sin verificar, base desconocida y eventos pendientes; ver [diagnóstico y evidencia requerida](diagnostico_nvidia_20260911.md). Sin modificar el feed, precios ni libros.
+
+**Primer bloque v0.6 local y separado:** `codex/v0.6-evaluador`, commit `2dbeb41`, sobre la cabeza de dev.3. `sma-cross-evaluator-v1`: contratos estrictos, comparación de medias exacta, reloj/datos explícitos, objetivo por presupuesto, replay e incremental compartidos, huecos/eventos, expiración de apertura y checkpoint. 53 pruebas nuevas; **861 Python y 91 subcasos** en 84,49 s, dos avisos previos; `output/validation/v06-python.log`. Referencia `tools/run_sma_reference.py` produce dos intenciones y paridad con recuperación en cada paso. Código/guía del evaluador viven en esa rama; no están incluidos en la PR/CI de dev.3. No modifica HTTP, UI, esquema 5 ni identificación de aplicación dev.3; la integración y simulación económica quedan pendientes.
+
+ATLAS se detuvo cooperativamente antes de editar. Copia previa `backups/atlas-20260911T081309290792Z-36ef7a06`. Ensayo/monitor de 48 horas, movimientos personales, gasto API, bróker, móvil/remoto y LaTeX siguen aplazados. Estado final de arranque/base y publicación se registra al terminar.
+
+## Antecedente · rama subida para instalar en el portátil
 
 Autorización posterior: «sube la rama y dime pasos para instalar el software en mi portátil». **`codex/v0.5-comparador` subida y verificada en GitHub sobre `5482e3f19302bd871be700c1ad5abb97cbb4f369`**, con seguimiento `origin/codex/v0.5-comparador`. Se añade la [guía actual del portátil](instalacion_portatil.md) en un commit documental posterior de la misma rama. Código sin cambios; no se ha abierto PR, lanzado CI, fusionado ni etiquetado dev.3. El workflow no se dispara con este push de rama. No se ha instalado nada en el portátil ni transferido su base; las comprobaciones siguientes pertenecen al sobremesa. Para obtener dev.3 clonar esta rama, no `master`.
 

@@ -1,6 +1,6 @@
 # v0.5 · Revisión de cierre funcional
 
-11/09/2026. Dev.1 y dev.2 están publicadas; dev.3 se implementa localmente en `codex/v0.5-comparador`, esquema 5. **Candidata al cierre funcional del alcance analítico inicial**, no declaración de versión estable. La aceptación visual/funcional del usuario y la publicación de dev.3 se registran por separado.
+11/09/2026. Dev.1 y dev.2 están publicadas; dev.3 está subida en `codex/v0.5-comparador`, esquema 5, PR #12 y CI gratuita correcta. [Registro actualizado](v0_5_dev3_entrega.md). **Candidata al cierre funcional del alcance analítico inicial**, no declaración de versión estable. La aceptación visual/funcional del usuario y la publicación de dev.3 se registran por separado.
 
 | Criterio de la hoja de ruta | Entrega/evidencia | Límite o decisión de cierre |
 | --- | --- | --- |
@@ -21,4 +21,4 @@ Los elementos analíticos de la hoja de ruta tienen implementación inicial al t
 
 El caso guiado de planificación y su resultado se entregan en [v0_5_ejemplo_guiado.md](v0_5_ejemplo_guiado.md). Revisarlo no registra movimientos personales ni órdenes. La revisión del agente se acredita con pruebas/capturas; no se atribuye aceptación manual al usuario si no responde.
 
-Estado de comprobaciones y operación: [guía del comparador](v0_5_comparador.md) y [continuidad](CONTINUIDAD.md). Primer contrato v0.6 [definido aparte](v0_6_alcance_inicial.md), sin implementación. La publicación de dev.3 y su CI gratuita son la siguiente decisión; no se reutiliza la CI de otra entrega ni se publica una etiqueta estable. El ensayo operativo de 48 horas continúa aplazado y v0.2 sigue siendo candidata.
+Estado de comprobaciones y operación: [guía del comparador](v0_5_comparador.md) y [continuidad](CONTINUIDAD.md). Primer contrato v0.6 [definido aparte](v0_6_alcance_inicial.md); su implementación posterior autorizada se conserva en otra rama y no altera esta PR. La CI de dev.3 está correcta; la fusión/etiqueta autorizadas esperan la revisión manual. No se publica una etiqueta estable. El ensayo operativo de 48 horas continúa aplazado y v0.2 sigue siendo candidata.
