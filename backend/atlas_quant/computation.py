@@ -13,7 +13,7 @@ def bounded_calculation(function):
     @wraps(function)
     def run(*args, **kwargs):
         if not _SLOTS.acquire(blocking=False):
-            raise ComputationBusy('Hay dos cálculos de patrimonio o rentabilidad en curso. Espera a que terminen y vuelve a consultar.')
+            raise ComputationBusy('Hay dos cálculos en curso. Espera a que terminen y vuelve a consultar.')
         try:
             return function(*args, **kwargs)
         finally:

@@ -2,6 +2,26 @@
 
 Actualizado: 11 de septiembre de 2026. Este documento resume decisiones y estado para una conversación nueva de Codex; no contiene la transcripción completa del chat original.
 
+## Cuatro tareas autorizadas · Laboratorio v0.6
+
+El usuario acepta los cuatro primeros pasos propuestos: subir/CI gratuita, CSV
+propio con evidencia, API/UI de simulaciones y validación temporal con benchmarks.
+Desarrollo **0.6.0-dev.1** en `codex/v0.6-evaluador`, esquema 5. Guía y registro en
+[v0_6_laboratorio.md](v0_6_laboratorio.md), que prevalece sobre los pendientes del
+antecedente de abajo. CI inicial **34588116355** correcta sobre `d7ea898`.
+
+Se reutilizan series nativas, evaluador y economía del libro. Protocolos y resultados
+se guardan sin tocar carteras. Reservas/exposición por instrumento y fechas impiden
+reutilizar como prueba no vista un periodo calculado en este Laboratorio. Dos cuentas
+independientes, calentamiento dentro de cada periodo y benchmarks con costes iguales.
+No hay optimizador, validación estadística completa ni permisos para ejecución externa.
+
+ATLAS se detuvo antes de editar y se creó
+`backups/atlas-20260911T100806272408Z-ab4ac1f1`. Ver la guía para el estado final de
+pruebas, CI y reinicio. Revisión manual del portátil, PR #12/fusión/etiqueta, ensayo
+48 h y movimientos personales continúan pendientes. La CI del núcleo inicial no
+certifica el código posterior de API/UI; publicar también la evidencia final.
+
 ## Ampliación v0.6 · simulación económica EUR offline
 
 El usuario indica «Ahora no puedo usar el portátil, sigue desarrollando lo siguiente». Se aplaza el resto de su revisión manual y se desarrolla el siguiente bloque v0.6, conservando sus confirmaciones anteriores. No se fusiona/etiqueta dev.3 ni se atribuye aceptación global. Las comprobaciones manuales recibidas están conservadas por separado en el commit local `5479df3`.

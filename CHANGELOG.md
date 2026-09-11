@@ -1,5 +1,14 @@
 # Cambios de ATLAS Quant
 
+## 0.6.0-dev.1 · Laboratorio temporal · 2026-09-11
+
+- CSV nativo EUR y evidencia explícita de aperturas, calendario, disponibilidad y ausencia de eventos corporativos.
+- Protocolos SMA congelados, historial paginado, reproducción y guardado con auditoría atómica.
+- Desarrollo y prueba final separados, reserva explícita y exposición persistida por instrumento/fechas.
+- Efectivo y comprar/mantener con costes, lotes y límites compartidos; NAV, rentabilidad, caída máxima y operaciones simuladas.
+- Interfaz en Laboratorio, contratos HTTP/TypeScript, esquema 5 y libros anteriores conservados. [Guía y validación](docs/v0_6_laboratorio.md).
+- Rama subida; CI inicial del núcleo 34588116355 correcta. Cierre final en la guía. No fusiona PR #12 ni publica etiqueta.
+
 ## v0.6 · Simulación económica local, sin etiqueta de aplicación · 2026-09-11
 
 - Simulador EUR offline sobre el evaluador SMA compartido y `NativeBook`: lotes, comisiones fijas/proporcionales, deslizamiento, siguiente apertura estricta y consumo en memoria sin efectos duplicados.

@@ -1,6 +1,6 @@
 # ATLAS Quant
 
-**Rama local actual: `codex/v0.6-evaluador`.** Evaluador SMA 20/50 y simulación económica EUR offline implementados como módulos Python y referencias CLI: [evaluador](docs/v0_6_evaluador.md), [simulador, uso y límites](docs/v0_6_simulacion.md). Compras/ventas en la siguiente apertura, lotes, costes y libro nativo, con recuperación reproducible; 909 pruebas Python y 91 subcasos correctos. La aplicación conserva la interfaz/API dev.3; faltan integración con datos reales y UI, sin nueva etiqueta. Este desarrollo aún no se ha subido a GitHub y está separado de la PR #12.
+**Desarrollo actual: `0.6.0-dev.1`, rama `codex/v0.6-evaluador`, esquema 5.** El Laboratorio incorpora protocolos SMA sobre CSV nativo EUR con evidencia explícita, configuración congelada, historial, prueba final reservada, benchmarks y reproducción. [Uso y límites](docs/v0_6_laboratorio.md). La rama ya está subida; CI inicial del núcleo 34588116355 correcta. La validación/publicación del conjunto final se registra en esa guía. PR #12 conserva su revisión manual pendiente; no hay nueva etiqueta.
 
 **v0.5.0-dev.3: CI gratuita correcta y PR #12 preparada.** [Revisión/publicación y coste](docs/v0_5_dev3_entrega.md), [instalación en el portátil](docs/instalacion_portatil.md). Rama `codex/v0.5-comparador`, esquema 5; fusión/etiqueta autorizadas tras la revisión manual pendiente. El comienzo del evaluador SMA de v0.6 se conserva en una rama independiente y no forma parte de esta PR.
 

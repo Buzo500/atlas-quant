@@ -34,6 +34,7 @@ from .performance_routes import register_performance_routes
 from .targets_routes import register_targets_routes
 from .planning_routes import register_planning_routes
 from .asset_analysis_routes import register_asset_analysis_routes
+from .lab_routes import register_lab_routes
 from .computation import ComputationBusy
 from .book_contracts import (ImportInput, ReconciliationInput, CorrectionInput, BookDetail,
                             BookPreview, ReconciliationPreview, BookDocuments, BookDocument, BookErrorResponse)
@@ -165,6 +166,7 @@ def create_app(data_dir=None, run_worker=True):
     register_targets_routes(app, store)
     register_planning_routes(app, store)
     register_asset_analysis_routes(app, store)
+    register_lab_routes(app, store)
     app.state.service = service
     app.add_middleware(TrustedHostMiddleware,allowed_hosts=["localhost","127.0.0.1","testserver"])
 

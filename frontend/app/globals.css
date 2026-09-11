@@ -637,6 +637,19 @@ code {
   gap: 0 18px;
   max-width: 960px;
 }
+.simulation-fields {
+  border: 0;
+  min-width: 0;
+  padding: 1rem 0 0;
+  display: grid;
+  gap: 0.8rem;
+}
+.simulation-fields .form-grid {
+  width: 100%;
+}
+.simulation-fields > button {
+  justify-self: start;
+}
 .costs {
   grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
   margin: 20px 0 0;

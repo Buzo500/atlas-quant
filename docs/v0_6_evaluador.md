@@ -1,5 +1,9 @@
 # v0.6 · Primer bloque del evaluador SMA
 
+Estado posterior: [Laboratorio temporal 0.6.0-dev.1](v0_6_laboratorio.md), con
+CSV, API/UI, benchmarks y persistencia. Las restricciones del primer bloque
+que siguen se conservan como antecedente, no como estado actual.
+
 11/09/2026. El usuario autoriza los cinco siguientes pasos, incluido **comenzar SMA 20/50 con contrato restringido, evaluador puro y pruebas de paridad**. Sustituye la restricción anterior de «solo definición». Desarrollo en `codex/v0.6-evaluador`, separado de la PR #12 de v0.5.
 
 Código guardado en `2dbeb41` y documentación posterior incorporada. Rama solo local, sin publicación ni CI remota propia. Aplicación habitual dev.3 arrancada y verificada, tres carteras/libros y esquema 5 intactos; evidencia operativa en continuidad.

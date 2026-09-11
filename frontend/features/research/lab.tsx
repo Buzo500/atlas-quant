@@ -9,6 +9,7 @@ import { CostForm, DEFAULT_COSTS } from '@/shared/research-forms';
 import { useAction } from '@/shared/use-action';
 import { useDatasetSymbol } from '@/shared/use-dataset-symbol';
 import { ResearchResult } from './research-result';
+import { SimulationLab } from './simulation-lab';
 
 export function Lab({
   dataset,
@@ -17,6 +18,7 @@ export function Lab({
   dataset: DatasetResponse | undefined;
   onError: (s: string) => void;
 }) {
+  const [simulationOpen, setSimulationOpen] = useState(false);
   type SubmittedContext = Pick<
     ResearchResponse['execution'],
     | 'dataset_id'
@@ -64,6 +66,13 @@ export function Lab({
   }
   return (
     <>
+      <details
+        className="panel details"
+        onToggle={(event) => setSimulationOpen(event.currentTarget.open)}
+      >
+        <summary>Simulación SMA con protocolo temporal</summary>
+        {simulationOpen && <SimulationLab onError={onError} />}
+      </details>
       <div className="lab-layout">
         <section className="panel lab-config">
           <div className="panel-heading">

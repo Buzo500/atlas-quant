@@ -983,6 +983,103 @@ export type InstrumentResponse = {
 
 export type JsonValue = unknown;
 
+export type LabHistory = {
+  "items": Array<LabSummary>;
+  "offset": number;
+  "limit": number;
+};
+
+export type LabInput = {
+  "name": string;
+  "series_id": string;
+  "series_version": number;
+  "start_date": string;
+  "holdout_date": string;
+  "end_date": string;
+  "fast"?: number;
+  "slow"?: number;
+  "sessions_csv": string;
+  "opening_source": string;
+  "event_free_source": string;
+  "evidence_reviewed": boolean;
+  "config": SimulationConfig;
+};
+
+export type LabMetric = {
+  "name": "SMA" | "Comprar y mantener" | "Efectivo";
+  "final_nav_eur": (string) | (null);
+  "return_pct": (string) | (null);
+  "max_drawdown_pct": (string) | (null);
+  "fills": number;
+  "fees_eur": string;
+};
+
+export type LabOpenInput = {
+  "protocol_hash": string;
+  "acknowledge_exposure": true;
+};
+
+export type LabPeriod = {
+  "start_date": string;
+  "end_date": string;
+  "sessions": number;
+  "metrics": Array<LabMetric>;
+  "curve": Array<LabPoint>;
+  "trades": Array<LabTrade>;
+  "rejected": number;
+  "expired": number;
+  "report_hash": string;
+};
+
+export type LabPoint = {
+  "date": string;
+  "sma_eur": (string) | (null);
+  "buy_hold_eur": (string) | (null);
+  "cash_eur": string;
+};
+
+export type LabReport = {
+  "protocol": LabSummary;
+  "config": SimulationConfig;
+  "development": LabPeriod;
+  "holdout": (LabPeriod) | (null);
+  "warnings": Array<string>;
+  "evidence_hash": string;
+};
+
+export type LabReproduction = {
+  "id": string;
+  "development_matches": boolean;
+  "holdout_matches": (boolean) | (null);
+};
+
+export type LabSummary = {
+  "id": string;
+  "name": string;
+  "created_at": string;
+  "policy": "atlas-lab-temporal-v1";
+  "instrument_id": string;
+  "listing_id": string;
+  "series_id": string;
+  "series_version": number;
+  "source_hash": string;
+  "start_date": string;
+  "holdout_date": string;
+  "end_date": string;
+  "opened": boolean;
+  "fast": number;
+  "slow": number;
+};
+
+export type LabTrade = {
+  "strategy": "SMA" | "Comprar y mantener";
+  "date": string;
+  "side": "buy" | "sell";
+  "quantity": string;
+  "price_eur": string;
+  "fee_eur": string;
+};
+
 export type LastPrice = {
   "date": string;
   "close": number;
@@ -1966,6 +2063,18 @@ export type SimulatedTrade = {
   "fee_eur": string;
   "price_mark": Mark;
   "fx_mark": (Mark) | (null);
+};
+
+export type SimulationConfig = {
+  "policy"?: "sma-economics-eur-v1";
+  "initial_cash_eur": string;
+  "strategy_weight"?: string;
+  "max_position_weight"?: string;
+  "quantity_step"?: string;
+  "fixed_fee_eur"?: string;
+  "fee_bps"?: string;
+  "slippage_bps"?: string;
+  "purchases_enabled"?: boolean;
 };
 
 export type SourceMetadata = {

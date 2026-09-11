@@ -1,5 +1,7 @@
 # v0.6 · Primer contrato del laboratorio
 
+**Ampliación vigente:** cuatro tareas posteriores implementan API/Laboratorio, CSV nativo EUR con evidencia, reserva temporal y benchmarks en `0.6.0-dev.1`. [Alcance, uso y validación](v0_6_laboratorio.md). Los límites anteriores son antecedentes.
+
 11/09/2026. **Primer bloque implementado por autorización posterior:** contrato restringido, evaluador puro SMA 20/50 y casos de referencia/paridad. [Uso, semántica y límites](v0_6_evaluador.md). El usuario autoriza comenzar esta referencia al aceptar los cinco siguientes pasos; sustituye el estado anterior de «solo definición». Una nueva petición de continuar mientras no puede usar el portátil autoriza el siguiente bloque: [simulación económica EUR offline implementada](v0_6_simulacion.md). El adaptador de datos reales y la validación temporal siguen pendientes. McClellan continúa en STRAT-001, con datos de amplitud y reglas pendientes de concretar.
 
 ## Primera estrategia declarativa

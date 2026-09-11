@@ -1,5 +1,9 @@
 # v0.6 · Simulación económica EUR
 
+Ampliación posterior: [Laboratorio temporal 0.6.0-dev.1](v0_6_laboratorio.md)
+integra este motor con CSV nativo, HTTP, interfaz, informes persistidos y
+benchmarks. El alcance sin API/UI de este documento describe el bloque original.
+
 11/09/2026. «Ahora no puedo usar el portátil, sigue desarrollando lo siguiente» autoriza continuar el bloque siguiente del laboratorio. La revisión manual de v0.5 queda pendiente con sus comprobaciones ya recibidas conservadas; no se fusiona ni etiqueta por este aplazamiento.
 
 ## Alcance y criterios del bloque
