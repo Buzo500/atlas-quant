@@ -2,6 +2,18 @@
 
 Actualizado: 11 de septiembre de 2026. Este documento resume decisiones y estado para una conversación nueva de Codex; no contiene la transcripción completa del chat original.
 
+## Ampliación v0.6 · simulación económica EUR offline
+
+El usuario indica «Ahora no puedo usar el portátil, sigue desarrollando lo siguiente». Se aplaza el resto de su revisión manual y se desarrolla el siguiente bloque v0.6, conservando sus confirmaciones anteriores. No se fusiona/etiqueta dev.3 ni se atribuye aceptación global. Las comprobaciones manuales recibidas están conservadas por separado en el commit local `5479df3`.
+
+**Implementado en `codex/v0.6-evaluador`:** `simulation_contracts.py`, `strategy_simulation.py` y `tools/run_sma_simulation.py`, política `sma-economics-eur-v1`. Un instrumento/cuenta ficticia EUR, lotes, costes, deslizamiento, siguiente apertura, límites explícitos y libro `NativeBook` compartido. Intención lógica y posición real de la simulación distintas; rechazos no reintentados, huecos sin valoraciones inventadas, eventos corporativos bloqueados y recuperación por replay del diario de observaciones. [Uso y límites](v0_6_simulacion.md).
+
+**Validación local:** 48 pruebas nuevas, 101 con el evaluador; regresión **909 Python + 91 subcasos**, 84,95 s, dos avisos previos. Contratos HTTP/TypeScript y build con manifiesto correctos, sin cambio frontend/API/esquema. CLI generada y reproducida: capital 1.000 EUR, compra 9 a 100 EUR y venta a 80 EUR, comisión 1 EUR por lado; saldo final **818 EUR**, sin posición y con paridad exacta tras recuperar cada evento. Evidencia `output/validation/v06-economics-python.log` y `v06-sma-economics-reference.json`. Un primer intento del test CLI falló al acceder al temporal predeterminado de pytest; resuelto usando directorio de pruebas nuevo dentro del proyecto, sin cambiar lógica para omitir el test.
+
+**Protección de datos y arranque final en el sobremesa:** parada cooperativa antes de editar, copia `backups/atlas-20260911T094306917891Z-6b217137`; todas las tablas coinciden con la copia tanto tras las pruebas como después del reinicio, integridad `ok`, esquema 5 y tres carteras. ATLAS arrancado con run `78f23e9ad14942d3918a5adbcb7125e8`, salud directa/proxy correcta, HTML de interfaz servido y parada global activa. Evidencia `output/validation/v06-economics-data-pre.json` y `v06-economics-data-online.json`. Sin llamadas pagadas ni datos personales añadidos. Código y documentación se conservan en la rama local, sin push/CI remota nuevos; la CI de dev.3 no valida este bloque posterior. La comprobación del sobremesa no sustituye la revisión aplazada del portátil.
+
+Pendientes v0.6: datos reales con evidencia contrastada, caso de uso persistente/API/UI, protocolo temporal/benchmarks y registro de candidatas. No se conectan ni certifican automáticamente los datasets NVD o la demo legacy. La interfaz/API conservan `0.5.0-dev.3`. Ensayo de 48 horas, movimientos personales, IA de pago, bróker, McClellan, móvil/remoto y LaTeX siguen aplazados.
+
 ## Revisión manual en el portátil · operación, avisos y persistencia confirmados
 
 El usuario indica que está en el portátil y confirma «Sí, funciona la comprobación» tras el recorrido guiado: abrir ATLAS, comprobar conexión/versión dev.3 y acceso al comparador, detener mediante `Detener-ATLAS.cmd` y volver a iniciar. **Arranque/parada/segundo arranque aceptados por comprobación manual del usuario en el portátil.** Es evidencia comunicada por el usuario; no una instalación o prueba remota ejecutada por el agente. No volver a pedir esta misma comprobación.

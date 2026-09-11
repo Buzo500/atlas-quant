@@ -1,6 +1,6 @@
 # v0.6 · Primer contrato del laboratorio
 
-11/09/2026. **Primer bloque implementado por autorización posterior:** contrato restringido, evaluador puro SMA 20/50 y casos de referencia/paridad. [Uso, semántica y límites](v0_6_evaluador.md). El usuario autoriza comenzar esta referencia al aceptar los cinco siguientes pasos; sustituye el estado anterior de «solo definición». Los apartados de simulación económica y validación temporal de este documento siguen siendo planificación. McClellan continúa en STRAT-001, con datos de amplitud y reglas pendientes de concretar.
+11/09/2026. **Primer bloque implementado por autorización posterior:** contrato restringido, evaluador puro SMA 20/50 y casos de referencia/paridad. [Uso, semántica y límites](v0_6_evaluador.md). El usuario autoriza comenzar esta referencia al aceptar los cinco siguientes pasos; sustituye el estado anterior de «solo definición». Una nueva petición de continuar mientras no puede usar el portátil autoriza el siguiente bloque: [simulación económica EUR offline implementada](v0_6_simulacion.md). El adaptador de datos reales y la validación temporal siguen pendientes. McClellan continúa en STRAT-001, con datos de amplitud y reglas pendientes de concretar.
 
 ## Primera estrategia declarativa
 
@@ -30,7 +30,7 @@ El simulador convierte objetivos a cantidades con lotes configurados, redondeo c
 4. Protocolo temporal congelado antes de ver el resultado: por ejemplo, 500 sesiones válidas, 400 de desarrollo y las 100 finales reservadas. El calentamiento puede usar el pasado anterior a cada tramo; no los resultados del tramo reservado para seleccionar parámetros. Si se abre el reservado y se retoca la regla, se registra como consumido y se necesita otro periodo para evaluación independiente.
 5. Comparación declarada con permanecer en efectivo y buy-and-hold bajo las mismas fechas, capital y costes. Sensibilidad de parámetros solo en desarrollo; conservar intentos negativos y cantidad de variantes ensayadas. No convertir significación o rentabilidad histórica en autorización operativa.
 
-La autorización posterior cubre **solo contrato restringido + evaluador puro + casos de referencia/paridad**, implementados en el primer bloque. Después vendrían adaptador de datos/caso de uso, simulador económico, protocolo temporal y registro de candidatas. Esto no declara walk-forward, Monte Carlo, memoria de IA o LaTeX implementados.
+La primera autorización cubría **contrato restringido + evaluador puro + casos de referencia/paridad**. La petición posterior «sigue desarrollando lo siguiente» amplía al simulador económico offline, ya implementado sobre datos ficticios explícitos. Siguen pendientes adaptador de datos reales/caso de uso persistente, protocolo temporal y registro de candidatas. Esto no declara walk-forward, Monte Carlo, memoria de IA o LaTeX implementados.
 
 ## Decisiones posteriores
 

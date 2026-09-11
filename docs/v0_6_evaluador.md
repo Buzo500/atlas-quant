@@ -4,6 +4,8 @@
 
 Código guardado en `2dbeb41` y documentación posterior incorporada. Rama solo local, sin publicación ni CI remota propia. Aplicación habitual dev.3 arrancada y verificada, tres carteras/libros y esquema 5 intactos; evidencia operativa en continuidad.
 
+**Ampliación posterior autorizada:** el usuario aplaza la revisión manual del portátil y pide continuar el desarrollo. Ya existe el [simulador económico EUR offline](v0_6_simulacion.md), que consume este mismo evaluador y reutiliza el libro nativo. Las menciones siguientes a simulación económica pendiente describen el límite de este primer bloque; la ampliación tiene sus propias pruebas y continúa separada de la UI/PR de v0.5.
+
 ## Alcance implementado
 
 Módulos `strategy_spec.py` y `strategy_evaluator.py`, versión semántica `sma-cross-evaluator-v1`. Contratos Pydantic estrictos, inmutables y sin campos adicionales. Un instrumento, cotización EUR, fuente/versión/huella, base bruta acreditada y calendario explícito con mercado, zona y aperturas/cierres. Parámetros enteros `2 <= fast < slow <= 250`; referencia 20/50.

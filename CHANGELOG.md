@@ -1,5 +1,13 @@
 # Cambios de ATLAS Quant
 
+## v0.6 · Simulación económica local, sin etiqueta de aplicación · 2026-09-11
+
+- Simulador EUR offline sobre el evaluador SMA compartido y `NativeBook`: lotes, comisiones fijas/proporcionales, deslizamiento, siguiente apertura estricta y consumo en memoria sin efectos duplicados.
+- Límites de efectivo y exposición, caducidad y ausencia de datos explícitas; objetivo lógico separado de posición simulada. Correcciones y fallos no publican un libro parcial.
+- CLI `tools/run_sma_simulation.py`, informe con entradas/código/costes y reconstrucción verificable. Referencia ficticia 1.000 → 818 EUR; no escribe carteras habituales ni envía órdenes.
+- 48 pruebas nuevas; regresión 909 Python + 91 subcasos. Contratos HTTP/build coherentes, esquema 5 y UI/API dev.3 conservados. [Uso, pruebas y pendientes](docs/v0_6_simulacion.md).
+- Rama solo local, sin nueva CI remota, push ni etiqueta. Revisión manual del portátil aplazada por el usuario; PR #12 continúa pendiente de aceptación.
+
 ## v0.6 · Primer bloque local, sin etiqueta de aplicación · 2026-09-11
 
 - Contrato restringido y evaluador puro SMA20/50, política `sma-cross-evaluator-v1`, calendario/datos explícitos, objetivos por presupuesto y comparación exacta.
