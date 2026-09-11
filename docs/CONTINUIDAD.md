@@ -2,11 +2,15 @@
 
 Actualizado: 11 de septiembre de 2026. Este documento resume decisiones y estado para una conversación nueva de Codex; no contiene la transcripción completa del chat original.
 
-## Revisión manual en el portátil · comprobación operativa confirmada
+## Revisión manual en el portátil · operación, avisos y persistencia confirmados
 
 El usuario indica que está en el portátil y confirma «Sí, funciona la comprobación» tras el recorrido guiado: abrir ATLAS, comprobar conexión/versión dev.3 y acceso al comparador, detener mediante `Detener-ATLAS.cmd` y volver a iniciar. **Arranque/parada/segundo arranque aceptados por comprobación manual del usuario en el portátil.** Es evidencia comunicada por el usuario; no una instalación o prueba remota ejecutada por el agente. No volver a pedir esta misma comprobación.
 
-Continúan pendientes la revisión de resultados del comparador, el caso guiado de planificación/guardado y la aceptación de los límites del alcance funcional. Esta respuesta no declara esos pasos completados ni autoriza atribuir una aceptación global. Fusión y etiqueta dev.3 mantienen su autorización previa condicionada a cerrar esa revisión. La rama local, CI y estado del sobremesa del bloque siguiente no cambian; no se ha accedido a la base del portátil.
+En el comparador aparecen `DEMO_WORLD`, `DEMO_EURO` y `DEMO_BOND`. Tras el recorrido para calcular y consultar el detalle, el usuario confirma «Sí, lo explica, funciona»: queda comprobada por él la presentación de los motivos de métricas no disponibles. La demostración estándar no aporta calendario/base de precios verificados para este comparador; esta confirmación no valida cifras ni correlaciones completas y no se modifica su evidencia para forzarlas.
+
+Después de guardar la comparación, recargar con F5 y volver a consultarla desde «Comparaciones guardadas», el usuario confirma «Sí, aparece igual». Quedan comprobadas por él la persistencia y la reapertura de ese informe, con sus activos, fechas y explicaciones. No se le pide repetir el recorrido ni se atribuye una inspección del libro a esta respuesta.
+
+Continúan pendientes revisar resultados numéricos con datos preparados, el caso guiado de planificación/guardado y la aceptación de los límites del alcance funcional. Las respuestas recibidas no declaran esos pasos completados ni autorizan atribuir una aceptación global. Para guiar planificación en el portátil, falta conocer si hay una cartera con libro v2: la demo legacy no muestra ese panel. Fusión y etiqueta dev.3 mantienen su autorización previa condicionada a cerrar esa revisión. La rama local, CI y estado del sobremesa del bloque siguiente no cambian; no se ha accedido a la base del portátil.
 
 ## Cinco pasos posteriores · revisión/CI de dev.3 e inicio SMA
 

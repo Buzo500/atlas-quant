@@ -12,7 +12,9 @@ Coste verificado en la sesión de GitHub: antes 310/2.000 minutos, después 330/
 
 ## Revisión manual y decisión de publicación
 
-La matriz del [cierre funcional](v0_5_cierre.md), el [caso guiado](v0_5_ejemplo_guiado.md) y la guía del [comparador](v0_5_comparador.md) están preparados y tienen evidencia técnica. **El usuario ya ha confirmado el arranque, la parada y el segundo arranque en el portátil**, después del recorrido guiado que incluye conexión y acceso al comparador. Es su comprobación manual, no una prueba remota del agente. Siguen pendientes la revisión de resultados, planificación/guardado y aceptación funcional del alcance; no se deducen de la confirmación operativa.
+La matriz del [cierre funcional](v0_5_cierre.md), el [caso guiado](v0_5_ejemplo_guiado.md) y la guía del [comparador](v0_5_comparador.md) están preparados y tienen evidencia técnica. **El usuario ya ha confirmado el arranque, la parada y el segundo arranque en el portátil**, después del recorrido guiado que incluye conexión y acceso al comparador. También confirma que el detalle del comparador explica las métricas no disponibles con `DEMO_WORLD`, `DEMO_EURO` y `DEMO_BOND`. La demo estándar carece de calendario/base verificados para ese cálculo; no constituye una revisión de cifras o correlaciones completas. Es su comprobación manual, no una prueba remota del agente.
+
+El usuario también confirma que la comparación guardada aparece igual al recargar la página y consultarla desde el historial: persistencia y reapertura verificadas manualmente por él. Siguen pendientes revisar resultados numéricos con datos preparados, planificación/guardado y aceptación funcional del alcance; no se deducen de las confirmaciones recibidas.
 
 La fusión y la etiqueta de desarrollo están autorizadas dentro de los cinco pasos, condicionadas a la revisión aceptada. La CI ya satisface su condición técnica. No se requiere una segunda autorización genérica de publicación, pero no se atribuye al usuario una revisión que todavía no ha confirmado. Estado de PR, etiqueta y equipo se actualiza en continuidad cuando se complete ese paso.
 
