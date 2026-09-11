@@ -8,7 +8,7 @@ El usuario acepta los cuatro primeros pasos propuestos: subir/CI gratuita, CSV
 propio con evidencia, API/UI de simulaciones y validación temporal con benchmarks.
 Desarrollo **0.6.0-dev.1** en `codex/v0.6-evaluador`, esquema 5. Guía y registro en
 [v0_6_laboratorio.md](v0_6_laboratorio.md), que prevalece sobre los pendientes del
-antecedente de abajo. CI inicial **34588116355** correcta sobre `d7ea898`.
+antecedente de abajo. CI inicial **34588116355** correcta sobre `d7ea898`; CI final **34590252591** correcta sobre `e797ca3` (929 Python + 91 subcasos, 297 frontend, 8 Node, 21 E2E y arranque/parada), gasto 0 USD.
 
 Se reutilizan series nativas, evaluador y economía del libro. Protocolos y resultados
 se guardan sin tocar carteras. Reservas/exposición por instrumento y fechas impiden
@@ -17,10 +17,11 @@ independientes, calentamiento dentro de cada periodo y benchmarks con costes igu
 No hay optimizador, validación estadística completa ni permisos para ejecución externa.
 
 ATLAS se detuvo antes de editar y se creó
-`backups/atlas-20260911T100806272408Z-ab4ac1f1`. Ver la guía para el estado final de
-pruebas, CI y reinicio. Revisión manual del portátil, PR #12/fusión/etiqueta, ensayo
-48 h y movimientos personales continúan pendientes. La CI del núcleo inicial no
-certifica el código posterior de API/UI; publicar también la evidencia final.
+`backups/atlas-20260911T100806272408Z-ab4ac1f1`. ATLAS reiniciado en el sobremesa con run `41ea181bbe744aabbd6a34d20a0acdf2`,
+versión `0.6.0-dev.1`, salud/UI correctas y todas las tablas iguales a la copia,
+integridad `ok`, tres carteras. Ver la guía para la evidencia. Revisión manual del portátil, PR #12/fusión/etiqueta, ensayo
+48 h y movimientos personales continúan pendientes. La CI del núcleo inicial es antecedente; el código API/UI lo valida la CI final.
+Rama subida; cierre posterior solo documental, sin nueva etiqueta ni fusión PR #12.
 
 ## Ampliación v0.6 · simulación económica EUR offline
 

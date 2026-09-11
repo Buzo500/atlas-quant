@@ -7,7 +7,7 @@
 - Desarrollo y prueba final separados, reserva explícita y exposición persistida por instrumento/fechas.
 - Efectivo y comprar/mantener con costes, lotes y límites compartidos; NAV, rentabilidad, caída máxima y operaciones simuladas.
 - Interfaz en Laboratorio, contratos HTTP/TypeScript, esquema 5 y libros anteriores conservados. [Guía y validación](docs/v0_6_laboratorio.md).
-- Rama subida; CI inicial del núcleo 34588116355 correcta. Cierre final en la guía. No fusiona PR #12 ni publica etiqueta.
+- Rama subida; CI final 34590252591 correcta sobre e797ca3: 929 Python + 91 subcasos, 297 frontend, ocho Node y 21 E2E, instalación/arranque/parada y gasto 0 USD. No fusiona PR #12 ni publica etiqueta.
 
 ## v0.6 · Simulación económica local, sin etiqueta de aplicación · 2026-09-11
 

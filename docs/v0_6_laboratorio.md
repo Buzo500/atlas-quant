@@ -48,7 +48,7 @@ sin sustituir ni simular la API. **El nuevo E2E completo pasa** en
 `e2e-e301b24c03f642de989af305882563d6`: importación, reserva, apertura, F5,
 reproducción y ventanas de 960/1366/3440 px. Base habitual intacta, integridad `ok`
 y puertos liberados. Son tamaños de navegador en el sobremesa, no escalado físico
-ni aceptación manual en el portátil. CI de publicación pendiente de registrar. No fusionar ni etiquetar
+ni aceptación manual en el portátil. CI final correcta, detallada más abajo. No fusionar ni etiquetar
 PR #12 por esta autorización; tampoco reactivar el ensayo de 48 horas.
 
 ## Uso
@@ -95,3 +95,46 @@ efectivo); efectivo en **1.000 EUR**. No sustituye la SMA 20/50 por defecto.
 
 No importar esta referencia en una cartera personal. La CI/E2E la ejecuta en una
 base exclusiva y comprueba que la base habitual no cambia.
+
+
+## Comprobación operativa del sobremesa
+
+Código publicado en `e797ca34cfbfcd177c7873b605f21d484f0f643d`. CI final
+[34590252591](https://github.com/Buzo500/atlas-quant/actions/runs/34590252591),
+job 103233664678, **correcta sobre ese commit** (10 min 51 s). Antes de lanzarla:
+348,3/2.000 minutos gratuitos, 0/0,5 GB, facturable 0 USD y presupuesto Actions
+0 USD con Stop usage activado. No se modificó la configuración de facturación.
+
+ATLAS reiniciado con run `41ea181bbe744aabbd6a34d20a0acdf2`. Salud directa y por
+proxy `ok`, versión `0.6.0-dev.1`, HTML 200, parada global activa y ningún proveedor
+configurado. Las tres carteras y todas las filas de todas las tablas coinciden
+con la copia previa, esquema 5, integridad `ok`; el Laboratorio habitual está vacío.
+Evidencia: `v06-lab-health.json` y `v06-lab-data-online.json` en `output/validation`.
+No se insertaron las referencias sintéticas en la base habitual.
+
+Comprobación del límite de entrada en memoria, con 2.000 sesiones sintéticas,
+dos periodos de 1.000 y 16 ejecuciones SMA por periodo: 0,747 s en este sobremesa,
+177.782 bytes de informes. Es una medición local de este escenario, no una garantía
+de latencia ni una prueba prolongada. Evidencia `v06-lab-bound.json`.
+
+
+## Cierre verificado
+
+CI gratuita **34590252591** correcta sobre **e797ca3**: **929 Python + 91 subcasos,
+297 frontend, 8 Node y 21 E2E**, además de instalación, compilación, TypeScript,
+contratos, lint y arranque/parada. Evidencia local `output/validation/v06-lab-ci.json`.
+La CI completa confirmó los 21 recorridos juntos, incluyendo los selectores corregidos.
+Facturación tras terminar: **366,7/2.000 minutos**, 0/0,5 GB, coste bruto 2,20 USD
+cubierto por 2,20 USD de uso incluido, **facturable 0 USD**. Presupuesto Actions
+0 USD con bloqueo de uso de pago verificado antes de ambas ejecuciones.
+
+Los cuatro pasos quedan implementados y subidos a `codex/v0.6-evaluador`.
+La documentación de cierre posterior no cambia el código probado por CI.
+No se ha creado una nueva etiqueta ni fusionado PR #12. La validación de una
+fuente observada concreta sigue pendiente: las pruebas usan datos ficticios
+identificados y no convierten NVD.DE u otra serie existente en datos acreditados.
+
+La exposición es un registro de esta base: restaurar una copia antigua, crear
+identidades duplicadas o usar otra base no demuestra que un periodo sea desconocido.
+Mantener esa distinción al investigar. El usuario conserva la decisión de cuándo
+retomar la revisión del portátil; el ensayo de 48 horas no se ha reactivado.
