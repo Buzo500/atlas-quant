@@ -2,6 +2,8 @@
 
 11/09/2026. El usuario autoriza los cinco siguientes pasos, incluido **comenzar SMA 20/50 con contrato restringido, evaluador puro y pruebas de paridad**. Sustituye la restricción anterior de «solo definición». Desarrollo en `codex/v0.6-evaluador`, separado de la PR #12 de v0.5.
 
+Código guardado en `2dbeb41` y documentación posterior incorporada. Rama solo local, sin publicación ni CI remota propia. Aplicación habitual dev.3 arrancada y verificada, tres carteras/libros y esquema 5 intactos; evidencia operativa en continuidad.
+
 ## Alcance implementado
 
 Módulos `strategy_spec.py` y `strategy_evaluator.py`, versión semántica `sma-cross-evaluator-v1`. Contratos Pydantic estrictos, inmutables y sin campos adicionales. Un instrumento, cotización EUR, fuente/versión/huella, base bruta acreditada y calendario explícito con mercado, zona y aperturas/cierres. Parámetros enteros `2 <= fast < slow <= 250`; referencia 20/50.

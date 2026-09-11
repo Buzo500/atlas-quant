@@ -1,5 +1,7 @@
 # ATLAS Quant
 
+**Rama local actual: `codex/v0.6-evaluador`.** Primer bloque SMA 20/50 implementado como módulo Python y referencia CLI: [uso y límites](docs/v0_6_evaluador.md). 861 pruebas Python y 91 subcasos correctos. La aplicación conserva la interfaz/API dev.3; no hay simulador económico v0.6 ni nueva etiqueta. Este desarrollo aún no se ha subido a GitHub y está separado de la PR #12.
+
 **v0.5.0-dev.3: CI gratuita correcta y PR #12 preparada.** [Revisión/publicación y coste](docs/v0_5_dev3_entrega.md), [instalación en el portátil](docs/instalacion_portatil.md). Rama `codex/v0.5-comparador`, esquema 5; fusión/etiqueta autorizadas tras la revisión manual pendiente. El comienzo del evaluador SMA de v0.6 se conserva en una rama independiente y no forma parte de esta PR.
 
 **v0.5.0-dev.3 · fichas y comparador de activos.** En Datos: precios EUR/USD, cobertura, volatilidad, caída máxima, comparación en base 100 y correlaciones sobre intervalos comunes, con informes inmutables. [Uso y validación](docs/v0_5_comparador.md), [ejemplo de planificación](docs/v0_5_ejemplo_guiado.md), [revisión del cierre v0.5](docs/v0_5_cierre.md). [Diagnóstico NVIDIA y evidencia pendiente](docs/diagnostico_nvidia_20260911.md).

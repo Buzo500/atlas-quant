@@ -1,5 +1,7 @@
 # ATLAS Quant v0.1 · Entrega del 5 de septiembre de 2026
 
+Actualización posterior en la rama local `codex/v0.6-evaluador`: [núcleo puro SMA20/50 y referencia CLI](v0_6_evaluador.md) implementados y probados, separados de la interfaz y del Laboratorio legacy. No se implementa todavía el simulador económico nuevo ni se publica una versión de aplicación v0.6.
+
 Actualización de alcance 11/09/2026: `0.5.0-dev.3` añade **fichas/comparador de activos y correlaciones** en Datos, con fuentes EUR/USD versionadas, calidad, métricas de precio y guardado de informes. [Guía y pruebas](v0_5_comparador.md). [Ejemplo de planificación](v0_5_ejemplo_guiado.md) y [revisión del cierre v0.5](v0_5_cierre.md). Rama `codex/v0.5-comparador`, esquema 5; PR #12 y CI gratuita correcta. [Publicación y revisión manual](v0_5_dev3_entrega.md). El núcleo SMA v0.6 se implementa posteriormente en otra rama, sin cambiar la UI, API o ejecución de esta entrega.
 
 ## Alcance real

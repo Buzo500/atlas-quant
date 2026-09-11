@@ -1,5 +1,12 @@
 # Cambios de ATLAS Quant
 
+## v0.6 · Primer bloque local, sin etiqueta de aplicación · 2026-09-11
+
+- Contrato restringido y evaluador puro SMA20/50, política `sma-cross-evaluator-v1`, calendario/datos explícitos, objetivos por presupuesto y comparación exacta.
+- Replay e incremental comparten transición; checkpoints, duplicados, huecos, eventos corporativos y expiración temporal comprobados. No produce órdenes ni fills.
+- Referencia sintética ejecutable con `tools/run_sma_reference.py`; 53 casos nuevos y regresión total 861 Python + 91 subcasos. [Uso y límites](docs/v0_6_evaluador.md).
+- Rama `codex/v0.6-evaluador` solo local; UI/API permanecen en dev.3, esquema 5. La integración con datasets y la simulación económica quedan pendientes.
+
 ## v0.5.0-dev.3 · PR y CI correctas · 2026-09-11
 
 - Fichas y comparador de activos en Datos: identidad/versiones, precio EUR, cobertura, volatilidad y caída máxima, comparación normalizada sobre fechas comunes.
