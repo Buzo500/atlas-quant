@@ -19,6 +19,7 @@ from .strategy_spec import CloseObservation, OpeningObservation, SmaSpec
 ZERO = D(0)
 MAX_EVENTS = 40_000
 MAX_CHECKPOINT_BYTES = 32_000_000
+WARMED_SIMULATOR_VERSION = 'sma-warmup-eur-v1'
 
 
 def _entry(day, sequence, kind, gross, fee=ZERO, *, listing=None, quantity=None, price=None, key=None):
@@ -114,18 +115,35 @@ def _execute(book, spec, config, intent, opening, day):
 
 class SmaSimulation:
     """Incremental research coordinator; process commits each valid event atomically in memory."""
-    def __init__(self, spec: SmaSpec, config: SimulationConfig):
+    def __init__(self, spec: SmaSpec, config: SimulationConfig, *, warmup: tuple[CloseObservation, ...] = ()):
+        if (not isinstance(warmup, tuple) or not all(isinstance(o, CloseObservation) for o in warmup)
+            or len(warmup) > spec.slow or len(warmup) >= len(spec.calendar.sessions)):
+            raise ValueError('El calentamiento debe ser un prefijo de como máximo slow cierres, anterior a la evaluación.')
         self.spec, self.config = spec, config
-        self.context_hash = digest(dict(simulator=SIMULATOR_VERSION, spec=spec.fingerprint, config=config.fingerprint))
+        self._warmup = warmup
+        self._format = WARMED_SIMULATOR_VERSION if warmup else SIMULATOR_VERSION
+        context = dict(simulator=self._format, spec=spec.fingerprint, config=config.fingerprint)
+        if warmup:
+            context['warmup'] = [o.model_dump(mode='json') for o in warmup]
+        self.context_hash = digest(context)
         self._strategy = initial_state(spec)
+        for i, observation in enumerate(warmup):
+            if not isinstance(observation, CloseObservation) or observation.session_index != i:
+                raise ValueError('El calentamiento debe consumir el prefijo consecutivo del calendario.')
+            if timestamp(observation.decision_at) >= timestamp(spec.calendar.sessions[len(warmup)].open_at):
+                raise ValueError('El calentamiento no puede usar información de la evaluación.')
+            result = evaluate(spec, self._strategy, observation)
+            if result.status in ('waiting', 'duplicate') or result.intent:
+                raise ValueError('El calentamiento requiere cierres disponibles y no puede emitir intenciones.')
+            self._strategy = result.state
         self._pending = None
         self._book = NativeBook()
-        self._day = spec.calendar.sessions[0].date
+        self._day = spec.calendar.sessions[len(warmup)].date
         initial = _entry(self._day, 0, 'deposit', D(config.initial_cash_eur))
         self._book.apply(initial)
         self._journal = [initial]
         self._events, self._records = [], []
-        self._last_at, self._last_hash = None, None
+        self._last_at, self._last_hash = (warmup[-1].decision_at if warmup else None), None
         self._last_open_index, self._last_open_hash = -1, None
         self._opens = {s.open_at: i for i, s in enumerate(spec.calendar.sessions)}
         self._mark = None
@@ -141,6 +159,10 @@ class SmaSimulation:
             raise ValueError('Se requiere una observación de cierre o apertura validada.')
         if event.spec_hash != self.spec.fingerprint:
             raise ValueError('La observación pertenece a otra especificación.')
+        if self._warmup and ((isinstance(event, CloseObservation) and event.session_index < len(self._warmup)) or
+            (isinstance(event, OpeningObservation) and timestamp(event.open_at) <
+             timestamp(self.spec.calendar.sessions[len(self._warmup)].open_at))):
+            raise ValueError('El calentamiento no admite operaciones ni eventos de la cuenta de evaluación.')
         kind = 'close' if isinstance(event, CloseObservation) else 'open'
         payload = dict(kind=kind, observation=event.model_dump(mode='json'))
         event_hash = digest(payload)
@@ -232,16 +254,19 @@ class SmaSimulation:
             context.prec, context.rounding = 64, ROUND_HALF_EVEN
             valuation = _valuation(self._book, self._day, self.spec.source.listing_id, self._mark, self.config)
         executions = [outcome for row in self._records for outcome in row['executions']]
-        return deepcopy(dict(format=SIMULATOR_VERSION, context_hash=self.context_hash,
+        return deepcopy(dict(format=self._format, context_hash=self.context_hash,
             spec=self.spec.model_dump(mode='json'), config=self.config.model_dump(mode='json'),
             events=self._events, records=self._records, journal=self._journal, executions=executions,
             strategy_state=self._strategy.model_dump(mode='json'),
             pending_intent=self._pending.model_dump(mode='json') if self._pending else None,
             final={**valuation, 'valuation_price_at': self._mark_at},
-            economic_scope='isolated-offline-account', external_orders=False))
+            economic_scope='isolated-offline-account', external_orders=False,
+            **({'warmup': [o.model_dump(mode='json') for o in self._warmup]} if self._warmup else {})))
 
     def checkpoint(self):
-        payload = dict(format=SIMULATOR_VERSION, context_hash=self.context_hash, events=self._events)
+        payload = dict(format=self._format, context_hash=self.context_hash, events=self._events)
+        if self._warmup:
+            payload['warmup'] = [o.model_dump(mode='json') for o in self._warmup]
         return json.dumps(dict(payload=payload, sha256=digest(payload)), sort_keys=True, separators=(',', ':'))
 
 
@@ -254,10 +279,17 @@ def restore_simulation(spec, config, document):
     payload = envelope['payload']
     if digest(payload) != envelope['sha256']:
         raise ValueError('Checkpoint económico corrupto.')
-    simulation = SmaSimulation(spec, config)
-    if not isinstance(payload, dict) or set(payload) != {'format', 'context_hash', 'events'}:
+    if not isinstance(payload, dict):
         raise ValueError('Contenido de checkpoint económico desconocido.')
-    if payload['format'] != SIMULATOR_VERSION or payload['context_hash'] != simulation.context_hash:
+    warmed = payload.get('format') == WARMED_SIMULATOR_VERSION
+    if set(payload) != {'format', 'context_hash', 'events'} | ({'warmup'} if warmed else set()):
+        raise ValueError('Contenido de checkpoint económico desconocido.')
+    raw = payload.get('warmup', [])
+    if not isinstance(raw, list) or len(raw) > spec.slow or (warmed and not raw):
+        raise ValueError('Calentamiento del checkpoint inválido.')
+    warmup = tuple(CloseObservation.model_validate_json(json.dumps(o)) for o in raw)
+    simulation = SmaSimulation(spec, config, warmup=warmup)
+    if payload['format'] != simulation._format or payload['context_hash'] != simulation.context_hash:
         raise ValueError('El checkpoint pertenece a otra especificación o costes.')
     if not isinstance(payload['events'], list) or len(payload['events']) > MAX_EVENTS:
         raise ValueError('Historial económico demasiado largo o inválido.')

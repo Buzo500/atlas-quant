@@ -142,3 +142,53 @@ it('presenta un fallo de apertura sin revelar resultados ni reintentar la mutaci
     1,
   );
 });
+
+it('no confirma reproducción si el walk-forward guardado falta o diverge', async () => {
+  const stored = {
+    ...report('a'),
+    walk_forward: {
+      policy: 'atlas-walk-forward-fixed-v1',
+      config: { context_sessions: 7, evaluation_sessions: 7 },
+      windows: [],
+      summary: {
+        status: 'insufficient_data',
+        windows: 0,
+        evaluable_windows: 0,
+        passing_windows: 0,
+        passing_pct: '0',
+        mean_return_pct: null,
+        mean_excess_pct: null,
+        worst_drawdown_pct: null,
+        reasons: [],
+      },
+      unused_sessions: 0,
+      unused_start: null,
+      unused_end: null,
+      warnings: [],
+      report_hash: 'wf-hash',
+    },
+  };
+  call.mockImplementation(async (path) =>
+    path.endsWith('/reproduce')
+      ? {
+          id: 'a',
+          development_matches: true,
+          holdout_matches: null,
+          walk_forward_matches: false,
+        }
+      : path === '/lab/protocols/a'
+        ? stored
+        : defaults(path),
+  );
+  render(<SimulationLab onError={vi.fn()} />);
+  fireEvent.click(
+    await screen.findByRole('button', { name: 'Ver Protocolo a' }),
+  );
+  fireEvent.click(
+    await screen.findByRole('button', { name: 'Comprobar reproducción' }),
+  );
+  expect(await screen.findByText(/La reproducción no coincide/)).toBeTruthy();
+  expect(call.mock.calls.filter(([p]) => p.endsWith('/holdout'))).toHaveLength(
+    0,
+  );
+});

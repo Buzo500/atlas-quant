@@ -2,6 +2,33 @@
 
 Actualizado: 11 de septiembre de 2026. Este documento resume decisiones y estado para una conversación nueva de Codex; no contiene la transcripción completa del chat original.
 
+## Primera tarea autorizada · Walk-forward fijo v0.6
+
+El usuario indica «Vale, haz la primera»: implementar walk-forward, no los otros
+cuatro pasos propuestos. Rama `codex/v0.6-evaluador`, **0.6.0-dev.2**, esquema 5.
+Leer [v0_6_walk_forward.md](v0_6_walk_forward.md) para contrato, uso y verificación.
+Configuración opcional congelada junto al protocolo: contexto 252/evaluación 63
+sesiones por defecto; SMA fija, cuentas independientes y calentamiento previo
+sin operaciones. Diagnósticos con datos ausentes explícitos, máximos de cálculo,
+reproducción y publicación atómica. La prueba final no se abre por esta función.
+Los protocolos sin walk-forward conservan su identidad y resultados anteriores.
+
+ATLAS detenido antes de editar; copia previa
+`backups/atlas-20260911T105820889993Z-c20a5e3b`. Estado operativo y pruebas finales
+en la guía. Ampliación local: no se ha solicitado nueva publicación/CI, fusión ni
+etiqueta. La CI 34590252591 de abajo valida dev.1 y no esta ampliación.
+Sensibilidad, candidatas, datos observados contrastados, revisión del portátil,
+PR #12, ensayo de 48 horas y movimientos personales mantienen sus pendientes.
+
+Cierre: **961 Python + 91 subcasos, 300 frontend, ocho Node y 22 E2E** correctos;
+contratos, TypeScript, lint y compilación canónica verificados. Confirmación E2E final
+`e2e-7872a710e89941a6874c8ace34e1d4e2`. Una ejecución selectiva anterior agotó 10 s
+en GET `/api/state` al preparar la demo, antes del gráfico; conservarla como
+recurrencia de la incidencia de transporte, no declararla resuelta por el pase posterior.
+ATLAS habitual arrancado con run `a2902c6436714915bc3ec7fa1255b5c7`, salud/UI correctas,
+parada global activa, sin proveedores configurados, tres carteras y todas las tablas
+iguales a la copia previa. Capturas, límites y registros detallados en la guía.
+
 ## Cuatro tareas autorizadas · Laboratorio v0.6
 
 El usuario acepta los cuatro primeros pasos propuestos: subir/CI gratuita, CSV

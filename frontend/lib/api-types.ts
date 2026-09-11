@@ -1003,6 +1003,7 @@ export type LabInput = {
   "event_free_source": string;
   "evidence_reviewed": boolean;
   "config": SimulationConfig;
+  "walk_forward"?: (WalkForwardConfig) | (null);
 };
 
 export type LabMetric = {
@@ -1045,12 +1046,14 @@ export type LabReport = {
   "holdout": (LabPeriod) | (null);
   "warnings": Array<string>;
   "evidence_hash": string;
+  "walk_forward"?: (WalkForwardReport) | (null);
 };
 
 export type LabReproduction = {
   "id": string;
   "development_matches": boolean;
   "holdout_matches": (boolean) | (null);
+  "walk_forward_matches"?: (boolean) | (null);
 };
 
 export type LabSummary = {
@@ -2387,4 +2390,52 @@ export type ValuationSummary = {
   "portfolio_revision": number;
   "status": "complete" | "provisional" | "incomplete";
   "value": (string) | (null);
+};
+
+export type WalkForwardConfig = {
+  "policy"?: "atlas-walk-forward-fixed-v1";
+  "context_sessions"?: number;
+  "evaluation_sessions"?: number;
+  "minimum_windows"?: number;
+  "minimum_pass_pct"?: string;
+  "maximum_drawdown_pct"?: string;
+  "minimum_fills"?: number;
+};
+
+export type WalkForwardReport = {
+  "policy": "atlas-walk-forward-fixed-v1";
+  "config": WalkForwardConfig;
+  "windows": Array<WalkForwardWindow>;
+  "summary": WalkForwardSummary;
+  "unused_sessions": number;
+  "unused_start": (string) | (null);
+  "unused_end": (string) | (null);
+  "warnings": Array<string>;
+  "report_hash": string;
+};
+
+export type WalkForwardSummary = {
+  "status": "meets_criteria" | "does_not_meet" | "insufficient_data";
+  "windows": number;
+  "evaluable_windows": number;
+  "passing_windows": number;
+  "passing_pct": string;
+  "mean_return_pct": (string) | (null);
+  "mean_excess_pct": (string) | (null);
+  "worst_drawdown_pct": (string) | (null);
+  "reasons": Array<string>;
+};
+
+export type WalkForwardWindow = {
+  "index": number;
+  "context_start": string;
+  "context_end": string;
+  "warmup_start": string;
+  "warmup_sessions": number;
+  "context_metrics": Array<LabMetric>;
+  "context_hash": string;
+  "evaluation": LabPeriod;
+  "evaluable": boolean;
+  "passed": boolean;
+  "reasons": Array<string>;
 };

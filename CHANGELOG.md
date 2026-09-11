@@ -1,5 +1,12 @@
 # Cambios de ATLAS Quant
 
+## 0.6.0-dev.2 · Walk-forward con parámetros fijos · 2026-09-11
+
+- Ventanas móviles de contexto/evaluación dentro del desarrollo, con configuración y criterios congelados antes del cálculo; reserva final intacta.
+- Calentamiento SMA con cierres anteriores y cuenta nueva por evaluación; sin operaciones durante el calentamiento ni posiciones heredadas. Reutiliza evaluador, política económica y libro nativo.
+- Informe por ventana con contexto, curvas, operaciones, benchmarks, motivos y diagnóstico agregado. Los datos ausentes y las ventanas incompletas se muestran explícitamente; no capitaliza cuentas independientes ni autoriza estrategias.
+- Publicación atómica junto al protocolo y auditoría, reproducción y contratos API regenerados. Protocolos previos mantienen identidad y resultados. [Uso, límites y pruebas locales](docs/v0_6_walk_forward.md). Sin nueva CI remota, fusión ni etiqueta.
+
 ## 0.6.0-dev.1 · Laboratorio temporal · 2026-09-11
 
 - CSV nativo EUR y evidencia explícita de aperturas, calendario, disponibilidad y ausencia de eventos corporativos.

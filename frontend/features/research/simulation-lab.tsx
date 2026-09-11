@@ -1,10 +1,9 @@
 'use client';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { api } from '@/lib/api';
 import type {
   LabHistory,
   LabReport,
-  LabPeriod,
   LabReproduction,
   MarketCatalog,
   SimulationConfig,
@@ -12,12 +11,18 @@ import type {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Curve } from '@/components/atlas/curve';
 import { Choice, DataTable, Field } from '@/shared/ui';
 import { useRead } from '@/shared/use-read';
 import { useAction } from '@/shared/use-action';
 import { QueryStatus } from '@/shared/query-status';
-import { moneyEUR, number, date } from '@/shared/format';
+import { date } from '@/shared/format';
+
+import { PeriodResult } from './simulation-result';
+import {
+  WalkForwardEditor,
+  WalkForwardResult,
+  initialWalkForward,
+} from './walk-forward';
 
 const initialConfig: SimulationConfig = {
   policy: 'sma-economics-eur-v1',
@@ -30,109 +35,6 @@ const initialConfig: SimulationConfig = {
   slippage_bps: '5',
   purchases_enabled: true,
 };
-const amount = (value: string | null) =>
-  value === null ? 'No disponible' : moneyEUR(Number(value));
-const percentage = (value: string | null) =>
-  value === null
-    ? 'No disponible'
-    : `${number(Number(value), { maximumFractionDigits: 3 })} %`;
-
-function PeriodResult({ result, title }: { result: LabPeriod; title: string }) {
-  const curve = useMemo(
-    () =>
-      result.curve.every((p) => p.sma_eur !== null && p.buy_hold_eur !== null)
-        ? result.curve.map((p) => ({
-            date: p.date,
-            equity: Number(p.sma_eur),
-            benchmark: Number(p.buy_hold_eur),
-          }))
-        : [],
-    [result],
-  );
-  return (
-    <section className="panel" aria-label={title}>
-      <div className="panel-heading">
-        <div>
-          <h3>{title}</h3>
-          <p className="muted">
-            {date(result.start_date)} → {date(result.end_date)} ·{' '}
-            {result.sessions} sesiones
-          </p>
-        </div>
-      </div>
-      <DataTable
-        heads={[
-          'Referencia',
-          'NAV final',
-          'Rentabilidad',
-          'Caída máxima',
-          'Ejecuciones',
-          'Comisiones',
-        ]}
-        numericColumns={[1, 2, 3, 4, 5]}
-        rows={result.metrics.map((m) => [
-          m.name,
-          amount(m.final_nav_eur),
-          percentage(m.return_pct),
-          percentage(m.max_drawdown_pct),
-          m.fills,
-          amount(m.fees_eur),
-        ])}
-      />
-      <p className="muted">
-        {result.rejected} intentos rechazados · {result.expired} oportunidades
-        caducadas. La posición final se valora sin venderla automáticamente.
-      </p>
-      {curve.length > 0 ? (
-        <>
-          <p className="muted">SMA y referencia comprar/mantener, en EUR.</p>
-          <Curve data={curve} />
-        </>
-      ) : (
-        <p className="notice">
-          Hay valoraciones no disponibles. Consulta las observaciones; los
-          huecos no se sustituyen por cero.
-        </p>
-      )}
-      <details className="details">
-        <summary>Operaciones simuladas y observaciones</summary>
-        <DataTable
-          heads={[
-            'Estrategia',
-            'Fecha',
-            'Operación',
-            'Cantidad',
-            'Precio EUR',
-            'Comisión EUR',
-          ]}
-          numericColumns={[3, 4, 5]}
-          rows={result.trades.map((t) => [
-            t.strategy,
-            date(t.date),
-            t.side === 'buy' ? 'Compra' : 'Venta',
-            t.quantity,
-            amount(t.price_eur),
-            amount(t.fee_eur),
-          ])}
-        />
-        <DataTable
-          heads={['Fecha', 'SMA EUR', 'Comprar/mantener EUR', 'Efectivo EUR']}
-          numericColumns={[1, 2, 3]}
-          rows={result.curve.map((p) => [
-            date(p.date),
-            amount(p.sma_eur),
-            amount(p.buy_hold_eur),
-            amount(p.cash_eur),
-          ])}
-        />
-        <p className="mono native-hash">
-          Huella del resultado: {result.report_hash}
-        </p>
-      </details>
-    </section>
-  );
-}
-
 export function SimulationLab({
   onError,
 }: {
@@ -162,6 +64,8 @@ export function SimulationLab({
   const [reviewed, setReviewed] = useState(false),
     [acknowledged, setAcknowledged] = useState(false);
   const [config, setConfig] = useState(initialConfig);
+  const [walkForward, setWalkForward] = useState(initialWalkForward);
+  const [withWalkForward, setWithWalkForward] = useState(false);
   const [reproduction, setReproduction] = useState('');
   const { busy, run } = useAction(onError);
   const available =
@@ -205,6 +109,7 @@ export function SimulationLab({
       event_free_source: eventSource,
       evidence_reviewed: reviewed,
       config,
+      ...(withWalkForward ? { walk_forward: walkForward } : {}),
     });
     setSelected(result.protocol.id);
     setPublished(result);
@@ -428,6 +333,12 @@ export function SimulationLab({
               He revisado la evidencia y la ausencia de eventos corporativos en
               el periodo
             </label>
+            <WalkForwardEditor
+              enabled={withWalkForward}
+              onEnabled={setWithWalkForward}
+              value={walkForward}
+              onChange={setWalkForward}
+            />
             <Button type="submit" disabled={!ready || !reviewed || busy}>
               {busy ? 'Procesando…' : 'Congelar y simular desarrollo'}
             </Button>
@@ -537,7 +448,9 @@ export function SimulationLab({
                   );
                   setReproduction(
                     result.development_matches &&
-                      result.holdout_matches !== false
+                      result.holdout_matches !== false &&
+                      (!report.walk_forward ||
+                        result.walk_forward_matches === true)
                       ? 'Reproducción correcta: coincide con el informe guardado.'
                       : 'La reproducción no coincide. Conserva el informe y revisa la versión del motor.',
                   );
@@ -552,6 +465,9 @@ export function SimulationLab({
             result={report.development}
             title="Resultado de desarrollo"
           />
+          {report.walk_forward && (
+            <WalkForwardResult result={report.walk_forward} />
+          )}
           {report.holdout ? (
             <PeriodResult
               result={report.holdout}

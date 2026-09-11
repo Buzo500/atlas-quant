@@ -74,7 +74,13 @@ function seriesValue(point: CurvePoint) {
 }
 
 /** A measured SVG keeps type and stroke sizes stable on wide and narrow panels. */
-export function Curve({ data: original }: { data: CurvePoint[] }) {
+export function Curve({
+  data: original,
+  benchmarkLabel,
+}: {
+  data: CurvePoint[];
+  benchmarkLabel?: string;
+}) {
   const viewport = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
   const [expanded, setExpanded] = useState(false);
@@ -153,7 +159,9 @@ export function Curve({ data: original }: { data: CurvePoint[] }) {
   }, [original, selectedDate, data.length, window]);
   const valueOf = useCallback(
     (point: CurvePoint) =>
-      twrMode && 'twr_index' in point ? point.twr_index - 1 : seriesValue(point),
+      twrMode && 'twr_index' in point
+        ? point.twr_index - 1
+        : seriesValue(point),
     [twrMode],
   );
   const formatValue = (value: number | null | undefined) =>
@@ -370,7 +378,7 @@ export function Curve({ data: original }: { data: CurvePoint[] }) {
   const lastDate = dateLabel(data.at(-1)?.date || '');
   const lastValue = values.at(-1) ?? 0;
   const description = valid
-    ? `${seriesName} en ${unit}. Escala lineal; eje horizontal por observaciones, sin distancias proporcionales entre fechas. ${number(values.length)} observaciones del ${firstDate} al ${lastDate}. Valor inicial ${formatValue(values[0])}; valor final ${formatValue(lastValue)}.${benchmark ? ` Mantener, con el mismo peso: valor final ${moneyEUR(benchmark.at(-1))}. La línea discontinua representa este benchmark.` : ''}${reduced ? ' El dibujo reduce puntos conservando los extremos de cada tramo; la tabla mantiene todos los datos originales.' : ''}`
+    ? `${seriesName} en ${unit}. Escala lineal; eje horizontal por observaciones, sin distancias proporcionales entre fechas. ${number(values.length)} observaciones del ${firstDate} al ${lastDate}. Valor inicial ${formatValue(values[0])}; valor final ${formatValue(lastValue)}.${benchmark ? ` ${benchmarkLabel ?? 'Mantener, con el mismo peso'}: valor final ${moneyEUR(benchmark.at(-1))}. La línea discontinua representa este benchmark.` : ''}${reduced ? ' El dibujo reduce puntos conservando los extremos de cada tramo; la tabla mantiene todos los datos originales.' : ''}`
     : data.length === 0
       ? original.length === 0
         ? 'No hay observaciones disponibles para representar la evolución.'
@@ -379,7 +387,7 @@ export function Curve({ data: original }: { data: CurvePoint[] }) {
         ? 'La serie contiene fechas no válidas, duplicadas o desordenadas y no se puede representar.'
         : 'La serie contiene valores no válidos y no se puede representar.';
   const pointSummary = selectedPoint
-    ? `Sesión ${dateLabel(selectedPoint.date)}. ${'nav' in selectedPoint ? `Patrimonio ${moneyEUR(selectedPoint.nav)}. TWR desde el origen ${percent(Number.isFinite(selectedPoint.twr_index) ? selectedPoint.twr_index - 1 : undefined)}.` : `Estrategia ${moneyEUR(selectedPoint.equity)}. Mantener ${moneyEUR(selectedPoint.benchmark)}.`}`
+    ? `Sesión ${dateLabel(selectedPoint.date)}. ${'nav' in selectedPoint ? `Patrimonio ${moneyEUR(selectedPoint.nav)}. TWR desde el origen ${percent(Number.isFinite(selectedPoint.twr_index) ? selectedPoint.twr_index - 1 : undefined)}.` : `Estrategia ${moneyEUR(selectedPoint.equity)}. ${benchmarkLabel ?? 'Mantener'} ${moneyEUR(selectedPoint.benchmark)}.`}`
     : 'Selecciona una observación con el cursor o el teclado.';
   const tooltipAnchor =
     valid &&
@@ -835,8 +843,9 @@ export function Curve({ data: original }: { data: CurvePoint[] }) {
             <div className="curve-inspection">
               <p id={`${id}-keys`} className="chart-context">
                 Flechas: observación anterior/siguiente. Inicio/Fin: extremos.
-                +/−: zoom. Escape: {expanded ? 'salir de pantalla completa' : 'quitar selección'}.
-                {' '}Fechas de sesión; sin hora intradía.
+                +/−: zoom. Escape:{' '}
+                {expanded ? 'salir de pantalla completa' : 'quitar selección'}.{' '}
+                Fechas de sesión; sin hora intradía.
               </p>
               <section
                 id={`${id}-detail`}
@@ -883,7 +892,7 @@ export function Curve({ data: original }: { data: CurvePoint[] }) {
                           </data>
                         </span>
                         <span>
-                          Mantener · mismo peso{' '}
+                          {benchmarkLabel ?? 'Mantener · mismo peso'}{' '}
                           <data
                             value={
                               Number.isFinite(selectedPoint.benchmark)
@@ -950,7 +959,7 @@ export function Curve({ data: original }: { data: CurvePoint[] }) {
                           {moneyEUR(selectedPoint.equity)}
                         </data>
                       </dd>
-                      <dt>Mantener · mismo peso</dt>
+                      <dt>{benchmarkLabel ?? 'Mantener · mismo peso'}</dt>
                       <dd>
                         <data
                           value={
@@ -985,7 +994,7 @@ export function Curve({ data: original }: { data: CurvePoint[] }) {
                       style={{ borderColor: BENCHMARK_COLOR }}
                       aria-hidden="true"
                     />
-                    Mantener · mismo peso
+                    {benchmarkLabel ?? 'Mantener · mismo peso'}
                   </span>
                 )}
               </div>
@@ -1051,7 +1060,9 @@ export function Curve({ data: original }: { data: CurvePoint[] }) {
                           {seriesName} ({unit})
                         </th>
                         {benchmark && (
-                          <th scope="col">Mantener · mismo peso (EUR)</th>
+                          <th scope="col">
+                            {benchmarkLabel ?? 'Mantener · mismo peso'} (EUR)
+                          </th>
                         )}
                       </tr>
                     </thead>

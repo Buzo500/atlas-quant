@@ -4,6 +4,8 @@ Actualizado: 11 de septiembre de 2026. **La secuencia de versiones se conserva.*
 
 ## Estado vigente
 
+- **Actualización vigente v0.6:** [walk-forward fijo](v0_6_walk_forward.md) implementado en `0.6.0-dev.2`, sobre el Laboratorio con CSV, API/UI y protocolos publicado en dev.1. Ventanas, criterios y resultados reproducibles dentro del desarrollo, sin abrir la reserva final. Esta ampliación está pendiente de publicación/CI; sensibilidad, registro de candidatas, memoria y LaTeX siguen pendientes. Los estados siguientes son antecedentes.
+
 - **Ampliación posterior v0.6:** el usuario pide continuar el desarrollo mientras no puede usar el portátil. [Simulación económica EUR offline implementada](v0_6_simulacion.md), con el mismo evaluador y el libro nativo; 909 Python + 91 subcasos locales. API/UI siguen en dev.3; adaptador de datos reales, protocolo temporal y registro de candidatas pendientes. Las referencias anteriores al simulador pendiente se conservan como antecedentes. Revisión manual/publicación de v0.5 aplazadas, sin declarar aceptación.
 
 - **Actualización posterior:** dev.3 tiene PR #12 y CI gratuita 34578070191 correcta; revisión manual y publicación según [registro de entrega](v0_5_dev3_entrega.md). El primer evaluador SMA20/50 de v0.6 ya está implementado en la rama independiente `codex/v0.6-evaluador`, por autorización posterior, con 53 pruebas nuevas. Sustituye el estado anterior de «definido, sin implementar»; no anticipa el simulador económico ni cambia las versiones de la hoja de ruta.

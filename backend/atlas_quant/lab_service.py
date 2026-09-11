@@ -4,6 +4,7 @@ from .computation import bounded_calculation
 from .lab_contracts import LabInput, POLICY
 from .lab_sources import freeze_source
 from .lab_economics import period
+from .walk_forward import evaluate as walk_forward, plan as plan_walk_forward
 from .quality import digest
 from .store import now
 
@@ -33,7 +34,10 @@ class LabService:
 
     @staticmethod
     def _public(value):
-        return {k: value[k] for k in ('protocol', 'config', 'development', 'holdout', 'warnings', 'evidence_hash')}
+        result = {k: value[k] for k in ('protocol', 'config', 'development', 'holdout', 'warnings', 'evidence_hash')}
+        if 'walk_forward' in value:
+            result['walk_forward'] = value['walk_forward']
+        return result
 
     def read(self, ident):
         return self._public(self.store.read(lambda w: self._get(w, ident)))
@@ -68,7 +72,8 @@ class LabService:
     def create(self, body):
         snapshot = self.store.read(lambda w: self._snapshot(w, body))
         frozen = freeze_source(*snapshot, body)
-        ident = digest(dict(policy=POLICY, inputs=body.model_dump(mode='json'), frozen=frozen))
+        inputs = body.model_dump(mode='json', exclude={'walk_forward'} if body.walk_forward is None else set())
+        ident = digest(dict(policy=POLICY, inputs=inputs, frozen=frozen))
         prior = self.store.read(lambda w: w.get('lab_protocol', ident))
         if prior:
             return self._public(prior)
@@ -79,10 +84,15 @@ class LabService:
             holdout_date=body.holdout_date, end_date=body.end_date, opened=False, fast=body.fast, slow=body.slow)
         guard = dict(summary, development_end=max(s['date'] for s in frozen['calendar']['sessions'] if s['date'] < body.holdout_date))
         self.store.read(lambda w: self._guard(w, guard))
+        if body.walk_forward is not None:
+            plan_walk_forward(frozen['calendar']['sessions'], body)
         development = period(frozen, body, False)
-        value = dict(id=ident, protocol=summary, inputs=body.model_dump(mode='json'), frozen=frozen,
+        value = dict(id=ident, protocol=summary, inputs=inputs, frozen=frozen,
             config=body.config.model_dump(mode='json'), development=development, holdout=None,
             evidence_hash=source['evidence_sha256'], warnings=WARNINGS)
+        if body.walk_forward is not None:
+            value['walk_forward'] = walk_forward(frozen, body)
+            value['warnings'] = [*WARNINGS[:-1], 'Incluye walk-forward con parámetros fijos; faltan sensibilidad y pruebas de sobreajuste.']
         signature = digest(snapshot)
         def save(work):
             old = work.get('lab_protocol', ident)
@@ -97,7 +107,10 @@ class LabService:
                 start_date=body.holdout_date, end_date=body.end_date))
             work.lab_insert('lab_exposure', dict(id=ident + '-development', instrument_id=source['instrument_id'],
                 start_date=body.start_date, end_date=guard['development_end']))
-            work.audit('lab.development_saved', ident, dict(policy=POLICY, source_hash=source['sha256']))
+            detail = dict(policy=POLICY, source_hash=source['sha256'])
+            if 'walk_forward' in value:
+                detail['walk_forward_hash'] = value['walk_forward']['report_hash']
+            work.audit('lab.development_saved', ident, detail)
             return value
         return self._public(self.store.atomic(save))
 
@@ -132,5 +145,8 @@ class LabService:
         body = LabInput.model_validate(value['inputs'])
         development = period(value['frozen'], body, False)
         holdout = period(value['frozen'], body, True) if value['holdout'] else None
-        return dict(id=ident, development_matches=development == value['development'],
+        result = dict(id=ident, development_matches=development == value['development'],
             holdout_matches=holdout == value['holdout'] if holdout else None)
+        if 'walk_forward' in value:
+            result['walk_forward_matches'] = walk_forward(value['frozen'], body) == value['walk_forward']
+        return result

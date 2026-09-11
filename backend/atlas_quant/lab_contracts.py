@@ -4,6 +4,7 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator
 from .contracts import ResponseModel
 from .book import cutoff
 from .simulation_contracts import SimulationConfig
+from .walk_forward_contracts import WalkForwardConfig, WalkForwardSummary
 
 POLICY = 'atlas-lab-temporal-v1'
 
@@ -23,6 +24,7 @@ class LabInput(BaseModel):
     event_free_source: str = Field(min_length=3, max_length=500)
     evidence_reviewed: bool
     config: SimulationConfig
+    walk_forward: WalkForwardConfig | None = None
 
     @field_validator('start_date', 'holdout_date', 'end_date')
     @classmethod
@@ -80,6 +82,32 @@ class LabPeriod(ResponseModel):
     report_hash: str
 
 
+class WalkForwardWindow(ResponseModel):
+    index: int
+    context_start: str
+    context_end: str
+    warmup_start: str
+    warmup_sessions: int
+    context_metrics: list[LabMetric]
+    context_hash: str
+    evaluation: LabPeriod
+    evaluable: bool
+    passed: bool
+    reasons: list[str]
+
+
+class WalkForwardReport(ResponseModel):
+    policy: Literal['atlas-walk-forward-fixed-v1']
+    config: WalkForwardConfig
+    windows: list[WalkForwardWindow]
+    summary: WalkForwardSummary
+    unused_sessions: int
+    unused_start: str | None
+    unused_end: str | None
+    warnings: list[str]
+    report_hash: str
+
+
 class LabSummary(ResponseModel):
     id: str
     name: str
@@ -111,9 +139,11 @@ class LabReport(ResponseModel):
     holdout: LabPeriod | None
     warnings: list[str]
     evidence_hash: str
+    walk_forward: WalkForwardReport | None = None
 
 
 class LabReproduction(ResponseModel):
     id: str
     development_matches: bool
     holdout_matches: bool | None
+    walk_forward_matches: bool | None = None

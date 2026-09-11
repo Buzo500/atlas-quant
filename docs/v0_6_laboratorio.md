@@ -1,5 +1,9 @@
 # v0.6: CSV, Laboratorio y validación temporal
 
+Ampliación posterior `0.6.0-dev.2`: [walk-forward con parámetros fijos](v0_6_walk_forward.md),
+opcional al crear un protocolo. Preserva el comportamiento y las huellas de los
+protocolos anteriores sin walk-forward. La CI que se registra abajo valida dev.1.
+
 El usuario autorizó el 11/09/2026 los cuatro siguientes pasos: subir la rama y
 ejecutar CI gratuita, conectar CSV propio con evidencia explícita, integrar las
 simulaciones en API/Laboratorio y separar desarrollo de una prueba final con
