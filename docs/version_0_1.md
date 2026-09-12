@@ -3,9 +3,9 @@
 Actualización vigente: **0.6.0-dev.4** añade [prevalidación del CSV y consulta
 de candidatas](v0_6_prevalidacion_consulta.md): diagnóstico de la versión antes de
 configurar, búsqueda en hipótesis/descartes históricos y comparación de revisiones
-con evidencia y condiciones económicas. Rama subida y captura API ejecutada en
-[CI 34610747174 fallida](https://github.com/Buzo500/atlas-quant/actions/runs/34610747174);
-dataset observado apto e incidencia intermitente siguen pendientes. Diseño de
+con evidencia y condiciones económicas. Rama subida, con [corrección del cierre
+nativo de Node y nueva validación CI](diagnostico_ci_20260912.md);
+dataset observado apto e incidencia API intermitente siguen pendientes. Diseño de
 [robustez estadística](v0_6_robustez_estadistica.md) definido, sin implementar.
 Esquema 5, libros intactos y ninguna orden externa. [Estado actual](CONTINUIDAD.md).
 

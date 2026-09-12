@@ -2,6 +2,13 @@
 
 ## 0.6.0-dev.4 · Prevalidación y consulta de investigación · 2026-09-11
 
+- Corrección posterior del 12/09: Node 24.21.0 fijado en CI y seleccionado por los
+  lanzadores en Windows, con rechazo previo de versiones 24.0–24.15 afectadas.
+  Cierre nativo reproducido sin ATLAS y regresión HTTP de carga acotada; captura
+  de propiedad, códigos de salida y colas limitadas de logs del E2E.
+  [CI 34691977950 correcta](https://github.com/Buzo500/atlas-quant/actions/runs/34691977950)
+  sobre `e1628b2`: 1.024 Python + 91 subcasos, 322 frontend, ocho Node, 23 E2E y
+  arranque/parada. [Evidencia y límites](docs/diagnostico_ci_20260912.md). No cambia API/esquema.
 - Prevalidación visual de versiones CSV antes de configurar: identidad, base,
   calendario, cobertura, disponibilidad y eventos; lectura sin acreditar ni simular.
 - Búsqueda literal Unicode en revisiones de candidatas, incluidos motivos antiguos;
@@ -10,7 +17,7 @@
   informe acotado de etapas/errores sin atribuir causa raíz ni cambiar timeouts.
 - Diseño de robustez estadística concretado, todavía sin código. Fuente observada
   suficiente aún pendiente; datos/carteras intactos, esquema 5 y ninguna llamada pagada.
-- Rama subida sobre `8dadb74`; [CI gratuita 34610747174 fallida](https://github.com/Buzo500/atlas-quant/actions/runs/34610747174):
+- Antecedente del 11/09, rama subida sobre `8dadb74`; [CI gratuita 34610747174 fallida](https://github.com/Buzo500/atlas-quant/actions/runs/34610747174):
   pasan 1.004 Python + 91 subcasos, 322 frontend, ocho Node y build/contratos/TypeScript/lint.
   E2E aborta tras 14 recorridos correctos al perder la comprobación del propietario
   del puerto 3000; sin causa confirmada ni validación de arranque/parada posterior.

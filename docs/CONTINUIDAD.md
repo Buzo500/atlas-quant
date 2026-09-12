@@ -2,7 +2,7 @@
 
 Actualizado: 12 de septiembre de 2026. Este documento resume decisiones y estado para una conversación nueva de Codex; no contiene la transcripción completa del chat original.
 
-## Diagnóstico y corrección del cierre de Node · CI final pendiente
+## Diagnóstico y corrección del cierre de Node · CI final correcta
 
 «Haz los 3 primeros pasos» autoriza diagnosticar el servidor E2E, corregir y volver
 a ejecutar CI gratuita. [Evidencia y límites](diagnostico_ci_20260912.md).
@@ -14,7 +14,17 @@ en Actions y regresión HTTP acotada. [Instalación](node_windows.md); Node glob
 Corrección local validada: **1.024 Python + 91 subcasos, 322 frontend, ocho Node y
 23 E2E**, contratos, TypeScript, lint y build. La CI 34690769777 sobre `647be92`
 pasó con Node 24.15.0 e instrumentación nueva (1.010 Python + 91, 322 frontend,
-ocho Node, 23 E2E y arranque/parada); **CI de la corrección pendiente**.
+ocho Node, 23 E2E y arranque/parada). La corrección se sube en
+`e1628b230a2f0e7b2630588361abe79fad21c108`: [CI 34691977950](https://github.com/Buzo500/atlas-quant/actions/runs/34691977950)
+**correcta** con Node 24.21.0, 1.024 Python + 91 subcasos, 322 frontend, ocho Node,
+23 E2E (2,9 min), build, contratos, TypeScript, lint y arranque/recorrido/parada.
+Sonda HTTP: 3.659 conexiones sin errores. Servidores E2E con salida 0, sin parada
+forzada, integridad correcta, base del runner intacta y puertos liberados.
+El cierre posterior es solo documental; la CI acredita `e1628b2`.
+Cuota comprobada tras las dos ejecuciones de este turno: **446,7/2.000 minutos**
+(405 al comenzar y 426,7 tras la de diagnóstico); 0/0,5 GB, 2,68 USD brutos
+cubiertos por descuentos y **0 USD facturables**. Presupuesto Actions 0 USD y
+bloqueo de uso de pago verificados antes de cada CI, sin cambios de facturación.
 La app habitual ya estaba detenida; no se arranca ni se modifica su base.
 Versión 0.6.0-dev.4/esquema 5, sin PR/fusión/etiqueta nuevas. Portátil, PR #12,
 ensayo y datos personales aplazados. La causa exacta del job antiguo no se prueba

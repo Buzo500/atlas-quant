@@ -124,7 +124,7 @@ textos finales de prevalidación pasaron otras diez pruebas backend y cinco de
 componente; compilación posterior. Capturas locales `output/validation/dev4-*.png`.
 Estos anchos CSS no sustituyen una validación física nueva del portátil.
 
-## Publicación posterior autorizada
+## Antecedente de publicación · 11/09
 
 El usuario autoriza solo subir y ejecutar CI gratuita. Código `8dadb74` subido:
 [CI 34610747174 fallida](https://github.com/Buzo500/atlas-quant/actions/runs/34610747174).
@@ -139,3 +139,11 @@ minutos, 0/0,5 GB y 0 USD facturables, con bloqueo de gasto de pago conservado.
 Continuidad/documentación posteriores subidas sin nueva PR, fusión o etiqueta.
 En este turno el motor habitual no respondía en 8000; no se arranca ni se altera
 la base. Portátil, ensayo, movimientos personales y operaciones externas aplazados.
+
+## Corrección posterior · 12/09
+
+El usuario autoriza diagnosticar, corregir y ejecutar CI gratuita. Se reproduce
+un cierre nativo de Node 24.15.0 y se actualiza a 24.21.0, sin cambios funcionales
+en prevalidación/comparación ni datos habituales. [Diagnóstico y CI](diagnostico_ci_20260912.md),
+[instalación Windows](node_windows.md). La causa exacta del job antiguo y la
+espera API histórica no quedan demostradas; no se cierran por esta reproducción.

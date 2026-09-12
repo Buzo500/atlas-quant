@@ -81,5 +81,33 @@ de Git: `output/validation/node-24.21-*` y el directorio aislado de ese run.
 
 La app habitual ya estaba detenida por el fallo anterior; no se arranca en este
 turno ni se modifica su base. La instalación privada y el build están preparados
-para el siguiente arranque. CI de esta corrección pendiente: el pase anterior
-34690769777 valida la instrumentación con Node 24.15.0, no el cambio de versión.
+para el siguiente arranque.
+
+## CI final de la corrección · correcta
+
+Código `e1628b230a2f0e7b2630588361abe79fad21c108`, rama subida y verificada.
+[CI 34691977950](https://github.com/Buzo500/atlas-quant/actions/runs/34691977950),
+job 103548728567, `workflow_dispatch`, **correcta**, 12/09 11:47–11:59 UTC.
+El log confirma Node **24.21.0**. Pasan **1.024 Python + 91 subcasos, 322 frontend,
+ocho Node**, contratos, TypeScript, lint y build. La nueva sonda HTTP completa
+**3.659 conexiones, cero errores**, en 30,361 s.
+
+E2E `e2e-c9ea6dd9267e45caa68e867651e055f6`: **23/23 en 2,9 min**, códigos
+backend/frontend 0, sin fallo de propietario ni parada forzada, integridad `ok`,
+puertos liberados y base habitual del runner intacta. Arranque, recorrido sintético
+por el proxy y parada posteriores también correctos. Esa comprobación de ciclo
+completo pertenece al runner, no a una nueva ejecución habitual en este sobremesa.
+Las colas de servidor están limitadas a 16 KiB y marcadas como truncadas;
+los parámetros de consulta aparecen ocultos. Log local excluido de Git:
+`output/validation/ci-34691977950.log`.
+
+La CI anterior 34690769777 valida la instrumentación con Node 24.15.0;
+la que acredita la corrección es **34691977950 sobre e1628b2**. El cierre posterior
+solo modifica Markdown; no hay nueva PR, fusión o etiqueta. Se mantienen los
+aplazamientos de portátil, PR #12, ensayo y movimientos personales.
+
+Facturación comprobada con sesión de GitHub: **405 → 426,7 → 446,7 de 2.000
+minutos** incluidos tras las dos ejecuciones de este turno. Lectura final:
+2,68 USD brutos cubiertos por 2,68 USD de descuentos, **0 USD facturables**,
+almacenamiento 0/0,5 GB. Antes de cada ejecución se comprobó presupuesto Actions
+0 USD y `Stop usage: Yes`; no se modificó la facturación.

@@ -8,10 +8,11 @@ Actualizado: 11 de septiembre de 2026. **La secuencia de versiones se conserva.*
   implementadas, captura API preparada y [contrato estadístico](v0_6_robustez_estadistica.md)
   concretado sin implementarlo. Búsqueda en revisiones históricas y comparación con
   condiciones/evidencia explícitas, sin selección automática. Dataset observado
-  acreditado aún no conseguido; API intermitente sin causa confirmada. Rama subida,
-  [CI gratuita 34610747174 fallida](https://github.com/Buzo500/atlas-quant/actions/runs/34610747174)
-  en E2E al perder la comprobación del servidor del puerto 3000; diagnóstico pendiente,
-  0 USD facturables. Sin nueva PR/fusión/etiqueta ni reactivar trabajos aplazados.
+  acreditado aún no conseguido; API intermitente sin causa confirmada. El cierre
+  nativo de Node se reproduce y corrige actualizando a 24.21.0; [evidencia](diagnostico_ci_20260912.md).
+  Rama subida sobre `e1628b2`, [CI gratuita de la corrección correcta](https://github.com/Buzo500/atlas-quant/actions/runs/34691977950):
+  1.024 Python + 91 subcasos, 322 frontend, ocho Node, 23 E2E y arranque/parada.
+  Sin nueva PR/fusión/etiqueta ni reactivar trabajos aplazados.
 
 - **Actualización vigente v0.6:** [sensibilidad y registro de candidatas](v0_6_sensibilidad_candidatas.md) implementados en `0.6.0-dev.3`, junto al walk-forward fijo de dev.2. Variaciones predeclaradas, evidencia y descartes versionados, sin optimizador ni permisos de ejecución. Publicación/CI según continuidad. [Datos observados](v0_6_csv_observado.md) auditados pero aún no aptos; memoria automática, remuestreo/validación estadística y LaTeX pendientes. Los estados siguientes son antecedentes.
 

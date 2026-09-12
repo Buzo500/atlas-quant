@@ -1,5 +1,11 @@
 # API intermitente · comprobación del 11/09/2026
 
+Actualización del 12/09: [diagnóstico y corrección de Node](diagnostico_ci_20260912.md).
+Un cierre nativo `0xC0000409` de Node 24.15.0 se reproduce con HTTP local sin ATLAS;
+se actualiza a 24.21.0 y se refuerza la captura E2E. El job antiguo no conservó
+su código de salida: la coincidencia no demuestra su causa exacta. La espera API
+histórica sigue abierta. Las entradas siguientes registran la evidencia del 11/09.
+
 ## CI dev.4: servidor E2E sin propietario comprobable, causa pendiente
 
 [CI 34610747174](https://github.com/Buzo500/atlas-quant/actions/runs/34610747174),

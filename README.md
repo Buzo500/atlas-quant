@@ -5,11 +5,13 @@ simulación, búsqueda de hipótesis/descartes históricos y comparación de rev
 con evidencia y costes. [Guía de uso y límites](docs/v0_6_prevalidacion_consulta.md).
 El [diseño estadístico](docs/v0_6_robustez_estadistica.md) está definido, sin implementar;
 dataset observado acreditado e incidencia API siguen pendientes.
-[CI gratuita 34610747174 fallida](https://github.com/Buzo500/atlas-quant/actions/runs/34610747174)
-sobre `8dadb74`: pasan 1.004 Python + 91 subcasos, 322 frontend, ocho Node y
-build/contratos/TypeScript/lint; E2E aborta después de 14 recorridos al perder la
-comprobación del servidor del puerto 3000. Gasto facturable 0 USD. Sin nueva PR,
-fusión o etiqueta. [Estado y diagnóstico pendientes](docs/CONTINUIDAD.md).
+Corrección del cierre nativo de Node en Windows: [diagnóstico reproducido](docs/diagnostico_ci_20260912.md)
+y [Node 24.21.0 local](docs/node_windows.md), con captura de fallos E2E reforzada.
+La [CI de la corrección](https://github.com/Buzo500/atlas-quant/actions/runs/34691977950)
+es correcta sobre `e1628b2`: 1.024 Python + 91 subcasos, 322 frontend, ocho Node,
+23 E2E, regresión HTTP, build/contratos/TypeScript/lint y arranque/parada.
+Gasto facturable **0 USD**, dentro de la cuota incluida y con bloqueo de pago.
+Sin nueva PR, fusión o etiqueta. [Estado y antecedentes](docs/CONTINUIDAD.md).
 
 **Desarrollo anterior: `0.6.0-dev.3`, rama `codex/v0.6-evaluador`, esquema 5.** El Laboratorio añade [sensibilidad y registro de candidatas](docs/v0_6_sensibilidad_candidatas.md): variaciones de medias/costes declaradas antes del cálculo, informes reproducibles e hipótesis con revisiones y descartes conservados. Incluye [walk-forward fijo](docs/v0_6_walk_forward.md), CSV nativo EUR, benchmarks y reserva final protegida. Ver [auditoría del CSV observado NVIDIA](docs/v0_6_csv_observado.md) y [diagnóstico API](docs/diagnostico_api_20260911.md): la evidencia de mercado es insuficiente y la espera intermitente sigue abierta. Rama subida y [CI gratuita correcta](https://github.com/Buzo500/atlas-quant/actions/runs/34600509327): 990 Python + 91 subcasos, 317 frontend, ocho Node y 23 E2E, arranque/parada y gasto 0 USD. [Continuidad](docs/CONTINUIDAD.md). PR #12 mantiene su revisión manual pendiente; no hay nueva etiqueta ni órdenes externas.
 
