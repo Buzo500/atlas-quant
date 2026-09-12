@@ -6,11 +6,31 @@ from .candidate_service import CandidateService
 from .candidate_contracts import CandidateComparisonInput, CandidateComparison, Status
 from .lab_preflight import SourcePreflight, inspect_source
 from types import SimpleNamespace
+from .robustness_contracts import RobustnessInput, RobustnessReport, RobustnessHistory, RobustnessReproduction
+from .robustness_service import RobustnessService
 
 
 def register_lab_routes(app, store):
     service = LabService(store)
     candidates = CandidateService(store)
+    robustness = RobustnessService(store)
+
+    @app.get('/api/lab/robustness', response_model=RobustnessHistory)
+    def robustness_history(candidate_id: str = Query(pattern=r'^[0-9a-f]{64}$'),
+                           offset: int = Query(0, ge=0, le=100_000), limit: int = Query(20, ge=1, le=20)):
+        return robustness.history(candidate_id, offset, limit)
+
+    @app.post('/api/lab/robustness', response_model=RobustnessReport)
+    def robustness_create(body: RobustnessInput):
+        return robustness.create(body)
+
+    @app.get('/api/lab/robustness/{ident}', response_model=RobustnessReport)
+    def robustness_read(ident: str):
+        return robustness.read(ident)
+
+    @app.post('/api/lab/robustness/{ident}/reproduce', response_model=RobustnessReproduction)
+    def robustness_reproduce(ident: str):
+        return robustness.reproduce(ident)
 
     @app.get('/api/lab/sources/preflight', response_model=SourcePreflight)
     def source_preflight(series_id: str = Query(min_length=1, max_length=100), series_version: int = Query(ge=1)):

@@ -2,6 +2,48 @@
 
 Actualizado: 12 de septiembre de 2026. Este documento resume decisiones y estado para una conversación nueva de Codex; no contiene la transcripción completa del chat original.
 
+## Cuatro últimos pasos · integración, fuente, captura y robustez local dev.5
+
+«Haz los 4 últimos» acepta los puntos 2–5: decidir integración con PR #12,
+obtener/auditar CSV observado suficiente, capturar la espera API si reaparece e
+implementar el primer bloque estadístico. No realiza el punto 1 de revisión manual.
+Rama `codex/v0.6-evaluador`, **0.6.0-dev.5**, esquema 5. Guía:
+[robustez exploratoria](v0_6_robustez_implementacion.md); conserva el diseño previo.
+
+Implementado: bootstrap estacionario pareado sobre NAV del desarrollo, con
+calentamiento excluido, L=5/10/20, principal 10, 5.000 réplicas y NumPy 2.5.2/PCG64.
+504–2.000 intervalos, máximo 30 millones de índices y semáforo compartido.
+Informe independiente con candidata/revisión inmutable, ensayos declarados,
+contexto económico, estado no evaluable, hashes y reproducción. Proyección SQL de
+solo desarrollo: no entrega barras, aperturas ni resultados/calendario de la reserva
+al módulo estadístico. Auditoría/guardado atómicos y ninguna escritura en libros.
+
+Experimento de cobertura predeclarado: 180 históricos sintéticos, tres longitudes
+por cada uno. L=10 cubre 57/60 IID y 53/60 AR(1); se documenta la infracobertura
+sin reajustar parámetros. 95 % es nominal, sin significación confirmatoria,
+probabilidad de éxito, promoción de candidatas ni permiso de órdenes.
+
+Verificación local: **1.064 Python + 91 subcasos, 328 frontend, ocho Node, 24/24 E2E**,
+contratos, TypeScript, lint y build canónico. E2E
+`e2e-fcfb5be04b53451a976d6a77cd603e2c`, 102,58 s, recarga/reproducción y anchos CSS
+960/1366/3440. No equivale a nueva comprobación física del portátil. Guardado
+concurrente, conflictos, corrupción y rollback comprobados con datos aislados.
+
+Puntos condicionados: [búsqueda de CSV](v0_6_csv_observado.md) ampliada con fuentes
+primarias, **sin conseguir datos observados aptos**; no fabricar disponibilidad.
+[Captura API](diagnostico_api_20260911.md): 1.840 peticiones, ningún grupo ≥1 s,
+67 cierres/finalizaciones incompletas de captura por debajo del umbral, sin
+reproducir la espera histórica. Ambas incidencias siguen abiertas.
+[Integración](integracion_v06_pr12.md) definida: conservar v0.5 → v0.6 por separado;
+PR #12 sigue abierta y requiere la aceptación funcional pendiente antes de fusionar.
+
+App habitual ya detenida y conservada así; pruebas con motor/interfaz aislados,
+salida 0 sin parada forzada, integridad correcta, base habitual intacta y puertos
+liberados. Sin llamadas pagadas ni cambios de presupuesto. Trabajo local sobre
+`3211b42`; no nueva subida/CI remota/PR/fusión/etiqueta. Segundo entorno numérico,
+portátil, ensayo y datos personales pendientes/aplazados según corresponda.
+Las entradas siguientes son antecedentes; la CI dev.4 no acredita dev.5.
+
 ## Diagnóstico y corrección del cierre de Node · CI final correcta
 
 «Haz los 3 primeros pasos» autoriza diagnosticar el servidor E2E, corregir y volver

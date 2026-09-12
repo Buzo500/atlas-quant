@@ -1,5 +1,28 @@
 # API intermitente · comprobación del 11/09/2026
 
+## Captura dev.5 · 12/09/2026
+
+Petición «Haz los 4 últimos»: capturar la espera histórica **si reaparece**.
+E2E aislado `e2e-fcfb5be04b53451a976d6a77cd603e2c`, 17:03–17:05 UTC,
+Node 24.21.0 y versión local 0.6.0-dev.5: **24/24 recorridos correctos**, sin
+reintentos ni casos omitidos, 102,58 segundos. Incluye el informe estadístico nuevo.
+
+1.840 peticiones correlacionadas, **ningún grupo supera el umbral de 1 s**.
+67 grupos registran error/cierre o finalización incompleta en la captura:
+34 con proxy finalizado y sin final de cliente, 12 con ASGI finalizado y sin final
+de proxy, 21 sin recepción ASGI correlacionada. En estos grupos constan 46 cierres
+de proxy y 11 errores upstream; su mayor duración registrada es 240,93 ms.
+No se atribuyen todos a un fallo funcional ni se presuponen todas las cancelaciones
+intencionadas. No hay truncamiento de logs/incidencias; estas trazas no reproducen
+la espera histórica de diez segundos ni confirman su causa.
+
+Motor e interfaz salen con código 0, sin parada forzada. Integridad correcta,
+base habitual intacta y puertos liberados. Evidencia local excluida de Git:
+`var/validation/e2e-fcfb5be04b53451a976d6a77cd603e2c/diagnostic-report.json`,
+`playwright.json` y `output/validation/dev5-e2e-diagnostic.log`.
+No se han cambiado timeouts/reintentos, creado un monitor o ejecutado CI remota.
+**Incidencia histórica abierta**; conservar captura ante una próxima recurrencia.
+
 Actualización del 12/09: [diagnóstico y corrección de Node](diagnostico_ci_20260912.md).
 Un cierre nativo `0xC0000409` de Node 24.15.0 se reproduce con HTTP local sin ATLAS;
 se actualiza a 24.21.0 y se refuerza la captura E2E. El job antiguo no conservó

@@ -2105,6 +2105,90 @@ export type RiskLimits = {
   "minimum_fee": number;
 };
 
+export type RobustnessHistory = {
+  "items": Array<RobustnessReport>;
+  "offset": number;
+  "limit": number;
+};
+
+export type RobustnessInput = {
+  "protocol_id": string;
+  "candidate_id": string;
+  "revision": number;
+  "revision_hash": string;
+  "related_protocol_ids": Array<string>;
+  "reason": string;
+  "acknowledge_exploratory": true;
+};
+
+export type RobustnessLength = {
+  "length": number;
+  "principal": boolean;
+  "seed": string;
+  "replicas": number;
+  "lower_pp": string;
+  "upper_pp": string;
+  "direction": "positive" | "negative" | "uncertain";
+  "indices_hash": string;
+};
+
+export type RobustnessReport = {
+  "id": string;
+  "created_at": string;
+  "request": RobustnessInput;
+  "protocol": LabSummary;
+  "config": SimulationConfig;
+  "metrics": Array<LabMetric>;
+  "rejected": number;
+  "expired": number;
+  "trials": Array<RobustnessTrial>;
+  "snapshot_hash": string;
+  "result": RobustnessResult;
+  "python_version": string;
+  "platform": string;
+  "report_hash": string;
+};
+
+export type RobustnessReproduction = {
+  "id": string;
+  "matches": boolean;
+  "result_matches": boolean;
+  "snapshot_matches": boolean;
+  "environment_matches": boolean;
+  "warnings": Array<string>;
+};
+
+export type RobustnessResult = {
+  "policy": "atlas-robustness-stationary-v1";
+  "status": "no_evaluable" | "exploratory";
+  "reasons": Array<string>;
+  "warnings": Array<string>;
+  "intervals": number;
+  "warmup_sessions": number;
+  "start_date": (string) | (null);
+  "end_date": (string) | (null);
+  "work_indices": number;
+  "mean_excess_pp": (string) | (null);
+  "principal_includes_zero": (boolean) | (null);
+  "direction_changes": (boolean) | (null);
+  "lengths": Array<RobustnessLength>;
+  "nav_hash": string;
+  "returns_hash": (string) | (null);
+  "float_returns_hash": (string) | (null);
+  "prng": string;
+  "numpy_version": string;
+  "master_seed": number;
+  "result_hash": string;
+};
+
+export type RobustnessTrial = {
+  "protocol_id": string;
+  "name": string;
+  "development_hash": string;
+  "source_hash": string;
+  "context_hash": string;
+};
+
 export type ScenarioResult = {
   "kind": "scenario";
   "cut": ValuationCut;

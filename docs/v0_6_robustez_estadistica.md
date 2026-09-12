@@ -1,8 +1,10 @@
 # v0.6 · Diseño inicial de robustez estadística
 
-Definición autorizada el 11/09/2026. **No implementada**: no añade un test,
-una aprobación ni una probabilidad de éxito al Laboratorio actual. La siguiente
-implementación requiere aceptar este contrato y disponer de datos suficientes.
+Definición autorizada el 11/09/2026 y aceptada para implementar el 12/09.
+El primer bloque está implementado localmente en **0.6.0-dev.5**:
+[contrato, uso y comprobaciones](v0_6_robustez_implementacion.md).
+Este documento conserva las decisiones de diseño previas. No aporta aprobación
+de estrategias ni probabilidad de éxito; el CSV observado suficiente sigue pendiente.
 
 ## Pregunta y unidad de análisis
 

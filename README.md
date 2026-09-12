@@ -1,9 +1,20 @@
 # ATLAS Quant
 
-**Desarrollo 0.6.0-dev.4, rama subida:** prevalidación de CSV antes de configurar una
+**Desarrollo local 0.6.0-dev.5:** primer bloque de [robustez estadística](docs/v0_6_robustez_implementacion.md)
+en candidatas: incertidumbre del exceso diario SMA frente a comprar/mantener,
+bootstrap pareado con tres longitudes fijas, informes guardados y reproducción.
+Solo desarrollo, desde 504 intervalos tras el calentamiento, con límites y estado
+no evaluable. El 95 % es nominal: las referencias sintéticas muestran limitaciones
+de cobertura y no validan una estrategia de mercado. Esquema 5 conservado.
+[Integración prevista con PR #12](docs/integracion_v06_pr12.md), sin fusionarla.
+Fuente observada suficiente y espera API histórica siguen pendientes.
+No hay subida/CI remota/fusión/etiqueta nuevas de dev.5.
+[Verificación y estado operativo](docs/CONTINUIDAD.md).
+
+**Antecedente 0.6.0-dev.4, rama subida:** prevalidación de CSV antes de configurar una
 simulación, búsqueda de hipótesis/descartes históricos y comparación de revisiones
 con evidencia y costes. [Guía de uso y límites](docs/v0_6_prevalidacion_consulta.md).
-El [diseño estadístico](docs/v0_6_robustez_estadistica.md) está definido, sin implementar;
+El [diseño estadístico](docs/v0_6_robustez_estadistica.md) quedó definido en dev.4;
 dataset observado acreditado e incidencia API siguen pendientes.
 Corrección del cierre nativo de Node en Windows: [diagnóstico reproducido](docs/diagnostico_ci_20260912.md)
 y [Node 24.21.0 local](docs/node_windows.md), con captura de fallos E2E reforzada.

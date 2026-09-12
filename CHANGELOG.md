@@ -1,5 +1,22 @@
 # Cambios de ATLAS Quant
 
+## 0.6.0-dev.5 · Robustez exploratoria · 2026-09-12 · local
+
+- Informe estadístico independiente sobre NAV de desarrollo: bootstrap estacionario
+  pareado SMA/BH, L=5/10/20, principal 10, 5.000 réplicas por longitud y semilla fija.
+  Mínimo 504 intervalos tras calentamiento; rechazo de huecos, fuente incompatible,
+  NAV inválido y exceso de trabajo. Sin leer/aperturar la reserva ni alterar libros.
+- Contratos/API/UI con candidata y revisión inmutables, declaración de ensayos,
+  guardado/auditoría atómicos, consultas paginadas y reproducción. Cálculos acotados
+  por el semáforo compartido. No hay aprobación ni permiso de órdenes asociado.
+- Experimento de cobertura predeclarado: infracobertura con AR(1), documentada sin
+  ajustar parámetros después. Nivel 95 % explícitamente nominal y exploratorio.
+  [Uso, resultados y límites](docs/v0_6_robustez_implementacion.md).
+- [Integración v0.5 → v0.6 definida](docs/integracion_v06_pr12.md); PR #12 conserva
+  la revisión pendiente. Adquisición observada aún no conseguida tras ampliar la
+  auditoría primaria. Captura API acotada; estado final en continuidad.
+- Esquema 5; ampliación local sin nueva CI remota, fusión o etiqueta.
+
 ## 0.6.0-dev.4 · Prevalidación y consulta de investigación · 2026-09-11
 
 - Corrección posterior del 12/09: Node 24.21.0 fijado en CI y seleccionado por los

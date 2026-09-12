@@ -17,6 +17,7 @@ import { useAction } from '@/shared/use-action';
 import { QueryStatus } from '@/shared/query-status';
 import { dateTime, number } from '@/shared/format';
 import { CandidateBrowser } from './candidate-browser';
+import { RobustnessDisclosure } from './robustness';
 
 const statuses = [
   { value: 'researching', label: 'En investigación' },
@@ -374,6 +375,7 @@ export function Candidates({
       {value && (
         <>
           <RevisionEvidence value={value} />
+          <RobustnessDisclosure key={value.revision_hash} candidate={value} onError={onError} />
           <Button
             disabled={busy || editing || value.revision >= 100}
             onClick={() => {

@@ -7,6 +7,30 @@ Es una comprobación del 11/09/2026 sobre datos anteriores, no una descarga nuev
 
 ## Fuente y transformación explícita
 
+### Búsqueda adicional · 12/09/2026
+
+La adquisición sigue **pendiente**. Se revisan alternativas primarias sin comprar
+datos, solicitar claves ni modificar series habituales. La página actual de
+[Deutsche Börse](https://www.cashmarket.deutsche-boerse.com/cash-en/Data-Tech/statistics/market-data)
+remite a Data Shop y A7 para históricos; no acredita aquí una exportación gratuita
+con todos los campos exigidos por ATLAS.
+
+La [especificación pública NextHistory de Euronext, versión 2.1.2 de 2020](https://connect2.euronext.com/sites/default/files/documentation/data/NextHistory%20Cash%20Client%20Specification%20V2.1.2_20.10.2020.pdf)
+describe datos posteriores a compensación, ficheros de calendario, instrumentos,
+dividendos, ajustes y precios dentro de sus suscripciones (páginas 5–7). En la
+sección 3.2, página 9, indica que la disponibilidad del fichero no tiene una hora
+fija y varía cada día. Es una especificación histórica, no una garantía comercial
+actual ni un fichero adquirido.
+
+Consecuencia para esta auditoría: una hora de operación o un OHLC oficial no basta
+para reconstruir `available_at`. No asignar una hora constante a los ficheros ni
+usar su hora de descarga actual como disponibilidad histórica. No se ha conseguido
+un CSV observado que supere todos los controles; esto no demuestra que no exista
+ninguna fuente gratuita apta. Tampoco se relajan controles para forzar la prueba.
+
+El ensayo estadístico de dev.5 usa exclusivamente escenarios sintéticos declarados:
+verifica el cálculo, no valida una estrategia con datos de mercado.
+
 ### Búsqueda adicional de fuente gratuita · 11/09/2026
 
 Se buscó una alternativa primaria para completar OHLC, disponibilidad y eventos.
