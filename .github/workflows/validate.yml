@@ -33,7 +33,7 @@ jobs:
           python-version: '3.14.4'
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
-          node-version: '24.15.0'
+          node-version: '24.21.0'
           package-manager-cache: false
       - name: Instalar pnpm fijado
         run: npm.cmd install --global pnpm@11.19.0
@@ -45,6 +45,8 @@ jobs:
         run: pnpm.cmd run test:run
       - name: Transporte HTTP local y cancelaciones
         run: node --test frontend/api-proxy.test.mjs
+      - name: Regresión de conexiones HTTP de Node en Windows
+        run: node tools/diagnostics/http_connection_probe.mjs 30000
       - name: Instalar dependencias y compilar
         run: ./Install-Atlas.ps1
       - name: Pruebas Python con datos aislados

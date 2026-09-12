@@ -1,6 +1,26 @@
 # ATLAS Quant: continuidad entre equipos
 
-Actualizado: 11 de septiembre de 2026. Este documento resume decisiones y estado para una conversación nueva de Codex; no contiene la transcripción completa del chat original.
+Actualizado: 12 de septiembre de 2026. Este documento resume decisiones y estado para una conversación nueva de Codex; no contiene la transcripción completa del chat original.
+
+## Diagnóstico y corrección del cierre de Node · CI final pendiente
+
+«Haz los 3 primeros pasos» autoriza diagnosticar el servidor E2E, corregir y volver
+a ejecutar CI gratuita. [Evidencia y límites](diagnostico_ci_20260912.md).
+Se reproduce un cierre nativo de Node 24.15.0 en una sonda HTTP local independiente
+de ATLAS: `0xC0000409`, el mismo código del último frontend habitual. Node 24.21.0
+se instala privadamente y se selecciona en lanzadores/build/E2E, con versión fijada
+en Actions y regresión HTTP acotada. [Instalación](node_windows.md); Node global intacto.
+
+Corrección local validada: **1.024 Python + 91 subcasos, 322 frontend, ocho Node y
+23 E2E**, contratos, TypeScript, lint y build. La CI 34690769777 sobre `647be92`
+pasó con Node 24.15.0 e instrumentación nueva (1.010 Python + 91, 322 frontend,
+ocho Node, 23 E2E y arranque/parada); **CI de la corrección pendiente**.
+La app habitual ya estaba detenida; no se arranca ni se modifica su base.
+Versión 0.6.0-dev.4/esquema 5, sin PR/fusión/etiqueta nuevas. Portátil, PR #12,
+ensayo y datos personales aplazados. La causa exacta del job antiguo no se prueba
+sin su código de salida/dump; el timeout API histórico sigue abierto.
+
+Las entradas siguientes describen estados anteriores a esta autorización.
 
 ## Publicación de dev.4 · CI remota fallida
 

@@ -8,7 +8,7 @@ Estos pasos usan Windows nativo x64 y una carpeta nueva. No requieren WSL, CUDA,
 
 Si ya están instaladas, comprueba las versiones antes de instalar nada más. Descargas oficiales: [Git para Windows](https://git-scm.com/install/windows), [Python para Windows](https://www.python.org/downloads/windows/) y [Node.js](https://nodejs.org/en/download). Para una instalación nueva: Python 3.14 de 64 bits y Node 24 LTS. Deja Python y Node accesibles en PATH y abre una ventana nueva de PowerShell después de instalarlos.
 
-El instalador de ATLAS exige Python >=3.12, Node >=22.13 y **pnpm exactamente 11.19.0**. Entorno comprobado en el sobremesa: Python 3.14.4, Node 24.15.0, pnpm 11.19.0; no es una matriz de compatibilidad exhaustiva para todas las revisiones posteriores.
+El instalador de ATLAS exige Python >=3.12, Node >=22.13 y **pnpm exactamente 11.19.0**. En Windows rechaza Node 24.0–24.15 por un cierre nativo reproducido; usa **Node 24.21.0 LTS**. El sobremesa emplea ahora una instalación propia de Node bajo `var/`, que Git no copia: [cómo instalarlo](node_windows.md). No es una validación del portátil ni una matriz exhaustiva de compatibilidad.
 
 ```powershell
 git --version

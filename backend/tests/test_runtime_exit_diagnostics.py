@@ -38,8 +38,8 @@ def supervisor(tmp_path, monkeypatch):
     for name, value in {"ROOT": tmp_path, "VAR": var, "STATE": var / "runtime.json",
                         "LOCK": var / "atlas.lock"}.items():
         monkeypatch.setattr(run_atlas, name, value)
-    monkeypatch.setattr(run_atlas.shutil, "which", lambda name: "offline-node")
-    monkeypatch.setattr(run_atlas.subprocess, "check_output", lambda *args, **kwargs: "v24.15.0")
+    monkeypatch.setattr(run_atlas, "find_node", lambda root: "offline-node")
+    monkeypatch.setattr(run_atlas.subprocess, "check_output", lambda *args, **kwargs: "v24.21.0")
     monkeypatch.setattr(run_atlas, "verify_build", lambda path: None)
     monkeypatch.setattr(run_atlas, "port_open", lambda port: False)
     group = Mock()
@@ -101,6 +101,17 @@ def test_stop_request_racing_child_exit_is_not_reported_as_failure(supervisor, m
     assert state["child_exit_codes"] == {"backend": 0, "frontend": 0}
     assert read_json(run_atlas.VAR / "logs" / f"runtime-{'f' * 32}.json") == state
     health.assert_not_called()
+
+
+def test_affected_node_is_rejected_before_any_application_process_starts(supervisor, monkeypatch):
+    monkeypatch.setattr(run_atlas.subprocess, 'check_output', lambda *args, **kwargs: 'v24.15.0')
+    spawn = Mock(side_effect=AssertionError('No application with affected Node'))
+    monkeypatch.setattr(run_atlas.subprocess, 'Popen', spawn)
+    with pytest.raises(RuntimeError, match='fallo de conexiones HTTP'):
+        run_atlas.supervise(5, False, 'd' * 32)
+    spawn.assert_not_called()
+    assert read_json(run_atlas.STATE)['status'] == 'failed'
+    assert not locked(run_atlas.LOCK)
 
 
 def test_startup_failure_is_archived_and_a_new_run_keeps_previous_evidence(supervisor, monkeypatch):

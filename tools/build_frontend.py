@@ -5,10 +5,10 @@ import argparse
 import hashlib
 import os
 from pathlib import Path
-import shutil
 import subprocess
 
 from atlas_runtime import InstanceLock, atomic_json, frontend_env, read_json, run_owned
+from node_runtime import check_node, find_node, node_environment
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -59,13 +59,14 @@ def verify_build(frontend):
 
 def build_locked(root=ROOT):
     frontend = root / "frontend"
-    node = shutil.which("node")
+    node = find_node(root)
     if not node:
         raise RuntimeError("Falta Node.js en PATH.")
+    check_node(node)
     (frontend / "dist/atlas-build.json").unlink(missing_ok=True)
     before = source_hash(frontend)
     run_owned([node, str(frontend / "node_modules/vinext/dist/cli.js"), "build"],
-              cwd=frontend, env=frontend_env(os.environ))
+              cwd=frontend, env=frontend_env(node_environment(node, os.environ)))
     if before != source_hash(frontend):
         raise RuntimeError("Las fuentes cambiaron durante la compilación. Vuelve a compilar.")
     atomic_json(frontend / "dist/atlas-build.json", {

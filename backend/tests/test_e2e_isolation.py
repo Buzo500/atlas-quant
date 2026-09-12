@@ -118,7 +118,7 @@ def test_busy_port_refuses_before_build_or_server_start(private_root, monkeypatc
     cli = private_root / "frontend/node_modules/@playwright/test/cli.js"
     cli.parent.mkdir(parents=True)
     cli.write_text("not executed", encoding="utf-8")
-    monkeypatch.setattr(run_e2e.shutil, "which", lambda _: "node")
+    monkeypatch.setattr(run_e2e, "find_node", lambda root: "node")
     monkeypatch.setattr(run_e2e, "port_open", lambda port: port == 8000)
     spawn = Mock(side_effect=AssertionError("Must not start or stop a process"))
     build = Mock(side_effect=AssertionError("Must not inspect an occupied instance"))

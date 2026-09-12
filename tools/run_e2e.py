@@ -16,7 +16,6 @@ import json
 import os
 from pathlib import Path
 import re
-import shutil
 import socket
 import sqlite3
 import struct
@@ -28,6 +27,7 @@ import uuid
 from atlas_runtime import InstanceLock, atomic_json, frontend_env, port_open, read_json
 from build_frontend import file_hash, verify_build
 from process_group import ProcessGroup
+from node_runtime import check_node, find_node, node_environment
 
 ROOT = Path(__file__).resolve().parents[1]
 BASE_URL = "http://127.0.0.1:3000"
@@ -181,26 +181,28 @@ def finish_descriptor(directory: Path, data: Path, descriptor: dict, *, result: 
 def run(*, manual: bool, timeout: int, grep: str | None = None) -> int:
     if os.name != "nt":
         raise RuntimeError("E2E requiere Windows nativo; otros sistemas no están certificados.")
-    node = shutil.which("node")
+    node = find_node(ROOT)
     cli = ROOT / "frontend/node_modules/@playwright/test/cli.js"
     if not node or not cli.is_file():
         raise RuntimeError("Instala las dependencias de frontend fijadas antes de ejecutar E2E.")
     with InstanceLock(ROOT / "var/atlas.lock"):
         if any(port_open(port) for port in PORTS.values()):
             raise RuntimeError("Detén ATLAS. E2E no reutiliza ni detiene servidores existentes.")
+        node_version = check_node(node)
         verify_build(ROOT / "frontend")
         before = normal_database_hashes()
         directory = run_directory("e2e-" + uuid.uuid4().hex)
         directory.mkdir(parents=True, exist_ok=False)
         data = isolated_data(directory)
         data.mkdir(exist_ok=False)
-        environment = clean_environment(directory)
+        environment = node_environment(node, clean_environment(directory))
         token = uuid.uuid4().hex
         descriptor = {"format": 1, "run_id": directory.name, "root": str(ROOT),
                       "data_dir": str(data), "base_url": BASE_URL, "token": token,
                       "harness_pid": os.getpid(), "active": False,
                       "ordinary_database_before": before,
-                      "started_at": datetime.now(timezone.utc).isoformat()}
+                      "started_at": datetime.now(timezone.utc).isoformat(),
+                      "node_version": node_version, "node_path": node}
         children: dict[str, subprocess.Popen] = {}
         owned: list[subprocess.Popen] = []
         streams = []

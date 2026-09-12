@@ -59,3 +59,10 @@ def test_server_diagnostic_retains_fatal_tail_but_not_descriptor_credentials(tmp
 
 def test_server_diagnostic_survives_missing_descriptor(tmp_path):
     assert report.server_diagnostics(tmp_path)['descriptor_unavailable']
+
+
+def test_server_log_tail_removes_query_values(tmp_path):
+    (tmp_path/'backend.log').write_text('INFO: "GET /api/search?q=private-value HTTP/1.1" 200 OK\n')
+    result = report.server_diagnostics(tmp_path)
+    assert 'private-value' not in json.dumps(result)
+    assert '/api/search?[redacted]' in result['logs']['backend.log']['tail']

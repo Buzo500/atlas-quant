@@ -205,8 +205,8 @@ def test_active_state_with_failed_health_is_not_reported_as_running(private_runt
 
 @pytest.mark.parametrize("failure", ["missing_build", "occupied_port"])
 def test_startup_failure_releases_lock_and_never_starts_or_stops_foreign_processes(private_runtime, monkeypatch, failure):
-    monkeypatch.setattr(run_atlas.shutil, "which", lambda name: "test-node")
-    monkeypatch.setattr(run_atlas.subprocess, "check_output", lambda *args, **kwargs: "v24.15.0")
+    monkeypatch.setattr(run_atlas, "find_node", lambda root: "test-node")
+    monkeypatch.setattr(run_atlas.subprocess, "check_output", lambda *args, **kwargs: "v24.21.0")
     verify = Mock(side_effect=RuntimeError("Falta la interfaz compilada") if failure == "missing_build" else None)
     ports = Mock(return_value=True)
     spawn = Mock(side_effect=AssertionError("No application process may be launched"))

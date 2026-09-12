@@ -7,7 +7,6 @@ from http.client import HTTPException
 import json
 import os
 from pathlib import Path
-import shutil
 import subprocess
 import sys
 import time
@@ -18,6 +17,7 @@ from atlas_runtime import InstanceLock, atomic_json, frontend_env, locked, port_
 from build_frontend import verify_build
 from local_http import open_local_http
 from process_group import ProcessGroup
+from node_runtime import check_node, find_node, node_environment
 
 ROOT = Path(__file__).resolve().parents[1]
 VAR = ROOT / "var"
@@ -164,12 +164,10 @@ def supervise(timeout, open_browser, run_id):
         record()
         if sys.version_info < (3, 12):
             raise RuntimeError("Se necesita Python 3.12 o posterior.")
-        node = shutil.which("node")
+        node = find_node(ROOT)
         if not node:
             raise RuntimeError("Falta Node.js en PATH.")
-        version = subprocess.check_output([node, "--version"], text=True).strip().lstrip("v")
-        if tuple(int(n) for n in version.split(".")[:2]) < (22, 13):
-            raise RuntimeError("Se necesita Node.js 22.13 o posterior.")
+        record(node_version=check_node(node), node_path=node)
         verify_build(ROOT / "frontend")
         for port in (8000, 3000):
             if port_open(port):
@@ -186,7 +184,7 @@ def supervise(timeout, open_browser, run_id):
         environment.update(ATLAS_DATA_DIR=str(VAR / "atlas"), ATLAS_STOP_FILE=str(stop_signal), PYTHONUTF8="1")
         commands = [
             ("backend", [sys.executable, "-u", str(ROOT / "tools/serve_backend.py")], environment, ROOT),
-            ("frontend", [node, str(ROOT / "frontend/local-server.mjs")], frontend_env(environment), ROOT / "frontend"),
+            ("frontend", [node, str(ROOT / "frontend/local-server.mjs")], frontend_env(node_environment(node, environment)), ROOT / "frontend"),
         ]
         group = ProcessGroup()
         for name, command, env, cwd in commands:

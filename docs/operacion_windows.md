@@ -64,7 +64,7 @@ La opción `ExecutionPolicy Bypass` de los ejemplos afecta únicamente al proces
 
 ## Instalar o reconstruir dependencias
 
-Requisitos comprobados por el instalador: Python **3.12 o posterior**, Node.js **22.13 o posterior** y pnpm **11.19.0** en PATH. En este sobremesa se han usado Python 3.14.4, Node 24.15.0 y pnpm 11.19.0. Estas versiones observadas no equivalen a una matriz completa de compatibilidad.
+Requisitos comprobados por el instalador: Python **3.12 o posterior**, Node.js **22.13 o posterior** y pnpm **11.19.0**. En Windows se rechaza Node 24.0–24.15 por un cierre nativo reproducido. La referencia actual es **Node 24.21.0 LTS**; en este sobremesa ATLAS selecciona una instalación portable propia. [Rutas, instalación y comprobaciones](node_windows.md). Python 3.14.4 y pnpm 11.19.0 conservados; no equivale a una matriz completa de compatibilidad.
 
 Puedes consultar las versiones disponibles en una ventana nueva de PowerShell:
 

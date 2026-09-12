@@ -1,6 +1,7 @@
 """Correlate bounded, opt-in trace metadata; stage observations are not root causes."""
 import json
 from pathlib import Path
+import re
 
 FIELDS = {'diag', 'event', 'utc', 'correlation', 'ms', 'method', 'path', 'status',
           'transport', 'complete', 'finished', 'code', 'sent', 'response_complete'}
@@ -27,7 +28,8 @@ def server_diagnostics(directory: Path):
             if start:
                 lines = lines[1:]
             result['logs'][name] = dict(truncated=bool(start),
-                tail='\n'.join(line for line in lines if '{"diag":' not in line))
+                tail='\n'.join(re.sub(r'(\S+)\?[^\s\"]+', r'\1?[redacted]', line)
+                    for line in lines if '{"diag":' not in line))
         except OSError:
             result['logs'][name] = {'unavailable': True}
     return result

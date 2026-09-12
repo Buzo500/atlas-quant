@@ -9,6 +9,7 @@ import sys
 
 from atlas_runtime import InstanceLock, frontend_env, port_open, run_owned
 from build_frontend import build_locked
+from node_runtime import check_node, find_node, node_environment
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -16,13 +17,11 @@ ROOT = Path(__file__).resolve().parents[1]
 def main():
     if sys.version_info < (3, 12):
         raise RuntimeError("Se necesita Python 3.12 o posterior.")
-    node = shutil.which("node")
+    node = find_node(ROOT)
     pnpm = shutil.which("pnpm.cmd") if os.name == "nt" else shutil.which("pnpm")
     if not node or not pnpm:
         raise RuntimeError("Instala Node.js >=22.13 y pnpm 11.19.0 y abre una nueva ventana de PowerShell.")
-    version = subprocess.check_output([node, "--version"], text=True).strip().lstrip("v")
-    if tuple(map(int, version.split(".")[:2])) < (22, 13):
-        raise RuntimeError("Se necesita Node.js 22.13 o posterior.")
+    check_node(node)
     if subprocess.check_output([pnpm, "--version"], text=True).strip() != "11.19.0":
         raise RuntimeError("Esta entrega se instala con pnpm 11.19.0: npm.cmd install --global pnpm@11.19.0")
     with InstanceLock(ROOT / "var/atlas.lock"):
@@ -41,7 +40,7 @@ def main():
         run_owned([str(python), "-m", "pip", "install", "-r", str(ROOT / "requirements.txt")])
         run_owned([str(python), "-m", "pip", "check"])
         run_owned([pnpm, "--dir", str(ROOT / "frontend"), "install", "--frozen-lockfile", "--prod=false"],
-                  env=frontend_env(os.environ))
+                  env=frontend_env(node_environment(node, os.environ)))
         build_locked(ROOT)
     print("Instalación y compilación verificadas. Ejecuta Start-Atlas.ps1 -OpenBrowser.")
 
