@@ -6,6 +6,33 @@ FIELDS = {'diag', 'event', 'utc', 'correlation', 'ms', 'method', 'path', 'status
           'transport', 'complete', 'finished', 'code', 'sent', 'response_complete'}
 
 
+def server_diagnostics(directory: Path):
+    """Keep bounded server stderr evidence from this credential-free E2E run."""
+    result = {'logs': {}}
+    try:
+        descriptor = json.loads((directory / 'run.json').read_text(encoding='utf-8'))
+        result.update({key: descriptor.get(key) for key in
+            ('ownership_failure', 'server_exit_codes', 'forced_stop')})
+    except (OSError, ValueError):
+        result['descriptor_unavailable'] = True
+    for name in ('frontend.log', 'backend.log'):
+        try:
+            with (directory / name).open('rb') as stream:
+                size = stream.seek(0, 2)
+                start = max(0, size - 16384)
+                stream.seek(start)
+                raw = stream.read(16384)
+            # Drop an incomplete first line and trace JSON (already in the report).
+            lines = raw.decode('utf-8', errors='replace').splitlines()
+            if start:
+                lines = lines[1:]
+            result['logs'][name] = dict(truncated=bool(start),
+                tail='\n'.join(line for line in lines if '{"diag":' not in line))
+        except OSError:
+            result['logs'][name] = {'unavailable': True}
+    return result
+
+
 def summarize(events):
     groups = {}
     for event in events:

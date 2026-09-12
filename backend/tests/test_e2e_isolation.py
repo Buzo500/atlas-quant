@@ -97,6 +97,23 @@ def test_listener_must_belong_to_created_process(monkeypatch):
         run_e2e.assert_owned(children, groups)
 
 
+@pytest.mark.parametrize('code,listener,member,reason', [
+    (7, None, False, 'child_exited'), (None, None, False, 'listener_missing'),
+    (None, 999, False, 'listener_not_owned'), (0, 456, True, 'child_exited'),
+])
+def test_ownership_failure_preserves_observation_without_adopting_processes(monkeypatch, code, listener, member, reason):
+    monkeypatch.setattr(run_e2e, 'PORTS', {'frontend': 3000})
+    monkeypatch.setattr(run_e2e, 'listening_pid', lambda port: listener)
+    child = SimpleNamespace(pid=456, poll=lambda: code)
+    group = Mock(contains_pid=Mock(return_value=member))
+    with pytest.raises(run_e2e.OwnershipError) as error:
+        run_e2e.assert_owned({'frontend': child}, {'frontend': group})
+    assert error.value.observation == dict(server='frontend', port=3000, child_pid=456,
+        exit_code=code, listener_pid=listener, member=member if code is None and listener else None,
+        reason=reason)
+    assert not group.add.called and not group.close.called
+
+
 def test_busy_port_refuses_before_build_or_server_start(private_root, monkeypatch):
     cli = private_root / "frontend/node_modules/@playwright/test/cli.js"
     cli.parent.mkdir(parents=True)

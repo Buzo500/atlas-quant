@@ -92,13 +92,25 @@ def listening_pid(port: int) -> int | None:
     return None
 
 
+class OwnershipError(RuntimeError):
+    def __init__(self, observation):
+        self.observation = observation
+        super().__init__(f"El puerto {observation['port']} no pertenece al proceso E2E "
+                         f"{observation['server']}. Observación: {json.dumps(observation)}")
+
+
 def assert_owned(children: dict[str, subprocess.Popen], groups: dict[str, ProcessGroup]) -> dict[str, int]:
     listeners = {}
     for name, port in PORTS.items():
         child = children[name]
         pid = listening_pid(port)
-        if child.poll() is not None or pid is None or not groups[name].contains_pid(pid):
-            raise RuntimeError(f"El puerto {port} no pertenece al proceso E2E {name}.")
+        exit_code = child.poll()
+        member = groups[name].contains_pid(pid) if exit_code is None and pid is not None else None
+        if exit_code is not None or pid is None or not member:
+            raise OwnershipError(dict(server=name, port=port, child_pid=child.pid,
+                exit_code=exit_code, listener_pid=pid, member=member,
+                reason='child_exited' if exit_code is not None else
+                       'listener_missing' if pid is None else 'listener_not_owned'))
         listeners[name] = pid
     return listeners
 
@@ -309,13 +321,16 @@ def run(*, manual: bool, timeout: int, grep: str | None = None) -> int:
                         result = 1
         except (Exception, KeyboardInterrupt) as exc:
             error = str(exc) or type(exc).__name__
+            if isinstance(exc, OwnershipError):
+                descriptor['ownership_failure'] = exc.observation
             result = 1
         finally:
             for stream in streams:
                 stream.close()
             finish_descriptor(directory, data, descriptor, result=result, error=error, forced_stop=forced_stop)
         print(json.dumps({key: descriptor.get(key) for key in (
-            "run_id", "result", "error", "cleanup_error", "ordinary_database_unchanged", "ports_released", "integrity")}, ensure_ascii=False), flush=True)
+            "run_id", "result", "error", "cleanup_error", "ownership_failure", "server_exit_codes",
+            "forced_stop", "ordinary_database_unchanged", "ports_released", "integrity")}, ensure_ascii=False), flush=True)
         if (directory / "playwright.log").is_file():
             print((directory / "playwright.log").read_text(encoding="utf-8", errors="replace"), flush=True)
         return descriptor["result"]

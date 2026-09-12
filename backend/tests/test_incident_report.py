@@ -39,3 +39,23 @@ def test_reader_extracts_only_trace_json_and_is_bounded(tmp_path):
     assert len(result['incidents']) == 1
     assert 'secret' not in (tmp_path/'diagnostic-report.json').read_text(encoding='utf-8')
     assert result['logs_truncated'] is False
+
+
+def test_server_diagnostic_retains_fatal_tail_but_not_descriptor_credentials(tmp_path):
+    (tmp_path/'run.json').write_text(json.dumps(dict(token='private-token',
+        server_exit_codes={'frontend': 1}, ownership_failure={'reason': 'child_exited'})))
+    (tmp_path/'frontend.log').write_text('old line\n' * 4000 +
+        json.dumps(event('proxy', 'start')) + '\nFATAL ERROR: controlled failure\n', encoding='utf-8')
+    result = report.server_diagnostics(tmp_path)
+    assert result['server_exit_codes'] == {'frontend': 1}
+    assert result['ownership_failure']['reason'] == 'child_exited'
+    assert 'private-token' not in json.dumps(result)
+    tail = result['logs']['frontend.log']
+    assert tail['truncated'] and len(tail['tail']) < 16384
+    assert 'FATAL ERROR: controlled failure' in tail['tail']
+    assert 'correlation' not in tail['tail']
+    assert result['logs']['backend.log']['unavailable']
+
+
+def test_server_diagnostic_survives_missing_descriptor(tmp_path):
+    assert report.server_diagnostics(tmp_path)['descriptor_unavailable']

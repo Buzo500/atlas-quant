@@ -13,7 +13,7 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
 sys.path.insert(0, str(ROOT / 'tools'))
 import run_e2e
-from incident_report import write_report
+from incident_report import server_diagnostics, write_report
 
 original_popen = subprocess.Popen
 directories = set()
@@ -22,6 +22,9 @@ directories = set()
 def traced_popen(command, *args, **kwargs):
     command = list(command)
     environment = kwargs.get('env') or {}
+    if environment.get('ATLAS_STOP_FILE') and command[-1] in (
+            str(ROOT / 'tools/serve_backend.py'), str(ROOT / 'frontend/local-server.mjs')):
+        directories.add(Path(environment['ATLAS_STOP_FILE']).parent)
     if environment.get('ATLAS_E2E_RUN_DIR'):
         directories.add(Path(environment['ATLAS_E2E_RUN_DIR']))
         kwargs['env'] = {**environment, 'ATLAS_DIAGNOSTIC': '1'}
@@ -39,7 +42,11 @@ if __name__ == '__main__':
     finally:
         subprocess.Popen = original_popen
         for directory in directories:
-            report = write_report(directory)
-            print(f"Captura correlacionada: {directory / 'diagnostic-report.json'}; incidencias: {len(report['incidents'])}; causa no confirmada.")
-            # Keep bounded correlated evidence in CI's retained console log too.
-            print(json.dumps({'atlas_diagnostic_report': report}, ensure_ascii=False))
+            try:
+                print(json.dumps({'atlas_server_diagnostics': server_diagnostics(directory)}, ensure_ascii=False))
+                report = write_report(directory)
+                print(f"Captura correlacionada: {directory / 'diagnostic-report.json'}; incidencias: {len(report['incidents'])}; causa no confirmada.")
+                print(json.dumps({'atlas_diagnostic_report': report}, ensure_ascii=False))
+            except (OSError, ValueError) as error:
+                # Evidence must not replace the original run's exit code.
+                print(f"No se pudo completar la captura E2E: {type(error).__name__}", file=sys.stderr)
