@@ -1,6 +1,6 @@
 # ATLAS Quant
 
-**Desarrollo local 0.6.0-dev.5:** primer bloque de [robustez estadística](docs/v0_6_robustez_implementacion.md)
+**Desarrollo 0.6.0-dev.5, rama subida y CI correcta:** primer bloque de [robustez estadística](docs/v0_6_robustez_implementacion.md)
 en candidatas: incertidumbre del exceso diario SMA frente a comprar/mantener,
 bootstrap pareado con tres longitudes fijas, informes guardados y reproducción.
 Solo desarrollo, desde 504 intervalos tras el calentamiento, con límites y estado
@@ -8,7 +8,11 @@ no evaluable. El 95 % es nominal: las referencias sintéticas muestran limitacio
 de cobertura y no validan una estrategia de mercado. Esquema 5 conservado.
 [Integración prevista con PR #12](docs/integracion_v06_pr12.md), sin fusionarla.
 Fuente observada suficiente y espera API histórica siguen pendientes.
-No hay subida/CI remota/fusión/etiqueta nuevas de dev.5.
+[CI gratuita 34707688577](https://github.com/Buzo500/atlas-quant/actions/runs/34707688577)
+correcta sobre `6dd01ce`: 1.064 Python + 91 subcasos, 328 frontend, ocho Node,
+24 E2E, build/contratos/TypeScript/lint y arranque/parada.
+[Publicación y coste](docs/publicacion_v06_dev5.md): 465/2.000 minutos incluidos,
+0 USD facturables. Sin nueva PR/fusión/etiqueta; revisión funcional pendiente.
 [Verificación y estado operativo](docs/CONTINUIDAD.md).
 
 **Antecedente 0.6.0-dev.4, rama subida:** prevalidación de CSV antes de configurar una

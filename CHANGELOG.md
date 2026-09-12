@@ -1,6 +1,12 @@
 # Cambios de ATLAS Quant
 
-## 0.6.0-dev.5 · Robustez exploratoria · 2026-09-12 · local
+## 0.6.0-dev.5 · Robustez exploratoria · 2026-09-12
+
+- Publicación posterior autorizada: rama subida sobre `6dd01ce` y
+  [CI 34707688577 correcta](https://github.com/Buzo500/atlas-quant/actions/runs/34707688577):
+  1.064 Python + 91 subcasos, 328 frontend, ocho Node, 24 E2E y arranque/parada;
+  build/contratos/TypeScript/lint correctos. Gasto facturable 0 USD.
+  [Evidencia](docs/publicacion_v06_dev5.md). Sin nueva PR/fusión/etiqueta.
 
 - Informe estadístico independiente sobre NAV de desarrollo: bootstrap estacionario
   pareado SMA/BH, L=5/10/20, principal 10, 5.000 réplicas por longitud y semilla fija.
@@ -15,7 +21,7 @@
 - [Integración v0.5 → v0.6 definida](docs/integracion_v06_pr12.md); PR #12 conserva
   la revisión pendiente. Adquisición observada aún no conseguida tras ampliar la
   auditoría primaria. Captura API acotada; estado final en continuidad.
-- Esquema 5; ampliación local sin nueva CI remota, fusión o etiqueta.
+- Esquema 5; aceptación funcional pendiente y sin declaración de versión estable.
 
 ## 0.6.0-dev.4 · Prevalidación y consulta de investigación · 2026-09-11
 

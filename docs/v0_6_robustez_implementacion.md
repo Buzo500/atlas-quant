@@ -6,6 +6,10 @@ primer bloque estadístico. El diseño `v0_6_robustez_estadistica.md` queda acep
 para esta implementación. No autoriza nuevas órdenes, datos personales, ensayo,
 fusión, etiqueta ni una nueva CI remota.
 
+Autorización posterior «Haz el 2»: rama subida y **CI gratuita correcta** sobre
+`6dd01ce`. [Publicación y resultados remotos](publicacion_v06_dev5.md). El alcance
+del cálculo no cambia; las verificaciones de abajo corresponden al trabajo local.
+
 ## Contrato de implementación
 
 Informe independiente, sin modificar `LabInput` ni identidades o resultados
@@ -134,6 +138,7 @@ Esquema SQLite 5 y los identificadores/resultados previos permanecen intactos.
   Cierre de ambos servidores con código 0, integridad correcta, puertos liberados
   y base habitual intacta. La app habitual ya estaba detenida y continúa así.
 
-No se han ejecutado una CI remota, subida, nueva PR, fusión o etiqueta de dev.5.
-El resultado de la CI anterior acredita dev.4, no esta ampliación. Segundo entorno
-y aceptación funcional del usuario pendientes; no se declara una versión estable.
+Al cerrar la implementación local todavía no se habían ejecutado subida/CI dev.5.
+La [publicación posterior](publicacion_v06_dev5.md) acredita esta ampliación en
+Windows, sin nueva PR/fusión/etiqueta. Segundo entorno y aceptación funcional del
+usuario pendientes; no se declara una versión estable.

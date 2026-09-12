@@ -20,4 +20,5 @@ conflicto; CI nueva cuando se autorice su publicación.
 
 Esta decisión no fusiona, etiqueta ni cambia la base de la PR existente. Revisión
 manual pendiente del portátil y revisión manual de dev.4 siguen aplazadas. La
-implementación estadística dev.5 continúa localmente en `codex/v0.6-evaluador`.
+implementación estadística dev.5 continúa por separado en `codex/v0.6-evaluador`.
+La [publicación posterior y CI](publicacion_v06_dev5.md) no cambian esta decisión.

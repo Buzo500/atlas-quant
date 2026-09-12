@@ -4,13 +4,15 @@ Actualizado: 11 de septiembre de 2026. **La secuencia de versiones se conserva.*
 
 ## Estado vigente
 
-- **Actualización v0.6 dev.5, local:** [robustez exploratoria](v0_6_robustez_implementacion.md)
+- **Actualización v0.6 dev.5, subida y CI correcta:** [robustez exploratoria](v0_6_robustez_implementacion.md)
   implementada sobre desarrollo: bootstrap estacionario pareado, tres longitudes
   fijas, informes independientes y reproducción. Cobertura sintética y limitaciones
   documentadas; no equivale a validación observada o confirmatoria. [Integración con
   PR #12](integracion_v06_pr12.md) definida sin fusionar. Datos observados suficientes,
   comparación entre equipos, multiplicidad y espera API histórica pendientes.
-  Publicación/validación según continuidad; sin reactivar los trabajos aplazados.
+  [CI y publicación](publicacion_v06_dev5.md) sobre `6dd01ce`: 1.064 Python + 91,
+  328 frontend, ocho Node, 24 E2E y arranque/parada; gasto 0 USD.
+  Sin nueva PR/fusión/etiqueta ni reactivar los trabajos aplazados.
 
 - **Antecedente v0.6 dev.4:** [prevalidación y consulta](v0_6_prevalidacion_consulta.md)
   implementadas, captura API preparada y [contrato estadístico](v0_6_robustez_estadistica.md)

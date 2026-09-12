@@ -2,6 +2,32 @@
 
 Actualizado: 12 de septiembre de 2026. Este documento resume decisiones y estado para una conversación nueva de Codex; no contiene la transcripción completa del chat original.
 
+## Publicación dev.5 y CI gratuita correcta
+
+«Haz el 2» autoriza subir la rama y ejecutar CI gratuita. Rama
+`codex/v0.6-evaluador` subida y verificada sobre
+`6dd01cec456793b506f7f6f44fb4700f60bed6ab`, **0.6.0-dev.5**, esquema 5.
+[CI 34707688577](https://github.com/Buzo500/atlas-quant/actions/runs/34707688577)
+**correcta**, job 103590615138, primer intento: **1.064 Python + 91 subcasos,
+328 frontend, ocho Node, 24 E2E**, build/contratos/TypeScript/lint y arranque/parada.
+[Registro de publicación y límites](publicacion_v06_dev5.md).
+
+Node 24.21.0: 3.632 conexiones HTTP sin fallos. E2E
+`e2e-0dbd4aeee0824238a9df110c5731543d`, 3,1 min, ambos servidores con salida 0,
+integridad correcta, base habitual del runner intacta y puertos liberados.
+Captura de 1.816 peticiones, seis grupos ≥1 s, máximo 1.333,30 ms; no reproduce
+la espera histórica. Arranque posterior confirma dev.5/proxy/interfaz/gasto de IA 0
+y parada limpia. Esta validación remota no es una nueva ejecución en este PC.
+
+Cuota comprobada antes y después: **446,7 → 465 de 2.000 minutos**, 0/0,5 GB.
+**0 USD facturables**, presupuesto Actions 0 USD con bloqueo de pago comprobado;
+facturación intacta. Log local excluido `output/validation/ci-34707688577.log`.
+Cierre posterior solo documental, subido en la misma rama sin otra CI.
+App habitual sin arrancar ni modificar su base; sin nueva PR/fusión/etiqueta.
+Revisión funcional dev.5, aceptación PR #12, segundo entorno numérico y fuente
+observada suficiente siguen pendientes; API histórica abierta. Portátil, ensayo
+y datos personales mantienen sus aplazamientos. Los estados siguientes son antecedentes.
+
 ## Cuatro últimos pasos · integración, fuente, captura y robustez local dev.5
 
 «Haz los 4 últimos» acepta los puntos 2–5: decidir integración con PR #12,
