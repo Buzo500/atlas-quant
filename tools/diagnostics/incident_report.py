@@ -4,7 +4,7 @@ from pathlib import Path
 import re
 
 FIELDS = {'diag', 'event', 'utc', 'correlation', 'ms', 'method', 'path', 'status',
-          'transport', 'complete', 'finished', 'code', 'sent', 'response_complete'}
+          'transport', 'resource_type', 'complete', 'finished', 'code', 'sent', 'response_complete'}
 
 
 def server_diagnostics(directory: Path):
@@ -50,7 +50,9 @@ def summarize(events):
         if not (failed or slow):
             continue
         stages = {f"{e['diag']}:{e['event']}" for e in items}
-        if any(e.get('code') == 'ECONNREFUSED' for e in items):
+        if any(e.get('code') == 'net::ERR_NO_BUFFER_SPACE' for e in items):
+            observation = 'Chromium indica falta de espacio de buffer de socket; no demuestra agotamiento de puertos ni fallo ASGI.'
+        elif any(e.get('code') == 'ECONNREFUSED' for e in items):
             observation = 'Conexión al backend rechazada (ECONNREFUSED); comprobar si el servidor había terminado de arrancar.'
         elif 'client:body_end' in stages:
             observation = 'El cliente completó el cuerpo; revisar tiempos/estado.'

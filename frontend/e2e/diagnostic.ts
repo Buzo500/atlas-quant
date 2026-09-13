@@ -16,8 +16,7 @@ export function trace(event: string, fields: Record<string, unknown>) {
     );
 }
 export function browserStart(request: Request) {
-  if (!diagnostic || !new URL(request.url()).pathname.startsWith('/api/'))
-    return undefined;
+  if (!diagnostic) return undefined;
   const value = { correlation: correlation(), start: performance.now() };
   starts.set(request, value);
   trace('start', {
@@ -25,15 +24,18 @@ export function browserStart(request: Request) {
     transport: 'browser',
     method: request.method(),
     path: new URL(request.url()).pathname,
+    resource_type: request.resourceType(),
   });
   return value.correlation;
 }
 export function browserEvent(request: Request, event: string, status?: number) {
   const value = starts.get(request);
+  const failure = event === 'failed' ? request.failure()?.errorText : undefined;
   if (value)
     trace(event, {
       correlation: value.correlation,
       ms: performance.now() - value.start,
       status,
+      code: failure && /^net::ERR_[A-Z0-9_]+$/.test(failure) ? failure : undefined,
     });
 }

@@ -18,6 +18,18 @@ def test_success_is_not_an_incident():
     assert result['root_cause_confirmed'] is False
 
 
+def test_static_socket_failure_is_kept_without_misattributing_to_backend():
+    result = report.summarize([
+        event('client', 'start', path='/_next/static/chunks/app.js', resource_type='script'),
+        event('client', 'failed', code='net::ERR_NO_BUFFER_SPACE', ms=24),
+    ])
+    incident = result['incidents'][0]
+    assert incident['failed'] and not incident['slow']
+    assert 'no demuestra' in incident['observation']
+    assert incident['events'][0]['resource_type'] == 'script'
+    assert result['root_cause_confirmed'] is False
+
+
 def test_timeout_correlates_stages_without_claiming_root_cause_or_copying_secrets():
     result = report.summarize([event('client', 'start', body='private'), event('backend', 'body_end', ms=2),
         event('proxy', 'finish', ms=3, cookie='private'), event('client', 'failed', ms=10001)])
