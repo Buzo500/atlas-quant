@@ -32,7 +32,7 @@ Requisitos de adaptación:
 
 ## REPORT-001 · Informes LaTeX de cartera y backtests por fechas
 
-**Estado:** funcionalidad solicitada para planificación, sin implementación autorizada. Encaje propuesto en la exportación reproducible de **v0.6**, reordenable al acotar esa entrega. No es necesaria para cerrar v0.2 ni para aplicar el rediseño visual.
+**Estado:** diseño inicial concretado por autorización del 13/09/2026: [contrato propuesto, estética y maqueta editable](informes_latex_diseno.md). Fuente `.tex` y vista HTML sintética disponibles; generador integrado y compilación PDF pendientes. Encaje en la exportación reproducible de **v0.6**, reordenable al acotar esa entrega. No es necesaria para cerrar v0.2 ni para aplicar el rediseño visual.
 
 Solicitud del usuario: exportar un documento LaTeX con diseño original de ATLAS que resuma la evolución de la cartera, sus activos y resultados entre fechas elegidas en el momento de exportar; utilizar también este recorrido para resúmenes de backtests.
 
@@ -46,7 +46,7 @@ Alcance y criterios propuestos:
 - Generación local con herramientas gratuitas, sin claves ni llamadas a IA o servicios de pago. Tratar nombres, textos e informes como contenido escapado para LaTeX. La plantilla y la compilación no deben ejecutar instrucciones aportadas por los datos.
 - Validar cifras contra el motor para el mismo corte temporal: flujos intermedios, posiciones previas al inicio, días sin sesión y series insuficientes. Comprobar compilación, caracteres españoles, tablas extensas y gráficos legibles. Recortar una curva no permite conservar como si fueran del tramo las métricas de toda la historia.
 
-La selección de motor LaTeX, paquetes, estructura del informe y distribución del paquete exportado se decidirá al acotar la implementación. Registrar esta funcionalidad no instala herramientas ni genera ahora un informe.
+La definición propone LuaLaTeX, paquetes, estructura y distribución; la implementación deberá fijar versiones y verificar compilación y paginación. No se han instalado herramientas ni generado informes de cartera con esta entrega.
 
 ## Pendientes de gráficos
 

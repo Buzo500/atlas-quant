@@ -1,6 +1,26 @@
 # Cambios de ATLAS Quant
 
+## 0.6.0-dev.7 · Retrospectivo en el Laboratorio · 2026-09-13
+
+- Formulario CSV/calendario, identidad y costes; congelación revisable antes de
+  calcular, curvas/tablas y descargas JSON/CSV/ZIP, reapertura con recálculo.
+- HTTP local acotado, cuatro rutas y contratos; mismo evaluador/paquete que CLI,
+  sin escribir carteras, candidatas o reservas. Detecta diferencias de código
+  al reabrir conservando las huellas originales, sin acreditar su autenticidad.
+- HFG.DE con protocolo previo, 634 sesiones de desarrollo y 128 reservadas sin
+  calcular; ZIP reproducido. SMA termina en 8.413,39 EUR desde 10.000 EUR.
+- Revisión AR(1) y próximo experimento predeclarado; método del producto intacto.
+  Plantilla LaTeX definida con fuente/maqueta sintética, generador/PDF pendientes.
+- 1.124 Python + 91 subcasos, 336 frontend, ocho Node, 25 E2E locales,
+  build/contratos/TypeScript/lint. [Guía y evidencia](docs/v0_6_retrospectivo_interfaz.md).
+  Dev.7 local; esquema 5. App habitual detenida/base intacta, gasto cero.
+
 ## 0.6.0-dev.6 · Investigación retrospectiva por CLI · 2026-09-13
+
+- Publicación posterior: `27892a2` subido, [CI gratuita 34768335375 correcta](https://github.com/Buzo500/atlas-quant/actions/runs/34768335375),
+  1.104 Python + 91 subcasos, 328 frontend, ocho Node, 24 E2E y arranque/parada.
+  Cuota 510/2.000 minutos y 0 USD facturables; [evidencia](docs/publicacion_v06_dev6.md).
+  Sin nueva PR/fusión/etiqueta. El cierre local siguiente es antecedente.
 
 - Política `atlas-retrospective-eur-v1` con contratos separados para disponibilidad,
   horarios y base supuestos. Conserva falsos los indicadores de acreditación;

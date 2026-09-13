@@ -1,0 +1,91 @@
+% ATLAS report design v1. Synthetic mockup; not a generated strategy report.
+% Proposed engine: LuaLaTeX. Compilation has not been validated in this delivery.
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=20mm,headheight=16pt]{geometry}
+\usepackage{fontspec}
+\setmainfont{TeX Gyre Heros}[Numbers=Monospaced]
+\setmonofont{Latin Modern Mono}[Scale=0.9]
+\usepackage[spanish]{babel}
+\usepackage[table]{xcolor}
+\usepackage{booktabs,tabularx,longtable,fancyhdr,hyperref,pgfplots}
+\pgfplotsset{compat=1.18}
+\definecolor{ink}{HTML}{272B2D}
+\definecolor{copper}{HTML}{975435}
+\definecolor{cream}{HTML}{F4F1EA}
+\definecolor{ivory}{HTML}{FFFCF6}
+\definecolor{slate}{HTML}{526B80}
+\definecolor{rulegray}{HTML}{DCD7CF}
+\color{ink}
+\hypersetup{colorlinks=true,urlcolor=copper,linkcolor=copper,pdftitle={ATLAS: maqueta sintética}}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{7pt}
+\renewcommand{\arraystretch}{1.3}
+\linespread{1.15}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textbf{ATLAS}\quad Investigación cuantitativa}
+\fancyhead[R]{\small Maqueta v1 · Datos sintéticos}
+\fancyfoot[L]{\small atlas-report-template-v1}
+\fancyfoot[R]{\small\thepage}
+\renewcommand{\headrulewidth}{0.3pt}
+\newcommand{\AtlasSection}[1]{\vspace{8pt}{\large\bfseries\color{copper}#1}\par}
+\begin{document}
+{\small\color{copper}\textbf{INFORME DE DESARROLLO}}\par
+{\LARGE\bfseries Tendencia y preservación de capital}\par
+ACTIVO DEMO · EUR\hfill 02/01/2024 — 08/01/2024\par
+\colorbox{cream}{\parbox{\dimexpr\linewidth-2\fboxsep}{\small
+\textbf{Maqueta con datos sintéticos.} Cinco observaciones para revisar el diseño.
+No representa un backtest ejecutado ni una estrategia validada.}}
+\AtlasSection{Resumen del periodo}
+\begin{tabularx}{\linewidth}{@{}Xrrr@{}}
+\toprule
+Referencia & Patrimonio EUR & Variación & Caída máxima\\\midrule
+Ejemplo sintético & 10.125,00 & 1,25\,\% & 0,30\,\%\\
+Referencia sintética & 10.080,00 & 0,80\,\% & 0,20\,\%\\
+Efectivo & 10.000,00 & 0,00\,\% & 0,00\,\%\\\bottomrule
+\end{tabularx}
+\AtlasSection{Evolución del patrimonio}
+\begin{tikzpicture}
+\begin{axis}[width=\linewidth,height=60mm,axis lines=left,
+  axis line style={rulegray},tick style={rulegray},grid=major,
+  grid style={rulegray!45},ylabel={EUR},xtick={1,2,3,4,5},
+  xticklabels={02/01,03/01,04/01,05/01,08/01},scaled y ticks=false,
+  yticklabel style={/pgf/number format/fixed,/pgf/number format/1000 sep={.}},
+  legend style={draw=none,font=\small,at={(0.5,1.05)},anchor=south,legend columns=2}]
+\addplot[color=slate,thick] coordinates {(1,10000)(2,10100)(3,10069.7)(4,10100)(5,10125)};
+\addlegendentry{Ejemplo sintético}
+\addplot[color=ink,dashed] coordinates {(1,10000)(2,10050)(3,10029.9)(4,10050)(5,10080)};
+\addlegendentry{Referencia sintética}
+\end{axis}
+\end{tikzpicture}
+\AtlasSection{Lectura y límites}
+La muestra ilustra alineación de cifras, jerarquía y contraste. No debe inferirse
+significancia estadística a partir de cinco puntos. El gráfico es vectorial y sus
+series se distinguen por trazo además de color. La reserva queda fuera del informe.
+\newpage
+\AtlasSection{Contexto de cálculo}
+\begin{tabularx}{\linewidth}{@{}lX@{}}
+\toprule
+Campo & Contenido de la maqueta\\\midrule
+Origen & Datos sintéticos diseñados para composición\\
+Rango solicitado & 02/01/2024 — 08/01/2024, extremos inclusivos\\
+Rango efectivo & Cinco sesiones ficticias\\
+Política & Demostración visual; sin motor económico\\
+Estado de evidencia & Sintético, no acreditado\\\bottomrule
+\end{tabularx}
+\AtlasSection{Detalle y trazabilidad}
+Los informes reales incluirán aquí sus operaciones o posiciones, parámetros,
+comisiones, supuestos, versiones y huellas, sin trasladar las métricas de toda
+la historia a un subperiodo. Las tablas extensas repetirán cabeceras.
+\begin{longtable}{@{}p{0.2\linewidth}p{0.72\linewidth}@{}}
+\toprule Identificador & Valor\\\midrule\endfirsthead
+\toprule Identificador & Valor (continuación)\\\midrule\endhead
+Plantilla & \texttt{atlas-report-template-v1}\\
+Tipo & Maqueta sintética\\
+Fuente & Este documento; no hay proveedor de mercado\\\bottomrule
+\end{longtable}
+\AtlasSection{Reproducción}
+El futuro paquete conservará fuente TeX, JSON, CSV, recursos locales y manifiesto.
+La compilación estará aislada, sin red ni shell-escape. Este archivo es una propuesta
+de plantilla y su compilación queda pendiente de verificar con la herramienta fijada.
+\end{document}

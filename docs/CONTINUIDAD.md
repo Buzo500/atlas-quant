@@ -2,7 +2,67 @@
 
 Actualizado: 13 de septiembre de 2026. Este documento resume decisiones y estado para una conversación nueva de Codex; no contiene la transcripción completa del chat original.
 
-## Continuación dev.6: retrospectivo, caso observado y exportación local
+## Continuación dev.7: interfaz retrospectiva y cinco tareas completadas
+
+«Haz las 5 cosas» autoriza publicación dev.6, revisión estadística, interfaz
+retrospectiva, segundo activo y definición LaTeX. [Plan previo](v0_6_dev7_plan.md)
+y [guía/evidencia](v0_6_retrospectivo_interfaz.md). Rama `codex/v0.6-evaluador`,
+**0.6.0-dev.7 local**, esquema 5. No nueva PR/fusión/etiqueta.
+
+Dev.6 **subida sobre `27892a2`**, [CI 34768335375 correcta](https://github.com/Buzo500/atlas-quant/actions/runs/34768335375):
+1.104 Python + 91 subcasos, 328 frontend, ocho Node, 24 E2E y arranque/parada.
+Node 24.21.0, 3.685 conexiones sin fallos, contratos/build/TypeScript/lint.
+Cuota 486,7 → 510/2.000 minutos, **0 USD facturables**, presupuesto cero con bloqueo
+de pago comprobado antes del lanzamiento. [Publicación](publicacion_v06_dev6.md).
+La CI no cubre los cambios posteriores de dev.7.
+
+Dev.7 añade cuatro rutas HTTP locales acotadas y panel en Laboratorio para CSV y
+calendario explícito, revisión del protocolo congelado antes de calcular, curvas,
+descarga JSON/CSV/ZIP y reapertura verificada por recálculo. Contratos generados.
+`retrospective_package.py` compartido con CLI, políticas acreditadas intactas,
+sin nuevas tablas/libros/candidatas ni apertura de reserva. Conservación inicial
+mediante archivos descargados; el borrador no sobrevive a recargas/cambios de
+pestaña. Reabrir código anterior conserva informe/huellas originales, muestra la
+diferencia y exige resultados idénticos; CLI verify conserva coincidencia estricta
+de código. Reproducción del ZAL original comprobada, sin reescribirlo.
+
+HFG.DE/HelloFresh, DE000A161408, EUR/Xetra: elegido y predeclarado antes de descarga
+y cálculo. 762 fechas contrastadas con calendario 2023–2025, sin huecos y sin
+dividendos/splits en la respuesta Yahoo gratuita/TLS verificado. Recompras del
+emisor reconocidas; no se acredita ausencia exhaustiva de eventos o disponibilidad.
+Mismo SMA20/50/capital 10.000/lote/pesos/costes que ZAL: desarrollo 634 sesiones,
+NAV SMA **8.413,39 EUR**, BH **3.803,28 EUR**, efectivo 10.000 EUR. Pérdida y caída
+SMA 57,36 % explícitas, sin promoción. Reserva 128 sesiones no calculada ni
+exportada con precios. Informe `4b06777d73354bc5c87a9c773285794a36bf49d72568e02c818bf1195c856880`,
+ZIP local `output/validation/v06-retrospective-hfg/atlas-hfg-desarrollo.zip`,
+verificado por recálculo con el código dev.7.
+
+[Revisión estadística](v0_6_dependencia_revision.md) con oráculo AR(1) frente a
+matriz de covarianzas y nuevo experimento fijado. No cambia L=10 ni los informes;
+el estudio nuevo aún no se ejecuta. [LaTeX definido](informes_latex_diseno.md),
+fuente `.tex` y dos páginas HTML sintéticas inspeccionadas, sin compilador nuevo,
+PDF o generador integrado. REPORT-001 conserva ampliaciones de cartera/fechas.
+
+Dev.7 local: **1.124 Python + 91 subcasos**, 336 frontend, ocho Node, **25 E2E**
+finales correctos; contratos, TypeScript, lint y build canónico. Recorrido nuevo
+incluye teclado, descarga/reapertura exacta, reserva excluida y anchuras CSS
+565/1366/3440, sin afirmar comprobación física de DPI.
+Un selector de la prueba inicial falló tras llenar el textarea; corregido por
+nombre accesible. Se acotó su altura para archivos largos. Pase dirigido 1/1
+y regresión final completa `e2e-8067445a9b4c451bb5cd1189375e342c`, 25/25 en 111,42 s,
+sin omitidos/reintentos. Resultado 0, ambos servidores salida 0, sin parada forzada,
+limpieza correcta, puertos liberados e integridad OK.
+Captura final 1.886 grupos, 82 marcas de fallo/cancelación ≤167,705 ms, ninguna
+espera de 1 s. La CI dev.6 sí registra hasta 3.050,818 ms; ninguna captura demuestra
+la causa de la incidencia histórica. No declararla resuelta.
+
+ATLAS habitual **detenido**, build dev.7 listo para iniciar. SHA-256 de su base
+conservado `2791f15e1bb5be5833117810ce5de745e4dfb46817850c4d8d8cbc3cc2bc5549`.
+Sin proveedor IA/claves/dependencias nuevas/gasto. No reactivar portátil,
+aceptación/fusión PR #12, ensayo de 48 h o movimientos personales. La fuente
+acreditada sigue pendiente; retrospectivo no la sustituye.
+
+## Antecedente dev.6: retrospectivo, caso observado y exportación local
 
 «Vale, haz las 5 cosas» autoriza definir el modo retrospectivo, auditar una fuente
 EUR, calcular el primer desarrollo con costes/reserva, ampliar cobertura y preparar

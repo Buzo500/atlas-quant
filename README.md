@@ -1,13 +1,18 @@
 # ATLAS Quant
 
-**Desarrollo local 0.6.0-dev.6:** [investigación retrospectiva y exportación reproducible](docs/v0_6_retrospectivo.md)
-por CLI, reutilizando SMA y el libro económico. Histórico observado ZAL.DE en EUR
-auditado bajo supuestos explícitos, desarrollo calculado con costes y reserva sin
-evaluar. Exporta JSON/CSV/ZIP y recalcula al verificar; no añade aún un panel o LaTeX.
-Cobertura ampliada a seis escenarios: confirma infracobertura con autocorrelación
-fuerte. No acredita datos ni habilita órdenes. 1.104 Python + 91 subcasos, cuatro
-recorridos E2E v0.6, build/contratos/TypeScript/lint correctos. Esquema 5,
-app habitual detenida y base intacta. Sin subida/CI remota de dev.6.
+**Desarrollo local 0.6.0-dev.7:** [retrospectivo en el Laboratorio](docs/v0_6_retrospectivo_interfaz.md):
+CSV/calendario, protocolo revisable, cálculo con costes, curvas y descarga/reapertura
+JSON/CSV. Casos observados ZAL.DE y HFG.DE bajo supuestos explícitos, reserva sin
+calcular. 1.124 Python + 91 subcasos, 336 frontend, ocho Node y 25 E2E locales;
+build/contratos/TypeScript/lint correctos. Esquema 5 y base habitual intactos.
+[Revisión estadística y siguiente experimento](docs/v0_6_dependencia_revision.md)
+definidos sin cambiar el método; [diseño LaTeX con maqueta editable](docs/informes_latex_diseno.md),
+sin generador/PDF integrado. No acredita datos ni habilita órdenes.
+
+**Dev.6 subida:** `27892a2`, [CI gratuita 34768335375 correcta](https://github.com/Buzo500/atlas-quant/actions/runs/34768335375)
+con 1.104 Python + 91 subcasos, 328 frontend, ocho Node, 24 E2E y arranque/parada;
+510/2.000 minutos incluidos y 0 USD facturables. [Evidencia](docs/publicacion_v06_dev6.md).
+Esta CI corresponde a dev.6; dev.7 permanece local. App habitual detenida.
 [Estado y límites](docs/CONTINUIDAD.md).
 
 **Antecedente 0.6.0-dev.5, rama subida y CI correcta:** primer bloque de [robustez estadística](docs/v0_6_robustez_implementacion.md)

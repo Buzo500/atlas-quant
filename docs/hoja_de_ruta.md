@@ -4,7 +4,14 @@ Actualizado: 11 de septiembre de 2026. **La secuencia de versiones se conserva.*
 
 ## Estado vigente
 
-- **Actualización local v0.6 dev.6:** [modo retrospectivo por CLI](v0_6_retrospectivo.md),
+- **Actualización local v0.6 dev.7:** [interfaz retrospectiva](v0_6_retrospectivo_interfaz.md),
+  congelación revisable, descarga/reapertura JSON/CSV, segundo caso HFG.DE sin
+  calcular reserva. [Revisión estadística y experimento fijado](v0_6_dependencia_revision.md),
+  sin cambiar el método, y [definición LaTeX](informes_latex_diseno.md) con maqueta,
+  sin generador integrado. Dev.7 local; dev.6 ya subida con
+  [CI gratuita correcta](publicacion_v06_dev6.md). La secuencia se conserva.
+
+- **Antecedente v0.6 dev.6:** [modo retrospectivo por CLI](v0_6_retrospectivo.md),
   histórico EUR observado bajo supuestos, primer desarrollo con costes/reserva,
   cobertura ampliada a seis escenarios y paquete JSON/CSV reproducible. No acredita
   datos ni activa estrategias. Sin nueva CI/publicación. Interfaz retrospectiva,

@@ -1586,6 +1586,18 @@ code {
 .native-hash {
   overflow-wrap: anywhere;
 }
+.retrospective-panel {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.retrospective-panel .check-row {
+  margin-block: 0.75rem;
+}
+.retrospective-panel textarea {
+  field-sizing: fixed;
+  max-height: 20rem;
+  resize: vertical;
+}
 .technical-data {
   max-height: 24rem;
   overflow: auto;

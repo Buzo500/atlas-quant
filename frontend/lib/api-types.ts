@@ -2071,6 +2071,77 @@ export type ResearchResult = {
   "execution"?: (ResearchExecution) | (null);
 };
 
+export type RetrospectiveCalculateInput = {
+  "frozen_json": string;
+  "expected_frozen_hash": string;
+};
+
+export type RetrospectiveContext = {
+  "symbol": string;
+  "instrument_id": string;
+  "market": string;
+  "currency": "EUR";
+  "fast": number;
+  "slow": number;
+  "config": SimulationConfig;
+  "start_date": string;
+  "development_end": string;
+  "development_sessions": number;
+  "holdout_start": string;
+  "holdout_end": string;
+  "holdout_sessions": number;
+  "holdout_evaluated": false;
+  "evidence_verified": false;
+  "provider": string;
+  "calendar_source": string;
+  "event_review": string;
+  "source_sha256": string;
+  "frozen_hash": string;
+  "warnings": Array<string>;
+};
+
+export type RetrospectivePrepareInput = {
+  "settings": RetrospectiveSettings;
+  "csv": string;
+};
+
+export type RetrospectivePreview = {
+  "context": RetrospectiveContext;
+  "frozen_json": string;
+};
+
+export type RetrospectiveReopenInput = {
+  "report_json": string;
+};
+
+export type RetrospectiveSettings = {
+  "policy"?: "atlas-retrospective-eur-v1";
+  "symbol": string;
+  "instrument_id": string;
+  "market": string;
+  "currency"?: "EUR";
+  "timezone"?: "Europe/Berlin";
+  "expected_dates": Array<string>;
+  "early_close_dates"?: Array<string>;
+  "holdout_date": string;
+  "fast"?: number;
+  "slow"?: number;
+  "config": SimulationConfig;
+  "provider": string;
+  "calendar_source": string;
+  "event_review": string;
+  "source_sha256"?: "server-computed";
+  "acknowledge_assumptions": true;
+};
+
+export type RetrospectiveView = {
+  "context": RetrospectiveContext;
+  "development": LabPeriod;
+  "report_json": string;
+  "report_hash": string;
+  "code_matches": boolean;
+};
+
 export type ReturnSegment = {
   "value": (string) | (null);
   "status": "complete" | "provisional" | "incomplete" | "unavailable";

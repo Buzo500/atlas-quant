@@ -1,11 +1,12 @@
 # ATLAS Quant v0.1 · Entrega del 5 de septiembre de 2026
 
-Actualización vigente: **0.6.0-dev.6 local** añade [investigación retrospectiva
-por CLI y exportación reproducible](v0_6_retrospectivo.md), con contratos de
-supuestos separados, caso observado EUR calculado solo en desarrollo y cobertura
-ampliada. Dev.5 ya implementó [robustez exploratoria](v0_6_robustez_implementacion.md)
-con informes, persistencia y reproducción en el Laboratorio. Esquema 5, sin órdenes
-externas ni nuevos formularios retrospectivos. [Estado y validación](CONTINUIDAD.md).
+Actualización vigente: **0.6.0-dev.7 local** añade [formulario retrospectivo,
+descarga y reapertura de informes](v0_6_retrospectivo_interfaz.md), segundo caso
+observado EUR solo en desarrollo, revisión estadística y definición LaTeX.
+Dev.6 ya subida con [CI gratuita correcta](publicacion_v06_dev6.md). No hay
+generador LaTeX integrado, acreditación de estos datos ni órdenes externas.
+Dev.5 ya implementó [robustez exploratoria](v0_6_robustez_implementacion.md)
+con informes persistentes. Esquema 5. [Estado y validación](CONTINUIDAD.md).
 
 Antecedente **0.6.0-dev.4**: [prevalidación del CSV y consulta
 de candidatas](v0_6_prevalidacion_consulta.md): diagnóstico de la versión antes de

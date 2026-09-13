@@ -11,6 +11,7 @@ import { useDatasetSymbol } from '@/shared/use-dataset-symbol';
 import { ResearchResult } from './research-result';
 import { SimulationLab } from './simulation-lab';
 import { Candidates } from './candidates';
+import { RetrospectiveLab } from './retrospective';
 
 export function Lab({
   dataset,
@@ -21,6 +22,7 @@ export function Lab({
 }) {
   const [simulationOpen, setSimulationOpen] = useState(false);
   const [candidatesOpen, setCandidatesOpen] = useState(false);
+  const [retrospectiveOpen, setRetrospectiveOpen] = useState(false);
   type SubmittedContext = Pick<
     ResearchResponse['execution'],
     | 'dataset_id'
@@ -68,6 +70,15 @@ export function Lab({
   }
   return (
     <>
+      <details
+        className="panel details"
+        onToggle={(event) => {
+          if (event.currentTarget.open) setRetrospectiveOpen(true);
+        }}
+      >
+        <summary>Investigación retrospectiva con supuestos</summary>
+        {retrospectiveOpen && <RetrospectiveLab onError={onError} />}
+      </details>
       <details
         className="panel details"
         onToggle={(event) => setSimulationOpen(event.currentTarget.open)}
