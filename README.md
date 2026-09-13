@@ -8,10 +8,10 @@ no evaluable. El 95 % es nominal: las referencias sintéticas muestran limitacio
 de cobertura y no validan una estrategia de mercado. Esquema 5 conservado.
 [Integración prevista con PR #12](docs/integracion_v06_pr12.md), sin fusionarla.
 Fuente observada suficiente y espera API histórica siguen pendientes.
-[CI gratuita 34707688577](https://github.com/Buzo500/atlas-quant/actions/runs/34707688577)
-correcta sobre `6dd01ce`: 1.064 Python + 91 subcasos, 328 frontend, ocho Node,
+[CI gratuita 34760823911](https://github.com/Buzo500/atlas-quant/actions/runs/34760823911)
+correcta sobre `2ee0dec`: 1.064 Python + 91 subcasos, 328 frontend, ocho Node,
 24 E2E, build/contratos/TypeScript/lint y arranque/parada.
-[Publicación y coste](docs/publicacion_v06_dev5.md): 465/2.000 minutos incluidos,
+[Publicación y coste](docs/v0_6_historial_contraste.md): 486,7/2.000 minutos incluidos,
 0 USD facturables. Sin nueva PR/fusión/etiqueta. [Revisión guiada de robustez](docs/revision_guiada_v06_dev5.md)
 completada con datos sintéticos. [Corrección posterior y contraste](docs/v0_6_historial_contraste.md):
 historial adaptable comprobado a 565/960/1366/3440 px y seis resultados numéricos

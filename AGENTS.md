@@ -2,6 +2,8 @@
 
 Antes de continuar una tarea sobre este proyecto, lee `docs/CONTINUIDAD.md` y `README.md`. Para instalarlo en otro equipo, consulta `docs/traslado_sobremesa.md`.
 
+- Publicación de la corrección del historial: `codex/v0.6-evaluador` subida sobre `2ee0dec`, dev.5/esquema 5, CI gratuita **34760823911 correcta**: 1.064 Python + 91 subcasos, 328 frontend, ocho Node, 24 E2E y arranque/parada. Uso mostrado 486,7/2.000 min y 0 USD facturables, bloqueo de pago verificado. Leer `docs/v0_6_historial_contraste.md`; cierre posterior solo Markdown/subido. Historial y contraste Windows–WSL completados, fuente observada apta aún pendiente. App habitual detenida/base intacta; sin PR/fusión/etiqueta nuevas ni reactivar aplazamientos.
+
 - Continuación autorizada «Vale, haz las 5 cosas», 13/09: historial de robustez corregido y probado a 565/960/1366/3440 px con teclado/nombres largos; 328 frontend, ocho Node y 24 E2E locales correctos. Contraste real Windows 3.14.4–Ubuntu/WSL 3.12.3 con NumPy 2.5.2: seis casos exactamente iguales, incluidos los dos informes guardados de la revisión. Leer `docs/v0_6_historial_contraste.md` y continuidad para publicación/CI. Dev.5/esquema 5 conservados, app habitual detenida y base intacta. Búsqueda de datos observados ampliada, fuente apta todavía no conseguida; no inventar disponibilidad ni acreditar OHLC incompletos. No fusionar PR #12 ni etiquetar por inercia, no reactivar aplazamientos. Sustituye los pendientes visual/segundo entorno de las entradas siguientes.
 
 - Responde en español, de forma directa y realista. El usuario estudia el doble grado de Ingeniería del Software y Matemática Computacional en U-TAD; quiere precisión y discrepancias argumentadas cuando correspondan.

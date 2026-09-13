@@ -17,7 +17,13 @@ exactamente iguales en Windows/Python 3.14.4 y Ubuntu/WSL/Python 3.12.3, NumPy
 La [fuente observada](v0_6_csv_observado.md) sigue pendiente tras revisar alternativas
 primarias; no se inventa evidencia ni se fuerza una importación.
 
-Publicación/CI autorizadas, pendientes de resultado remoto en este registro.
+Rama `codex/v0.6-evaluador` subida sobre `2ee0dec`, CI gratuita
+[34760823911](https://github.com/Buzo500/atlas-quant/actions/runs/34760823911) correcta:
+1.064 Python + 91 subcasos, 328 frontend, ocho Node, 24 E2E, build/contratos/
+TypeScript/lint y arranque/parada. Node 24.21.0, 3.683 conexiones de sonda sin
+fallos; captura API con máximo 1.577,284 ms, sin confirmar la causa histórica.
+Cuota mostrada 465 → 486,7/2.000 minutos, 0 USD facturables y bloqueo de pago
+comprobado. Cierre posterior solo Markdown, subido sin repetir CI.
 App habitual detenida, base intacta y pruebas aisladas cerradas con resultado 0,
 puertos libres e integridad correcta. No hay nueva PR/fusión/etiqueta ni se reactivan
 portátil, ensayo o movimientos personales.

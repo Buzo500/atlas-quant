@@ -15,7 +15,7 @@ Se mantienen `0.6.0-dev.5`, esquema 5 y rama `codex/v0.6-evaluador`.
    comprueba límites del documento/botón, texto completo, foco y apertura con Enter.
    Capturas revisadas de botón estrecho e informe ultrapanorámico. Es una prueba
    de viewport, no una nueva comprobación física de escala Windows.
-3. Subida y CI gratuita autorizadas; resultado remoto registrado al terminar.
+3. Rama subida sobre `2ee0dec`; CI gratuita **34760823911 correcta**.
 4. Contraste real Windows–Ubuntu/WSL: seis casos coinciden exactamente.
 5. Ampliada la búsqueda de fuente observada; **no se ha conseguido una fuente
    suficiente**. [Auditoría y decisión](v0_6_csv_observado.md). No se importa ni
@@ -26,7 +26,35 @@ correctos. Compilación canónica con manifiesto. Los 24 E2E locales pasan en 1,
 sin omitidos ni reintentos: `e2e-b31067aa3e4342609c044d60c3f7d6a9`.
 Resultado 0, ambos servidores con salida 0, integridad correcta, puertos liberados,
 sin parada forzada y base habitual intacta. Captura API: 1.839 peticiones
-correlacionadas; no establece la causa de la incidencia histórica.
+correlacionadas, ninguna agrupación lenta de al menos un segundo; no establece
+la causa de la incidencia histórica. Tras aplicar solo formato al código se
+recompiló y repitió el recorrido de robustez: 1/1 en 7,7 s,
+`e2e-3bccff0fa9964e6995ac2e7c52874d4b`, cierre e integridad correctos.
+
+## Publicación y CI gratuita
+
+Commit de código `2ee0dec4c916f36b981118571d88d8a1bdbccef5`, en GitHub dentro de
+`codex/v0.6-evaluador`. [CI 34760823911](https://github.com/Buzo500/atlas-quant/actions/runs/34760823911),
+trabajo `103733237448`, finalizada correctamente el 13/09 a las 16:00:28
+(Europe/Madrid). Resultado remoto verificado mediante API y registro descargado:
+
+- 1.064 Python + 91 subcasos, 108,26 s; dos avisos de dependencias, sin fallos.
+- 328 frontend, ocho Node, TypeScript, contratos, lint y build correctos.
+- 24 E2E en 3,6 min, sin omitidos ni reintentos; arranque/smoke/parada correctos.
+- Node 24.21.0: 3.683 conexiones de la sonda completadas sin fallos.
+- Servidores E2E con salida 0, sin pérdida de propietario ni parada forzada.
+  Captura API: 1.839 peticiones correlacionadas, seis grupos de al menos un segundo,
+  máximo observado en incidentes 1.577,284 ms; causa histórica aún no confirmada.
+
+Presupuesto comprobado antes y después en GitHub: Actions 0 USD, `Stop usage: Yes`.
+Lectura de uso incluido: 465 → 486,7 / 2.000 minutos; importe bruto y descuento
+iguales, 2,92 USD, **0 USD facturables**. Es el uso mostrado en la consulta de cierre,
+no una medición local ni una predicción de facturación. No se cambian presupuestos.
+Log local excluido: `output/validation/github-job-103733237448.log`.
+
+Cierre posterior solo Markdown, subido sin una segunda ejecución de CI. Sin nueva
+PR, fusión ni etiqueta. Compilación local comprobada mediante `build_frontend.py --check`;
+app habitual detenida, base y libros intactos.
 
 ## Segundo entorno numérico
 
