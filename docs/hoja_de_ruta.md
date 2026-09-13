@@ -4,6 +4,14 @@ Actualizado: 13 de septiembre de 2026. **La secuencia de versiones se conserva.*
 
 ## Estado vigente
 
+- **Actualización dev.9 local:** [exportación D7 de cartera](v0_6_dev9_implementacion.md)
+  sobre informes guardados, sin completar posiciones históricas desde la cartera
+  actual. Captura TCP Windows integrada en el diagnóstico y experimento por grupos
+  aislado con código congelado: [q4 pasa ambos lotes](v0_6_dependencia_grupos_resultados.md),
+  36.000 historias y 72 reproducciones exactas. No modifica el método del producto;
+  permite proponer su revisión versionada. La CI dev.8 es antecedente;
+  cierre y resultados en [continuidad](CONTINUIDAD.md).
+
 - **Actualización dev.8 subida:** [fuente LaTeX y PDF opcional Windows](informes_latex_implementacion.md)
   para desarrollo completo retrospectivo; [experimento de dependencia](v0_6_dependencia_resultados.md)
   ejecutado sin candidato que supere filtros. Método exploratorio conservado.
@@ -11,7 +19,8 @@ Actualizado: 13 de septiembre de 2026. **La secuencia de versiones se conserva.*
   puertos, D4/incidencia API histórica abiertos. 1.169 Python + 91 subcasos,
   341 frontend, ocho Node y 25 E2E, [CI gratuita dev.8 correcta](publicacion_v06_dev8.md).
   [Experimento por grupos](v0_6_dependencia_grupos_plan.md) y [contrato de informes
-  por periodo/cartera](informes_periodo_contrato.md) definidos, sin implementar.
+  por periodo/cartera](informes_periodo_contrato.md) quedaron definidos en dev.8;
+  implementación posterior en dev.9, con el detalle patrimonial aún pendiente.
   No modifica versiones ni reactiva aplazamientos; [continuidad](CONTINUIDAD.md).
 
 - **Antecedente v0.6 dev.7:** [interfaz retrospectiva](v0_6_retrospectivo_interfaz.md),

@@ -1,6 +1,11 @@
 # Informes por fechas y cartera: contrato inicial
 
-13/09/2026. **Definición autorizada, todavía sin implementar.** Continúa
+Actualización dev.9: el usuario autoriza e implementa las entregas 1–2, adaptador
+D7 guardado y descarga de fuente desde HTTP/UI. [Guía y límites](v0_6_dev9_implementacion.md).
+Detalle patrimonial y recorte retrospectivo permanecen definidos, sin implementar.
+La definición original siguiente conserva la semántica y los oráculos previos.
+
+13/09/2026. Definición original y oráculos anteriores a la implementación. Continúa
 [REPORT-001](informes_latex_diseno.md). El PDF y la estética de dev.8 están aceptados
 por el usuario; se conserva la plantilla. No se renumera la hoja de ruta.
 
@@ -17,8 +22,8 @@ nativa inicial, con explicación, sin convertirlo o reinterpretarlo automáticam
 No hay operaciones, rebalanceo, cambios de objetivos o datos externos al exportar.
 
 Orden recomendado: **cartera D7 guardada → detalle patrimonial verificable →
-subperiodo retrospectivo**. Los informes D7 por fechas ya existen; lo pendiente
-es su documento editable y la ampliación del recorte retrospectivo.
+subperiodo retrospectivo**. Los informes D7 por fechas y su documento editable
+ya existen; detalle patrimonial y recorte retrospectivo siguen pendientes.
 
 ## Periodos: reglas que no pueden mezclarse
 
@@ -163,14 +168,15 @@ una sola sesión retrospectiva, ambos extremos inválidos, todas las filas de ta
 largas, textos TeX no fiables, ZIP alterado, redondeo de presentación y código antiguo.
 Contrastar los esperados con aritmética independiente; no generarlos con la función probada.
 
-## Entregas y decisiones pendientes
+## Entregas y estado
 
-1. Adaptador puro D7 guardado → modelo de presentación, exportación limitada y pruebas.
-2. HTTP/UI para ese adaptador con las guardias actuales y descarga de fuente; sin compilador web.
+1. **Implementado dev.9:** adaptador puro D7 guardado → modelo de presentación, exportación limitada y pruebas.
+2. **Implementado dev.9:** HTTP/UI con las guardias actuales y descarga de fuente; sin compilador web.
 3. Cápsula de posiciones/efectivo y movimientos de una revisión reproducible.
 4. Proyección retrospectiva y selector de fechas con los oráculos anteriores.
 5. Revisión visual y CI gratuita de cada entrega; benchmark/LaTeX de otros módulos después.
 
-No se implementa ninguno de estos cinco bloques por el mero hecho de definirlos.
-El usuario decidirá qué entrega desarrollar. Ensayo de 48 h, portátil y movimientos
+La autorización posterior cubre las entregas 1–2. Las ampliaciones 3–4 requieren
+otra decisión; proponerlas no autoriza ejecutarlas. Validación visual local de
+dev.9 completada; su CI remota sigue pendiente. Ensayo de 48 h, portátil y movimientos
 personales siguen aplazados; presupuesto de API cero.

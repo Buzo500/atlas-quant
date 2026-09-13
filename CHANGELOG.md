@@ -1,5 +1,25 @@
 # Cambios de ATLAS Quant
 
+## 0.6.0-dev.9 · Cartera LaTeX y experimento por grupos · 2026-09-13
+
+- Exportación de informes D7 guardados desde Cartera: fuente original, modelo
+  de presentación, JSON/CSV exactos, LaTeX con estética aceptada y PDF local opcional.
+  Vigencia observada separada del histórico; posiciones no guardadas ausentes,
+  sin completar desde la cartera actual o recalcular métricas al descargar.
+- Ruta HTTP por IDs con guardias/límite compartido; descarga cancelable en UI.
+  Cierres de referencia/final explícitos. Tres PDF y anchos 390/1.280/3.440 revisados.
+- Captura TCP Windows automática en el diagnóstico, máximo una hora/8 MB, agregados
+  por PID/estado y eventos 4227/4231; resumen en log. Causalidad API sigue abierta.
+- Experimento estadístico aislado y predeclarado: q4 pasa principal y confirmación,
+  36.000 historias, 72 reproducciones exactas y auditoría aritmética de todas las
+  fuentes. q8 sensibilidad, L10 referencia; sin sustituir el método del producto.
+- 1.193 Python + 91 subcasos en suite completa, más un caso nuevo de captura;
+  344 frontend, ocho Node y 25 E2E; contratos/TypeScript/lint/build correctos.
+  [Validación y matices de recuento](docs/v0_6_dev9_validacion.md),
+  [resultados estadísticos](docs/v0_6_dependencia_grupos_resultados.md).
+- Código `1881465` local, rama `codex/v0.6-evaluador`, esquema 5. App habitual
+  detenida/base intacta, gasto cero; publicación/CI remota pendientes.
+
 ## 0.6.0-dev.8 · LaTeX reproducible y diagnóstico de dependencia · 2026-09-13
 
 - Fuente LaTeX editable desde Laboratorio/HTTP, desarrollo completo verificado,

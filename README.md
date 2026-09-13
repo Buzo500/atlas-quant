@@ -1,6 +1,16 @@
 # ATLAS Quant
 
-**Desarrollo 0.6.0-dev.8, rama subida y CI correcta:** [exportación LaTeX](docs/informes_latex_implementacion.md)
+**Desarrollo local 0.6.0-dev.9:** [informes de cartera D7 en LaTeX](docs/v0_6_dev9_implementacion.md),
+desde un informe por periodo guardado, con JSON/CSV originales y PDF opcional local.
+Conserva históricos y métricas ausentes; no incorpora posiciones actuales a un
+informe antiguo. Captura automática de presión TCP en el diagnóstico Windows.
+Experimento estadístico por grupos separado del producto: **q4 pasa principal y
+confirmación**, 36.000 historias bajo protocolo previo; [resultados y límites](docs/v0_6_dependencia_grupos_resultados.md).
+Método del producto aún intacto. [Validación local](docs/v0_6_dev9_validacion.md)
+y estado operativo en [continuidad](docs/CONTINUIDAD.md). Esquema 5.
+Esta ampliación local no está cubierta por la CI de dev.8 ni activa un bróker.
+
+**Antecedente 0.6.0-dev.8, rama subida y CI correcta:** [exportación LaTeX](docs/informes_latex_implementacion.md)
 del desarrollo retrospectivo completo: fuente y datos desde el Laboratorio,
 PDF opcional mediante CLI Windows. Contexto, costes, curvas, operaciones y huellas
 verificadas, con reserva excluida. LuaLaTeX portable opcional; ATLAS no lo instala
@@ -10,14 +20,14 @@ arbitrarias siguen pendientes; [contrato definido](docs/informes_periodo_contrat
 [Experimento de dependencia](docs/v0_6_dependencia_resultados.md): 6.000 historias;
 ninguna longitud pasa los filtros. Método del producto intacto, robustez exploratoria.
 [Corrección Windows](docs/diagnostico_windows_20260913.md) para bloqueos transitorios
-al reemplazar JSON de estado. El [nuevo experimento por grupos](docs/v0_6_dependencia_grupos_plan.md)
-solo está definido, sin implementar ni ejecutar. Esquema 5 conservado.
+al reemplazar JSON de estado. El [experimento por grupos](docs/v0_6_dependencia_grupos_plan.md)
+quedó definido en dev.8; su ejecución posterior corresponde a dev.9. Esquema 5 conservado.
 
 **Dev.8 subida:** código `2091ea1`, [CI gratuita 34774872432 correcta](https://github.com/Buzo500/atlas-quant/actions/runs/34774872432)
 con 1.169 Python + 91 subcasos, 341 frontend, ocho Node, 25 E2E, contratos,
 TypeScript/lint/build y arranque/parada; 555/2.000 minutos incluidos y 0 USD facturables.
 [Evidencia y cierre documental posterior](docs/publicacion_v06_dev8.md).
-Carpeta habitual en dev.8, app detenida/base intacta. El [diagnóstico](docs/diagnostico_api_20260913.md)
+Carpeta habitual dev.8 en aquel cierre, app detenida/base intacta. El [diagnóstico](docs/diagnostico_api_20260913.md)
 localiza D3 en agotamiento de puertos Windows; D4 y la incidencia API histórica
 siguen abiertas. [Estado y límites](docs/CONTINUIDAD.md).
 

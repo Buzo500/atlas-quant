@@ -1,0 +1,89 @@
+{
+  "format": "atlas-dev9-local-validation-v1",
+  "python": {
+    "full_suite": 1193,
+    "subtests": 91,
+    "additional_case": 1,
+    "final_tcp_tests": 5,
+    "final_export_tests": 9
+  },
+  "frontend": 344,
+  "node": 8,
+  "e2e": 25,
+  "contracts": true,
+  "typescript": true,
+  "lint": true,
+  "canonical_build": true,
+  "run": {
+    "run_id": "e2e-ad01b118a82c40a99b4f3f61fa65ea20",
+    "started_at": "2026-09-13T19:58:01.824984+00:00",
+    "completed_at": "2026-09-13T20:00:19.683644+00:00",
+    "node_version": "v24.21.0",
+    "result": 0,
+    "server_exit_codes": {
+      "backend": 0,
+      "frontend": 0
+    },
+    "forced_stop": false,
+    "ordinary_database_unchanged": true,
+    "ports_released": true,
+    "integrity": "ok"
+  },
+  "api": {
+    "correlated_requests": 1895,
+    "incidents": 78,
+    "slow_groups": 2,
+    "max_ms": 1409.0049,
+    "truncated": false,
+    "root_cause_confirmed": false,
+    "concurrent_offline_monte_carlo": true
+  },
+  "tcp": {
+    "samples": 26,
+    "unavailable_samples": 0,
+    "peak": {
+      "utc": "2026-09-13T20:00:04.704077+00:00",
+      "sockets": 1679
+    },
+    "tcpip_events": [],
+    "root_cause_confirmed": false
+  },
+  "database_sha256": "2791f15e1bb5be5833117810ce5de745e4dfb46817850c4d8d8cbc3cc2bc5549",
+  "ordinary_app_running": false,
+  "new_remote_ci": false,
+  "external_spend_usd": 0,
+  "pdf": [
+    {
+      "name": "cartera-sin-fx.pdf",
+      "pages": 2,
+      "all_curve_dates_present": 2,
+      "synthetic": true,
+      "sha256": "f35bc509a6702e9503e4e0920f05ca5fc2a485585364aa7d007c1f0cbc7cb053",
+      "all_pages_visually_reviewed": true
+    },
+    {
+      "name": "cartera-sintetica.pdf",
+      "pages": 2,
+      "all_curve_dates_present": 2,
+      "synthetic": true,
+      "sha256": "f4d29be8e81e7e319af351d15b23eec5ebc9826c4700c5cf89c5b44ac386dcf3",
+      "all_pages_visually_reviewed": true
+    },
+    {
+      "name": "cartera-tabla-larga.pdf",
+      "pages": 5,
+      "all_curve_dates_present": 151,
+      "synthetic": true,
+      "sha256": "1c8588b8febc2053c1f4b7c85f1645e6d1b26eb8933d21bf0f0c579dbddd4ad7",
+      "all_pages_visually_reviewed": true
+    }
+  ],
+  "evidence_sha256": {
+    "var/validation/e2e-ad01b118a82c40a99b4f3f61fa65ea20/run.json": "05998c170eadc66880d281e166a8e3dc980e33184cdf93c5ad7f2104782608f8",
+    "var/validation/e2e-ad01b118a82c40a99b4f3f61fa65ea20/diagnostic-report.json": "7476575d50dc35d4399159c32c8445c418cfa5c159d7a77ef5321a72d79a7be6",
+    "var/validation/e2e-ad01b118a82c40a99b4f3f61fa65ea20/tcp-pressure.jsonl": "acdb7e2bcaefae4951a803a3e867137310f1212ddf50f4ed5e878c4ca08e2d2d",
+    "output/validation/dev9-full-python.log": "23e0cc75361e94c6b55b72bce9798cc4747764bb8e9cdebe2384c7b770df9e5c",
+    "output/validation/dev9-full-frontend.log": "188fb1641833490b3490e6be4a424f772c8f22388e8ef2909914acd9b8771ef3",
+    "output/validation/dev9-tcp-final.log": "6b9b37088778ffd2e61382872b379160c15861d3d81008fb5b83079e130f46ab"
+  }
+}

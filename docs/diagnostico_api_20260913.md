@@ -81,3 +81,16 @@ leer eventos 4227/4231 y distribución por estado/PID con `netstat -anoq`, inclu
 BOUND; guardar únicamente agregados necesarios. Identificar primero el consumidor
 antes de cambiar política de conexiones. No cerrar procesos ajenos ni ampliar
 rangos como sustituto del diagnóstico. La captura ampliada queda en la CI manual.
+
+## Ampliación local dev.9: captura automática
+
+`run_api_diagnostic.py` ya activa una captura periódica y acotada de sockets por
+PID/estado/familia y eventos 4227/4231. El resumen compacto queda en el log del
+diagnóstico; muestras completas locales, sin direcciones remotas. También puede
+ejecutarse por CLI durante una sesión: [uso y límites](v0_6_dev9_implementacion.md).
+
+Validación local: 25/25 E2E, 26 muestras disponibles, pico agregado del equipo de
+1.679 sockets y ningún evento 4227/4231 en el intervalo. Dos grupos >=1 s, máximo
+1.409,0049 ms, durante cálculo Monte Carlo offline concurrente. No es una medición
+con CPU desocupada ni identificación del consumidor histórico; D4/API siguen abiertos.
+[Evidencia dev.9](v0_6_dev9_validacion.md). Esta ampliación aún no tiene CI remota propia.

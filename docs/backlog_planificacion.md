@@ -32,9 +32,14 @@ Requisitos de adaptación:
 
 ## REPORT-001 · Informes LaTeX de cartera y backtests por fechas
 
+Ampliación dev.9: [exportación D7 guardada por periodo](v0_6_dev9_implementacion.md)
+implementada con descarga LaTeX y compilación local opcional. El detalle de activos
+no conservado en el original y el recorte retrospectivo con estado heredado siguen
+pendientes; no completar esos huecos con el libro actual. Estados anteriores debajo.
+
 Actualización dev.8: [generador inicial implementado](informes_latex_implementacion.md) para el desarrollo completo retrospectivo; fuente/recursos desde UI y PDF opcional local, aceptado por el usuario. Carteras y rangos arbitrarios permanecen pendientes, con [contrato y oráculos definidos](informes_periodo_contrato.md): D7 guardado primero, detalle histórico verificable después y recorte retrospectivo.
 
-**Estado:** primer alcance retrospectivo implementado y compilado en dev.8. [Diseño y ampliaciones](informes_latex_diseno.md); fuente `.tex`, recursos, descarga UI y PDF local Windows. Informes de cartera y fechas arbitrarias aún pendientes. Encaje en la exportación reproducible de **v0.6**, reordenable al acotar esa entrega. No es necesaria para cerrar v0.2 ni para aplicar el rediseño visual.
+**Estado vigente:** desarrollo retrospectivo completo en dev.8 y exportación de informes D7 de cartera guardados en dev.9 local. [Diseño y ampliaciones](informes_latex_diseno.md); fuente `.tex`, recursos, descarga UI y PDF local Windows. Detalle patrimonial verificable y recorte retrospectivo aún pendientes. Encaje en la exportación reproducible de **v0.6**. No es necesaria para cerrar v0.2 ni para aplicar el rediseño visual.
 
 Solicitud del usuario: exportar un documento LaTeX con diseño original de ATLAS que resuma la evolución de la cartera, sus activos y resultados entre fechas elegidas en el momento de exportar; utilizar también este recorrido para resúmenes de backtests.
 

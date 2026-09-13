@@ -2,6 +2,61 @@
 
 Actualizado: 13 de septiembre de 2026. Este documento resume decisiones y estado para una conversación nueva de Codex; no contiene la transcripción completa del chat original.
 
+## Dev.9 local: cartera LaTeX, captura TCP y confirmación estadística
+
+«Vale, haz los 5» autoriza las cinco propuestas del cierre dev.8. Completadas:
+captura TCP automática, adaptador D7 guardado, descarga LaTeX en UI, experimento
+aislado por grupos y ejecución principal/confirmación condicionada.
+**0.6.0-dev.9 local**, `codex/v0.6-evaluador`, esquema 5; código `1881465`, cierre
+documental posterior. [Uso y límites](v0_6_dev9_implementacion.md),
+[validación local](v0_6_dev9_validacion.md) y
+[evidencia compacta](evidence/dev9-validation.json).
+No hay nueva subida, CI remota, PR, fusión o etiqueta. CI 34774872432 es dev.8.
+
+Informes de cartera: `atlas-period-report-v1`/`atlas-period-latex-bundle-v1` sobre
+el informe D7 almacenado, fuente original y JSON/CSV exactos. Descarga por IDs del
+servidor con guardias locales, lectura coherente y vigencia separada del original;
+sin recálculo contable ni escrituras. PDF opcional por CLI, misma estética aceptada.
+Estados/posiciones/movimientos no conservados siguen ausentes con motivo explícito.
+Detalle patrimonial verificable y subperiodo retrospectivo requieren la ampliación
+definida en el contrato; no completar un histórico con el libro actual.
+
+Tres PDF sintéticos compilados y todas sus páginas revisadas: caso base de
+aportación/comisión (2), falta FX (2), tabla larga (5 páginas, 151 cortes completos).
+En `output/pdf/dev9-cartera-entrega/`, con ZIP, fuentes y recibos. Exportación del
+navegador verificada; revisión a 390/1.280/3.440 px sin desbordamiento de página.
+No constituye una nueva aceptación del usuario o una prueba física de escalado.
+
+[Experimento predeclarado](v0_6_dependencia_grupos_resultados.md): código/oráculos
+congelados en `380e7375f86e09b8c5549c24591041b4f43158e7`. **q4 pasa todos los filtros
+en las 15 celdas estacionarias de cada lote**: coberturas
+93,8–95,7 % y 93,9–95,6 %, respectivamente. Cero intervalos inválidos; anchuras
+dentro de los límites fijados. 18.000 historias por lote, semillas 20260916/17,
+5.000 réplicas L10; q8 solo sensibilidad. Confirmación iniciada después de pasar
+principal/reproducciones/auditoría, sin cambiar código o filtros. 36.000 fuentes
+auditadas, 72 reproducciones exactas y comprobación aritmética independiente de
+72.000 intervalos q4/q8. Ambos cálculos en menos de 26 min por lote, seis procesos.
+Resumen completo versionado; fuentes conservadas bajo `var/validation/dependence-groups-*`.
+Permite proponer una revisión versionada de método/contrato, **no integrar q4
+automáticamente, declarar cobertura garantizada o validar una estrategia**.
+La robustez del producto permanece exploratoria y los informes previos intactos.
+
+Validación: suite completa 1.193 Python + 91 subcasos; nueve regresiones finales
+de exportación y cinco de captura TCP correctas, incluido un caso adicional nuevo
+(1.194 casos Python distintos comprobados, sin afirmar una segunda suite completa).
+344 frontend, ocho Node, contratos/TypeScript/lint/build y **25/25 E2E** correctos.
+Run `e2e-ad01b118a82c40a99b4f3f61fa65ea20`: arranque/parada 0/0, sin parada forzada,
+base intacta y puertos liberados. Captura: 1.895 grupos, dos >=1 s, máximo
+1.409,0049 ms, mientras corría Monte Carlo offline. TCP: 26 muestras, pico agregado
+del equipo 1.679 sockets, sin eventos 4227/4231; no demuestra consumidor histórico
+ni resuelve D4/API. Revisión final fija LF y límite estricto de 8 MB en la captura.
+
+App habitual **detenida**, base SHA-256
+`2791f15e1bb5be5833117810ce5de745e4dfb46817850c4d8d8cbc3cc2bc5549` conservado.
+Gasto externo cero. Ensayo de 48 h, portátil, PR #12 y movimientos personales
+siguen aplazados. Los archivos concurrentes de IA/riesgo se conservan en su estado,
+sin incluirlos en este commit documental; su nota permanece como cambio local separado.
+
 ## Publicación dev.8, PDF aceptado y cinco tareas completadas
 
 El usuario acepta expresamente el PDF dev.8 y autoriza diagnóstico API, registrar

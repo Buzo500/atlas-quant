@@ -1,12 +1,18 @@
 # LaTeX inicial de ATLAS · dev.8
 
+Ampliación posterior dev.9: [informes D7 de cartera guardados](v0_6_dev9_implementacion.md)
+con el mismo estilo, fuente/CSV/JSON y compilación local opcional. El recorrido
+retrospectivo descrito aquí conserva su formato; su recorte de fechas sigue pendiente.
+
 Implementa el desarrollo completo de un informe retrospectivo verificado,
 conservando el alcance de [REPORT-001](informes_latex_diseno.md). La selección
-arbitraria de fechas y los informes de carteras siguen como ampliaciones futuras.
+arbitraria de fechas retrospectivas sigue como ampliación futura; D7 de cartera
+se exporta desde dev.9 con el alcance limitado enlazado arriba.
 
 El usuario acepta expresamente el PDF el 13/09/2026. El siguiente alcance queda
 concretado en [informes por periodo](informes_periodo_contrato.md): primero D7
-guardado, después detalle de posiciones y recorte retrospectivo. Solo definido.
+guardado, después detalle de posiciones y recorte retrospectivo. El primer bloque
+está implementado en dev.9; los otros dos conservan su definición pendiente.
 
 ## Uso desde el Laboratorio
 
