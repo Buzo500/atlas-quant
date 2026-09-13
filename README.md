@@ -1,22 +1,25 @@
 # ATLAS Quant
 
-**Desarrollo local 0.6.0-dev.8:** [exportación LaTeX](docs/informes_latex_implementacion.md)
+**Desarrollo 0.6.0-dev.8, rama subida y CI correcta:** [exportación LaTeX](docs/informes_latex_implementacion.md)
 del desarrollo retrospectivo completo: fuente y datos desde el Laboratorio,
 PDF opcional mediante CLI Windows. Contexto, costes, curvas, operaciones y huellas
 verificadas, con reserva excluida. LuaLaTeX portable opcional; ATLAS no lo instala
-ni descarga paquetes al arrancar. Carteras/fechas arbitrarias siguen pendientes.
+ni descarga paquetes al arrancar. PDF aceptado por el usuario. Carteras/fechas
+arbitrarias siguen pendientes; [contrato definido](docs/informes_periodo_contrato.md).
 
 [Experimento de dependencia](docs/v0_6_dependencia_resultados.md): 6.000 historias;
 ninguna longitud pasa los filtros. Método del producto intacto, robustez exploratoria.
 [Corrección Windows](docs/diagnostico_windows_20260913.md) para bloqueos transitorios
-al reemplazar JSON de estado. 1.168 Python + 91 subcasos, 338 frontend, ocho Node,
-25 E2E locales; build/contratos/TypeScript/lint correctos. Esquema 5 conservado.
+al reemplazar JSON de estado. El [nuevo experimento por grupos](docs/v0_6_dependencia_grupos_plan.md)
+solo está definido, sin implementar ni ejecutar. Esquema 5 conservado.
 
-**Dev.7 aceptada y subida:** `ab7764d`, [CI gratuita 34771575781 correcta](https://github.com/Buzo500/atlas-quant/actions/runs/34771575781)
-con 1.124 Python + 91 subcasos, 336 frontend, ocho Node, 25 E2E y arranque/parada;
-531,7/2.000 minutos incluidos y 0 USD facturables. [Evidencia](docs/publicacion_v06_dev7.md).
-Dev.8 sigue local y no está cubierta por esa CI. App habitual detenida/base intacta.
-La incidencia API sigue abierta; [estado y límites](docs/CONTINUIDAD.md).
+**Dev.8 subida:** código `2091ea1`, [CI gratuita 34774872432 correcta](https://github.com/Buzo500/atlas-quant/actions/runs/34774872432)
+con 1.169 Python + 91 subcasos, 341 frontend, ocho Node, 25 E2E, contratos,
+TypeScript/lint/build y arranque/parada; 555/2.000 minutos incluidos y 0 USD facturables.
+[Evidencia y cierre documental posterior](docs/publicacion_v06_dev8.md).
+Carpeta habitual en dev.8, app detenida/base intacta. El [diagnóstico](docs/diagnostico_api_20260913.md)
+localiza D3 en agotamiento de puertos Windows; D4 y la incidencia API histórica
+siguen abiertas. [Estado y límites](docs/CONTINUIDAD.md).
 
 **Antecedente 0.6.0-dev.5, rama subida y CI correcta:** primer bloque de [robustez estadística](docs/v0_6_robustez_implementacion.md)
 en candidatas: incertidumbre del exceso diario SMA frente a comprar/mantener,

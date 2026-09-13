@@ -61,7 +61,18 @@ La comprobación final se realiza sin otra regresión local concurrente. No prue
 que pytest fuera el consumidor de puertos ni que serializar elimine toda incidencia.
 La CI ya ejecuta sus fases secuencialmente. Ninguna prueba usa la base habitual.
 
-Resultado final, run y publicación: [continuidad](CONTINUIDAD.md).
+Resultado local final: 25/25 E2E, run `e2e-6ced188b297e41e3add95b36d5e84145`,
+1.887 grupos y 78 incidencias cortas, ninguna ≥1 s. Base habitual intacta y
+servidores aislados detenidos correctamente.
+
+CI 34774872432 correcta sobre `2091ea1`: 25/25 E2E, run
+`e2e-334f3ec90502429eb43b1c3c639b65ec`. Captura de 1.910 grupos y 73 incidencias,
+23 ≥1 s (8 API, 15 estáticos), máximo 1.547,308 ms. Veintiuna lentas completan
+la lectura del cliente; dos peticiones de cartera muestran cierre previo del proxy
+y fin de envío ASGI posterior. Sin timeout de 10 s ni NO_BUFFER_SPACE en esta
+ejecución. Son observaciones de etapas, no una nueva causa demostrada. Informe
+correlacionado sin truncar; las colas adicionales de servidor sí están truncadas.
+[Publicación, cuota y verificación](publicacion_v06_dev8.md).
 
 ## Siguiente captura si reaparece
 

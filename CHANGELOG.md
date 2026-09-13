@@ -11,10 +11,17 @@
   informe de cobertura/Wilson/sesgos/anchuras/pares. Método intacto y exploratorio.
 - Reemplazo atómico JSON en Windows: reintentos limitados para errores 5/32/33;
   no repetir acciones y conservar fallos persistentes/estado anterior.
-- 1.168 Python + 91 subcasos, 338 frontend, ocho Node y 25 E2E locales;
-  contratos/TypeScript/lint/build. La espera API sigue abierta. [Continuidad](docs/CONTINUIDAD.md).
-- Dev.8 local/esquema 5. Dev.7 aceptada, subida sobre `ab7764d` y CI gratuita
-  34771575781 correcta; no atribuir esa CI a dev.8. Sin PR/fusión/etiqueta nuevas.
+- PDF aceptado por el usuario. Contrato de informes por periodo/cartera y siguiente
+  experimento estadístico por grupos definidos, todavía sin implementar/ejecutar.
+- D3 localizado en agotamiento de puertos Windows (evento 4231 y fallo de chunk JS).
+  Captura estática/códigos canónicos reforzada con cuatro regresiones. D4 y la espera
+  API histórica siguen abiertas; no se altera el transporte ni la configuración del SO.
+- **1.169 Python + 91 subcasos, 341 frontend, ocho Node y 25 E2E** en
+  [CI gratuita 34774872432 correcta](https://github.com/Buzo500/atlas-quant/actions/runs/34774872432);
+  contratos/TypeScript/lint/build y arranque/parada. Código `2091ea1` subido,
+  cierre posterior documental, esquema 5. 555/2.000 min y 0 USD facturables.
+  [Publicación](docs/publicacion_v06_dev8.md), [continuidad](docs/CONTINUIDAD.md).
+  Sin PR/fusión/etiqueta nuevas.
 
 ## 0.6.0-dev.7 · Retrospectivo en el Laboratorio · 2026-09-13
 

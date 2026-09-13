@@ -4,12 +4,14 @@ Actualizado: 13 de septiembre de 2026. **La secuencia de versiones se conserva.*
 
 ## Estado vigente
 
-- **Actualización dev.8 local:** [fuente LaTeX y PDF opcional Windows](informes_latex_implementacion.md)
+- **Actualización dev.8 subida:** [fuente LaTeX y PDF opcional Windows](informes_latex_implementacion.md)
   para desarrollo completo retrospectivo; [experimento de dependencia](v0_6_dependencia_resultados.md)
   ejecutado sin candidato que supere filtros. Método exploratorio conservado.
-  Reemplazo JSON de estado Windows reforzado; incidencia API abierta. 1.168 Python
-  + 91 subcasos, 338 frontend, ocho Node y 25 E2E locales. Dev.7 aceptada y subida,
-  [CI gratuita correcta](publicacion_v06_dev7.md). Dev.8 aún sin publicación propia.
+  PDF aceptado. Reemplazo JSON Windows reforzado; D3 localizado en agotamiento de
+  puertos, D4/incidencia API histórica abiertos. 1.169 Python + 91 subcasos,
+  341 frontend, ocho Node y 25 E2E, [CI gratuita dev.8 correcta](publicacion_v06_dev8.md).
+  [Experimento por grupos](v0_6_dependencia_grupos_plan.md) y [contrato de informes
+  por periodo/cartera](informes_periodo_contrato.md) definidos, sin implementar.
   No modifica versiones ni reactiva aplazamientos; [continuidad](CONTINUIDAD.md).
 
 - **Antecedente v0.6 dev.7:** [interfaz retrospectiva](v0_6_retrospectivo_interfaz.md),

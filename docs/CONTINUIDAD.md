@@ -2,7 +2,49 @@
 
 Actualizado: 13 de septiembre de 2026. Este documento resume decisiones y estado para una conversación nueva de Codex; no contiene la transcripción completa del chat original.
 
-## Cierre dev.8: LaTeX, experimento de dependencia y revisión Windows
+## Publicación dev.8, PDF aceptado y cinco tareas completadas
+
+El usuario acepta expresamente el PDF dev.8 y autoriza diagnóstico API, registrar
+esa aceptación, subir/ejecutar CI gratuita y definir el siguiente experimento e
+informes por fechas/cartera. [Cierre y evidencia](publicacion_v06_dev8.md).
+**0.6.0-dev.8**, esquema 5, rama `codex/v0.6-evaluador` subida sobre código
+`2091ea1c2557a9d067049e73673e26e14ded6c6c`, con cierre documental posterior.
+[CI 34774872432 correcta](https://github.com/Buzo500/atlas-quant/actions/runs/34774872432):
+**1.169 Python + 91 subcasos, 341 frontend, ocho Node y 25 E2E**;
+contratos/TypeScript/lint/build, sonda 3.666 conexiones sin fallos y arranque/parada.
+Cuota **531,7 → 555/2.000 minutos**, **0 USD facturables**, presupuesto cero y
+bloqueo de pago comprobados. Sin PR, fusión o etiqueta nueva.
+
+[Diagnóstico API](diagnostico_api_20260913.md): D3 local falla al descargar un
+chunk JS con `net::ERR_NO_BUFFER_SPACE`, coincidente con evento Windows Tcpip
+4231 por agotamiento de puertos efímeros. Identifica el recurso agotado, no el
+proceso consumidor. D4 y las esperas históricas siguen abiertas. Captura ampliada
+a estáticos con códigos canónicos, sin consultas/cuerpos ni cambios de transporte.
+Cuatro regresiones nuevas. CI: 1.910 grupos/73 incidencias, 23 ≥1 s (8 API/15 estáticos),
+máximo 1.547,308 ms; sin timeout de 10 s ni NO_BUFFER_SPACE. No declarar corregida
+toda la API ni confundir esta evidencia con los reintentos JSON de dev.8.
+
+[Nuevo experimento por grupos](v0_6_dependencia_grupos_plan.md): definido, **sin
+implementar ni ejecutar**. q4 candidato, q8 sensibilidad, filtros previos y semilla
+de confirmación solo si pasa; método exploratorio del producto conservado.
+[Contrato de informes por periodo](informes_periodo_contrato.md): definido, **sin
+implementar**. Primero exportar D7 guardado; no reconstruir sus posiciones históricas
+desde el libro actual. Subperiodo retrospectivo hereda cuenta/estado de estrategia
+y excluye reserva; exige una proyección futura compartida, no recalcular desde cero.
+Aceptación visual registrada en la guía LaTeX, sin cambiar el PDF aceptado.
+
+La carpeta habitual cambió a `master` durante la tarea. Se trabajó temporalmente
+en un checkout aislado y, por respuesta explícita «Volver a dev.8», se restituyó
+**`codex/v0.6-evaluador`**. Interfaz recompilada por el constructor canónico y
+manifiesto verificado. Checkout temporal limpio y retirado; documentos posteriores
+a `2091ea1` sin cambios de producto y subidos como cierre documental.
+`output/analysis/` ajeno al cierre permanece sin seguimiento, sin modificarlo/publicarlo.
+App habitual **detenida**, 3000/8000 libres, SHA-256 de la base
+`2791f15e1bb5be5833117810ce5de745e4dfb46817850c4d8d8cbc3cc2bc5549` intacto.
+No reactivar ensayo de 48 h, portátil, movimientos personales ni aceptación/fusión
+PR #12. No nueva declaración de estabilidad ni llamadas IA/bróker.
+
+## Antecedente local dev.8: LaTeX, dependencia y revisión Windows
 
 El usuario acepta dev.7 («resulta claro») y autoriza las cinco propuestas.
 [Plan previo](v0_6_dev8_plan.md). Rama `codex/v0.6-evaluador`, **0.6.0-dev.8 local**,
