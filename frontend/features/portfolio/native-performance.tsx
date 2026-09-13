@@ -16,6 +16,7 @@ import { Button } from '@/components/ui/button';
 import { Curve } from '@/components/atlas/curve';
 import { useCorporateReview } from '@/features/data/corporate-shared';
 import { reasonText, valuationStatus } from './native-valuation';
+import { PerformanceExport } from './performance-export';
 
 const statusLabel = { ...valuationStatus, unavailable: 'No disponible' };
 const explanations: Record<string, string> = {
@@ -74,6 +75,13 @@ export function PerformanceDetails({ report }: { report: PerformanceReport }) {
   }, [report]);
   return (
     <section aria-label="Detalle de rentabilidad">
+      {report.saved && (
+        <PerformanceExport
+          key={`${report.portfolio_id}:${report.id}`}
+          portfolioId={report.portfolio_id}
+          reportId={report.id}
+        />
+      )}
       <p className="muted">
         Cierres del {report.start_date} al {report.end_date}.{' '}
         {!report.saved
@@ -346,7 +354,7 @@ export function NativePerformance({
           });
         }}
       >
-        <Field label="Cierre inicial del periodo">
+        <Field label="Cierre de referencia del periodo">
           <Input
             type="date"
             required
@@ -381,7 +389,8 @@ export function NativePerformance({
       <p className="muted">
         Hasta 3.660 días por consulta. Para TWR continuo, elige como inicio un
         cierre con patrimonio financiado. Para MWR desde la primera aportación,
-        usa el cierre anterior con saldo cero conocido.
+        usa el cierre anterior con saldo cero conocido. Para informar de todo
+        enero, usa 31/12 como referencia y 31/01 como cierre final.
       </p>
       {error && (
         <p className="notice" role="alert">

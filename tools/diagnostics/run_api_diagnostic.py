@@ -14,9 +14,11 @@ ROOT = HERE.parents[1]
 sys.path.insert(0, str(ROOT / 'tools'))
 import run_e2e
 from incident_report import server_diagnostics, write_report
+from tcp_capture import Capture, summary as tcp_summary
 
 original_popen = subprocess.Popen
 directories = set()
+captures = {}
 
 
 def traced_popen(command, *args, **kwargs):
@@ -25,6 +27,12 @@ def traced_popen(command, *args, **kwargs):
     if environment.get('ATLAS_STOP_FILE') and command[-1] in (
             str(ROOT / 'tools/serve_backend.py'), str(ROOT / 'frontend/local-server.mjs')):
         directories.add(Path(environment['ATLAS_STOP_FILE']).parent)
+        directory = Path(environment['ATLAS_STOP_FILE']).parent
+        if directory not in captures:
+            try:
+                captures[directory] = Capture(directory / 'tcp-pressure.jsonl').__enter__()
+            except OSError:
+                print('Captura TCP no disponible; el recorrido mantiene sus comprobaciones.', file=sys.stderr)
     if environment.get('ATLAS_E2E_RUN_DIR'):
         directories.add(Path(environment['ATLAS_E2E_RUN_DIR']))
         kwargs['env'] = {**environment, 'ATLAS_DIAGNOSTIC': '1'}
@@ -41,6 +49,13 @@ if __name__ == '__main__':
         sys.exit(run_e2e.main())
     finally:
         subprocess.Popen = original_popen
+        for capture in captures.values():
+            capture.__exit__(None, None, None)
+            print(json.dumps({'atlas_tcp_capture': str(capture.path), 'error': capture.error}))
+            try:
+                print(json.dumps({'atlas_tcp_pressure':tcp_summary(capture.path)},ensure_ascii=False))
+            except (OSError, ValueError, KeyError):
+                print('Resumen de presión TCP no disponible.',file=sys.stderr)
         for directory in directories:
             try:
                 print(json.dumps({'atlas_server_diagnostics': server_diagnostics(directory)}, ensure_ascii=False))

@@ -103,7 +103,7 @@ it('keeps unavailable rates absent and explains why instead of showing zero', ()
 
 it('changing period invalidates its confirmation without writing', async () => {
   render(<NativePerformance portfolioId="p" revision={1} active />);
-  fireEvent.change(screen.getByLabelText('Cierre inicial del periodo'), {
+  fireEvent.change(screen.getByLabelText('Cierre de referencia del periodo'), {
     target: { value: '2026-01-05' },
   });
   fireEvent.change(screen.getByLabelText('Cierre final del periodo'), {
@@ -117,7 +117,7 @@ it('changing period invalidates its confirmation without writing', async () => {
       screen.queryByRole('button', { name: 'Guardar informe de rentabilidad' }),
     ).not.toBeNull(),
   );
-  fireEvent.change(screen.getByLabelText('Cierre inicial del periodo'), {
+  fireEvent.change(screen.getByLabelText('Cierre de referencia del periodo'), {
     target: { value: '2026-01-04' },
   });
   expect(
@@ -136,7 +136,7 @@ it('a late calculation does not restore the confirmation after changing dates', 
       : { reports: [], offset: 0, limit: 20 },
   );
   render(<NativePerformance portfolioId="p" revision={1} active />);
-  fireEvent.change(screen.getByLabelText('Cierre inicial del periodo'), {
+  fireEvent.change(screen.getByLabelText('Cierre de referencia del periodo'), {
     target: { value: '2026-01-05' },
   });
   fireEvent.change(screen.getByLabelText('Cierre final del periodo'), {
@@ -145,7 +145,7 @@ it('a late calculation does not restore the confirmation after changing dates', 
   fireEvent.click(
     screen.getByRole('button', { name: 'Calcular rentabilidad' }),
   );
-  fireEvent.change(screen.getByLabelText('Cierre inicial del periodo'), {
+  fireEvent.change(screen.getByLabelText('Cierre de referencia del periodo'), {
     target: { value: '2026-01-04' },
   });
   finish({ report, preview_token: 'stale', committed: false });
@@ -196,9 +196,12 @@ it('an audit refresh preserves the reviewed period and sends its frozen confirma
     onDemo: vi.fn(async () => {}),
   };
   const view = render(<PortfolioPanel {...props} auditSequence={10} />);
-  fireEvent.change(await screen.findByLabelText('Cierre inicial del periodo'), {
-    target: { value: '2026-01-05' },
-  });
+  fireEvent.change(
+    await screen.findByLabelText('Cierre de referencia del periodo'),
+    {
+      target: { value: '2026-01-05' },
+    },
+  );
   fireEvent.change(screen.getByLabelText('Cierre final del periodo'), {
     target: { value: '2026-01-06' },
   });
@@ -215,8 +218,11 @@ it('an audit refresh preserves the reviewed period and sends its frozen confirma
     ),
   );
   expect(
-    (screen.getByLabelText('Cierre inicial del periodo') as HTMLInputElement)
-      .value,
+    (
+      screen.getByLabelText(
+        'Cierre de referencia del periodo',
+      ) as HTMLInputElement
+    ).value,
   ).toBe('2026-01-05');
   fireEvent.click(
     screen.getByRole('button', { name: 'Guardar informe de rentabilidad' }),
@@ -265,9 +271,12 @@ it('a changed portfolio revision discards the old confirmation', async () => {
       auditSequence={10}
     />,
   );
-  fireEvent.change(await screen.findByLabelText('Cierre inicial del periodo'), {
-    target: { value: '2026-01-05' },
-  });
+  fireEvent.change(
+    await screen.findByLabelText('Cierre de referencia del periodo'),
+    {
+      target: { value: '2026-01-05' },
+    },
+  );
   fireEvent.change(screen.getByLabelText('Cierre final del periodo'), {
     target: { value: '2026-01-06' },
   });
@@ -302,7 +311,7 @@ it('a rejected context clears confirmation and never retries a write', async () 
       : { reports: [] };
   });
   render(<NativePerformance portfolioId="p" revision={1} active />);
-  fireEvent.change(screen.getByLabelText('Cierre inicial del periodo'), {
+  fireEvent.change(screen.getByLabelText('Cierre de referencia del periodo'), {
     target: { value: '2026-01-05' },
   });
   fireEvent.change(screen.getByLabelText('Cierre final del periodo'), {

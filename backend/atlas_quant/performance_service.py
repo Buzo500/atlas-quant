@@ -48,3 +48,15 @@ class PerformanceService:
 
     def history(self, ident, offset=0, limit=20):
         return dict(reports=self.store.read(lambda w:w.performance_history(ident,offset,limit)), offset=offset, limit=limit)
+
+    @bounded_calculation
+    def export_latex(self, ident, report_id):
+        from .period_latex import make_files, archive
+        def snapshot(work):
+            original = work.performance(ident, report_id)
+            if original is None:
+                raise IdentityNotFound('Informe de rentabilidad guardado no encontrado.')
+            current = fingerprint(work.valuation_stamp(ident)) == original['context_hash']
+            return original, current
+        original, current = self.store.read(snapshot)
+        return archive(make_files(original, current=current))

@@ -267,7 +267,7 @@ test('D6/D7/v0.5: CSV USD y FX, patrimonio, rentabilidad y objetivos en tres anc
     exact: true,
   });
   await performance
-    .getByLabel('Cierre inicial del periodo', { exact: true })
+    .getByLabel('Cierre de referencia del periodo', { exact: true })
     .fill('2026-01-05');
   await performance
     .getByLabel('Cierre final del periodo', { exact: true })
@@ -324,6 +324,47 @@ test('D6/D7/v0.5: CSV USD y FX, patrimonio, rentabilidad y objetivos en tres anc
       .getByRole('region', { name: 'Detalle de rentabilidad', exact: true })
       .getByText('87,90 €', { exact: true }),
   ).toBeVisible();
+
+  const savedBeforeExport = await readApi<PerformanceHistory>(
+    page,
+    `/api/v2/portfolios/${portfolio.id}/performance`,
+  );
+  const downloaded = page.waitForEvent('download');
+  await performance
+    .getByRole('button', {
+      name: 'Exportar fuente LaTeX de cartera',
+      exact: true,
+    })
+    .click();
+  const latex = await downloaded;
+  expect(latex.suggestedFilename()).toMatch(
+    /^atlas-cartera-latex-[0-9a-f]{12}\.zip$/,
+  );
+  await latex.saveAs(info.outputPath('d7-cartera-latex.zip'));
+  expect(await latex.failure()).toBeNull();
+  await expect(
+    performance.getByText(
+      'Fuente LaTeX y datos del informe guardado descargados.',
+    ),
+  ).toBeVisible();
+  expect(
+    await readApi<PerformanceHistory>(
+      page,
+      `/api/v2/portfolios/${portfolio.id}/performance`,
+    ),
+  ).toEqual(savedBeforeExport);
+  for (const width of [3440, 1280, 390]) {
+    await page.setViewportSize({ width, height: 1000 });
+    await performance
+      .getByRole('button', { name: 'Exportar fuente LaTeX de cartera' })
+      .scrollIntoViewIfNeeded();
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+    ).toBe(true);
+    await page.screenshot({ path: info.outputPath(`d7-latex-${width}.png`) });
+  }
 
   const objectives = page.getByRole('region', {
     name: 'Objetivos y desviaciones',
