@@ -230,7 +230,10 @@ export function RobustnessPanel({
     await history.refresh();
   }
   return (
-    <section aria-label="Robustez estadística" className="research-result">
+    <section
+      aria-label="Robustez estadística"
+      className="research-result robustness-panel"
+    >
       <h3>Robustez estadística del desarrollo</h3>
       <p className="muted">
         Estima la incertidumbre de una SMA fija frente a comprar/mantener.
@@ -307,14 +310,17 @@ export function RobustnessPanel({
         <Button
           key={item.id}
           variant="outline"
+          className="robustness-history-entry"
           disabled={busy}
           onClick={() => {
             setReport(item);
             setReproduction('');
           }}
         >
-          Consultar robustez · {item.protocol.name} · revisión{' '}
-          {item.request.revision} · {dateTime(item.created_at)}
+          <span>
+            Consultar robustez · {item.protocol.name} · revisión{' '}
+            {item.request.revision} · {dateTime(item.created_at)}
+          </span>
         </Button>
       ))}
       <div className="actions">

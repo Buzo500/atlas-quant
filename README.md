@@ -12,7 +12,10 @@ Fuente observada suficiente y espera API histórica siguen pendientes.
 correcta sobre `6dd01ce`: 1.064 Python + 91 subcasos, 328 frontend, ocho Node,
 24 E2E, build/contratos/TypeScript/lint y arranque/parada.
 [Publicación y coste](docs/publicacion_v06_dev5.md): 465/2.000 minutos incluidos,
-0 USD facturables. Sin nueva PR/fusión/etiqueta; revisión funcional pendiente.
+0 USD facturables. Sin nueva PR/fusión/etiqueta. [Revisión guiada de robustez](docs/revision_guiada_v06_dev5.md)
+completada con datos sintéticos. [Corrección posterior y contraste](docs/v0_6_historial_contraste.md):
+historial adaptable comprobado a 565/960/1366/3440 px y seis resultados numéricos
+idénticos entre Windows nativo y Ubuntu/WSL. Fuente observada apta todavía pendiente.
 [Verificación y estado operativo](docs/CONTINUIDAD.md).
 
 **Antecedente 0.6.0-dev.4, rama subida:** prevalidación de CSV antes de configurar una

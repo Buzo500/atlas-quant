@@ -1,6 +1,113 @@
 # ATLAS Quant: continuidad entre equipos
 
-Actualizado: 12 de septiembre de 2026. Este documento resume decisiones y estado para una conversación nueva de Codex; no contiene la transcripción completa del chat original.
+Actualizado: 13 de septiembre de 2026. Este documento resume decisiones y estado para una conversación nueva de Codex; no contiene la transcripción completa del chat original.
+
+## Continuación dev.5: historial corregido y segundo entorno comprobado
+
+El usuario autoriza cinco tareas después de la revisión guiada. Corrección localizada
+del historial y navegación compacta, comprobación responsiva/teclado, subida/CI
+gratuita, contraste numérico entre entornos y búsqueda de datos observados.
+[Detalle y evidencia](v0_6_historial_contraste.md). Dev.5 y esquema 5 conservados,
+sin cambios estadísticos, contables ni en la reserva final.
+
+Historial comprobado a 565/960/1366/3440 px CSS. 328 frontend, ocho Node, 24 E2E
+locales, contratos, TypeScript, lint y build correctos. Seis resultados completos
+exactamente iguales en Windows/Python 3.14.4 y Ubuntu/WSL/Python 3.12.3, NumPy
+2.5.2 en ambos. No equivale a validar toda ATLAS en Linux o en otro ordenador.
+La [fuente observada](v0_6_csv_observado.md) sigue pendiente tras revisar alternativas
+primarias; no se inventa evidencia ni se fuerza una importación.
+
+Publicación/CI autorizadas, pendientes de resultado remoto en este registro.
+App habitual detenida, base intacta y pruebas aisladas cerradas con resultado 0,
+puertos libres e integridad correcta. No hay nueva PR/fusión/etiqueta ni se reactivan
+portátil, ensayo o movimientos personales.
+
+## Antecedente: revisión guiada dev.5 completada, ajuste visual pendiente
+
+El usuario ha completado cálculo, lectura de contexto/método, recuperación tras
+recarga, reproducción estadística y muestra insuficiente. El agente comprobó
+además que «No evaluable» se recupera tras recargar. [Registro y procedencia de
+las comprobaciones](revision_guiada_v06_dev5.md). No repetir estos pasos como si
+siguieran pendientes ni confundirlos con la aceptación de v0.5/PR #12.
+
+Defecto visual confirmado, sin corregir: el botón «Consultar robustez…» tiene
+`white-space: nowrap` y desborda un panel de 435,35 px en un viewport de 565 px;
+el documento alcanza 629 px. Proponer ajuste localizado y verificación responsiva.
+Recorrido funcional correcto; esto no declara estable toda v0.6.
+
+Sesión `e2e-efa0141a11a04f01a1c94729b66e99f1` detenida de forma cooperativa:
+resultado 0, servidores con salida 0, integridad correcta, sin errores de limpieza,
+base habitual intacta y puertos liberados. Ambas sesiones de revisión están
+cerradas; ATLAS queda detenido. Captura diagnóstica conservada, causa API aún
+sin confirmar. Cierre solo documental local, sin subida/CI/PR/fusión/etiqueta.
+
+### Antecedentes de la preparación y seguimiento de la revisión
+
+Los pendientes y arranques de este apartado describen estados intermedios,
+sustituidos por el cierre anterior.
+
+Primer paso comprobado por el usuario mediante captura del informe calculado y
+guardado a las 15:06:39 del 13/09: muestra completa, revisión 1, 504 intervalos
+tras 3 sesiones de calentamiento, bloques 5/10/20 con 10 principal, estado
+«Exploratorio» y acceso al informe en el historial. Media visible
+−0,010393445904 pp diarios; los intervalos mostrados incluyen cero. Esto confirma
+la presentación y el cálculo/guardado inicial. Muestra corta y aceptación
+completa siguen pendientes. El usuario
+confirma después haber realizado la revisión de «Contexto económico y ensayos
+declarados» y «Método y reproducción» (comprobación comunicada por él, sin nueva
+ejecución del agente). El usuario confirma recuperar el informe tras recargar y
+que los valores coinciden. Lectura de la interfaz a las 15:13 confirma el informe
+original de las 15:06:39, mismo motivo, 504 intervalos y resultados conservados.
+Después de pulsar «Comprobar reproducción estadística», el usuario confirma que
+aparece «Reproducción coincidente: instantánea y resultado conservados».
+Reproducción manual comunicada por el usuario, sin ejecutar esa acción el agente.
+Siguiente acción guiada: calcular robustez para «Revisión dev.5 · muestra corta»
+y comprobar «No evaluable» por 4 intervalos frente al mínimo de 504.
+La captura muestra
+desplazamiento horizontal de la tabla y el botón de historial cortado a la derecha;
+observación de presentación pendiente de valorar, sin modificar código.
+
+Reapertura solicitada por el usuario el 13/09, sin haber podido comprobar el
+primer paso. La sesión anterior terminó con resultado 0, ambos servidores con
+salida 0, integridad correcta, puertos liberados y base habitual intacta. Al
+retomar estaba abierto ATLAS habitual, run `f02eadac431b4a0ea5bf07cbdaee9097`, sin
+experimentos activos; se detuvo mediante su lanzador antes de preparar la revisión.
+Nueva sesión aislada `e2e-efa0141a11a04f01a1c94729b66e99f1`, abierta aproximadamente
+a las 15:04, con el mismo límite de 1.200 segundos. Recibo y log excluidos:
+`output/validation/dev5-manual-20260913-reapertura.json` y
+`output/validation/dev5-manual-20260913-reapertura.log`. Casos sintéticos recreados
+con nuevos identificadores; base habitual intacta durante la preparación. Formulario
+de muestra completa abierto, informe aún sin calcular por el agente y aceptación
+pendiente. Parada anticipada:
+`.venv/Scripts/python.exe tools/run_e2e.py --stop-run e2e-efa0141a11a04f01a1c94729b66e99f1`.
+Verificar vigencia y cierre de esta nueva sesión al continuar. Sin cambios de
+código ni publicación; el registro siguiente describe la primera sesión.
+
+El usuario autoriza la revisión guiada de dev.5. Se ha preparado una sesión
+manual aislada, sin modificar código ni arrancar la base habitual:
+`e2e-d8fc7ecf780a47c8bc9de48f8c3fa904`, iniciada el 13/09 a las 14:30
+(Europe/Madrid), con límite de 1.200 segundos y parada automática. Antes de
+continuar, comprobar si sigue activa; no dar por vigente este arranque después
+del límite. Interfaz local: `http://127.0.0.1:3000/?tab=lab`.
+
+Dos candidatas sintéticas: «Revisión dev.5 · muestra completa», con 504 intervalos
+de desarrollo tras el calentamiento, y «Revisión dev.5 · muestra corta», con 4.
+Se crearon sus protocolos y revisiones; todavía no se calculó ningún informe de
+robustez. La interfaz queda abierta en el formulario de robustez de la muestra
+completa para que lo utilice el usuario. Cinco comprobaciones pendientes de su
+respuesta: cálculo, interpretación/contexto, conservación al recargar,
+reproducción y rechazo de la muestra insuficiente. No confundir esta preparación
+con aceptación manual ni con evidencia de mercado observado.
+
+Recibo local excluido: `output/validation/dev5-manual-20260913.json`; log:
+`output/validation/dev5-manual-20260913.log`. Base y procesos exclusivos bajo
+`var/validation/e2e-d8fc7ecf780a47c8bc9de48f8c3fa904`. Las huellas de la base
+habitual coinciden antes y después de preparar los casos; sin proveedores ni
+presupuesto de IA. Para cerrar la sesión antes del límite:
+`.venv/Scripts/python.exe tools/run_e2e.py --stop-run e2e-d8fc7ecf780a47c8bc9de48f8c3fa904`.
+Después verificar el recibo de limpieza, puertos liberados e integridad; no
+declarar aún comprobado ese cierre. PR #12, segundo entorno, fuente observada,
+ensayo y demás aplazamientos conservan su estado. Sin nueva publicación o CI.
 
 ## Publicación dev.5 y CI gratuita correcta
 

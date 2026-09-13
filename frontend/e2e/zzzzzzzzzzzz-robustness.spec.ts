@@ -78,7 +78,7 @@ test('v0.6 robustez: tres intervalos, evidencia inmutable y reserva intacta', as
     { ...market, commit: true, preview_token: preview.preview_token },
   );
   const lab = await post<LabReport>(page, '/lab/protocols', {
-    name: 'Robustez 504 intervalos ficticios',
+    name: `Robustez sintética ${'Referencia'.repeat(8)}`,
     series_id: committed.series!.id,
     series_version: committed.series!.version,
     start_date: days[0],
@@ -153,13 +153,58 @@ test('v0.6 robustez: tres intervalos, evidencia inmutable y reserva intacta', as
     .getByText('Contexto económico y ensayos declarados', { exact: true })
     .click();
   await report.getByText('Método y reproducción', { exact: true }).click();
-  for (const width of [960, 1366, 3440]) {
+  const historyEntry = panel.getByRole('button', {
+    name: /Consultar robustez/,
+  });
+  for (const width of [565, 960, 1366, 3440]) {
     await page.setViewportSize({ width, height: width === 3440 ? 1440 : 900 });
-    expect(
-      await page.evaluate(
-        () => document.documentElement.scrollWidth <= window.innerWidth + 1,
-      ),
-    ).toBe(true);
+    const layout = await page.evaluate(() => ({
+      fits: document.documentElement.scrollWidth <= window.innerWidth + 1,
+      overflowing: [...document.querySelectorAll('body *')]
+        .filter((el) => {
+          if (el.getBoundingClientRect().right <= window.innerWidth + 1)
+            return false;
+          for (
+            let parent = el.parentElement;
+            parent;
+            parent = parent.parentElement
+          ) {
+            if (
+              ['auto', 'scroll', 'hidden', 'clip'].includes(
+                getComputedStyle(parent).overflowX,
+              )
+            )
+              return false;
+          }
+          return true;
+        })
+        .slice(0, 12)
+        .map((el) => ({
+          tag: el.tagName,
+          className: el.className,
+          text: el.textContent?.slice(0, 80),
+        })),
+    }));
+    expect(layout.fits, JSON.stringify(layout.overflowing)).toBe(true);
+    const bounds = await historyEntry.evaluate((button) => {
+      const rect = button.getBoundingClientRect();
+      const parent = button.parentElement!.getBoundingClientRect();
+      return {
+        contained:
+          rect.left >= parent.left - 1 && rect.right <= parent.right + 1,
+        contentFits:
+          button.scrollHeight <= button.clientHeight + 1 &&
+          button.scrollWidth <= button.clientWidth + 1,
+      };
+    });
+    expect(bounds).toEqual({ contained: true, contentFits: true });
+    await historyEntry.focus();
+    await expect(historyEntry).toBeFocused();
+    await historyEntry.press('Enter');
+    await expect(report.getByText(/504 intervalos posteriores/)).toBeVisible();
+    await historyEntry.screenshot({
+      path: testInfo.outputPath(`robustness-history-${width}.png`),
+    });
     await report.screenshot({
       path: testInfo.outputPath(`robustness-${width}.png`),
     });

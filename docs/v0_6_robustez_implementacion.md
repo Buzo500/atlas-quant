@@ -140,5 +140,9 @@ Esquema SQLite 5 y los identificadores/resultados previos permanecen intactos.
 
 Al cerrar la implementación local todavía no se habían ejecutado subida/CI dev.5.
 La [publicación posterior](publicacion_v06_dev5.md) acredita esta ampliación en
-Windows, sin nueva PR/fusión/etiqueta. Segundo entorno y aceptación funcional del
-usuario pendientes; no se declara una versión estable.
+Windows, sin nueva PR/fusión/etiqueta. La [revisión guiada posterior](revision_guiada_v06_dev5.md)
+completa el recorrido de robustez con el usuario y detecta un defecto visual del
+historial en un panel de 565 px CSS. La [corrección posterior](v0_6_historial_contraste.md)
+resuelve el desbordamiento, verifica cuatro anchos y contrasta seis casos exactos
+en Windows y Ubuntu/WSL. Fuente observada suficiente aún pendiente; no se declara
+una versión estable ni se certifica toda la aplicación en Linux.

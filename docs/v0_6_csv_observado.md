@@ -65,6 +65,31 @@ por separado una política futura de supuestos explícitos de ejecución; **no
 reclasificar esos supuestos como evidencia** ni relajar la política actual de forma
 silenciosa. Comprar datos no garantiza que contengan estos campos.
 
+### Búsqueda adicional de fuente gratuita · 13/09/2026
+
+Se revisaron alternativas primarias sin claves, compras ni cambios en la política:
+
+| Fuente consultada | Qué aporta | Carencia para el Laboratorio actual |
+| --- | --- | --- |
+| [Nasdaq, datos diferidos MiFID II](https://www.nasdaq.com/market-regulation/nordic/mifid-ii) | Ficheros gratuitos diferidos, con actualización frecuente | La retención descrita de 24 horas no recupera los 504 intervalos de desarrollo más calentamiento y reserva necesarios. |
+| [Nasdaq Baltic, ficha NTU1L](https://nasdaqbaltic.com/statistics/en/instrument/LT0000131872/trading) | Identidad LT0000131872, EUR y operaciones recientes | No se obtuvo el histórico completo ni evidencia de publicación histórica y ausencia de eventos. El enlace histórico falló en la herramienta web; no se interpreta como inexistencia del servicio. |
+| [Euronext Web Services](https://www.euronext.com/en/data/how-access-market-data/web-services) | Oferta de acceso a datos históricos | La página comercial no acredita una descarga gratuita accesible con todos los campos requeridos. No se solicitó contrato ni se contactó a terceros. |
+| [BCE, tipos de referencia](https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/index.en.html) | Histórico descargable de tipos FX | Son tipos de referencia, no OHLC ejecutables de un activo EUR. No sustituyen la fuente exigida para SMA. |
+
+La [estructura de sesión de Nasdaq Baltic](https://nasdaqbaltic.com/market-information/trading-day/)
+describe una subasta de apertura con instante aleatorio dentro de cinco segundos
+y una de cierre dentro de treinta segundos. Inferencia para esta auditoría: el
+horario general del mercado no acredita la hora efectiva de cada apertura ni la
+disponibilidad histórica del dato. Tampoco «sin dividendos próximos» en una ficha
+actual demuestra ausencia de eventos en un periodo histórico.
+
+**Resultado: fuente observada apta todavía pendiente.** No se genera un CSV con
+horas inventadas, no se acredita el NVD anterior y no se abre una reserva final.
+La próxima decisión útil es aportar una exportación con evidencia suficiente o
+definir explícitamente, como trabajo nuevo, un modo exploratorio retrospectivo
+con supuestos y restricciones propios. Este último no equivaldría a evidencia
+point-in-time ni habilitaría paper externo. No se ha implementado en este turno.
+
 ### CSV ya auditado
 
 Dataset `4fc6914f5b944719a4901d8613d9968b`, versión 2, en EUR; tramo
