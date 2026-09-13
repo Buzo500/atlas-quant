@@ -17,4 +17,5 @@ node_modules/
 
 # Resultados de ejecuciones y copias locales; no son codigo compartido.
 /output/validation/
+/output/pdf/
 /backups/

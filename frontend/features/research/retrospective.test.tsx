@@ -245,26 +245,74 @@ it('lee el CSV local y lo incorpora al borrador sin ejecutar el cálculo', async
   expect(call).not.toHaveBeenCalled();
 });
 
-it('un fallo de exportación informa del error y conserva el resultado', async () => {
-  const error = vi.fn();
-  vi.spyOn(globalThis, 'fetch').mockResolvedValue(
-    new Response('error', { status: 422 }),
-  );
-  render(<RetrospectiveLab onError={error} />);
+it.each(['Exportar paquete JSON/CSV', 'Exportar fuente LaTeX'])(
+  'un fallo de %s informa del error y conserva el resultado',
+  async (name) => {
+    const error = vi.fn();
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+      new Response('error', { status: 422 }),
+    );
+    render(<RetrospectiveLab onError={error} />);
+    fireEvent.change(screen.getByLabelText('Informe retrospectivo guardado'), {
+      target: { files: [file(report.report_json)] },
+    });
+    fireEvent.click(await screen.findByRole('button', { name }));
+    await waitFor(() =>
+      expect(error).toHaveBeenCalledWith(
+        expect.stringContaining('No se pudo verificar'),
+      ),
+    );
+    expect(
+      screen.getByRole('region', {
+        name: 'Resultado retrospectivo de desarrollo',
+      }),
+    ).not.toBeNull();
+  },
+);
+
+it('exporta la fuente LaTeX verificada una sola vez y mantiene la descarga JSON independiente', async () => {
+  const pending = deferred<Response>();
+  const fetcher = vi
+    .spyOn(globalThis, 'fetch')
+    .mockReturnValue(pending.promise);
+  vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:latex-test');
+  vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => {});
+  const click = vi
+    .spyOn(HTMLAnchorElement.prototype, 'click')
+    .mockImplementation(() => {});
+  render(<RetrospectiveLab onError={vi.fn()} />);
   fireEvent.change(screen.getByLabelText('Informe retrospectivo guardado'), {
     target: { files: [file(report.report_json)] },
   });
-  fireEvent.click(
-    await screen.findByRole('button', { name: 'Exportar paquete JSON/CSV' }),
+  const button = await screen.findByRole('button', {
+    name: 'Exportar fuente LaTeX',
+  });
+  fireEvent.click(button);
+  fireEvent.click(button);
+  expect(fetcher).toHaveBeenCalledTimes(1);
+  expect(fetcher).toHaveBeenCalledWith(
+    '/api/lab/retrospective/latex',
+    expect.objectContaining({
+      method: 'POST',
+      body: JSON.stringify({ report_json: report.report_json }),
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Atlas-Client': 'local-v1',
+      },
+    }),
   );
-  await waitFor(() =>
-    expect(error).toHaveBeenCalledWith(
-      expect.stringContaining('No se pudo verificar'),
+  await act(async () =>
+    pending.resolve(
+      new Response('zip', { headers: { 'Content-Type': 'application/zip' } }),
     ),
   );
+  expect(click).toHaveBeenCalledTimes(1);
+  expect((click.mock.instances[0] as HTMLAnchorElement).download).toBe(
+    'atlas-retrospectivo-latex-cccccccccccc.zip',
+  );
   expect(
-    screen.getByRole('region', {
-      name: 'Resultado retrospectivo de desarrollo',
-    }),
-  ).not.toBeNull();
+    screen
+      .getByRole('button', { name: 'Descargar informe JSON' })
+      .hasAttribute('disabled'),
+  ).toBe(false);
 });

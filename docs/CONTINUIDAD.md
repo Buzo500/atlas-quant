@@ -2,6 +2,66 @@
 
 Actualizado: 13 de septiembre de 2026. Este documento resume decisiones y estado para una conversación nueva de Codex; no contiene la transcripción completa del chat original.
 
+## Cierre dev.8: LaTeX, experimento de dependencia y revisión Windows
+
+El usuario acepta dev.7 («resulta claro») y autoriza las cinco propuestas.
+[Plan previo](v0_6_dev8_plan.md). Rama `codex/v0.6-evaluador`, **0.6.0-dev.8 local**,
+esquema 5. Dev.7 subida sobre `ab7764d`, [CI 34771575781 correcta](publicacion_v06_dev7.md):
+1.124 Python + 91 subcasos, 336 frontend, ocho Node, 25 E2E y arranque/parada.
+Cuota 510 → 531,7/2.000 minutos, 0 USD facturables, bloqueo de pago comprobado.
+Esa CI no cubre los cambios locales de dev.8. Sin nueva PR/fusión/etiqueta.
+
+[Generador LaTeX inicial](informes_latex_implementacion.md): desarrollo retrospectivo
+completo verificado, botón de fuente editable en ZIP, contexto/métricas/curvas/todas
+las operaciones y huellas originales. CLI opcional produce PDF/log/recibo local.
+Sin compilador HTTP ni nuevas tablas/escrituras contables; ZIP JSON/CSV anterior
+compatible, reserva sin precios ni cálculo. Paquete de 12 miembros con manifiesto,
+verificador que reconstruye sin extraer y textos escapados/controlados.
+LuaHBTeX 1.24.0 / TinyTeX v2026.09 portable bajo `var/tools`, sin PATH global;
+2 GB/120 s/32 MB, dos pasadas, sockets/shell-escape desactivados. No es un sandbox
+completo del SO. Versiones/licencias y límite de verificación GPG en la guía.
+
+Maqueta de dos páginas compilada y revisada. HFG y ZAL: tres páginas cada uno;
+prueba con 59 operaciones: cinco; sin operaciones y notas largas: cuatro.
+Fuentes originales HFG/ZAL no se reescriben ni se calculan sus 128 sesiones reservadas.
+PDF finales y ZIP: `output/pdf/atlas-dev8-entrega/`; maqueta en
+`output/pdf/atlas-dev8/maqueta-atlas.pdf`. Artefactos excluidos de Git.
+
+[Experimento de dependencia](v0_6_dependencia_resultados.md): 6.000 historias,
+18.000 bootstrap y 4.000 oráculos; 5.000 réplicas por longitud, L10/20/40,
+n504/1008 y seis procesos generadores, semilla 20260914. Ninguna longitud pasa
+los filtros previos: AR(0,95), n504, L10 cubre 64,2 %, L40 76 %. No cambiar método
+ni parámetros a posteriori; robustez sigue exploratoria. Semilla independiente
+20260915 no ejecutada al no haber candidato que pase. Se verifican todos los hashes,
+resúmenes/tablas y 12 reproducciones exactas. Resumen completo conservado en
+`docs/evidence/dependence-study-v1-summary.json`, fuentes largas locales.
+
+[Revisión Windows](diagnostico_windows_20260913.md): se reprodujo WinError 5 en
+reemplazo atómico del monitor y lanzador. Ahora el mismo temporal se reintenta
+solo para errores Windows 5/32/33, máximo seis intentos/310 ms acumulados; fallos
+persistentes se propagan y conservan el JSON anterior. No reintenta acciones.
+Seis regresiones nuevas, incluido handle real que impide reemplazar temporalmente.
+Primera pasada Python usó por error el Node global antiguo: no confundir ese cierre
+nativo con la entrega. Todas las comprobaciones finales usan Node 24.21.0.
+
+Validación final: **1.168 Python + 91 subcasos**, 338 frontend, ocho Node;
+contratos/TypeScript/lint/build correctos. 45 pruebas de LaTeX/HTTP después del
+último ajuste de composición. Regresión E2E final
+`e2e-d3b911045f3242c2b740cbce8503d05f`, **25/25 en 1,8 min**; resultado 0,
+servidores 0/0, sin parada forzada/errores de limpieza, puertos libres e integridad OK.
+Captura 1.884 grupos y 70 marcas de fallo/cancelación ≤169,68 ms, ninguna lenta.
+
+La primera E2E sí tuvo dos timeouts de 10 s en recorridos antiguos (23/25):
+síntoma observado, causa no confirmada; las capturas siguientes no lo reproducen.
+**La incidencia API sigue abierta.** No presentar los reintentos acotados del JSON
+como una corrección de la API ni el monitor sintético como un ensayo real.
+
+ATLAS habitual **detenido** y base intacta, SHA-256
+`2791f15e1bb5be5833117810ce5de745e4dfb46817850c4d8d8cbc3cc2bc5549`.
+Sin llamadas IA/bróker/claves ni gasto facturable. No reactivar ensayo de 48 h,
+portátil, movimientos personales o aceptación/fusión PR #12. La aceptación dev.7
+no sustituye esas revisiones ni declara estable v0.2/v0.6.
+
 ## Continuación dev.7: interfaz retrospectiva y cinco tareas completadas
 
 «Haz las 5 cosas» autoriza publicación dev.6, revisión estadística, interfaz

@@ -1,19 +1,22 @@
 # ATLAS Quant
 
-**Desarrollo local 0.6.0-dev.7:** [retrospectivo en el Laboratorio](docs/v0_6_retrospectivo_interfaz.md):
-CSV/calendario, protocolo revisable, cálculo con costes, curvas y descarga/reapertura
-JSON/CSV. Casos observados ZAL.DE y HFG.DE bajo supuestos explícitos, reserva sin
-calcular. 1.124 Python + 91 subcasos, 336 frontend, ocho Node y 25 E2E locales;
-build/contratos/TypeScript/lint correctos. Esquema 5 y base habitual intactos.
-[Revisión estadística y siguiente experimento](docs/v0_6_dependencia_revision.md)
-definidos sin cambiar el método; [diseño LaTeX con maqueta editable](docs/informes_latex_diseno.md),
-sin generador/PDF integrado. No acredita datos ni habilita órdenes.
+**Desarrollo local 0.6.0-dev.8:** [exportación LaTeX](docs/informes_latex_implementacion.md)
+del desarrollo retrospectivo completo: fuente y datos desde el Laboratorio,
+PDF opcional mediante CLI Windows. Contexto, costes, curvas, operaciones y huellas
+verificadas, con reserva excluida. LuaLaTeX portable opcional; ATLAS no lo instala
+ni descarga paquetes al arrancar. Carteras/fechas arbitrarias siguen pendientes.
 
-**Dev.6 subida:** `27892a2`, [CI gratuita 34768335375 correcta](https://github.com/Buzo500/atlas-quant/actions/runs/34768335375)
-con 1.104 Python + 91 subcasos, 328 frontend, ocho Node, 24 E2E y arranque/parada;
-510/2.000 minutos incluidos y 0 USD facturables. [Evidencia](docs/publicacion_v06_dev6.md).
-Esta CI corresponde a dev.6; dev.7 permanece local. App habitual detenida.
-[Estado y límites](docs/CONTINUIDAD.md).
+[Experimento de dependencia](docs/v0_6_dependencia_resultados.md): 6.000 historias;
+ninguna longitud pasa los filtros. Método del producto intacto, robustez exploratoria.
+[Corrección Windows](docs/diagnostico_windows_20260913.md) para bloqueos transitorios
+al reemplazar JSON de estado. 1.168 Python + 91 subcasos, 338 frontend, ocho Node,
+25 E2E locales; build/contratos/TypeScript/lint correctos. Esquema 5 conservado.
+
+**Dev.7 aceptada y subida:** `ab7764d`, [CI gratuita 34771575781 correcta](https://github.com/Buzo500/atlas-quant/actions/runs/34771575781)
+con 1.124 Python + 91 subcasos, 336 frontend, ocho Node, 25 E2E y arranque/parada;
+531,7/2.000 minutos incluidos y 0 USD facturables. [Evidencia](docs/publicacion_v06_dev7.md).
+Dev.8 sigue local y no está cubierta por esa CI. App habitual detenida/base intacta.
+La incidencia API sigue abierta; [estado y límites](docs/CONTINUIDAD.md).
 
 **Antecedente 0.6.0-dev.5, rama subida y CI correcta:** primer bloque de [robustez estadística](docs/v0_6_robustez_implementacion.md)
 en candidatas: incertidumbre del exceso diario SMA frente a comprar/mantener,

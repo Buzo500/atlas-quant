@@ -77,7 +77,7 @@ def _windows_error(action: str) -> OSError:
 
 
 class _WindowsJob:
-    def __init__(self):
+    def __init__(self, memory_limit_bytes=None):
         self._api = _windows_api()
         # NULL SECURITY_ATTRIBUTES makes this handle non-inheritable. Keeping
         # it unnamed also prevents another launcher from opening the same job.
@@ -87,6 +87,9 @@ class _WindowsJob:
             raise _windows_error("No se pudo crear la protección de procesos de ATLAS")
         limits = _ExtendedLimitInformation()
         limits.BasicLimitInformation.LimitFlags = 0x00002000  # KILL_ON_JOB_CLOSE
+        if memory_limit_bytes is not None:
+            limits.BasicLimitInformation.LimitFlags |= 0x00000200  # JOB_MEMORY
+            limits.JobMemoryLimit = memory_limit_bytes
         if not self._api.SetInformationJobObject(
             self._handle, 9, ctypes.byref(limits), ctypes.sizeof(limits),
         ):
@@ -134,10 +137,15 @@ class ProcessGroup:
     up any subprocess whose add failed. close is idempotent after success.
     """
 
-    def __init__(self):
+    def __init__(self, *, memory_limit_bytes=None):
+        if memory_limit_bytes is not None:
+            if type(memory_limit_bytes) is not int or memory_limit_bytes <= 0:
+                raise ValueError('El límite de memoria debe ser un entero positivo.')
+            if os.name != 'nt':
+                raise ValueError('El límite de memoria del grupo requiere Windows.')
         self._processes: list[subprocess.Popen] = []
         self._closed = False
-        self._job = _WindowsJob() if os.name == "nt" else None
+        self._job = (_WindowsJob() if memory_limit_bytes is None else _WindowsJob(memory_limit_bytes)) if os.name == "nt" else None
 
     def __enter__(self):
         if self._closed:

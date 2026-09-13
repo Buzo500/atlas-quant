@@ -7,6 +7,7 @@ from pathlib import Path
 import socket
 import subprocess
 import sys
+import time
 import uuid
 
 
@@ -61,6 +62,12 @@ def locked(path):
 
 
 def atomic_json(path, value):
+    """Publish one serialized snapshot; caller remains responsible for writer ownership.
+
+    A Windows reader/scanner may briefly deny replacement. Retry only that
+    atomic operation on the same flushed temporary, never serialize or replay
+    an application action. Persistent access errors still propagate.
+    """
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
     temporary = path.with_name(path.name + "." + uuid.uuid4().hex + ".tmp")
@@ -69,7 +76,15 @@ def atomic_json(path, value):
             json.dump(value, stream, ensure_ascii=False, allow_nan=False, indent=2)
             stream.flush()
             os.fsync(stream.fileno())
-        os.replace(temporary, path)
+        delays = (.01, .02, .04, .08, .16)
+        for attempt in range(len(delays) + 1):
+            try:
+                os.replace(temporary, path)
+                break
+            except OSError as error:
+                if os.name != 'nt' or getattr(error, 'winerror', None) not in {5, 32, 33} or attempt == len(delays):
+                    raise
+                time.sleep(delays[attempt])
     finally:
         temporary.unlink(missing_ok=True)
 

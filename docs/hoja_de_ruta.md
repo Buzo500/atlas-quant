@@ -1,10 +1,18 @@
 # ATLAS Quant · Hoja de ruta
 
-Actualizado: 11 de septiembre de 2026. **La secuencia de versiones se conserva.** La [arquitectura objetivo](arquitectura_objetivo.md) concreta recorridos, módulos y condiciones de promoción/recuperación. Monolito modular. D1–D8 integrados como desarrollo: D6 publicado en `v0.4.0-dev.5`; D7/D8 en `v0.4.0-dev.6` (PR #9, CI gratuita 34509155203 correcta). El [primer alcance v0.5](v0_5_alcance_inicial.md) está publicado en PR #10 y etiqueta v0.5.0-dev.1, CI gratuita correcta. La [ampliación v0.5.0-dev.2](v0_5_planificacion.md) está publicada en PR #11, squash `bde915b` y etiqueta anotada; CI gratuita 34525527095 correcta, 0 USD facturables. No declara toda v0.5 terminada ni v0.2 estable.
+Actualizado: 13 de septiembre de 2026. **La secuencia de versiones se conserva.** La [arquitectura objetivo](arquitectura_objetivo.md) concreta recorridos, módulos y condiciones de promoción/recuperación. Monolito modular. D1–D8 integrados como desarrollo: D6 publicado en `v0.4.0-dev.5`; D7/D8 en `v0.4.0-dev.6` (PR #9, CI gratuita 34509155203 correcta). El [primer alcance v0.5](v0_5_alcance_inicial.md) está publicado en PR #10 y etiqueta v0.5.0-dev.1, CI gratuita correcta. La [ampliación v0.5.0-dev.2](v0_5_planificacion.md) está publicada en PR #11, squash `bde915b` y etiqueta anotada; CI gratuita 34525527095 correcta, 0 USD facturables. No declara toda v0.5 terminada ni v0.2 estable.
 
 ## Estado vigente
 
-- **Actualización local v0.6 dev.7:** [interfaz retrospectiva](v0_6_retrospectivo_interfaz.md),
+- **Actualización dev.8 local:** [fuente LaTeX y PDF opcional Windows](informes_latex_implementacion.md)
+  para desarrollo completo retrospectivo; [experimento de dependencia](v0_6_dependencia_resultados.md)
+  ejecutado sin candidato que supere filtros. Método exploratorio conservado.
+  Reemplazo JSON de estado Windows reforzado; incidencia API abierta. 1.168 Python
+  + 91 subcasos, 338 frontend, ocho Node y 25 E2E locales. Dev.7 aceptada y subida,
+  [CI gratuita correcta](publicacion_v06_dev7.md). Dev.8 aún sin publicación propia.
+  No modifica versiones ni reactiva aplazamientos; [continuidad](CONTINUIDAD.md).
+
+- **Antecedente v0.6 dev.7:** [interfaz retrospectiva](v0_6_retrospectivo_interfaz.md),
   congelación revisable, descarga/reapertura JSON/CSV, segundo caso HFG.DE sin
   calcular reserva. [Revisión estadística y experimento fijado](v0_6_dependencia_revision.md),
   sin cambiar el método, y [definición LaTeX](informes_latex_diseno.md) con maqueta,

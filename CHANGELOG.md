@@ -1,5 +1,21 @@
 # Cambios de ATLAS Quant
 
+## 0.6.0-dev.8 · LaTeX reproducible y diagnóstico de dependencia · 2026-09-13
+
+- Fuente LaTeX editable desde Laboratorio/HTTP, desarrollo completo verificado,
+  curvas/tablas/contexto y manifiesto; JSON/CSV anterior compatible, sin reservas
+  calculadas ni escrituras contables. PDF opcional local Windows con límites.
+- Maqueta y cuatro casos compilados, notas/tablas paginadas, escape de texto y
+  contraste de cifras. TinyTeX portable; sin instalación al arrancar ATLAS.
+- Experimento predeclarado de 6.000 historias: ninguna longitud supera filtros;
+  informe de cobertura/Wilson/sesgos/anchuras/pares. Método intacto y exploratorio.
+- Reemplazo atómico JSON en Windows: reintentos limitados para errores 5/32/33;
+  no repetir acciones y conservar fallos persistentes/estado anterior.
+- 1.168 Python + 91 subcasos, 338 frontend, ocho Node y 25 E2E locales;
+  contratos/TypeScript/lint/build. La espera API sigue abierta. [Continuidad](docs/CONTINUIDAD.md).
+- Dev.8 local/esquema 5. Dev.7 aceptada, subida sobre `ab7764d` y CI gratuita
+  34771575781 correcta; no atribuir esa CI a dev.8. Sin PR/fusión/etiqueta nuevas.
+
 ## 0.6.0-dev.7 · Retrospectivo en el Laboratorio · 2026-09-13
 
 - Formulario CSV/calendario, identidad y costes; congelación revisable antes de

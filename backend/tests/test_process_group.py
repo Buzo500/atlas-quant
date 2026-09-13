@@ -19,6 +19,27 @@ from process_group import ProcessGroup
 FLAGS = subprocess.CREATE_NO_WINDOW if os.name == "nt" else 0
 
 
+@pytest.mark.parametrize('limit', [0, -1, True])
+def test_invalid_memory_limit_is_rejected(limit):
+    with pytest.raises(ValueError, match='entero positivo'):
+        ProcessGroup(memory_limit_bytes=limit)
+
+
+@pytest.mark.skipif(os.name != 'nt', reason='Windows Job Object memory enforcement')
+def test_windows_memory_limit_blocks_large_child_allocation():
+    code = "input()\ntry:\n data=bytearray(256*1024*1024)\n print('unlimited')\nexcept MemoryError:\n print('limited')"
+    child = subprocess.Popen([sys.executable, '-c', code], stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, creationflags=FLAGS)
+    try:
+        with ProcessGroup(memory_limit_bytes=128*1024*1024) as group:
+            group.add(child)
+            output, error = child.communicate('go\n', timeout=8)
+            assert child.returncode == 0, error
+            assert output.strip() == 'limited'
+    finally:
+        stop_owned(child)
+
+
 def sleeper():
     return subprocess.Popen(
         [sys.executable, "-c", "import time; time.sleep(30)"],

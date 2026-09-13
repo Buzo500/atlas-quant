@@ -1,0 +1,35 @@
+% ATLAS Quant report style v1. Generated reports contain escaped data only.
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=20mm,headheight=16pt]{geometry}
+\usepackage{fontspec}
+\setmainfont{TeX Gyre Heros}[Numbers=Monospaced]
+\setmonofont{Latin Modern Mono}[Scale=0.86]
+\usepackage[spanish,es-nodecimaldot]{babel}
+\usepackage[table]{xcolor}
+\usepackage{booktabs,tabularx,longtable,fancyhdr,hyperref,pgfplots}
+\pgfplotsset{compat=1.18}
+\definecolor{ink}{HTML}{272B2D}
+\definecolor{copper}{HTML}{975435}
+\definecolor{cream}{HTML}{F4F1EA}
+\definecolor{ivory}{HTML}{FFFCF6}
+\definecolor{slate}{HTML}{526B80}
+\definecolor{rulegray}{HTML}{DCD7CF}
+\color{ink}
+\hypersetup{hidelinks,pdftitle={ATLAS Quant: informe de desarrollo}}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+\setlength{\LTleft}{0pt}
+\setlength{\LTright}{0pt}
+\setlength{\emergencystretch}{3em}
+\renewcommand{\arraystretch}{1.25}
+\linespread{1.1}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textbf{ATLAS}\quad Investigación cuantitativa}
+\fancyhead[R]{\small Desarrollo retrospectivo}
+\fancyfoot[L]{\footnotesize atlas-report-template-v1}
+\fancyfoot[R]{\footnotesize\thepage}
+\renewcommand{\headrulewidth}{0.3pt}
+\arrayrulecolor{rulegray}
+\newcommand{\AtlasSection}[1]{\par\addvspace{12pt}{\large\bfseries\color{copper}#1\par}\nobreak\vspace{3pt}}
+\newcommand{\AtlasNote}[1]{\par\colorbox{cream}{\parbox{\dimexpr\linewidth-2\fboxsep}{\small #1}}\par}

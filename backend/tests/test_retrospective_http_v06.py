@@ -57,6 +57,12 @@ def test_prepare_calculate_reopen_export_preserve_database_and_reserve(http):
         assert b'2025-01-08' not in archive.read('prices.csv')
         assert 'Investigación retrospectiva' in archive.read('README.txt').decode('utf-8')
         assert json.loads(archive.read('report.json')) == json.loads(result['report_json'])
+    latex = client.post(BASE+'latex', json=payload)
+    assert latex.status_code == 200
+    assert latex.headers['content-type'] == 'application/zip'
+    assert latex.headers['cache-control'] == 'no-store'
+    from atlas_quant.research_latex import verify_archive
+    assert verify_archive(latex.content)['source_report_hash'] == result['report_hash']
     assert hashlib.sha256(database.read_bytes()).hexdigest() == before
 
 
@@ -86,7 +92,7 @@ def test_bad_preparation_never_returns_a_frozen_protocol(http, problem):
     assert client.post(BASE+'prepare', json=body).status_code == 422
 
 
-@pytest.mark.parametrize('action', ['prepare', 'calculate', 'reopen', 'export'])
+@pytest.mark.parametrize('action', ['prepare', 'calculate', 'reopen', 'export', 'latex'])
 def test_http_origin_and_client_controls_apply(http, action):
     client, _, _ = http
     assert client.post(BASE+action, json={}, headers={'Origin':'https://untrusted.example'}).status_code == 403
@@ -107,7 +113,7 @@ def test_reopen_and_export_reject_tampering_even_with_rehashed_report(http, prob
     elif problem == 'code': report['code_sha256'] = {'historical.py':'not-a-hash'}
     report['report_hash'] = digest({k:v for k,v in report.items() if k != 'report_hash'})
     document = json.dumps([report] if problem == 'array' else report)
-    for action in ('reopen','export'):
+    for action in ('reopen','export','latex'):
         assert client.post(BASE+action, json={'report_json':document}).status_code == 422
 
 
@@ -126,6 +132,7 @@ def test_shared_computation_limit_and_recovery_leave_health_available(http):
             assert _SLOTS.acquire(blocking=False)
             acquired += 1
         assert client.post(BASE+'prepare',json=body).status_code == 503
+        assert client.post(BASE+'latex',json={'report_json':'x'*100}).status_code == 503
         assert client.get('/api/health').status_code == 200
     finally:
         for _ in range(acquired): _SLOTS.release()

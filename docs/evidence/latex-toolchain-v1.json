@@ -1,0 +1,120 @@
+{
+  "distribution": "TinyTeX v2026.09",
+  "source": "https://github.com/rstudio/tinytex-releases/releases/tag/v2026.09",
+  "archive": "TinyTeX-v2026.09.zip",
+  "archive_sha256": "e82d8b78fcf5740639f10ac8518f0c83c9202830e6bba364c70104601c12c6be",
+  "engine": "LuaHBTeX 1.24.0 (TeX Live 2026)",
+  "optional_packages_added": [
+    "pgfplots",
+    "babel-spanish",
+    "hyphen-spanish"
+  ],
+  "repository": "https://softlibre.unizar.es/tex-archive/systems/texlive/tlnet",
+  "tls_verified": true,
+  "gpg_verification": false,
+  "installation": "portable, no global PATH changes",
+  "packages": [
+    {
+      "name": "babel",
+      "revision": "80042",
+      "catalogue-version": "26.11",
+      "catalogue-license": "lppl1.3"
+    },
+    {
+      "name": "babel-spanish",
+      "revision": "79461",
+      "catalogue-version": "5.0q",
+      "catalogue-license": "lppl1.3"
+    },
+    {
+      "name": "booktabs",
+      "revision": "77682",
+      "catalogue-version": "1.61803398",
+      "catalogue-license": "lppl1.3c"
+    },
+    {
+      "name": "fancyhdr",
+      "revision": "78348",
+      "catalogue-version": "5.2",
+      "catalogue-license": "lppl1.3"
+    },
+    {
+      "name": "fontspec",
+      "revision": "79934",
+      "catalogue-version": "2.9h",
+      "catalogue-license": "lppl1.3c"
+    },
+    {
+      "name": "geometry",
+      "revision": "78315",
+      "catalogue-version": "6.0",
+      "catalogue-license": "lppl1.3c"
+    },
+    {
+      "name": "hyperref",
+      "revision": "79408",
+      "catalogue-version": "7.01r",
+      "catalogue-license": "lppl1.3"
+    },
+    {
+      "name": "hyphen-spanish",
+      "revision": "78069",
+      "catalogue-version": "5.0",
+      "catalogue-license": "mit"
+    },
+    {
+      "name": "l3kernel",
+      "revision": "80015",
+      "catalogue-version": null,
+      "catalogue-license": "lppl1.3c"
+    },
+    {
+      "name": "latex",
+      "revision": "79618",
+      "catalogue-version": null,
+      "catalogue-license": "lppl1.3c"
+    },
+    {
+      "name": "lm",
+      "revision": "77682",
+      "catalogue-version": "2.005",
+      "catalogue-license": "gfl"
+    },
+    {
+      "name": "luaotfload",
+      "revision": "74324",
+      "catalogue-version": "3.29",
+      "catalogue-license": "gpl2"
+    },
+    {
+      "name": "pgf",
+      "revision": "79866",
+      "catalogue-version": "3.1.12",
+      "catalogue-license": "lppl1.3c gpl2 fdl"
+    },
+    {
+      "name": "pgfplots",
+      "revision": "80105",
+      "catalogue-version": "1.18.3",
+      "catalogue-license": "gpl3+"
+    },
+    {
+      "name": "tex-gyre",
+      "revision": "68624",
+      "catalogue-version": "2.501",
+      "catalogue-license": "gfl"
+    },
+    {
+      "name": "tools",
+      "revision": "79234",
+      "catalogue-version": null,
+      "catalogue-license": "lppl1.3c"
+    },
+    {
+      "name": "xcolor",
+      "revision": "77682",
+      "catalogue-version": "3.02",
+      "catalogue-license": "lppl1.3c"
+    }
+  ]
+}

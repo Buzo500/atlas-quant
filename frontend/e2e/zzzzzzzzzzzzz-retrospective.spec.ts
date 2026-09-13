@@ -124,6 +124,13 @@ test('v0.6 retrospectivo: revisión, descarga, reapertura y reserva excluida', a
   expect(
     (await readFile((await zipped.path())!)).subarray(0, 4).toString('hex'),
   ).toBe('504b0304');
+  const latexEvent = page.waitForEvent('download');
+  await panel.getByRole('button', { name: 'Exportar fuente LaTeX' }).click();
+  const latex = await latexEvent;
+  expect(latex.suggestedFilename()).toContain('atlas-retrospectivo-latex-');
+  expect(
+    (await readFile((await latex.path())!)).subarray(0, 4).toString('hex'),
+  ).toBe('504b0304');
   await page.reload();
   await page
     .getByText('Investigación retrospectiva con supuestos', { exact: true })

@@ -32,7 +32,9 @@ Requisitos de adaptación:
 
 ## REPORT-001 · Informes LaTeX de cartera y backtests por fechas
 
-**Estado:** diseño inicial concretado por autorización del 13/09/2026: [contrato propuesto, estética y maqueta editable](informes_latex_diseno.md). Fuente `.tex` y vista HTML sintética disponibles; generador integrado y compilación PDF pendientes. Encaje en la exportación reproducible de **v0.6**, reordenable al acotar esa entrega. No es necesaria para cerrar v0.2 ni para aplicar el rediseño visual.
+Actualización dev.8: [generador inicial implementado](informes_latex_implementacion.md) para el desarrollo completo retrospectivo; fuente/recursos desde UI y PDF opcional local. Carteras y rangos arbitrarios permanecen pendientes.
+
+**Estado:** primer alcance retrospectivo implementado y compilado en dev.8. [Diseño y ampliaciones](informes_latex_diseno.md); fuente `.tex`, recursos, descarga UI y PDF local Windows. Informes de cartera y fechas arbitrarias aún pendientes. Encaje en la exportación reproducible de **v0.6**, reordenable al acotar esa entrega. No es necesaria para cerrar v0.2 ni para aplicar el rediseño visual.
 
 Solicitud del usuario: exportar un documento LaTeX con diseño original de ATLAS que resuma la evolución de la cartera, sus activos y resultados entre fechas elegidas en el momento de exportar; utilizar también este recorrido para resúmenes de backtests.
 

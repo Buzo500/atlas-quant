@@ -1,5 +1,7 @@
 # Retrospectivo desde el Laboratorio · 0.6.0-dev.7
 
+Publicación posterior: dev.7 aceptada por el usuario, subida sobre `ab7764d` y [CI gratuita correcta](publicacion_v06_dev7.md). Dev.8 añade [fuente LaTeX y PDF local](informes_latex_implementacion.md). Los resultados de desarrollo y el formato JSON/CSV originales se conservan.
+
 13/09/2026. Cinco tareas autorizadas en [el plan previo](v0_6_dev7_plan.md).
 Rama `codex/v0.6-evaluador`, esquema 5. Dev.6 ya subida y con
 [CI gratuita correcta](publicacion_v06_dev6.md); esta ampliación es local.

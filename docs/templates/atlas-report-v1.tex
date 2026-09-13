@@ -1,5 +1,5 @@
 % ATLAS report design v1. Synthetic mockup; not a generated strategy report.
-% Proposed engine: LuaLaTeX. Compilation has not been validated in this delivery.
+% Compiled with LuaHBTeX 1.24.0 / TeX Live 2026 on Windows, 13 September 2026.
 \documentclass[11pt,a4paper]{article}
 \usepackage[margin=20mm,headheight=16pt]{geometry}
 \usepackage{fontspec}
@@ -28,7 +28,7 @@
 \fancyfoot[L]{\small atlas-report-template-v1}
 \fancyfoot[R]{\small\thepage}
 \renewcommand{\headrulewidth}{0.3pt}
-\newcommand{\AtlasSection}[1]{\vspace{8pt}{\large\bfseries\color{copper}#1}\par}
+\newcommand{\AtlasSection}[1]{\par\addvspace{12pt}{\large\bfseries\color{copper}#1}\par\nobreak\vspace{3pt}}
 \begin{document}
 {\small\color{copper}\textbf{INFORME DE DESARROLLO}}\par
 {\LARGE\bfseries Tendencia y preservación de capital}\par
@@ -46,11 +46,12 @@ Efectivo & 10.000,00 & 0,00\,\% & 0,00\,\%\\\bottomrule
 \end{tabularx}
 \AtlasSection{Evolución del patrimonio}
 \begin{tikzpicture}
-\begin{axis}[width=\linewidth,height=60mm,axis lines=left,
+\begin{axis}[width=.94\linewidth,height=60mm,axis lines=left,
   axis line style={rulegray},tick style={rulegray},grid=major,
   grid style={rulegray!45},ylabel={EUR},xtick={1,2,3,4,5},
   xticklabels={02/01,03/01,04/01,05/01,08/01},scaled y ticks=false,
-  yticklabel style={/pgf/number format/fixed,/pgf/number format/1000 sep={.}},
+  yticklabel={\pgfmathprintnumber[fixed,precision=0,1000 sep={.},dec sep={,},assume math mode=true]{\tick}},
+  tick label style={font=\small\sffamily},
   legend style={draw=none,font=\small,at={(0.5,1.05)},anchor=south,legend columns=2}]
 \addplot[color=slate,thick] coordinates {(1,10000)(2,10100)(3,10069.7)(4,10100)(5,10125)};
 \addlegendentry{Ejemplo sintético}
@@ -85,7 +86,7 @@ Tipo & Maqueta sintética\\
 Fuente & Este documento; no hay proveedor de mercado\\\bottomrule
 \end{longtable}
 \AtlasSection{Reproducción}
-El futuro paquete conservará fuente TeX, JSON, CSV, recursos locales y manifiesto.
-La compilación estará aislada, sin red ni shell-escape. Este archivo es una propuesta
-de plantilla y su compilación queda pendiente de verificar con la herramienta fijada.
+El paquete conserva fuente TeX, JSON, CSV, recursos locales y manifiesto.
+Esta maqueta se ha compilado con LuaHBTeX 1.24.0 de TeX Live 2026 en Windows,
+con sockets y shell-escape desactivados. Sus cifras siguen siendo sintéticas.
 \end{document}

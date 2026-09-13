@@ -11,6 +11,7 @@ from .contracts import ResponseModel
 from .lab_contracts import LabPeriod
 from .retrospective import RetrospectiveRequest, freeze
 from .retrospective_package import encoded, run, verify_report, export_bytes, code_hashes
+from .research_latex import export_latex
 from .simulation_contracts import SimulationConfig
 from .strategy_spec import FrozenContract, Hash
 
@@ -140,3 +141,14 @@ def register_retrospective_routes(app):
             raise ValueError('Contenido del informe inválido.') from exc
         return Response(data, media_type='application/zip', headers={
             'Content-Disposition': 'attachment; filename="atlas-retrospectivo.zip"'})
+
+    @app.post('/api/lab/retrospective/latex', response_class=Response,
+        responses={200: {'content': {'application/zip': {'schema': {'type': 'string', 'format': 'binary'}}}}})
+    @bounded_calculation
+    def latex(body: RetrospectiveReopenInput):
+        try:
+            data = export_latex(read_document(body.report_json))
+        except (KeyError, TypeError, AttributeError, RecursionError) as exc:
+            raise ValueError('Contenido del informe inválido.') from exc
+        return Response(data, media_type='application/zip', headers={
+            'Content-Disposition': 'attachment; filename="atlas-retrospectivo-latex.zip"'})

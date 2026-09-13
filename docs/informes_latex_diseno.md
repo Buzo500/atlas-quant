@@ -1,5 +1,7 @@
 # REPORT-001 · Definición de la plantilla LaTeX ATLAS
 
+Actualización dev.8: el primer generador y la compilación Windows ya están implementados en [la guía de uso](informes_latex_implementacion.md). La definición siguiente conserva el diseño previo; cartera y fechas arbitrarias siguen pendientes.
+
 Diseño concretado el 13/09/2026 por autorización de las cinco tareas posteriores a
 dev.6. Entregables de esta fase: contrato, jerarquía, fuente de maqueta y vista
 HTML de referencia. **No es todavía un generador integrado ni un PDF compilado.**

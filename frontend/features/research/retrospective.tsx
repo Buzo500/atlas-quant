@@ -203,9 +203,9 @@ export function RetrospectiveLab({
     setReviewed(false);
     setFileStatus('Informe reabierto y cálculo reproducido.');
   }
-  async function downloadZip() {
+  async function downloadZip(format: 'export' | 'latex' = 'export') {
     if (!result) return;
-    const response = await fetch('/api/lab/retrospective/export', {
+    const response = await fetch(`/api/lab/retrospective/${format}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -222,7 +222,7 @@ export function RetrospectiveLab({
       );
     saveResearchFile(
       await response.blob(),
-      `atlas-retrospectivo-${result.report_hash.slice(0, 12)}.zip`,
+      `atlas-retrospectivo-${format === 'latex' ? 'latex-' : ''}${result.report_hash.slice(0, 12)}.zip`,
     );
     setFileStatus('Descarga del paquete solicitada al navegador.');
   }
@@ -516,15 +516,25 @@ export function RetrospectiveLab({
               <Button
                 disabled={busy}
                 variant="outline"
-                onClick={() => void run(downloadZip)}
+                onClick={() => void run(() => downloadZip())}
               >
                 <Download />
                 Exportar paquete JSON/CSV
               </Button>
+              <Button
+                disabled={busy}
+                variant="outline"
+                onClick={() => void run(() => downloadZip('latex'))}
+              >
+                <Download />
+                Exportar fuente LaTeX
+              </Button>
             </div>
             <p className="muted">
               La reserva sigue sin calcular. El paquete no contiene sus precios
-              ni autoriza operaciones.
+              ni autoriza operaciones. La fuente LaTeX incluye el desarrollo
+              completo, sus datos y recursos editables. El PDF se compila por
+              separado con LuaLaTeX.
             </p>
             <p className="mono native-hash">Informe: {result.report_hash}</p>
           </div>
