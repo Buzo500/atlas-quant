@@ -1,5 +1,20 @@
 # Cambios de ATLAS Quant
 
+## 0.6.0-dev.6 · Investigación retrospectiva por CLI · 2026-09-13
+
+- Política `atlas-retrospective-eur-v1` con contratos separados para disponibilidad,
+  horarios y base supuestos. Conserva falsos los indicadores de acreditación;
+  reutiliza evaluador SMA y NativeBook, sin nuevos endpoints o escrituras contables.
+- CSV EUR sin huecos/eventos conocidos, protocolo congelado, desarrollo aislado de
+  precios reservados y primer caso observado ZAL.DE calculado con costes.
+- Exportación JSON/CSV/ZIP determinista con manifiesto y reproducción numérica;
+  rechaza alteraciones, rutas/miembros inesperados y sobrescritura de archivos.
+- Cobertura ampliada predeclarada: 600 historias, seis escenarios y tres longitudes.
+  Infracobertura fuerte en AR(1) phi=0,9; no se modifica el método tras observarla.
+- 1.104 Python + 91 subcasos, cuatro E2E v0.6, build/contratos/TypeScript/lint.
+  [Uso, resultados y límites](docs/v0_6_retrospectivo.md). Desarrollo local,
+  esquema 5, sin nueva CI remota ni publicación; gasto cero.
+
 ## 0.6.0-dev.5 · Robustez exploratoria · 2026-09-12
 
 - Publicación posterior autorizada: rama subida sobre `6dd01ce` y

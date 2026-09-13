@@ -2,6 +2,60 @@
 
 Actualizado: 13 de septiembre de 2026. Este documento resume decisiones y estado para una conversación nueva de Codex; no contiene la transcripción completa del chat original.
 
+## Continuación dev.6: retrospectivo, caso observado y exportación local
+
+«Vale, haz las 5 cosas» autoriza definir el modo retrospectivo, auditar una fuente
+EUR, calcular el primer desarrollo con costes/reserva, ampliar cobertura y preparar
+exportación reproducible. Completado como entrega inicial por CLI en la rama
+`codex/v0.6-evaluador`, **0.6.0-dev.6 local**, esquema 5.
+[Política, fuentes, resultados, comandos y limitaciones](v0_6_retrospectivo.md).
+
+`atlas-retrospective-eur-v1` usa contratos independientes con indicadores de
+acreditación falsos, calendario/horarios y ejecución supuestos. Comparte evaluador
+SMA y NativeBook; la fábrica de especificaciones es un argumento interno, no una
+opción HTTP. El Laboratorio acreditado conserva sus validaciones y contratos.
+No hay nuevos endpoints, formularios, libros, candidatas ni permiso de órdenes.
+Exporta desarrollo en JSON/CSV/ZIP determinista; valida entradas e integridad,
+recalcula todos los resultados y no extrae archivos. LaTeX queda para otra entrega.
+
+ZAL.DE (Zalando, DE000ZAL1111) descargado gratuitamente con yfinance 1.7.0 y TLS
+verificado, sin dependencias nuevas. 762 fechas completas contrastadas con Xetra
+2023–2025, sin eventos en la respuesta; la ausencia exhaustiva de eventos/base
+point-in-time no está acreditada. Solo apta bajo la política retrospectiva.
+SMA 20/50, 10.000 EUR, coste fijo 1 EUR + 5 pb y deslizamiento 5 pb, fijados antes
+del cálculo: desarrollo 634 sesiones hasta 30/06/2025, NAV final 8.246,07 EUR;
+BH 8.358,97 EUR. Reserva de 128 sesiones desde 01/07/2025 no calculada ni exportada
+con precios. No acredita desconocimiento externo ni una reserva global de ATLAS.
+Artefactos locales: `output/validation/v06-retrospective-zal/`; ZIP
+`atlas-zal-desarrollo.zip`, verificado por recálculo con resultado idéntico.
+
+Ampliación de cobertura: 100 historias por cada uno de seis escenarios, 5.000
+réplicas y L=5/10/20. L=10 principal: 94/100 IID, 91/100 AR(1) phi=0,6,
+73/100 AR(1) phi=0,9, 95/100 t(5), 94/100 cambio de varianza y 100/100 cambio de
+media. Los cambios son estrés no estacionario, no prueba de validez.
+Infracobertura explícita; no cambiar parámetros a posteriori ni promover
+estrategias. Se verificaron hashes, 600 historias, 1.800 resultados y recuentos;
+originales en `output/validation/robustness-coverage-v2/`. El experimento v1 queda conservado.
+
+Validación local: **1.104 Python + 91 subcasos**, incluidos 40 nuevos y regresión
+completa del motor; cuatro E2E v0.6 correctos (18,6 s: desarrollo/reserva,
+walk-forward, sensibilidad/candidatas y robustez). Build canónico, contratos,
+TypeScript y lint correctos. No se ha repetido toda la suite frontend/24 E2E;
+las cifras 328/24 y CI 34760823911 de abajo son de dev.5.
+E2E `e2e-03618c9f0ac045e9a7a9db09c0b5924d`: resultado 0, ambos servidores salida 0,
+sin parada forzada ni error de limpieza, puertos liberados e integridad correcta.
+Captura: 321 grupos correlacionados, un cierre incompleto/ECONNRESET de `/api/state`
+a ~10 ms, ASGI completa en ~15 ms; no hay espera larga reproducida ni causa
+histórica confirmada. No se cambia transporte ni se declara resuelta la incidencia.
+
+ATLAS habitual continúa detenido. SHA-256 de su base conservado:
+`2791f15e1bb5be5833117810ce5de745e4dfb46817850c4d8d8cbc3cc2bc5549`, igual al cierre
+anterior y tras estas pruebas. Compilación dev.6 preparada para el próximo arranque.
+Sin subida, CI remota, PR, fusión o etiqueta nuevas; ningún gasto ni proveedor IA.
+No reactivar revisión pendiente v0.5/PR #12, portátil, ensayo o movimientos personales.
+La fuente apta para el Laboratorio acreditado sigue pendiente; el caso retrospectivo
+no la sustituye. Revisión dev.5 y contraste Windows–WSL anteriores ya completados.
+
 ## Continuación dev.5: historial corregido y segundo entorno comprobado
 
 El usuario autoriza cinco tareas después de la revisión guiada. Corrección localizada

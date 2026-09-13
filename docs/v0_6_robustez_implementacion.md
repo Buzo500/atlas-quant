@@ -1,5 +1,11 @@
 # v0.6 dev.5 · Primer bloque estadístico
 
+Actualización 13/09: [cobertura ampliada a seis escenarios y 100 historias por
+escenario](v0_6_retrospectivo.md#cobertura-ampliada-resultado-completo-por-longitud).
+AR(1) con phi=0,9 muestra 73/100 con L=10; limitación exploratoria explícita.
+No cambia el método, parámetros o resultados v1 descritos aquí ni aplica una prueba
+estadística a los retornos observados del caso retrospectivo.
+
 Autorizado el 12/09/2026 con «Haz los 4 últimos»: decidir integración con PR #12,
 buscar CSV observado apto, capturar la espera API si reaparece e implementar el
 primer bloque estadístico. El diseño `v0_6_robustez_estadistica.md` queda aceptado

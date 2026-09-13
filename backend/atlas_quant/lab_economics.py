@@ -40,14 +40,14 @@ def period(frozen, body, holdout):
         return _period(frozen, body, sessions)
 
 
-def window_period(frozen, body, start, end, *, warmup=0):
+def window_period(frozen, body, start, end, *, warmup=0, spec_type=SmaSpec):
     """Half-open session indices; warm-up is a preceding prefix, never a fill."""
     sessions = frozen['calendar']['sessions']
     if not 0 <= start < end <= len(sessions) or not 0 <= warmup <= min(body.slow, start):
         raise ValueError('Rango de evaluación o calentamiento no válido.')
     with localcontext() as context:
         context.prec, context.rounding = 64, ROUND_HALF_EVEN
-        return _period(frozen, body, sessions[start:end], sessions[start-warmup:start])
+        return _period(frozen, body, sessions[start:end], sessions[start-warmup:start], spec_type=spec_type)
 
 
 def _close(frozen, spec, index, session):
@@ -58,10 +58,10 @@ def _close(frozen, spec, index, session):
         decision_at=bar['available_at'] if bar else session.close_at)
 
 
-def _period(frozen, body, sessions, warmup_sessions=()):
+def _period(frozen, body, sessions, warmup_sessions=(), *, spec_type=SmaSpec):
     calendar = dict(frozen['calendar'])
     calendar['sessions'] = [*warmup_sessions, *sessions]
-    spec = SmaSpec.model_validate_json(json.dumps(dict(strategy_id='lab-sma', revision=1, fast=body.fast,
+    spec = spec_type.model_validate_json(json.dumps(dict(strategy_id='lab-sma', revision=1, fast=body.fast,
         slow=body.slow, source=frozen['source'], calendar=calendar)))
     config = body.config
     prefix = len(warmup_sessions)

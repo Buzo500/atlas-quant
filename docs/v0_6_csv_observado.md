@@ -1,5 +1,11 @@
 # v0.6 · auditoría de un CSV observado NVD.DE
 
+Actualización 13/09/2026: [primer caso ZAL.DE calculado bajo una política
+retrospectiva explícita](v0_6_retrospectivo.md), sin acreditar disponibilidad/base
+históricas. No cambia el diagnóstico de NVIDIA ni consigue una fuente apta para
+el Laboratorio acreditado. La adquisición pendiente de abajo se refiere a ese
+estándar de evidencia, no a ausencia de cualquier histórico observado.
+
 **Resultado: formato válido, evidencia insuficiente para el Laboratorio.**
 Se contrastó el histórico ya descargado de NVD.DE, sin cambiar sus versiones,
 importarlo en la base habitual ni completar artificialmente su evidencia.

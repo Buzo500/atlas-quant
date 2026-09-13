@@ -1,6 +1,16 @@
 # ATLAS Quant
 
-**Desarrollo 0.6.0-dev.5, rama subida y CI correcta:** primer bloque de [robustez estadística](docs/v0_6_robustez_implementacion.md)
+**Desarrollo local 0.6.0-dev.6:** [investigación retrospectiva y exportación reproducible](docs/v0_6_retrospectivo.md)
+por CLI, reutilizando SMA y el libro económico. Histórico observado ZAL.DE en EUR
+auditado bajo supuestos explícitos, desarrollo calculado con costes y reserva sin
+evaluar. Exporta JSON/CSV/ZIP y recalcula al verificar; no añade aún un panel o LaTeX.
+Cobertura ampliada a seis escenarios: confirma infracobertura con autocorrelación
+fuerte. No acredita datos ni habilita órdenes. 1.104 Python + 91 subcasos, cuatro
+recorridos E2E v0.6, build/contratos/TypeScript/lint correctos. Esquema 5,
+app habitual detenida y base intacta. Sin subida/CI remota de dev.6.
+[Estado y límites](docs/CONTINUIDAD.md).
+
+**Antecedente 0.6.0-dev.5, rama subida y CI correcta:** primer bloque de [robustez estadística](docs/v0_6_robustez_implementacion.md)
 en candidatas: incertidumbre del exceso diario SMA frente a comprar/mantener,
 bootstrap pareado con tres longitudes fijas, informes guardados y reproducción.
 Solo desarrollo, desde 504 intervalos tras el calentamiento, con límites y estado

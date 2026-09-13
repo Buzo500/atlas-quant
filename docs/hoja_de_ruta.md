@@ -4,7 +4,14 @@ Actualizado: 11 de septiembre de 2026. **La secuencia de versiones se conserva.*
 
 ## Estado vigente
 
-- **Actualización v0.6 dev.5, subida y CI correcta:** [robustez exploratoria](v0_6_robustez_implementacion.md)
+- **Actualización local v0.6 dev.6:** [modo retrospectivo por CLI](v0_6_retrospectivo.md),
+  histórico EUR observado bajo supuestos, primer desarrollo con costes/reserva,
+  cobertura ampliada a seis escenarios y paquete JSON/CSV reproducible. No acredita
+  datos ni activa estrategias. Sin nueva CI/publicación. Interfaz retrospectiva,
+  datos acreditados y revisión de las limitaciones estadísticas siguen pendientes;
+  la secuencia de versiones se conserva.
+
+- **Antecedente v0.6 dev.5, subida y CI correcta:** [robustez exploratoria](v0_6_robustez_implementacion.md)
   implementada sobre desarrollo: bootstrap estacionario pareado, tres longitudes
   fijas, informes independientes y reproducción. Cobertura sintética y limitaciones
   documentadas; no equivale a validación observada o confirmatoria. [Integración con
