@@ -18,6 +18,9 @@ todos los puertos TCP globales estaban en uso. La petición fallida se inició a
 17:47:56.050Z. La coincidencia temporal y ambos errores explican este fallo de
 carga por falta de recursos TCP. No identifican al proceso que agotó los puertos.
 
+[Evidencia mínima conservada](evidence/windows-tcp-20260913.json): campos del
+evento, error del recurso y SHA-256 de ambas trazas; sin cuerpos, claves o consultas.
+
 [Chromium](https://chromium.googlesource.com/chromium/src/net/+/285728c206d899dd545dbe0b77d473594bce51f7)
 relaciona WSAENOBUFS con ese código. [Microsoft](https://learn.microsoft.com/en-us/troubleshoot/windows-client/networking/tcp-ip-port-exhaustion-troubleshooting)
 incluye el evento 4231 en el diagnóstico de agotamiento y advierte que contar

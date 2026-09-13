@@ -32,7 +32,7 @@ Requisitos de adaptación:
 
 ## REPORT-001 · Informes LaTeX de cartera y backtests por fechas
 
-Actualización dev.8: [generador inicial implementado](informes_latex_implementacion.md) para el desarrollo completo retrospectivo; fuente/recursos desde UI y PDF opcional local. Carteras y rangos arbitrarios permanecen pendientes.
+Actualización dev.8: [generador inicial implementado](informes_latex_implementacion.md) para el desarrollo completo retrospectivo; fuente/recursos desde UI y PDF opcional local, aceptado por el usuario. Carteras y rangos arbitrarios permanecen pendientes, con [contrato y oráculos definidos](informes_periodo_contrato.md): D7 guardado primero, detalle histórico verificable después y recorte retrospectivo.
 
 **Estado:** primer alcance retrospectivo implementado y compilado en dev.8. [Diseño y ampliaciones](informes_latex_diseno.md); fuente `.tex`, recursos, descarga UI y PDF local Windows. Informes de cartera y fechas arbitrarias aún pendientes. Encaje en la exportación reproducible de **v0.6**, reordenable al acotar esa entrega. No es necesaria para cerrar v0.2 ni para aplicar el rediseño visual.
 

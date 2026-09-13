@@ -8,6 +8,10 @@ Ejecutado el 13/09/2026, sin cambiar el protocolo ni el método del producto.
 
 La semilla independiente 20260915 estaba condicionada a seleccionar un diseño que superara los filtros. Al fallar los tres, no se ejecuta para intentar rescatar estos resultados. El siguiente trabajo requiere un protocolo nuevo, justificado y fijado antes de calcular.
 
+Continuación autorizada: [protocolo de medias por grupos temporales](v0_6_dependencia_grupos_plan.md),
+definido el 13/09. q4 candidata única, q8 sensibilidad, semillas nuevas; todavía
+sin implementar ni ejecutar. No cambia esta decisión ni el método del producto.
+
 ## Cobertura sobre 500 historias por celda
 
 | Proceso | n | L10 | L20 | L40 | Oráculo |

@@ -4,6 +4,10 @@ Implementa el desarrollo completo de un informe retrospectivo verificado,
 conservando el alcance de [REPORT-001](informes_latex_diseno.md). La selección
 arbitraria de fechas y los informes de carteras siguen como ampliaciones futuras.
 
+El usuario acepta expresamente el PDF el 13/09/2026. El siguiente alcance queda
+concretado en [informes por periodo](informes_periodo_contrato.md): primero D7
+guardado, después detalle de posiciones y recorte retrospectivo. Solo definido.
+
 ## Uso desde el Laboratorio
 
 En **Investigación retrospectiva con supuestos**, calcula o reabre un informe

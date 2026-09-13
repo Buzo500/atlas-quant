@@ -1,0 +1,26 @@
+{
+  "format": "atlas-windows-tcp-evidence-v1",
+  "source_run": "e2e-57412c0d68d046338ba0a7bafc488e55",
+  "windows_event": {
+    "utc": "2026-09-13T17:47:56.0708076Z",
+    "id": 4231,
+    "record_id": 57153,
+    "provider": "Tcpip",
+    "message": "Error en una solicitud para asignar un número de puerto efímero del espacio de puertos TCP global porque todos los puertos están en uso."
+  },
+  "traces": [
+    {
+      "test": "D3",
+      "trace_sha256": "07ca691563e17a0efedac787cc3140790f80eeb9881fe74d16965aa4d198fdc9",
+      "request_started_utc": "2026-09-13T17:47:56.050Z",
+      "path": "/_next/static/chunks/app-elements-H_Dr48wG.js",
+      "duration_ms": 23.54899999999907,
+      "error": "net::ERR_NO_BUFFER_SPACE"
+    },
+    {
+      "test": "D4",
+      "trace_sha256": "e106bf707645557c560ce9af4c43d688bce6abf3efb0e7b78564e8a562ff0ff7"
+    }
+  ],
+  "scope": "D3 asset failure coincides with global TCP ephemeral port exhaustion; responsible process and D4 root cause are not established."
+}
