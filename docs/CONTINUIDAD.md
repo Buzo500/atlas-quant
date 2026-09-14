@@ -1,6 +1,6 @@
 # ATLAS Quant: continuidad entre equipos
 
-Actualizado: 13 de septiembre de 2026. Este documento resume decisiones y estado para una conversación nueva de Codex; no contiene la transcripción completa del chat original.
+Actualizado: 14 de septiembre de 2026. Este documento resume decisiones y estado para una conversación nueva de Codex; no contiene la transcripción completa del chat original.
 
 ## Diagnóstico de CI dev.9 · 14/09
 
@@ -12,8 +12,17 @@ El test D2 mezclaba conservación de cartera con registro de instrumentos dentro
 de 45 s; llega al tramo final aproximadamente a los 40 s. Se separa el registro
 sin aumentar timeouts ni añadir reintentos y se conservan artefactos sintéticos
 de fallos durante un día. La latencia intermitente sigue abierta: no se presenta
-esta corrección de la prueba como arreglo del transporte. Validación/publicación
-final se consignan en el diagnóstico. Motor y método estadístico intactos.
+esta corrección de la prueba como arreglo del transporte. Tras dos CI fallidas
+documentadas, se separan también las cuatro resoluciones del test de precios,
+se amplía solo el plazo global de CI a 600 s y se espera la opción asíncrona
+en el test de eventos corporativos. **Código `ebe618f` subido; CI gratuita
+`34833482831` correcta:** 1.194 Python + 91 subcasos, 344 frontend, ocho Node,
+29 E2E y arranque/parada. Artefactos de fallo publicados/descargados y verificados.
+0 USD facturables, bloqueo de pago comprobado; contador de minutos retrasado
+(último mostrado 601,7/2.000). Motor y método estadístico intactos, esquema 5.
+App habitual detenida y base intacta; archivos concurrentes IA/riesgo conservados
+sin publicar. Cierre posterior solo documental/evidencia, sin otra CI/PR/fusión/
+etiqueta ni reactivar los aplazamientos. Detalles y límites en el diagnóstico.
 Las referencias siguientes a dev.9 sin subida/CI son antecedentes.
 
 ## Dev.9 local: cartera LaTeX, captura TCP y confirmación estadística

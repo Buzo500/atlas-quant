@@ -109,7 +109,35 @@ La suite frontend completa local pasa: **344/344**, 42 archivos, 34,16 s.
 Build canónico, TypeScript y lint correctos. Los E2E no se repiten localmente
 tras este cambio exclusivo del test de componente: los 29/29 anteriores siguen
 siendo la validación del mismo código de aplicación y recorridos de navegador.
-Tercera publicación: pendiente en esta tarea.
+## Cierre: CI correcta
+
+Código `ebe618fd3bac1d42c116bfbfb642867c9e5a49c6` subido, CI
+[34833482831 correcta](https://github.com/Buzo500/atlas-quant/actions/runs/34833482831),
+job `103941958449`, 9 min 25 s en total:
+
+- **1.194 Python + 91 subcasos**, 344 frontend y ocho Node correctos.
+- **29/29 E2E**, sin reintentos ni omitidos, 2,8 min. D2 9,9 s y registro 1,6 s;
+  resoluciones 3440/1920/1366/390 en 4,8/3,8/3,3/3,4 s.
+- Build, contratos, TypeScript, lint, arranque, smoke y parada correctos.
+- Run aislado `e2e-0c18add8494d40b5b6350266abec00d6`: servidores 0/0,
+  sin parada forzada ni fallo de propietario/limpieza, base intacta e integridad
+  correcta, puertos liberados. Sonda: 3.662 conexiones, cero fallos.
+- Diagnóstico: 2.029 grupos y 70 incidencias; dos >=1 s, ambas cálculos de
+  robustez con cuerpo completado, máximo 1.672,381 ms. TCP: 29 muestras, pico
+  1.107 sockets, sin eventos 4227/4231. No resuelve la latencia histórica.
+- Artefacto de fallo omitido correctamente en esta ejecución exitosa; su
+  publicación y descarga sí quedaron verificadas en la primera CI de la tarea.
+
+Consulta posterior de facturación: **0 USD facturables**, 3,74 USD brutos y el
+mismo descuento. El contador sigue mostrando 601,7/2.000 minutos y 0/0,5 GB;
+no se interpreta ese contador retrasado como consumo definitivo de las tres
+ejecuciones. Presupuesto Actions 0 USD y bloqueo de pago comprobados de nuevo
+antes de la última ejecución, sin modificar ajustes.
+
+App habitual detenida, esquema 5 y base SHA-256
+`2791f15e1bb5be5833117810ce5de745e4dfb46817850c4d8d8cbc3cc2bc5549` conservada.
+El cierre posterior solo añade documentación/evidencia; no cambia código ni
+lanza otra CI, PR, fusión o etiqueta. [Evidencia compacta](evidence/ci-dev9-d2-diagnostic.json).
 
 Los archivos concurrentes de IA/riesgo y su documentación se conservan sin
 incluirlos. Ensayo, portátil, PR #12 y datos personales siguen aplazados.

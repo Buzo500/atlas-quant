@@ -1,0 +1,585 @@
+{
+  "run_id": 34833482831,
+  "commit": "ebe618fd3bac1d42c116bfbfb642867c9e5a49c6",
+  "job_id": 103941958449,
+  "conclusion": "success",
+  "python": 1194,
+  "python_subcases": 91,
+  "frontend": 344,
+  "node": 8,
+  "e2e": 29,
+  "retries": 0,
+  "smoke": "success",
+  "shutdown": "success",
+  "e2e_run": "e2e-0c18add8494d40b5b6350266abec00d6",
+  "forced_stop": false,
+  "server_exit_codes": {
+    "backend": 0,
+    "frontend": 0
+  },
+  "ordinary_database_unchanged": true,
+  "ports_released": true,
+  "connection_probe": {
+    "completed": 3662,
+    "failures": 0
+  },
+  "correlated_requests": 2029,
+  "slow_incidents": [
+    {
+      "correlation": "client-2220-1832",
+      "failed": false,
+      "slow": true,
+      "client_observed": true,
+      "observation": "El cliente completó el cuerpo; revisar tiempos/estado.",
+      "events": [
+        {
+          "diag": "backend",
+          "event": "start",
+          "utc": "2026-09-14T10:39:06.117565+00:00",
+          "correlation": "client-2220-1832",
+          "method": "POST",
+          "path": "/api/lab/robustness"
+        },
+        {
+          "diag": "backend",
+          "event": "headers",
+          "utc": "2026-09-14T10:39:07.556085+00:00",
+          "correlation": "client-2220-1832",
+          "method": "POST",
+          "path": "/api/lab/robustness",
+          "ms": 1438.501,
+          "status": 200
+        },
+        {
+          "diag": "backend",
+          "event": "body_end",
+          "utc": "2026-09-14T10:39:07.556383+00:00",
+          "correlation": "client-2220-1832",
+          "method": "POST",
+          "path": "/api/lab/robustness",
+          "ms": 1438.805
+        },
+        {
+          "diag": "backend",
+          "event": "complete",
+          "utc": "2026-09-14T10:39:07.556577+00:00",
+          "correlation": "client-2220-1832",
+          "method": "POST",
+          "path": "/api/lab/robustness",
+          "ms": 1439
+        },
+        {
+          "diag": "proxy",
+          "utc": "2026-09-14T10:39:06.114Z",
+          "event": "incoming",
+          "correlation": "client-2220-1832",
+          "method": "POST",
+          "path": "/api/lab/robustness"
+        },
+        {
+          "diag": "proxy",
+          "utc": "2026-09-14T10:39:06.115Z",
+          "event": "node_connected",
+          "correlation": "client-2220-1832",
+          "method": "POST",
+          "path": "/api/lab/robustness",
+          "ms": 1.0412000000069384
+        },
+        {
+          "diag": "proxy",
+          "utc": "2026-09-14T10:39:06.115Z",
+          "event": "node_sent",
+          "correlation": "client-2220-1832",
+          "method": "POST",
+          "path": "/api/lab/robustness",
+          "ms": 1.1490000000048894
+        },
+        {
+          "diag": "proxy",
+          "utc": "2026-09-14T10:39:07.126Z",
+          "event": "node_pending",
+          "correlation": "client-2220-1832",
+          "method": "POST",
+          "path": "/api/lab/robustness",
+          "ms": 1012.3701000000001,
+          "sent": true
+        },
+        {
+          "diag": "proxy",
+          "utc": "2026-09-14T10:39:07.555Z",
+          "event": "node_headers",
+          "correlation": "client-2220-1832",
+          "method": "POST",
+          "path": "/api/lab/robustness",
+          "ms": 1440.869000000006,
+          "status": 200
+        },
+        {
+          "diag": "proxy",
+          "utc": "2026-09-14T10:39:07.555Z",
+          "event": "node_body_end",
+          "correlation": "client-2220-1832",
+          "method": "POST",
+          "path": "/api/lab/robustness",
+          "ms": 1441.224199999997,
+          "complete": true
+        },
+        {
+          "diag": "proxy",
+          "utc": "2026-09-14T10:39:07.555Z",
+          "event": "node_closed",
+          "correlation": "client-2220-1832",
+          "method": "POST",
+          "path": "/api/lab/robustness",
+          "ms": 1441.2966000000015
+        },
+        {
+          "diag": "proxy",
+          "utc": "2026-09-14T10:39:07.555Z",
+          "event": "finish",
+          "correlation": "client-2220-1832",
+          "method": "POST",
+          "path": "/api/lab/robustness",
+          "status": 200,
+          "ms": 1441.4811999999802
+        },
+        {
+          "diag": "proxy",
+          "utc": "2026-09-14T10:39:07.555Z",
+          "event": "close",
+          "correlation": "client-2220-1832",
+          "method": "POST",
+          "path": "/api/lab/robustness",
+          "finished": true,
+          "ms": 1441.5252000000037
+        },
+        {
+          "diag": "proxy",
+          "utc": "2026-09-14T10:39:07.555Z",
+          "event": "node_body_close",
+          "correlation": "client-2220-1832",
+          "method": "POST",
+          "path": "/api/lab/robustness",
+          "ms": 1441.5769000000146,
+          "complete": true
+        },
+        {
+          "diag": "client",
+          "utc": "2026-09-14T10:39:06.111Z",
+          "event": "start",
+          "correlation": "client-2220-1832",
+          "transport": "browser",
+          "method": "POST",
+          "path": "/api/lab/robustness",
+          "resource_type": "fetch"
+        },
+        {
+          "diag": "client",
+          "utc": "2026-09-14T10:39:07.560Z",
+          "event": "headers",
+          "correlation": "client-2220-1832",
+          "ms": 1449.1163000000233,
+          "status": 200
+        },
+        {
+          "diag": "client",
+          "utc": "2026-09-14T10:39:07.561Z",
+          "event": "body_end",
+          "correlation": "client-2220-1832",
+          "ms": 1450.6432000000204
+        }
+      ],
+      "events_truncated": false
+    },
+    {
+      "correlation": "client-2220-1880",
+      "failed": false,
+      "slow": true,
+      "client_observed": true,
+      "observation": "El cliente completó el cuerpo; revisar tiempos/estado.",
+      "events": [
+        {
+          "diag": "backend",
+          "event": "start",
+          "utc": "2026-09-14T10:39:11.400829+00:00",
+          "correlation": "client-2220-1880",
+          "method": "POST",
+          "path": "/api/lab/robustness/dd63553440e29e486795230f0c000c528a5e842cf93d251c40e82ed8dbe1e1e9/reproduce"
+        },
+        {
+          "diag": "backend",
+          "event": "headers",
+          "utc": "2026-09-14T10:39:13.063351+00:00",
+          "correlation": "client-2220-1880",
+          "method": "POST",
+          "path": "/api/lab/robustness/dd63553440e29e486795230f0c000c528a5e842cf93d251c40e82ed8dbe1e1e9/reproduce",
+          "ms": 1662.504,
+          "status": 200
+        },
+        {
+          "diag": "backend",
+          "event": "body_end",
+          "utc": "2026-09-14T10:39:13.063645+00:00",
+          "correlation": "client-2220-1880",
+          "method": "POST",
+          "path": "/api/lab/robustness/dd63553440e29e486795230f0c000c528a5e842cf93d251c40e82ed8dbe1e1e9/reproduce",
+          "ms": 1662.805
+        },
+        {
+          "diag": "backend",
+          "event": "complete",
+          "utc": "2026-09-14T10:39:13.063846+00:00",
+          "correlation": "client-2220-1880",
+          "method": "POST",
+          "path": "/api/lab/robustness/dd63553440e29e486795230f0c000c528a5e842cf93d251c40e82ed8dbe1e1e9/reproduce",
+          "ms": 1663.006
+        },
+        {
+          "diag": "proxy",
+          "utc": "2026-09-14T10:39:11.397Z",
+          "event": "incoming",
+          "correlation": "client-2220-1880",
+          "method": "POST",
+          "path": "/api/lab/robustness/dd63553440e29e486795230f0c000c528a5e842cf93d251c40e82ed8dbe1e1e9/reproduce"
+        },
+        {
+          "diag": "proxy",
+          "utc": "2026-09-14T10:39:11.398Z",
+          "event": "node_connected",
+          "correlation": "client-2220-1880",
+          "method": "POST",
+          "path": "/api/lab/robustness/dd63553440e29e486795230f0c000c528a5e842cf93d251c40e82ed8dbe1e1e9/reproduce",
+          "ms": 0.952900000003865
+        },
+        {
+          "diag": "proxy",
+          "utc": "2026-09-14T10:39:11.398Z",
+          "event": "node_sent",
+          "correlation": "client-2220-1880",
+          "method": "POST",
+          "path": "/api/lab/robustness/dd63553440e29e486795230f0c000c528a5e842cf93d251c40e82ed8dbe1e1e9/reproduce",
+          "ms": 1.0712000000057742
+        },
+        {
+          "diag": "proxy",
+          "utc": "2026-09-14T10:39:12.423Z",
+          "event": "node_pending",
+          "correlation": "client-2220-1880",
+          "method": "POST",
+          "path": "/api/lab/robustness/dd63553440e29e486795230f0c000c528a5e842cf93d251c40e82ed8dbe1e1e9/reproduce",
+          "ms": 1025.809500000003,
+          "sent": true
+        },
+        {
+          "diag": "proxy",
+          "utc": "2026-09-14T10:39:13.062Z",
+          "event": "node_headers",
+          "correlation": "client-2220-1880",
+          "method": "POST",
+          "path": "/api/lab/robustness/dd63553440e29e486795230f0c000c528a5e842cf93d251c40e82ed8dbe1e1e9/reproduce",
+          "ms": 1664.999300000025,
+          "status": 200
+        },
+        {
+          "diag": "proxy",
+          "utc": "2026-09-14T10:39:13.063Z",
+          "event": "node_body_end",
+          "correlation": "client-2220-1880",
+          "method": "POST",
+          "path": "/api/lab/robustness/dd63553440e29e486795230f0c000c528a5e842cf93d251c40e82ed8dbe1e1e9/reproduce",
+          "ms": 1665.598800000007,
+          "complete": true
+        },
+        {
+          "diag": "proxy",
+          "utc": "2026-09-14T10:39:13.063Z",
+          "event": "node_closed",
+          "correlation": "client-2220-1880",
+          "method": "POST",
+          "path": "/api/lab/robustness/dd63553440e29e486795230f0c000c528a5e842cf93d251c40e82ed8dbe1e1e9/reproduce",
+          "ms": 1665.6792000000132
+        },
+        {
+          "diag": "proxy",
+          "utc": "2026-09-14T10:39:13.063Z",
+          "event": "finish",
+          "correlation": "client-2220-1880",
+          "method": "POST",
+          "path": "/api/lab/robustness/dd63553440e29e486795230f0c000c528a5e842cf93d251c40e82ed8dbe1e1e9/reproduce",
+          "status": 200,
+          "ms": 1665.8669999999984
+        },
+        {
+          "diag": "proxy",
+          "utc": "2026-09-14T10:39:13.063Z",
+          "event": "close",
+          "correlation": "client-2220-1880",
+          "method": "POST",
+          "path": "/api/lab/robustness/dd63553440e29e486795230f0c000c528a5e842cf93d251c40e82ed8dbe1e1e9/reproduce",
+          "finished": true,
+          "ms": 1665.903399999981
+        },
+        {
+          "diag": "proxy",
+          "utc": "2026-09-14T10:39:13.063Z",
+          "event": "node_body_close",
+          "correlation": "client-2220-1880",
+          "method": "POST",
+          "path": "/api/lab/robustness/dd63553440e29e486795230f0c000c528a5e842cf93d251c40e82ed8dbe1e1e9/reproduce",
+          "ms": 1665.9329000000143,
+          "complete": true
+        },
+        {
+          "diag": "client",
+          "utc": "2026-09-14T10:39:11.394Z",
+          "event": "start",
+          "correlation": "client-2220-1880",
+          "transport": "browser",
+          "method": "POST",
+          "path": "/api/lab/robustness/dd63553440e29e486795230f0c000c528a5e842cf93d251c40e82ed8dbe1e1e9/reproduce",
+          "resource_type": "fetch"
+        },
+        {
+          "diag": "client",
+          "utc": "2026-09-14T10:39:13.066Z",
+          "event": "headers",
+          "correlation": "client-2220-1880",
+          "ms": 1672.0166000000027,
+          "status": 200
+        },
+        {
+          "diag": "client",
+          "utc": "2026-09-14T10:39:13.066Z",
+          "event": "body_end",
+          "correlation": "client-2220-1880",
+          "ms": 1672.3807999999844
+        }
+      ],
+      "events_truncated": false
+    }
+  ],
+  "tcp": {
+    "samples": 29,
+    "unavailable_samples": 0,
+    "peak": {
+      "utc": "2026-09-14T10:38:40.689109+00:00",
+      "sockets": 1107
+    },
+    "top_peaks": [
+      {
+        "utc": "2026-09-14T10:38:52.356678+00:00",
+        "pid": 0,
+        "state": "TIME_WAIT",
+        "family": 4,
+        "loopback": true,
+        "sockets": 995,
+        "distinct_local_ports": 994,
+        "process_name": null
+      },
+      {
+        "utc": "2026-09-14T10:38:04.617711+00:00",
+        "pid": 0,
+        "state": "TIME_WAIT",
+        "family": 4,
+        "loopback": false,
+        "sockets": 13,
+        "distinct_local_ports": 13,
+        "process_name": null
+      },
+      {
+        "utc": "2026-09-14T10:38:34.214850+00:00",
+        "pid": 2640,
+        "state": "ESTABLISHED",
+        "family": 4,
+        "loopback": true,
+        "sockets": 9,
+        "distinct_local_ports": 3,
+        "process_name": "node.exe"
+      },
+      {
+        "utc": "2026-09-14T10:36:27.201104+00:00",
+        "pid": 4,
+        "state": "LISTENING",
+        "family": 4,
+        "loopback": false,
+        "sockets": 7,
+        "distinct_local_ports": 6,
+        "process_name": "System"
+      },
+      {
+        "utc": "2026-09-14T10:36:43.332817+00:00",
+        "pid": 3728,
+        "state": "BOUND",
+        "family": 4,
+        "loopback": false,
+        "sockets": 6,
+        "distinct_local_ports": 6,
+        "process_name": "chrome-headless-shell.exe"
+      },
+      {
+        "utc": "2026-09-14T10:36:37.085975+00:00",
+        "pid": 3728,
+        "state": "ESTABLISHED",
+        "family": 4,
+        "loopback": true,
+        "sockets": 6,
+        "distinct_local_ports": 6,
+        "process_name": "chrome-headless-shell.exe"
+      },
+      {
+        "utc": "2026-09-14T10:38:04.617711+00:00",
+        "pid": 8332,
+        "state": "BOUND",
+        "family": 4,
+        "loopback": false,
+        "sockets": 6,
+        "distinct_local_ports": 6,
+        "process_name": "svchost.exe"
+      },
+      {
+        "utc": "2026-09-14T10:38:04.617711+00:00",
+        "pid": 8332,
+        "state": "ESTABLISHED",
+        "family": 4,
+        "loopback": false,
+        "sockets": 6,
+        "distinct_local_ports": 6,
+        "process_name": "svchost.exe"
+      },
+      {
+        "utc": "2026-09-14T10:36:27.201104+00:00",
+        "pid": 4,
+        "state": "LISTENING",
+        "family": 6,
+        "loopback": false,
+        "sockets": 5,
+        "distinct_local_ports": 5,
+        "process_name": "System"
+      },
+      {
+        "utc": "2026-09-14T10:36:27.201104+00:00",
+        "pid": 3980,
+        "state": "LISTENING",
+        "family": 4,
+        "loopback": false,
+        "sockets": 5,
+        "distinct_local_ports": 5,
+        "process_name": "mqsvc.exe"
+      },
+      {
+        "utc": "2026-09-14T10:36:27.201104+00:00",
+        "pid": 3980,
+        "state": "LISTENING",
+        "family": 6,
+        "loopback": false,
+        "sockets": 5,
+        "distinct_local_ports": 5,
+        "process_name": "mqsvc.exe"
+      },
+      {
+        "utc": "2026-09-14T10:38:34.214850+00:00",
+        "pid": 4856,
+        "state": "ESTABLISHED",
+        "family": 4,
+        "loopback": true,
+        "sockets": 4,
+        "distinct_local_ports": 3,
+        "process_name": "python.exe"
+      },
+      {
+        "utc": "2026-09-14T10:37:06.375739+00:00",
+        "pid": 2640,
+        "state": "BOUND",
+        "family": 4,
+        "loopback": false,
+        "sockets": 4,
+        "distinct_local_ports": 4,
+        "process_name": "node.exe"
+      },
+      {
+        "utc": "2026-09-14T10:36:27.201104+00:00",
+        "pid": 3964,
+        "state": "BOUND",
+        "family": 4,
+        "loopback": false,
+        "sockets": 3,
+        "distinct_local_ports": 3,
+        "process_name": "WindowsAzureGuestAgent.exe"
+      },
+      {
+        "utc": "2026-09-14T10:36:27.201104+00:00",
+        "pid": 7880,
+        "state": "BOUND",
+        "family": 6,
+        "loopback": false,
+        "sockets": 3,
+        "distinct_local_ports": 3,
+        "process_name": "Runner.Worker.exe"
+      },
+      {
+        "utc": "2026-09-14T10:36:27.201104+00:00",
+        "pid": 7880,
+        "state": "ESTABLISHED",
+        "family": 4,
+        "loopback": false,
+        "sockets": 3,
+        "distinct_local_ports": 3,
+        "process_name": "Runner.Worker.exe"
+      },
+      {
+        "utc": "2026-09-14T10:37:58.381041+00:00",
+        "pid": 5764,
+        "state": "BOUND",
+        "family": 4,
+        "loopback": false,
+        "sockets": 3,
+        "distinct_local_ports": 3,
+        "process_name": "svchost.exe"
+      },
+      {
+        "utc": "2026-09-14T10:37:58.381041+00:00",
+        "pid": 5764,
+        "state": "ESTABLISHED",
+        "family": 4,
+        "loopback": false,
+        "sockets": 3,
+        "distinct_local_ports": 3,
+        "process_name": "svchost.exe"
+      },
+      {
+        "utc": "2026-09-14T10:37:58.381041+00:00",
+        "pid": 3908,
+        "state": "BOUND",
+        "family": 4,
+        "loopback": false,
+        "sockets": 2,
+        "distinct_local_ports": 2,
+        "process_name": "WaAppAgent.exe"
+      },
+      {
+        "utc": "2026-09-14T10:37:58.381041+00:00",
+        "pid": 3908,
+        "state": "ESTABLISHED",
+        "family": 4,
+        "loopback": false,
+        "sockets": 2,
+        "distinct_local_ports": 2,
+        "process_name": "WaAppAgent.exe"
+      }
+    ],
+    "tcpip_events": [],
+    "root_cause_confirmed": false,
+    "note": "Muestreo periódico; correlación temporal y recuentos no acreditan causalidad. PID 0 no identifica consumidor."
+  },
+  "billing": {
+    "billable_usd": 0,
+    "gross_usd": 3.74,
+    "discount_usd": 3.74,
+    "displayed_included_minutes": 601.7,
+    "included_limit": 2000,
+    "counter_finality": "not confirmed; still showing previous count",
+    "actions_budget_usd": 0,
+    "stop_paid_usage": true
+  },
+  "historical_latency_resolved": false
+}

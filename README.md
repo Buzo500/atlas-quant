@@ -1,6 +1,6 @@
 # ATLAS Quant
 
-**Desarrollo local 0.6.0-dev.9:** [informes de cartera D7 en LaTeX](docs/v0_6_dev9_implementacion.md),
+**Desarrollo 0.6.0-dev.9:** [informes de cartera D7 en LaTeX](docs/v0_6_dev9_implementacion.md),
 desde un informe por periodo guardado, con JSON/CSV originales y PDF opcional local.
 Conserva históricos y métricas ausentes; no incorpora posiciones actuales a un
 informe antiguo. Captura automática de presión TCP en el diagnóstico Windows.
@@ -8,7 +8,10 @@ Experimento estadístico por grupos separado del producto: **q4 pasa principal y
 confirmación**, 36.000 historias bajo protocolo previo; [resultados y límites](docs/v0_6_dependencia_grupos_resultados.md).
 Método del producto aún intacto. [Validación local](docs/v0_6_dev9_validacion.md)
 y estado operativo en [continuidad](docs/CONTINUIDAD.md). Esquema 5.
-Esta ampliación local no está cubierta por la CI de dev.8 ni activa un bróker.
+Rama subida sobre `ebe618f`: [CI gratuita correcta](https://github.com/Buzo500/atlas-quant/actions/runs/34833482831),
+1.194 Python + 91 subcasos, 344 frontend, ocho Node y 29 E2E, arranque/parada.
+[Correcciones de pruebas y diagnóstico](docs/diagnostico_ci_20260914.md), gasto 0 USD.
+Es una versión de desarrollo; la latencia intermitente sigue abierta y no activa un bróker.
 
 **Antecedente 0.6.0-dev.8, rama subida y CI correcta:** [exportación LaTeX](docs/informes_latex_implementacion.md)
 del desarrollo retrospectivo completo: fuente y datos desde el Laboratorio,
