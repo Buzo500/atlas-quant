@@ -11,7 +11,17 @@ import type {
 test('D2: cambiar fuente y ticker conserva cartera, libro y corte histórico', async ({
   page,
 }, testInfo) => {
+  const started = Date.now();
+  const checkpoint = (phase: string) =>
+    console.log(
+      JSON.stringify({
+        test: 'D2',
+        phase,
+        elapsed_ms: Date.now() - started,
+      }),
+    );
   const dataset = await ensureDemo(page);
+  checkpoint('demo lista');
   const state = await readApi<StateResponse>(page, '/api/state');
   const portfolio = state.portfolios![0];
   const before = await readApi<PortfolioDetail>(
@@ -72,6 +82,7 @@ test('D2: cambiar fuente y ticker conserva cartera, libro y corte histórico', a
   const response = await imported;
   expect(response.ok()).toBe(true);
   const other: DatasetResponse = await response.json();
+  checkpoint('fuente importada');
   await tab(page, 'Cartera');
   await expect(
     page.getByRole('heading', { name: 'Posiciones', exact: true }),
@@ -114,6 +125,7 @@ test('D2: cambiar fuente y ticker conserva cartera, libro y corte histórico', a
     .getByRole('button', { name: 'Confirmar fuentes', exact: true })
     .click();
   expect((await confirmation).ok()).toBe(true);
+  checkpoint('vínculos confirmados');
   const after = await readApi<PortfolioDetail>(
     page,
     `/api/portfolios/${portfolio.id}`,
@@ -129,6 +141,7 @@ test('D2: cambiar fuente y ticker conserva cartera, libro y corte histórico', a
       `/api/portfolios/${portfolio.id}?revision=${before.portfolio.revision}`,
     ),
   ).toEqual(before);
+  checkpoint('histórico verificado');
   await tab(page, 'Cartera');
   for (const symbol of dataset.manifest.symbols)
     await expect(
@@ -137,23 +150,7 @@ test('D2: cambiar fuente y ticker conserva cartera, libro y corte histórico', a
         .getByText(`NEW_${symbol}`, { exact: true }),
     ).toBeVisible();
   await tab(page, 'Datos');
-  await page
-    .getByText('Añadir instrumentos, cotizaciones o símbolos', { exact: true })
-    .click();
-  await page
-    .getByRole('textbox', { name: 'Nombre del instrumento', exact: true })
-    .fill('Instrumento E2E');
-  const save = page.waitForResponse((r) =>
-    r.url().endsWith('/catalog/instruments'),
-  );
-  await page
-    .getByRole('button', { name: 'Registrar instrumento', exact: true })
-    .click();
-  expect((await save).ok()).toBe(true);
-  const catalog = await readApi<CatalogResponse>(page, '/api/catalog');
-  expect(
-    catalog.instruments.filter((i) => i.name === 'Instrumento E2E'),
-  ).toHaveLength(1);
+  checkpoint('vista de datos recuperada');
   for (const width of [3440, 1280, 390]) {
     await page.setViewportSize({ width, height: width === 3440 ? 1440 : 900 });
     await expect
@@ -171,4 +168,46 @@ test('D2: cambiar fuente y ticker conserva cartera, libro y corte histórico', a
     path: testInfo.outputPath('d2-wide.png'),
     fullPage: true,
   });
+});
+
+// Catalog registration has its own setup and deadline. It does not depend on
+// the imported prices, source rebinding or historical assertions above.
+test('D2: registrar un instrumento persiste una única identidad', async ({
+  page,
+}) => {
+  await page.goto('/?tab=data');
+  await expect(
+    page.getByText('Motor conectado', { exact: true }),
+  ).toBeVisible();
+  await page
+    .getByText('Añadir instrumentos, cotizaciones o símbolos', { exact: true })
+    .click();
+  await page
+    .getByRole('textbox', { name: 'Nombre del instrumento', exact: true })
+    .fill('Instrumento E2E');
+  await test.step('Registrar instrumento con formulario válido y respuesta POST', async () => {
+    const button = page.getByRole('button', {
+      name: 'Registrar instrumento',
+      exact: true,
+    });
+    expect(
+      await button.evaluate((element) =>
+        (element as HTMLButtonElement).form?.checkValidity(),
+      ),
+    ).toBe(true);
+    const [save] = await Promise.all([
+      page.waitForResponse(
+        (r) =>
+          r.url().endsWith('/catalog/instruments') &&
+          r.request().method() === 'POST',
+        { timeout: 10_000 },
+      ),
+      button.click(),
+    ]);
+    expect(save.ok()).toBe(true);
+  });
+  const catalog = await readApi<CatalogResponse>(page, '/api/catalog');
+  expect(
+    catalog.instruments.filter((i) => i.name === 'Instrumento E2E'),
+  ).toHaveLength(1);
 });

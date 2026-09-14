@@ -61,7 +61,25 @@ jobs:
       - name: Instalar Chromium fijado para los recorridos E2E
         run: node frontend/node_modules/@playwright/test/cli.js install chromium
       - name: Recorridos de navegador con interfaz compilada y base aislada
+        id: e2e
         run: ./.venv/Scripts/python.exe tools/diagnostics/run_api_diagnostic.py
+      - name: Conservar evidencia del fallo E2E aislado
+        if: ${{ failure() && steps.e2e.outcome == 'failure' }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: e2e-windows-${{ github.run_id }}-${{ github.run_attempt }}
+          retention-days: 1
+          if-no-files-found: warn
+          # Only synthetic E2E evidence; never databases, .env or ordinary var/.
+          path: |
+            var/validation/e2e-*/browser-artifacts/**
+            var/validation/e2e-*/playwright.json
+            var/validation/e2e-*/playwright.xml
+            var/validation/e2e-*/playwright.log
+            var/validation/e2e-*/backend.log
+            var/validation/e2e-*/frontend.log
+            var/validation/e2e-*/diagnostic-report.json
+            var/validation/e2e-*/tcp-pressure.jsonl
       - name: Arranque y recorrido sintético mediante el proxy
         id: runtime
         run: |

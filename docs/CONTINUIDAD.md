@@ -2,6 +2,20 @@
 
 Actualizado: 13 de septiembre de 2026. Este documento resume decisiones y estado para una conversación nueva de Codex; no contiene la transcripción completa del chat original.
 
+## Diagnóstico de CI dev.9 · 14/09
+
+El usuario sube dev.9 y lanza CI `34821956088` sobre `12d262b`: fallan los E2E
+(24/25), mientras Python (1.194 + 91 subcasos) y frontend (344) pasan. Smoke
+posterior omitido. Autoriza las cinco tareas de reproducción/corrección/evidencia/
+validación/publicación gratuita. [Diagnóstico](diagnostico_ci_20260914.md).
+El test D2 mezclaba conservación de cartera con registro de instrumentos dentro
+de 45 s; llega al tramo final aproximadamente a los 40 s. Se separa el registro
+sin aumentar timeouts ni añadir reintentos y se conservan artefactos sintéticos
+de fallos durante un día. La latencia intermitente sigue abierta: no se presenta
+esta corrección de la prueba como arreglo del transporte. Validación/publicación
+final se consignan en el diagnóstico. Motor y método estadístico intactos.
+Las referencias siguientes a dev.9 sin subida/CI son antecedentes.
+
 ## Dev.9 local: cartera LaTeX, captura TCP y confirmación estadística
 
 «Vale, haz los 5» autoriza las cinco propuestas del cierre dev.8. Completadas:
