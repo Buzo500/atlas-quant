@@ -1,0 +1,346 @@
+{
+  "run_id": 34821956088,
+  "commit": "12d262b742560cc5efa59548c72d8973dcb87e1d",
+  "job_id": 103905323037,
+  "tests": {
+    "python": 1194,
+    "subtests": 91,
+    "frontend": 344,
+    "e2e_pass": 24,
+    "e2e_fail": 1
+  },
+  "smoke": "skipped",
+  "catalog_post_observed": false,
+  "limitations": "No trace artifact in original workflow; absence in capture does not prove where click was interrupted.",
+  "selected_incidents": [
+    {
+      "correlation": "client-4556-589",
+      "failed": false,
+      "slow": true,
+      "client_observed": true,
+      "observation": "El cliente completó el cuerpo; revisar tiempos/estado.",
+      "events": [
+        {
+          "diag": "backend",
+          "event": "start",
+          "utc": "2026-09-14T08:27:42.236195+00:00",
+          "correlation": "client-4556-589",
+          "method": "GET",
+          "path": "/api/datasets/d3f8bec67dd14364abb2f264f0e0b95c/prices"
+        },
+        {
+          "diag": "backend",
+          "event": "headers",
+          "utc": "2026-09-14T08:27:42.262706+00:00",
+          "correlation": "client-4556-589",
+          "method": "GET",
+          "path": "/api/datasets/d3f8bec67dd14364abb2f264f0e0b95c/prices",
+          "ms": 26.501,
+          "status": 200
+        },
+        {
+          "diag": "backend",
+          "event": "body_end",
+          "utc": "2026-09-14T08:27:42.264008+00:00",
+          "correlation": "client-4556-589",
+          "method": "GET",
+          "path": "/api/datasets/d3f8bec67dd14364abb2f264f0e0b95c/prices",
+          "ms": 27.81
+        },
+        {
+          "diag": "backend",
+          "event": "complete",
+          "utc": "2026-09-14T08:27:42.500824+00:00",
+          "correlation": "client-4556-589",
+          "method": "GET",
+          "path": "/api/datasets/d3f8bec67dd14364abb2f264f0e0b95c/prices",
+          "ms": 264.602
+        },
+        {
+          "diag": "proxy",
+          "utc": "2026-09-14T08:27:42.232Z",
+          "event": "incoming",
+          "correlation": "client-4556-589",
+          "method": "GET",
+          "path": "/api/datasets/d3f8bec67dd14364abb2f264f0e0b95c/prices"
+        },
+        {
+          "diag": "proxy",
+          "utc": "2026-09-14T08:27:42.233Z",
+          "event": "node_connected",
+          "correlation": "client-4556-589",
+          "method": "GET",
+          "path": "/api/datasets/d3f8bec67dd14364abb2f264f0e0b95c/prices",
+          "ms": 1.5185999999812339
+        },
+        {
+          "diag": "proxy",
+          "utc": "2026-09-14T08:27:42.233Z",
+          "event": "node_sent",
+          "correlation": "client-4556-589",
+          "method": "GET",
+          "path": "/api/datasets/d3f8bec67dd14364abb2f264f0e0b95c/prices",
+          "ms": 1.6068999999843072
+        },
+        {
+          "diag": "proxy",
+          "utc": "2026-09-14T08:27:42.261Z",
+          "event": "node_headers",
+          "correlation": "client-4556-589",
+          "method": "GET",
+          "path": "/api/datasets/d3f8bec67dd14364abb2f264f0e0b95c/prices",
+          "ms": 28.946100000001024,
+          "status": 200
+        },
+        {
+          "diag": "proxy",
+          "utc": "2026-09-14T08:27:42.262Z",
+          "event": "node_body_end",
+          "correlation": "client-4556-589",
+          "method": "GET",
+          "path": "/api/datasets/d3f8bec67dd14364abb2f264f0e0b95c/prices",
+          "ms": 29.887099999992643,
+          "complete": true
+        },
+        {
+          "diag": "proxy",
+          "utc": "2026-09-14T08:27:42.262Z",
+          "event": "node_closed",
+          "correlation": "client-4556-589",
+          "method": "GET",
+          "path": "/api/datasets/d3f8bec67dd14364abb2f264f0e0b95c/prices",
+          "ms": 29.967199999984587
+        },
+        {
+          "diag": "proxy",
+          "utc": "2026-09-14T08:27:42.262Z",
+          "event": "finish",
+          "correlation": "client-4556-589",
+          "method": "GET",
+          "path": "/api/datasets/d3f8bec67dd14364abb2f264f0e0b95c/prices",
+          "status": 200,
+          "ms": 30.215999999985797
+        },
+        {
+          "diag": "proxy",
+          "utc": "2026-09-14T08:27:42.262Z",
+          "event": "close",
+          "correlation": "client-4556-589",
+          "method": "GET",
+          "path": "/api/datasets/d3f8bec67dd14364abb2f264f0e0b95c/prices",
+          "finished": true,
+          "ms": 30.25749999997788
+        },
+        {
+          "diag": "proxy",
+          "utc": "2026-09-14T08:27:42.262Z",
+          "event": "node_body_close",
+          "correlation": "client-4556-589",
+          "method": "GET",
+          "path": "/api/datasets/d3f8bec67dd14364abb2f264f0e0b95c/prices",
+          "ms": 30.225299999990966,
+          "complete": true
+        },
+        {
+          "diag": "client",
+          "utc": "2026-09-14T08:27:35.751Z",
+          "event": "start",
+          "correlation": "client-4556-589",
+          "transport": "browser",
+          "method": "GET",
+          "path": "/api/datasets/d3f8bec67dd14364abb2f264f0e0b95c/prices",
+          "resource_type": "fetch"
+        },
+        {
+          "diag": "client",
+          "utc": "2026-09-14T08:27:44.015Z",
+          "event": "headers",
+          "correlation": "client-4556-589",
+          "ms": 8262.487999999998,
+          "status": 200
+        },
+        {
+          "diag": "client",
+          "utc": "2026-09-14T08:27:44.016Z",
+          "event": "body_end",
+          "correlation": "client-4556-589",
+          "ms": 8262.944300000003
+        }
+      ],
+      "events_truncated": false
+    },
+    {
+      "correlation": "client-4556-594",
+      "failed": false,
+      "slow": true,
+      "client_observed": true,
+      "observation": "El cliente completó el cuerpo; revisar tiempos/estado.",
+      "events": [
+        {
+          "diag": "backend",
+          "event": "start",
+          "utc": "2026-09-14T08:27:43.056502+00:00",
+          "correlation": "client-4556-594",
+          "method": "GET",
+          "path": "/api/catalog"
+        },
+        {
+          "diag": "backend",
+          "event": "headers",
+          "utc": "2026-09-14T08:27:43.060263+00:00",
+          "correlation": "client-4556-594",
+          "method": "GET",
+          "path": "/api/catalog",
+          "ms": 3.755,
+          "status": 200
+        },
+        {
+          "diag": "backend",
+          "event": "body_end",
+          "utc": "2026-09-14T08:27:43.060489+00:00",
+          "correlation": "client-4556-594",
+          "method": "GET",
+          "path": "/api/catalog",
+          "ms": 3.985
+        },
+        {
+          "diag": "backend",
+          "event": "complete",
+          "utc": "2026-09-14T08:27:43.060637+00:00",
+          "correlation": "client-4556-594",
+          "method": "GET",
+          "path": "/api/catalog",
+          "ms": 4.133
+        },
+        {
+          "diag": "proxy",
+          "utc": "2026-09-14T08:27:43.053Z",
+          "event": "incoming",
+          "correlation": "client-4556-594",
+          "method": "GET",
+          "path": "/api/catalog"
+        },
+        {
+          "diag": "proxy",
+          "utc": "2026-09-14T08:27:43.054Z",
+          "event": "node_connected",
+          "correlation": "client-4556-594",
+          "method": "GET",
+          "path": "/api/catalog",
+          "ms": 0.6362000000081025
+        },
+        {
+          "diag": "proxy",
+          "utc": "2026-09-14T08:27:43.054Z",
+          "event": "node_sent",
+          "correlation": "client-4556-594",
+          "method": "GET",
+          "path": "/api/catalog",
+          "ms": 0.707300000009127
+        },
+        {
+          "diag": "proxy",
+          "utc": "2026-09-14T08:27:43.059Z",
+          "event": "node_headers",
+          "correlation": "client-4556-594",
+          "method": "GET",
+          "path": "/api/catalog",
+          "ms": 5.6665999999968335,
+          "status": 200
+        },
+        {
+          "diag": "proxy",
+          "utc": "2026-09-14T08:27:43.059Z",
+          "event": "node_body_end",
+          "correlation": "client-4556-594",
+          "method": "GET",
+          "path": "/api/catalog",
+          "ms": 5.847999999998137,
+          "complete": true
+        },
+        {
+          "diag": "proxy",
+          "utc": "2026-09-14T08:27:43.059Z",
+          "event": "node_closed",
+          "correlation": "client-4556-594",
+          "method": "GET",
+          "path": "/api/catalog",
+          "ms": 5.947799999994459
+        },
+        {
+          "diag": "proxy",
+          "utc": "2026-09-14T08:27:43.059Z",
+          "event": "finish",
+          "correlation": "client-4556-594",
+          "method": "GET",
+          "path": "/api/catalog",
+          "status": 200,
+          "ms": 6.0847000000067055
+        },
+        {
+          "diag": "proxy",
+          "utc": "2026-09-14T08:27:43.059Z",
+          "event": "close",
+          "correlation": "client-4556-594",
+          "method": "GET",
+          "path": "/api/catalog",
+          "finished": true,
+          "ms": 6.120100000000093
+        },
+        {
+          "diag": "proxy",
+          "utc": "2026-09-14T08:27:43.059Z",
+          "event": "node_body_close",
+          "correlation": "client-4556-594",
+          "method": "GET",
+          "path": "/api/catalog",
+          "ms": 6.142099999997299,
+          "complete": true
+        },
+        {
+          "diag": "client",
+          "utc": "2026-09-14T08:27:35.807Z",
+          "event": "start",
+          "correlation": "client-4556-594",
+          "transport": "browser",
+          "method": "GET",
+          "path": "/api/catalog",
+          "resource_type": "fetch"
+        },
+        {
+          "diag": "client",
+          "utc": "2026-09-14T08:27:44.016Z",
+          "event": "headers",
+          "correlation": "client-4556-594",
+          "ms": 8207.243900000001,
+          "status": 200
+        },
+        {
+          "diag": "client",
+          "utc": "2026-09-14T08:27:44.017Z",
+          "event": "body_end",
+          "correlation": "client-4556-594",
+          "ms": 8207.419800000003
+        }
+      ],
+      "events_truncated": false
+    }
+  ],
+  "corrected_local": {
+    "run_id": "e2e-74a8c849c2394b27a2752bd45948477f",
+    "tests": 26,
+    "passed": 26,
+    "duration_ms": 109332.207,
+    "skipped": 0,
+    "retries": 0,
+    "d2_ms": 6626,
+    "catalog_ms": 887,
+    "server_exit_codes": {
+      "backend": 0,
+      "frontend": 0
+    },
+    "ordinary_database_unchanged": true,
+    "ports_released": true
+  },
+  "root_cause_of_latency_confirmed": false
+}

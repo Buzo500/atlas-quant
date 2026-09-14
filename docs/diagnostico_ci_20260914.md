@@ -63,7 +63,39 @@ Validación local final: **26/26 E2E**, sin reintentos ni omitidos, 109,33 s;
 Backend/frontend 0/0, sin parada forzada, integridad correcta, puertos liberados
 y base habitual intacta. No se repite la suite Python/frontend local porque
 solo se modifica un test y el workflow; la CI ejecutará la regresión completa.
-La subida y el resultado remoto se consignarán después de verificarlos.
+## Primera CI de la corrección y segunda causa comprobada
+
+Código `34322e02a492608c013585d5fcee7834e0c7a3ee` subido; CI
+[34831025722](https://github.com/Buzo500/atlas-quant/actions/runs/34831025722)
+fallida. **D2 pasa en 19,0 s y registro en 2,8 s**. Python 1.194 + 91 subcasos,
+344 frontend, transporte Node, build, contratos, TypeScript y lint correctos.
+El test de precios adaptables falla; luego el harness agota sus 300 s y corta
+la suite (21 recorridos terminados correctamente, uno fallido y cuatro sin
+resultado final). No existe informe Playwright final. Smoke omitido; base
+conservada y puertos liberados, pero `forced_stop: true` para el runner E2E.
+
+La subida de artefactos funciona: ID `10342209270`, 52 archivos, 8.531.955 bytes,
+retención de un día; ZIP SHA-256
+`cbf7176a4b4e6fec68f71a85bbf3be696f53020be51436fbc9a663a69cf5c57c`.
+Descargado bajo `var/validation/ci-34831025722/`, sin incluirlo en Git.
+La traza confirma que las aserciones de cuatro resoluciones pasan: etapas
+16,220 s (3440), 5,504 s (1920), 11,430 s (1366), 3,985 s (390).
+El cambio de activo final llega sin margen. Acciones Home/focus tardan 7,937 y
+7,066 s respectivamente; no se demuestra un error de datos de las fichas.
+
+Corrección adicional: parametrizar una prueba independiente por resolución,
+conservando ambas velas, valores originales, teclado, captura, ausencia de
+desbordamiento y cambio de activo en **cada** resolución. Mantener 45 s por
+test y cero reintentos. La CI usa el parámetro ya existente `--timeout 600`
+para el conjunto: 29 recorridos y una instalación remota más lenta ya no caben
+de forma fiable en el presupuesto global local de cinco minutos. El default
+local sigue en 300 s y el job mantiene su techo de 20 minutos.
+Segunda validación local: **29/29**, sin reintentos ni omitidos, 112,88 s;
+`e2e-2526395ba74b481f93ee591fce607d30`, backend/frontend 0/0, sin parada forzada,
+base intacta y puertos liberados. Build canónico, TypeScript y lint correctos.
+Antes de la segunda CI: 601,7/2.000 minutos incluidos y 0 USD facturables;
+0/0,5 GB mostrado por GitHub. Se conserva el bloqueo de pago.
+Resultado de la segunda publicación remota: pendiente en esta tarea.
 
 Los archivos concurrentes de IA/riesgo y su documentación se conservan sin
 incluirlos. Ensayo, portátil, PR #12 y datos personales siguen aplazados.

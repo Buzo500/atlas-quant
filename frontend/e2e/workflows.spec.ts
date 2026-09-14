@@ -734,34 +734,36 @@ test('precios reales: OHLCV, agregación del rango, estilos y teclado', async ({
 
 // Keep responsive interaction separate from the aggregation workflow: each
 // checks a different behavior within the same unchanged per-test time limit.
-test('precios adaptables: fichas de ambas velas, teclado y cambio de activo', async ({
-  page,
-}, testInfo) => {
-  const dataset = await ensureDemo(page);
-  const symbol = 'DEMO_WORLD';
-  const path = `/api/datasets/${dataset.id}/prices?version=${dataset.version}&symbol=${symbol}`;
-  const source = await readApi<DatasetPricesResponse>(page, path);
-  await tab(page, 'Datos');
-  await select(page, 'Activo del gráfico', symbol);
-  const plot = page.locator('.price-chart-svg');
-  const detail = page.getByRole('region', {
-    name: 'Lectura de precios',
-    exact: true,
-  });
-  const numeric = (value: number) =>
-    new Intl.NumberFormat('es-ES', { maximumFractionDigits: 20 }).format(value);
-  const field = (name: string) =>
-    detail.locator(`[data-price-field="${name}"]`);
-  await page
-    .getByRole('slider', { name: 'Desplazar precios', exact: true })
-    .focus();
-  await page.keyboard.press('Home');
-  for (const [width, height] of [
-    [3440, 1440],
-    [1920, 1080],
-    [1366, 768],
-    [390, 844],
-  ]) {
+for (const [width, height] of [
+  [3440, 1440],
+  [1920, 1080],
+  [1366, 768],
+  [390, 844],
+]) {
+  test(`precios adaptables ${width}x${height}: fichas de ambas velas, teclado y cambio de activo`, async ({
+    page,
+  }, testInfo) => {
+    const dataset = await ensureDemo(page);
+    const symbol = 'DEMO_WORLD';
+    const path = `/api/datasets/${dataset.id}/prices?version=${dataset.version}&symbol=${symbol}`;
+    const source = await readApi<DatasetPricesResponse>(page, path);
+    await tab(page, 'Datos');
+    await select(page, 'Activo del gráfico', symbol);
+    const plot = page.locator('.price-chart-svg');
+    const detail = page.getByRole('region', {
+      name: 'Lectura de precios',
+      exact: true,
+    });
+    const numeric = (value: number) =>
+      new Intl.NumberFormat('es-ES', { maximumFractionDigits: 20 }).format(
+        value,
+      );
+    const field = (name: string) =>
+      detail.locator(`[data-price-field="${name}"]`);
+    await page
+      .getByRole('slider', { name: 'Desplazar precios', exact: true })
+      .focus();
+    await page.keyboard.press('Home');
     await test.step(`Fichas y teclado a ${width} × ${height}`, async () => {
       await page.setViewportSize({ width, height });
       await expect
@@ -799,20 +801,20 @@ test('precios adaptables: fichas de ambas velas, teclado y cambio de activo', as
       await page.mouse.move(0, 0);
       await expect(page.getByRole('tooltip')).toHaveCount(0);
     });
-  }
-  await select(page, 'Activo del gráfico', 'DEMO_BOND');
-  await expect(page.getByRole('tooltip')).toHaveCount(0);
-  const bond = await readApi<DatasetPricesResponse>(
-    page,
-    `/api/datasets/${dataset.id}/prices?version=${dataset.version}&symbol=DEMO_BOND`,
-  );
-  await plot.focus();
-  await page.keyboard.press('End');
-  await expect(field('close')).toHaveText(
-    `${numeric(bond.bars.at(-1)!.close)} EUR`,
-  );
-  expect(await readApi<DatasetPricesResponse>(page, path)).toEqual(source);
-});
+    await select(page, 'Activo del gráfico', 'DEMO_BOND');
+    await expect(page.getByRole('tooltip')).toHaveCount(0);
+    const bond = await readApi<DatasetPricesResponse>(
+      page,
+      `/api/datasets/${dataset.id}/prices?version=${dataset.version}&symbol=DEMO_BOND`,
+    );
+    await plot.focus();
+    await page.keyboard.press('End');
+    await expect(field('close')).toHaveText(
+      `${numeric(bond.bars.at(-1)!.close)} EUR`,
+    );
+    expect(await readApi<DatasetPricesResponse>(page, path)).toEqual(source);
+  });
+}
 
 test('curva estrecha: la primera lectura sobrevive al ajuste de altura', async ({
   page,

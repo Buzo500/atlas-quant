@@ -62,7 +62,9 @@ jobs:
         run: node frontend/node_modules/@playwright/test/cli.js install chromium
       - name: Recorridos de navegador con interfaz compilada y base aislada
         id: e2e
-        run: ./.venv/Scripts/python.exe tools/diagnostics/run_api_diagnostic.py
+        # The full suite outgrew the local 300 s default on Windows runners.
+        # Keep each test at 45 s and retries at zero; bound the whole suite at 10 min.
+        run: ./.venv/Scripts/python.exe tools/diagnostics/run_api_diagnostic.py --timeout 600
       - name: Conservar evidencia del fallo E2E aislado
         if: ${{ failure() && steps.e2e.outcome == 'failure' }}
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
