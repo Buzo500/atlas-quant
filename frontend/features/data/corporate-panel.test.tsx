@@ -116,7 +116,7 @@ it('edición invalida la previsualización de eventos y conserva disponibilidad 
       name: 'Cotizaciones del evento · destino 1',
     }),
   );
-  await user.click(screen.getByRole('option', { name: /Activo/ }));
+  await user.click(await screen.findByRole('option', { name: /Activo/ }));
   await user.click(
     screen.getByRole('button', { name: 'Previsualizar eventos' }),
   );

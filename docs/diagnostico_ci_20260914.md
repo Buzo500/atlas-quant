@@ -80,7 +80,9 @@ retención de un día; ZIP SHA-256
 Descargado bajo `var/validation/ci-34831025722/`, sin incluirlo en Git.
 La traza confirma que las aserciones de cuatro resoluciones pasan: etapas
 16,220 s (3440), 5,504 s (1920), 11,430 s (1366), 3,985 s (390).
-El cambio de activo final llega sin margen. Acciones Home/focus tardan 7,937 y
+El cambio de activo y la aserción de su cierre también pasan: el timeout se
+registra en la lectura final de la fuente original (línea 814 del test anterior),
+que comprueba que no se han cambiado sus datos. Acciones Home/focus tardan 7,937 y
 7,066 s respectivamente; no se demuestra un error de datos de las fichas.
 
 Corrección adicional: parametrizar una prueba independiente por resolución,
@@ -95,7 +97,19 @@ Segunda validación local: **29/29**, sin reintentos ni omitidos, 112,88 s;
 base intacta y puertos liberados. Build canónico, TypeScript y lint correctos.
 Antes de la segunda CI: 601,7/2.000 minutos incluidos y 0 USD facturables;
 0/0,5 GB mostrado por GitHub. Se conserva el bloqueo de pago.
-Resultado de la segunda publicación remota: pendiente en esta tarea.
+Segunda publicación: `371020e42187452a7eabf2bbffd33130169473f8`, CI
+[34832891702](https://github.com/Buzo500/atlas-quant/actions/runs/34832891702)
+fallida antes de E2E. Pasan 343/344 frontend: `corporate-panel.test.tsx:119`
+consulta síncronamente la opción `Activo` después de abrir el selector y no
+la encuentra. No es un fallo de los gráficos ni acredita su validación remota.
+Se sustituye esa consulta por `findByRole`, que espera la aparición accesible
+con el límite habitual de Testing Library, sin reintentar el clic ni cambiar
+la lógica del formulario o sus aserciones de previsualización/invalidación.
+La suite frontend completa local pasa: **344/344**, 42 archivos, 34,16 s.
+Build canónico, TypeScript y lint correctos. Los E2E no se repiten localmente
+tras este cambio exclusivo del test de componente: los 29/29 anteriores siguen
+siendo la validación del mismo código de aplicación y recorridos de navegador.
+Tercera publicación: pendiente en esta tarea.
 
 Los archivos concurrentes de IA/riesgo y su documentación se conservan sin
 incluirlos. Ensayo, portátil, PR #12 y datos personales siguen aplazados.

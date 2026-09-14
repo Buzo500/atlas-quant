@@ -342,5 +342,71 @@
     "ordinary_database_unchanged": true,
     "ports_released": true
   },
-  "root_cause_of_latency_confirmed": false
+  "root_cause_of_latency_confirmed": false,
+  "second_run": {
+    "run_id": 34831025722,
+    "commit": "34322e02a492608c013585d5fcee7834e0c7a3ee",
+    "d2_passed": true,
+    "catalog_passed": true,
+    "global_harness_seconds": 300,
+    "forced_stop": true,
+    "artifact_id": 10342209270,
+    "artifact_sha256": "cbf7176a4b4e6fec68f71a85bbf3be696f53020be51436fbc9a663a69cf5c57c",
+    "trace_errors": [
+      {
+        "type": "error",
+        "message": "\u001b[31mTest timeout of 45000ms exceeded.\u001b[39m",
+        "stack": []
+      },
+      {
+        "type": "error",
+        "message": "Error: apiRequestContext.get: Test timeout of 45000ms exceeded.",
+        "stack": [
+          {
+            "file": "D:\\a\\atlas-quant\\atlas-quant\\frontend\\e2e\\fixtures.ts",
+            "line": 121,
+            "column": 41,
+            "function": "readApi"
+          },
+          {
+            "file": "D:\\a\\atlas-quant\\atlas-quant\\frontend\\e2e\\workflows.spec.ts",
+            "line": 814,
+            "column": 16
+          }
+        ]
+      }
+    ],
+    "completed_viewports": [
+      {
+        "title": "Fichas y teclado a 3440 × 1440",
+        "duration_ms": 16220.08
+      },
+      {
+        "title": "Fichas y teclado a 1920 × 1080",
+        "duration_ms": 5503.631
+      },
+      {
+        "title": "Fichas y teclado a 1366 × 768",
+        "duration_ms": 11429.823
+      },
+      {
+        "title": "Fichas y teclado a 390 × 844",
+        "duration_ms": 3985.179
+      }
+    ]
+  },
+  "final_local": {
+    "run_id": "e2e-2526395ba74b481f93ee591fce607d30",
+    "passed": 29,
+    "duration_ms": 112877.81,
+    "skipped": 0,
+    "retries": 0,
+    "forced_stop": false,
+    "server_exit_codes": {
+      "backend": 0,
+      "frontend": 0
+    },
+    "ordinary_database_unchanged": true,
+    "ports_released": true
+  }
 }
